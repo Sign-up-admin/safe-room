@@ -110,8 +110,9 @@ class ConfigControllerTest extends AbstractControllerIntegrationTest {
 
     private ConfigEntity persistConfig(String name, String value) {
         ConfigEntity config = createTestConfig(name, value);
-        // 确保ID为null
-        config.setId(null);
+        // 使用固定的测试ID范围，避免与预设数据（ID 1-3）冲突
+        long testId = 1000 + System.nanoTime() % 9000; // ID范围：1000-9999
+        config.setId(testId);
         configService.save(config);
         return config;
     }

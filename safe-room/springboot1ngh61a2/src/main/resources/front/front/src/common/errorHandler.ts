@@ -1,3 +1,5 @@
+import http from './http'
+
 /**
  * 全局错误处理工具
  * 捕获所有前端运行时错误，包括：
@@ -129,12 +131,11 @@ export function __setErrorReporterHttpClient(client: HttpClient | null) {
 /**
  * 获取用于上报的 HTTP 客户端
  */
-async function getHttpClient(): Promise<HttpClient> {
+function getHttpClient(): HttpClient {
   if (customHttpClient) {
     return customHttpClient
   }
-  const module = await import('./http')
-  return module.default
+  return http
 }
 
 /**

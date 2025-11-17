@@ -3,7 +3,7 @@ import { mount, VueWrapper } from '@vue/test-utils'
 import { createPinia, setActivePinia, Pinia } from 'pinia'
 import { createRouter, createMemoryHistory, Router } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import IndexHeader from '@/components/index/IndexHeader.vue'
+import IndexHeader from '../../../../src/components/index/IndexHeader.vue'
 import type { User, FitnessCoach } from '@/types/api'
 import { useTagsViewStore } from '@/stores/tagsView'
 

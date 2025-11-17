@@ -1,6 +1,6 @@
 /**
  * 组件注册测试
- * 测试Vue组件的全局和局部注册功能
+ * 测试Vue组件的全局和局部注册功�?
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll } from 'vitest'

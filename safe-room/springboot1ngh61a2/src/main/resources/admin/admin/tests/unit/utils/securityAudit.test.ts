@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest'
-import { securityAuditor, SecurityEventType } from '@/utils/securityAudit'
+import { securityAuditor, SecurityEventType } from '../../../src/utils/securityAudit'
 
 describe('安全审计工具', () => {
   beforeAll(() => {
@@ -28,7 +28,7 @@ describe('安全审计工具', () => {
   })
 
   beforeEach(() => {
-    // 清除所有事件
+    // 清除所有事�?
     securityAuditor.clearEvents()
     // 清除sessionStorage
     if (global.sessionStorage) {
@@ -52,7 +52,7 @@ describe('安全审计工具', () => {
       expect(events[0].details.username).toBe('test')
     })
 
-    it('事件应该包含时间戳', () => {
+    it('事件应该包含时间�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       const events = securityAuditor.getEvents()
       expect(events[0].timestamp).toBeTruthy()
@@ -66,26 +66,26 @@ describe('安全审计工具', () => {
       expect(events[0].url).toBeTruthy()
     })
 
-    it('应该限制事件数量为100条', () => {
+    it('应该限制事件数量�?00�?, () => {
       for (let i = 0; i < 150; i++) {
         securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT, { index: i })
       }
       const events = securityAuditor.getEvents()
       expect(events.length).toBe(100)
-      // 应该保留最新的100条
+      // 应该保留最新的100�?
       expect(events[0].details.index).toBe(50)
     })
   })
 
   describe('getEvents', () => {
-    it('应该返回所有事件', () => {
+    it('应该返回所有事�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       securityAuditor.logEvent(SecurityEventType.LOGIN_SUCCESS)
       const events = securityAuditor.getEvents()
       expect(events.length).toBe(2)
     })
 
-    it('应该返回事件的副本，而不是引用', () => {
+    it('应该返回事件的副本，而不是引�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       const events1 = securityAuditor.getEvents()
       const events2 = securityAuditor.getEvents()
@@ -94,7 +94,7 @@ describe('安全审计工具', () => {
   })
 
   describe('getEventsByType', () => {
-    it('应该返回指定类型的事件', () => {
+    it('应该返回指定类型的事�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       securityAuditor.logEvent(SecurityEventType.LOGIN_SUCCESS)
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
@@ -104,7 +104,7 @@ describe('安全审计工具', () => {
       expect(loginAttempts.every(e => e.type === SecurityEventType.LOGIN_ATTEMPT)).toBe(true)
     })
 
-    it('如果没有匹配的事件，应该返回空数组', () => {
+    it('如果没有匹配的事件，应该返回空数�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       const events = securityAuditor.getEventsByType(SecurityEventType.XSS_ATTEMPT)
       expect(events.length).toBe(0)
@@ -123,7 +123,7 @@ describe('安全审计工具', () => {
       expect(recent[9].details.index).toBe(5)
     })
 
-    it('如果事件数量少于请求数量，应该返回所有事件', () => {
+    it('如果事件数量少于请求数量，应该返回所有事�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       securityAuditor.logEvent(SecurityEventType.LOGIN_SUCCESS)
       const recent = securityAuditor.getRecentEvents(10)
@@ -132,7 +132,7 @@ describe('安全审计工具', () => {
   })
 
   describe('clearEvents', () => {
-    it('应该清除所有事件', () => {
+    it('应该清除所有事�?, () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_ATTEMPT)
       securityAuditor.logEvent(SecurityEventType.LOGIN_SUCCESS)
       securityAuditor.clearEvents()
@@ -156,7 +156,7 @@ describe('安全审计工具', () => {
       expect(analysis.eventCounts[SecurityEventType.XSS_ATTEMPT]).toBe(1)
     })
 
-    it('应该检测可疑活动', () => {
+    it('应该检测可疑活�?, () => {
       securityAuditor.logEvent(SecurityEventType.XSS_ATTEMPT)
       const analysis = securityAuditor.analyze()
       expect(analysis.hasSuspiciousActivity).toBe(true)
@@ -173,7 +173,7 @@ describe('安全审计工具', () => {
       vi.useFakeTimers()
       const now = Date.now()
       
-      // 记录一些失败登录
+      // 记录一些失败登�?
       securityAuditor.logEvent(SecurityEventType.LOGIN_FAILURE)
       vi.advanceTimersByTime(1000)
       securityAuditor.logEvent(SecurityEventType.LOGIN_FAILURE)
@@ -183,7 +183,7 @@ describe('安全审计工具', () => {
       securityAuditor.logEvent(SecurityEventType.LOGIN_FAILURE)
       
       const analysis = securityAuditor.analyze()
-      // 只有最近的失败登录（15分钟内）会被统计
+      // 只有最近的失败登录�?5分钟内）会被统计
       expect(analysis.recentFailures).toBeGreaterThanOrEqual(1)
       
       vi.useRealTimers()

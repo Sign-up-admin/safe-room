@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
-import AssetsList from '@/views/modules/assets/list.vue'
+import AssetsList from '../../../../src/views/modules/assets/list.vue'
 import http from '@/utils/http'
 import { ElMessage } from 'element-plus'
 import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
@@ -338,7 +338,7 @@ describe('AssetsList', () => {
 
       // Should show confirmation dialog
       expect(mockElMessageBox.confirm).toHaveBeenCalledWith(
-        '确定删除选中的 2 个素材？该操作不可恢复。',
+        '确定删除选中�?2 个素材？该操作不可恢复�?,
         '批量删除',
         expect.any(Object)
       )
@@ -436,7 +436,7 @@ describe('AssetsList', () => {
       })
 
       // Should show success message
-      expect(mockElMessage.success).toHaveBeenCalledWith('已批量启用')
+      expect(mockElMessage.success).toHaveBeenCalledWith('已批量启�?)
 
       // Should refresh data
       expect(vm.crudRef).toBeDefined()
@@ -465,7 +465,7 @@ describe('AssetsList', () => {
       vm.handleBatchStatus([], 'active')
 
       // Should show warning
-      expect(mockElMessage.warning).toHaveBeenCalledWith('请至少选择一条素材')
+      expect(mockElMessage.warning).toHaveBeenCalledWith('请至少选择一条素�?)
     })
 
     it('should export selected assets', async () => {
@@ -547,7 +547,7 @@ describe('AssetsList', () => {
       vm.handleSave(formModel, () => {})
 
       // Should show warning message for missing asset name
-      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名称')
+      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名�?)
 
       // Should not proceed with API call
       expect(mockHttp.post).not.toHaveBeenCalled()
@@ -576,7 +576,7 @@ describe('AssetsList', () => {
       vm.handleSave(formModel, () => {})
 
       // Should show warning message for missing file
-      expect(mockElMessage.warning).toHaveBeenCalledWith('请上传素材文件')
+      expect(mockElMessage.warning).toHaveBeenCalledWith('请上传素材文�?)
 
       // Should not proceed with API call
       expect(mockHttp.post).not.toHaveBeenCalled()
@@ -643,7 +643,7 @@ describe('AssetsList', () => {
       vm.handleSave(formModel, () => {})
 
       // Should show warning message for missing asset name first
-      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名称')
+      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名�?)
 
       // Should not proceed with API call
       expect(mockHttp.post).not.toHaveBeenCalled()
@@ -672,7 +672,7 @@ describe('AssetsList', () => {
       vm.handleSave(formModel, () => {})
 
       // Should show warning for asset name first (checked before file)
-      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名称')
+      expect(mockElMessage.warning).toHaveBeenCalledWith('请输入素材名�?)
       expect(mockElMessage.warning).toHaveBeenCalledTimes(1)
 
       // Should not proceed with API call

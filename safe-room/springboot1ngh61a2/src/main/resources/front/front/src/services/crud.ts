@@ -43,7 +43,7 @@ class CrudService<TRecord = Record<string, unknown>> {
   }
 
   save(payload: Partial<TRecord>): Promise<ApiResponse> {
-    if ((payload as any).id != null) {
+    if ('id' in payload && payload.id != null) {
       return this.update(payload)
     } else {
       return this.create(payload)

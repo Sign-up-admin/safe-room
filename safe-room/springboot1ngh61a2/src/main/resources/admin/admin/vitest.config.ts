@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'node:path'
-import { fileURLToPath, URL } from 'node:url'
+import { resolve, join } from 'node:path'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   plugins: [
@@ -14,18 +14,20 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@/utils': fileURLToPath(new URL('./src/utils', import.meta.url)),
-      '@/constants': fileURLToPath(new URL('./src/constants', import.meta.url)),
-      '@/stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
-      '@/components': fileURLToPath(new URL('./src/components', import.meta.url)),
-      '@/views': fileURLToPath(new URL('./src/views', import.meta.url)),
-      '@/types': fileURLToPath(new URL('./src/types', import.meta.url)),
-      '@/assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
-      '~': fileURLToPath(new URL('./src', import.meta.url)),
-      '#': fileURLToPath(new URL('./src/types', import.meta.url)),
-    },
+    alias: [
+      { find: '@', replacement: resolve(__dirname, 'src') },
+      { find: '@/utils', replacement: resolve(__dirname, 'src/utils') },
+      { find: '@/components', replacement: resolve(__dirname, 'src/components') },
+      { find: '@/stores', replacement: resolve(__dirname, 'src/stores') },
+      { find: '@/views', replacement: resolve(__dirname, 'src/views') },
+      { find: '@/types', replacement: resolve(__dirname, 'src/types') },
+      { find: '@/constants', replacement: resolve(__dirname, 'src/constants') },
+      { find: '@/assets', replacement: resolve(__dirname, 'src/assets') },
+    ],
+  },
+  // Add TypeScript path mapping for tests
+  esbuild: {
+    // Ensure ES modules work correctly
   },
   test: {
     globals: true,
@@ -74,7 +76,9 @@ export default defineConfig({
           'js-md5',
           'echarts-wordcloud',
           'quill',
-          '@amap/amap-jsapi-loader'
+          '@amap/amap-jsapi-loader',
+          // Ensure path aliases work in tests
+          'path'
         ]
       }
     },

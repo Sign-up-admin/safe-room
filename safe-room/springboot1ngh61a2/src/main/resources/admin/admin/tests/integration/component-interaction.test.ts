@@ -3,11 +3,11 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import { ElMessage } from 'element-plus'
-import IndexHeader from '@/components/index/IndexHeader.vue'
-import IndexMain from '@/components/index/IndexMain.vue'
-import storage from '@/utils/storage'
-import http from '@/utils/http'
-import { useTagsViewStore } from '@/stores/tagsView'
+import IndexHeader from '../../src/components/index/IndexHeader.vue'
+import IndexMain from '../../src/components/index/IndexMain.vue'
+import storage from '../../src/utils/storage'
+import http from '../../src/utils/http'
+import { useTagsViewStore } from '../../src/stores/tagsView'
 
 // Mock Element Plus
 vi.mock('element-plus', () => ({

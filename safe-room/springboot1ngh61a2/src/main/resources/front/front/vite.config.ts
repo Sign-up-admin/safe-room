@@ -74,6 +74,54 @@ export default defineConfig({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        manualChunks: (id) => {
+          // Vue生态系统
+          if (id.includes('node_modules/vue') ||
+              id.includes('node_modules/vue-router') ||
+              id.includes('node_modules/pinia') ||
+              id.includes('node_modules/@vue')) {
+            return 'vue-vendor';
+          }
+
+          // Element Plus
+          if (id.includes('node_modules/element-plus') ||
+              id.includes('node_modules/@element-plus')) {
+            return 'element-plus';
+          }
+
+          // 工具库
+          if (id.includes('node_modules/lodash') ||
+              id.includes('node_modules/dayjs') ||
+              id.includes('node_modules/axios') ||
+              id.includes('node_modules/qs')) {
+            return 'utils';
+          }
+
+          // 大页面组件拆分
+          if (id.includes('src/pages/booking') ||
+              id.includes('src/pages/list') ||
+              id.includes('src/components/booking')) {
+            return 'booking';
+          }
+
+          if (id.includes('src/pages/membership') ||
+              id.includes('src/components/membership')) {
+            return 'membership';
+          }
+
+          if (id.includes('src/pages/chat') ||
+              id.includes('src/components/discussion')) {
+            return 'chat';
+          }
+
+          // 其他第三方库
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+
+          // 业务代码保持在主chunk中
+          return 'main';
+        },
       },
     },
   },

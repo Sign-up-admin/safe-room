@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { encryptDes, decryptDes, encryptAes, decryptAes } from '@/utils/des'
+import { encryptDes, decryptDes, encryptAes, decryptAes } from '../../../src/utils/des'
 
 describe('DES/AES加密工具', () => {
   describe('DES加密解密', () => {
-    it('应该能够加密字符串', () => {
+    it('应该能够加密字符�?, () => {
       const message = 'test message'
       const encrypted = encryptDes(message)
       expect(encrypted).toBeTruthy()
@@ -11,7 +11,7 @@ describe('DES/AES加密工具', () => {
       expect(typeof encrypted).toBe('string')
     })
 
-    it('应该能够正确解密加密后的字符串', () => {
+    it('应该能够正确解密加密后的字符�?, () => {
       const message = 'test message 123'
       const encrypted = encryptDes(message)
       const decrypted = decryptDes(encrypted)
@@ -48,7 +48,7 @@ describe('DES/AES加密工具', () => {
   })
 
   describe('AES加密解密', () => {
-    it('应该能够加密字符串', () => {
+    it('应该能够加密字符�?, () => {
       const message = 'test message'
       const encrypted = encryptAes(message)
       expect(encrypted).toBeTruthy()
@@ -56,7 +56,7 @@ describe('DES/AES加密工具', () => {
       expect(typeof encrypted).toBe('string')
     })
 
-    it('应该能够正确解密加密后的字符串', () => {
+    it('应该能够正确解密加密后的字符�?, () => {
       const message = 'test message 123'
       const encrypted = encryptAes(message)
       const decrypted = decryptAes(encrypted)

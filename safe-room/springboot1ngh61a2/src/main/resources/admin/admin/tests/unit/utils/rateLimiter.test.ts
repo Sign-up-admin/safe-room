@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { rateLimiter } from '@/utils/rateLimiter'
+import { rateLimiter } from '../../../src/utils/rateLimiter'
 
 describe('速率限制工具', () => {
   beforeEach(() => {
-    // 清除所有限制记录
+    // 清除所有限制记�?
     rateLimiter.clearAll()
   })
 
@@ -19,23 +19,23 @@ describe('速率限制工具', () => {
       }
     })
 
-    it('超过限制次数应该被限制', () => {
+    it('超过限制次数应该被限�?, () => {
       const key = 'test_key'
-      // 前5次不应该被限制
+      // �?次不应该被限�?
       for (let i = 0; i < 5; i++) {
         rateLimiter.isRateLimited(key)
       }
-      // 第6次应该被限制
+      // �?次应该被限制
       expect(rateLimiter.isRateLimited(key)).toBe(true)
     })
 
-    it('应该支持自定义最大尝试次数', () => {
+    it('应该支持自定义最大尝试次�?, () => {
       const key = 'test_key_custom'
       // 设置最大尝试次数为3
       for (let i = 0; i < 3; i++) {
         expect(rateLimiter.isRateLimited(key, 3)).toBe(false)
       }
-      // 第4次应该被限制
+      // �?次应该被限制
       expect(rateLimiter.isRateLimited(key, 3)).toBe(true)
     })
 
@@ -43,7 +43,7 @@ describe('速率限制工具', () => {
       const key1 = 'key1'
       const key2 = 'key2'
       
-      // key1请求5次
+      // key1请求5�?
       for (let i = 0; i < 5; i++) {
         rateLimiter.isRateLimited(key1)
       }
@@ -52,22 +52,22 @@ describe('速率限制工具', () => {
       expect(rateLimiter.isRateLimited(key2)).toBe(false)
     })
 
-    it('超过时间窗口后应该重置计数', () => {
+    it('超过时间窗口后应该重置计�?, () => {
       const key = 'test_key_time'
       vi.useFakeTimers()
       
-      // 请求5次
+      // 请求5�?
       for (let i = 0; i < 5; i++) {
-        rateLimiter.isRateLimited(key, 5, 1000) // 1秒窗口
+        rateLimiter.isRateLimited(key, 5, 1000) // 1秒窗�?
       }
       
-      // 应该被限制
+      // 应该被限�?
       expect(rateLimiter.isRateLimited(key, 5, 1000)).toBe(true)
       
-      // 快进1秒
+      // 快进1�?
       vi.advanceTimersByTime(1001)
       
-      // 应该重置，不被限制
+      // 应该重置，不被限�?
       expect(rateLimiter.isRateLimited(key, 5, 1000)).toBe(false)
       
       vi.useRealTimers()
@@ -75,20 +75,20 @@ describe('速率限制工具', () => {
   })
 
   describe('getRemainingAttempts', () => {
-    it('如果没有记录，应该返回最大尝试次数', () => {
+    it('如果没有记录，应该返回最大尝试次�?, () => {
       expect(rateLimiter.getRemainingAttempts('new_key')).toBe(5)
     })
 
     it('应该正确计算剩余尝试次数', () => {
       const key = 'test_key'
-      rateLimiter.isRateLimited(key) // 1次
+      rateLimiter.isRateLimited(key) // 1�?
       expect(rateLimiter.getRemainingAttempts(key)).toBe(4)
       
-      rateLimiter.isRateLimited(key) // 2次
+      rateLimiter.isRateLimited(key) // 2�?
       expect(rateLimiter.getRemainingAttempts(key)).toBe(3)
     })
 
-    it('如果超过限制，应该返回0', () => {
+    it('如果超过限制，应该返�?', () => {
       const key = 'test_key'
       for (let i = 0; i < 5; i++) {
         rateLimiter.isRateLimited(key)
@@ -96,7 +96,7 @@ describe('速率限制工具', () => {
       expect(rateLimiter.getRemainingAttempts(key)).toBe(0)
     })
 
-    it('应该支持自定义最大尝试次数', () => {
+    it('应该支持自定义最大尝试次�?, () => {
       const key = 'test_key_custom'
       rateLimiter.isRateLimited(key, 10)
       expect(rateLimiter.getRemainingAttempts(key, 10)).toBe(9)
@@ -108,7 +108,7 @@ describe('速率限制工具', () => {
       expect(rateLimiter.getResetTime('new_key')).toBeNull()
     })
 
-    it('应该返回重置时间戳', () => {
+    it('应该返回重置时间�?, () => {
       const key = 'test_key'
       rateLimiter.isRateLimited(key)
       const resetTime = rateLimiter.getResetTime(key)
@@ -134,7 +134,7 @@ describe('速率限制工具', () => {
   })
 
   describe('clear', () => {
-    it('应该清除指定key的限制记录', () => {
+    it('应该清除指定key的限制记�?, () => {
       const key = 'test_key'
       rateLimiter.isRateLimited(key)
       rateLimiter.clear(key)
@@ -143,7 +143,7 @@ describe('速率限制工具', () => {
   })
 
   describe('clearAll', () => {
-    it('应该清除所有限制记录', () => {
+    it('应该清除所有限制记�?, () => {
       rateLimiter.isRateLimited('key1')
       rateLimiter.isRateLimited('key2')
       rateLimiter.clearAll()
@@ -153,24 +153,24 @@ describe('速率限制工具', () => {
   })
 
   describe('cleanup', () => {
-    it('应该清理过期的记录', () => {
+    it('应该清理过期的记�?, () => {
       vi.useFakeTimers()
       
       const key1 = 'key1'
       const key2 = 'key2'
       
-      // key1: 1秒窗口
+      // key1: 1秒窗�?
       rateLimiter.isRateLimited(key1, 5, 1000)
-      // key2: 10秒窗口
+      // key2: 10秒窗�?
       rateLimiter.isRateLimited(key2, 5, 10000)
       
-      // 快进2秒
+      // 快进2�?
       vi.advanceTimersByTime(2000)
       
       // 清理过期记录
       rateLimiter.cleanup()
       
-      // key1应该被清理
+      // key1应该被清�?
       expect(rateLimiter.getResetTime(key1)).toBeNull()
       // key2应该还在
       expect(rateLimiter.getResetTime(key2)).toBeTruthy()

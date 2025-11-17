@@ -5,7 +5,7 @@ vi.mock('@/constants/menu', () => ({
   getMenuList: vi.fn(),
 }))
 
-import menu from '@/utils/menu'
+import menu from '../../../src/utils/menu'
 import { getMenuList } from '@/constants/menu'
 
 describe('Menu工具', () => {
@@ -40,7 +40,7 @@ describe('Menu工具', () => {
       expect(vi.mocked(getMenuList)).toHaveBeenCalled()
     })
 
-    it('应该返回正确的菜单结构', () => {
+    it('应该返回正确的菜单结�?, () => {
       const result = menu.list()
       expect(result[0]).toHaveProperty('roleName')
       expect(result[0]).toHaveProperty('backMenu')

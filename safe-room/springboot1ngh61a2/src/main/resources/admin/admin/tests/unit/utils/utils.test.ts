@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { isAuth, getCurDateTime, getCurDate } from '@/utils/utils'
-import storage from '@/utils/storage'
-import menu from '@/utils/menu'
+import { isAuth, getCurDateTime, getCurDate } from '../../../src/utils/utils'
+import storage from '../../../src/utils/storage'
+import menu from '../../../src/utils/menu'
 
 // Mock dependencies
 vi.mock('@/utils/storage', () => ({
@@ -70,7 +70,7 @@ describe('Utils工具', () => {
   })
 
   describe('getCurDateTime', () => {
-    it('应该返回格式化的日期时间字符串', () => {
+    it('应该返回格式化的日期时间字符�?, () => {
       const result = getCurDateTime()
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2} \d{1,2}:\d{1,2}:\d{1,2}$/)
     })
@@ -84,7 +84,7 @@ describe('Utils工具', () => {
       expect(result).toContain(`${year}-${month}-${day}`)
     })
 
-    it('月份和日期应该是两位数', () => {
+    it('月份和日期应该是两位�?, () => {
       const result = getCurDateTime()
       const parts = result.split(' ')
       const datePart = parts[0]
@@ -95,7 +95,7 @@ describe('Utils工具', () => {
   })
 
   describe('getCurDate', () => {
-    it('应该返回格式化的日期字符串', () => {
+    it('应该返回格式化的日期字符�?, () => {
       const result = getCurDate()
       expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/)
     })
@@ -109,14 +109,14 @@ describe('Utils工具', () => {
       expect(result).toBe(`${year}-${month}-${day}`)
     })
 
-    it('月份和日期应该是两位数', () => {
+    it('月份和日期应该是两位�?, () => {
       const result = getCurDate()
       const [year, month, day] = result.split('-')
       expect(month.length).toBe(2)
       expect(day.length).toBe(2)
     })
 
-    it('不应该包含时间部分', () => {
+    it('不应该包含时间部�?, () => {
       const result = getCurDate()
       expect(result).not.toContain(':')
       expect(result.split(' ').length).toBe(1)

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
-import NewsList from '@/views/modules/news/list.vue'
+import NewsList from '../../../../src/views/modules/news/list.vue'
 import http from '@/utils/http'
 import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
 

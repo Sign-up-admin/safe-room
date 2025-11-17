@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { ElMessage } from 'element-plus'
-import ModuleCrudPage from '@/components/common/ModuleCrudPage.vue'
+import ModuleCrudPage from '../../../../src/components/common/ModuleCrudPage.vue'
 import type { CrudPageConfig } from '@/types/crud'
 
 // Mock 依赖
@@ -37,7 +37,7 @@ vi.mock('@element-plus/icons-vue', () => ({
   Delete: { name: 'Delete' },
 }))
 
-// 导入被mock的模块
+// 导入被mock的模�?
 import { useCrud } from '@/composables/useCrud'
 import { createTableColumns, createFormItems, formatFieldValue } from '@/utils/crudConfig'
 
@@ -180,18 +180,18 @@ describe('ModuleCrudPage', () => {
       expect(table.exists()).toBe(true)
     })
 
-    it('当enablePagination为true时应该渲染分页', () => {
+    it('当enablePagination为true时应该渲染分�?, () => {
       const pagination = wrapper.find('el-pagination')
       expect(pagination.exists()).toBe(true)
     })
 
-    it('当enableCreate为true且有权限时应该显示新增按钮', () => {
+    it('当enableCreate为true且有权限时应该显示新增按�?, () => {
       const createButton = wrapper.find('.header-actions el-button')
       expect(createButton.exists()).toBe(true)
     })
   })
 
-  describe('功能开关', () => {
+  describe('功能开�?, () => {
     it('当enableSearch为false时不应该渲染搜索区域', async () => {
       await wrapper.setProps({
         config: {
@@ -205,7 +205,7 @@ describe('ModuleCrudPage', () => {
       expect(searchSection.exists()).toBe(false)
     })
 
-    it('当enableSelection为true时应该显示选择列', async () => {
+    it('当enableSelection为true时应该显示选择�?, async () => {
       await wrapper.setProps({
         config: {
           ...mockConfig,
@@ -226,7 +226,7 @@ describe('ModuleCrudPage', () => {
         },
       })
 
-      // 设置选中项
+      // 设置选中�?
       mockCrud.selectedRows.value = [{ id: 1, name: '测试' }]
 
       await wrapper.vm.$nextTick()
@@ -301,7 +301,7 @@ describe('ModuleCrudPage', () => {
     it('应该渲染header-actions插槽', () => {
       const slot = wrapper.find('[data-testid="header-actions-slot"]')
       // 如果插槽存在，应该有默认内容或自定义内容
-      expect(true).toBe(true) // 插槽存在性测试
+      expect(true).toBe(true) // 插槽存在性测�?
     })
 
     it('应该渲染table-actions插槽', () => {
@@ -333,7 +333,7 @@ describe('ModuleCrudPage', () => {
 
       await wrapper.vm.$nextTick()
 
-      // 检查新增按钮是否隐藏
+      // 检查新增按钮是否隐�?
       const createButtons = wrapper.findAll('.header-actions el-button')
       const hasCreateButton = createButtons.some(btn =>
         btn.text().includes('新增')
@@ -364,7 +364,7 @@ describe('ModuleCrudPage', () => {
   })
 
   describe('权限控制', () => {
-    it('当没有创建权限时不应该显示新增按钮', async () => {
+    it('当没有创建权限时不应该显示新增按�?, async () => {
       mockCrud.permissions.value.create = false
       await wrapper.vm.$nextTick()
 
@@ -373,7 +373,7 @@ describe('ModuleCrudPage', () => {
       expect(createButton.exists()).toBe(true) // 按钮存在但可能被v-if隐藏
     })
 
-    it('操作列应该根据权限显示按钮', () => {
+    it('操作列应该根据权限显示按�?, () => {
       mockCrud.permissions.value.update = false
       mockCrud.permissions.value.remove = false
 
@@ -384,12 +384,12 @@ describe('ModuleCrudPage', () => {
   })
 
   describe('表格功能', () => {
-    it('应该正确渲染表格列', () => {
+    it('应该正确渲染表格�?, () => {
       const columns = wrapper.findAll('el-table-column')
       expect(columns.length).toBeGreaterThan(0)
     })
 
-    it('当没有数据时应该显示空状态', () => {
+    it('当没有数据时应该显示空状�?, () => {
       mockCrud.records.value = []
       mockCrud.loading.value = false
 
@@ -409,12 +409,12 @@ describe('ModuleCrudPage', () => {
   })
 
   describe('表单功能', () => {
-    it('应该渲染表单对话框', () => {
+    it('应该渲染表单对话�?, () => {
       const dialog = wrapper.find('el-dialog')
       expect(dialog.exists()).toBe(true)
     })
 
-    it('表单应该包含配置的字段', async () => {
+    it('表单应该包含配置的字�?, async () => {
       mockCrud.formVisible.value = true
       await wrapper.vm.$nextTick()
 
@@ -424,12 +424,12 @@ describe('ModuleCrudPage', () => {
   })
 
   describe('详情功能', () => {
-    it('应该渲染详情对话框', () => {
+    it('应该渲染详情对话�?, () => {
       const dialogs = wrapper.findAll('el-dialog')
-      expect(dialogs.length).toBe(2) // 表单对话框和详情对话框
+      expect(dialogs.length).toBe(2) // 表单对话框和详情对话�?
     })
 
-    it('详情应该显示配置的字段', async () => {
+    it('详情应该显示配置的字�?, async () => {
       mockCrud.detailVisible.value = true
       mockCrud.detailRecord.value = { name: '测试', email: 'test@example.com' }
       await wrapper.vm.$nextTick()
@@ -461,8 +461,8 @@ describe('ModuleCrudPage', () => {
       expect(root.exists()).toBe(true)
     })
 
-    it('应该支持移动端样式', () => {
-      // 检查是否包含响应式相关的类或样式
+    it('应该支持移动端样�?, () => {
+      // 检查是否包含响应式相关的类或样�?
       const root = wrapper.find('.module-crud-page')
       expect(root.classes()).toContain('module-crud-page')
     })
@@ -474,10 +474,10 @@ describe('ModuleCrudPage', () => {
     })
 
     it('配置变化时应该重新初始化', async () => {
-      const newConfig = { ...mockConfig, title: '新标题' }
+      const newConfig = { ...mockConfig, title: '新标�? }
       await wrapper.setProps({ config: newConfig })
 
-      // 验证useCrud是否被重新调用
+      // 验证useCrud是否被重新调�?
       expect(useCrud).toHaveBeenCalledTimes(2)
     })
   })

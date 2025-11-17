@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { sanitizeHtml, escapeHtml } from '@/utils/security'
+import { sanitizeHtml, escapeHtml } from '../../../src/utils/security'
 
 // Mock DOMPurify
 vi.mock('dompurify', () => ({

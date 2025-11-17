@@ -298,7 +298,7 @@ describe('Props Parsing Tests', () => {
         })
       }).not.toThrow()
 
-      // Vue 3中，props类型转换在生产模式下不会抛出错误，只会尝试转换
+      // Vue 3中，props类型转换在生产模式下不会抛出错误，只会尝试转�?
       expect(() => {
         const wrapper = mount({
           template: '<ChildComponent :flag="\'true\'" />',
@@ -308,7 +308,7 @@ describe('Props Parsing Tests', () => {
             plugins: [router, pinia]
           }
         })
-        // 验证组件仍然可以渲染（尽管类型不匹配）
+        // 验证组件仍然可以渲染（尽管类型不匹配�?
         expect(wrapper.exists()).toBe(true)
       }).not.toThrow()
     })
@@ -339,7 +339,7 @@ describe('Props Parsing Tests', () => {
         })
       }).not.toThrow()
 
-      // 对象prop验证在Vue 3中不会抛出错误
+      // 对象prop验证在Vue 3中不会抛出错�?
       expect(() => {
         const wrapper = mount({
           template: '<ChildComponent :config="{ title: \'Test\' }" />',
@@ -387,7 +387,7 @@ describe('Props Parsing Tests', () => {
         })
       }).not.toThrow()
 
-      // 多类型prop验证在Vue 3中不会抛出错误
+      // 多类型prop验证在Vue 3中不会抛出错�?
       expect(() => {
         const wrapper = mount({
           template: '<ChildComponent :value="true" />',

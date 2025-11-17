@@ -4,9 +4,9 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import { nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-import IndexHeader from '@/components/index/IndexHeader.vue'
-import { secureStorage, tokenStorage } from '@/utils/secureStorage'
-import { sanitizeHtml, escapeHtml } from '@/utils/security'
+import IndexHeader from '../../src/components/index/IndexHeader.vue'
+import { secureStorage, tokenStorage } from '../../src/utils/secureStorage'
+import { sanitizeHtml, escapeHtml } from '../../src/utils/security'
 
 // Mock Element Plus
 vi.mock('element-plus', () => ({

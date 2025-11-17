@@ -8,8 +8,10 @@ import type {
   NotificationActionResponse,
   BatchNotificationAction,
   NotificationStats,
+  NotificationType,
+  NotificationChannel,
+  NotificationStatus,
 } from '@/types/notification'
-import { NotificationType, NotificationChannel, NotificationStatus } from '@/types/notification'
 
 // 获取通知列表
 export async function getNotifications(params: NotificationQuery = {}): Promise<NotificationListResponse> {

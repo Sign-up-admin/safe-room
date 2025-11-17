@@ -3,8 +3,8 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import { nextTick } from 'vue'
-import App from '@/App.vue'
-import IndexHeader from '@/components/index/IndexHeader.vue'
+import App from '../../src/App.vue'
+import IndexHeader from '../../src/components/index/IndexHeader.vue'
 
 // Mock utils
 vi.mock('@/utils/storage', () => ({

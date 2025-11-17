@@ -3,7 +3,7 @@
 // =================================
 // 基于Design Token系统的Element Plus主题覆盖
 
-@import 'design-tokens';
+@use 'design-tokens';
 
 // Element Plus 颜色变量覆盖
 :root {

@@ -82,9 +82,9 @@ public abstract class AbstractControllerIntegrationTest {
         try {
             // 确保admin用户存在
             if (usersService != null) {
-                var adminUser = usersService.getOne(new QueryWrapper<com.entity.UsersEntity>()
+                var adminUsers = usersService.list(new QueryWrapper<com.entity.UsersEntity>()
                         .eq("username", "admin"));
-                if (adminUser == null) {
+                if (adminUsers == null || adminUsers.isEmpty()) {
                     log.info("Creating admin user for testing");
                     var newAdmin = new com.entity.UsersEntity();
                     newAdmin.setId(TestDataFactory.nextId());
@@ -102,9 +102,9 @@ public abstract class AbstractControllerIntegrationTest {
 
             // 确保user01用户存在
             if (yonghuService != null) {
-                var memberUser = yonghuService.getOne(new QueryWrapper<com.entity.YonghuEntity>()
+                var memberUsers = yonghuService.list(new QueryWrapper<com.entity.YonghuEntity>()
                         .eq("yonghuzhanghao", "user01"));
-                if (memberUser == null) {
+                if (memberUsers == null || memberUsers.isEmpty()) {
                     log.info("Creating member user 'user01' for testing");
                     var newMember = new com.entity.YonghuEntity();
                     newMember.setId(TestDataFactory.nextId());
@@ -427,7 +427,7 @@ public abstract class AbstractControllerIntegrationTest {
         String[] commonFields = {
             "username", "yonghuzhanghao", "jiaoliangonghao",
             "title", "name", "huiyuankamingcheng",
-            "content", "miaoshu", "jianjie"
+            "content"
         };
 
         // 重要：按外键依赖关系的倒序清理数据，先清理子表再清理父表

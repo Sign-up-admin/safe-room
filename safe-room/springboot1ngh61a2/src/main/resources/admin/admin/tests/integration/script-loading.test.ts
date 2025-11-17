@@ -90,14 +90,14 @@ describe('Script Loading Integration Tests', () => {
       })
     }
 
-    // 初始状态：jQuery 未加载
+    // 初始状态：jQuery 未加�?
     expect(typeof window.jQuery).toBe('undefined')
     expect(typeof window.$).toBe('undefined')
 
-    // 开始加载依赖脚本
+    // 开始加载依赖脚�?
     loadDependentScripts()
 
-    // 10ms 后，仍然没有创建脚本标签（因为 jQuery 未加载）
+    // 10ms 后，仍然没有创建脚本标签（因�?jQuery 未加载）
     vi.advanceTimersByTime(10)
     expect(mockScriptElements.length).toBe(0)
 
@@ -107,7 +107,7 @@ describe('Script Loading Integration Tests', () => {
     // 再次调用（模拟下一次检查）
     loadDependentScripts()
 
-    // 现在应该创建了脚本标签
+    // 现在应该创建了脚本标�?
     expect(mockScriptElements.length).toBe(2)
     expect(mockScriptElements[0].src).toBe('/verifys/yz.js')
     expect(mockScriptElements[1].src).toBe('/verifys/verify.js')
@@ -132,7 +132,7 @@ describe('Script Loading Integration Tests', () => {
       writable: true
     })
 
-    // 添加 DOMContentLoaded 监听器
+    // 添加 DOMContentLoaded 监听�?
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', loadDependentScripts)
     }
@@ -147,7 +147,7 @@ describe('Script Loading Integration Tests', () => {
       document.dispatchEvent(new Event('DOMContentLoaded'))
     }, 100)
 
-    // 验证在 DOMContentLoaded 事件触发前不会调用
+    // 验证�?DOMContentLoaded 事件触发前不会调�?
     vi.advanceTimersByTime(50)
     expect(loadScriptsCalled).toBe(false)
 
@@ -205,7 +205,7 @@ describe('Script Loading Integration Tests', () => {
     // 执行异步操作
     vi.advanceTimersByTime(50)
 
-    expect(successCount).toBe(2) // success.js 和 success2.js
+    expect(successCount).toBe(2) // success.js �?success2.js
     expect(errorCount).toBe(1) // error.js
   })
 
@@ -255,18 +255,18 @@ describe('Script Loading Integration Tests', () => {
   it('should handle jQuery plugin initialization correctly', () => {
     let pluginInitialized = false
 
-    // 模拟 yz.js 的结构
+    // 模拟 yz.js 的结�?
     function simulateYzJs() {
       if (typeof window.jQuery === 'undefined' || typeof window.$ === 'undefined') {
         setTimeout(simulateYzJs, 10)
         return
       }
 
-      // 模拟插件初始化
+      // 模拟插件初始�?
       const inlineCss = '*{margin:0;padding:0;}'
       const styleObj = window.jQuery(`<style type="text/css">${inlineCss}</style>`)
 
-      // 模拟 RotateVerify 构造函数
+      // 模拟 RotateVerify 构造函�?
       window.RotateVerify = function(options: any) {
         this.options = options
         pluginInitialized = true
@@ -282,7 +282,7 @@ describe('Script Loading Integration Tests', () => {
       }
     }
 
-    // 初始状态
+    // 初始状�?
     expect(typeof window.RotateVerify).toBe('undefined')
     expect(pluginInitialized).toBe(false)
 
@@ -342,7 +342,7 @@ describe('Script Loading Integration Tests', () => {
       document.body.appendChild(script2)
     }
 
-    // 开始加载
+    // 开始加�?
     loadMultipleScripts()
 
     // 10ms 后未执行
@@ -375,7 +375,7 @@ describe('Script Loading Integration Tests', () => {
       const startTime = Date.now()
 
       function checkTimeout() {
-        if (Date.now() - startTime > 5000) { // 5秒超时
+        if (Date.now() - startTime > 5000) { // 5秒超�?
           timeoutReached = true
           return
         }
@@ -393,7 +393,7 @@ describe('Script Loading Integration Tests', () => {
 
     loadWithTimeout()
 
-    // 模拟长时间等待
+    // 模拟长时间等�?
     vi.advanceTimersByTime(6000)
 
     expect(timeoutReached).toBe(true)
@@ -421,7 +421,7 @@ describe('Script Loading Integration Tests', () => {
         return
       }
       scriptACalled = true
-      // Script A 需要 Script B
+      // Script A 需�?Script B
       if (typeof window.ScriptB === 'undefined') {
         loadScriptB()
       } else {
@@ -436,13 +436,13 @@ describe('Script Loading Integration Tests', () => {
       }
       scriptBCalled = true
       window.ScriptB = true
-      // 检查 Script A 是否已经调用
+      // 检�?Script A 是否已经调用
       if (scriptACalled) {
         circularDependencyResolved = true
       }
     }
 
-    // 开始加载 Script A
+    // 开始加�?Script A
     loadScriptA()
 
     // 10ms 后未执行

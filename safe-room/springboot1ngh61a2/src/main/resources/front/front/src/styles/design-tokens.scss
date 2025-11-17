@@ -3,7 +3,7 @@
 // =================================
 
 // Import the new token system
-@import 'tokens/index';
+@use 'tokens/index';
 
 // Legacy theme variables (for backward compatibility)
 :root {

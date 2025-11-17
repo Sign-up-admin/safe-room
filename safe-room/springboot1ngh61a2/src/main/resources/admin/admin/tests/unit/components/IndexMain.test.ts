@@ -3,7 +3,7 @@ import { mount, VueWrapper } from '@vue/test-utils'
 import { createRouter, createMemoryHistory, Router } from 'vue-router'
 import { createPinia, Pinia } from 'pinia'
 import ElementPlus from 'element-plus'
-import IndexMain from '@/components/index/IndexMain.vue'
+import IndexMain from '../../../../src/components/index/IndexMain.vue'
 import type { MenuRole } from '@/types/menu'
 
 // Mock dependencies
@@ -148,10 +148,6 @@ describe('IndexMain', () => {
       expect(header.exists()).toBe(true)
       expect(aside.exists()).toBe(true)
       expect(content.exists()).toBe(true)
-            { name: 'profile', path: '/profile', title: 'Profile' }
-          ]
-        }
-      ])
       // Role is used internally, check that component renders with correct role-based behavior
     })
 

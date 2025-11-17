@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateTitle } from '@/utils/i18n'
+import { generateTitle } from '../../../src/utils/i18n'
 
 describe('i18n工具', () => {
   describe('generateTitle', () => {
@@ -26,8 +26,8 @@ describe('i18n工具', () => {
       expect(result).toBe(title)
     })
 
-    it('应该能够处理长标题', () => {
-      const title = '这是一个很长的测试标题，用于测试长文本的处理能力'
+    it('应该能够处理长标�?, () => {
+      const title = '这是一个很长的测试标题，用于测试长文本的处理能�?
       const result = generateTitle(title)
       expect(result).toBe(title)
     })

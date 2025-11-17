@@ -11,7 +11,7 @@ import {
   isDocumentFile,
   isVideoFile,
   type FileUploadConfig,
-} from '@/utils/fileUpload'
+} from '../../../src/utils/fileUpload'
 import { ElMessage } from 'element-plus'
 
 // Mock Element Plus
@@ -47,7 +47,7 @@ describe('fileUpload', () => {
       })
 
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('文件类型不支持')
+      expect(result.error).toContain('文件类型不支�?)
     })
 
     it('should reject file exceeding max size', () => {
@@ -81,7 +81,7 @@ describe('fileUpload', () => {
       })
 
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('文件类型不支持')
+      expect(result.error).toContain('文件类型不支�?)
     })
 
     it('should validate with default config when no config provided', () => {

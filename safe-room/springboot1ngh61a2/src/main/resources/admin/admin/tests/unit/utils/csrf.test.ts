@@ -12,7 +12,7 @@ import {
   clearCsrfToken,
   validateCsrfToken,
   CSRF_TOKEN_HEADER,
-} from '@/utils/csrf'
+} from '../../../src/utils/csrf'
 
 describe('CSRF Token工具', () => {
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('CSRF Token工具', () => {
   })
 
   describe('getOrCreateCsrfToken', () => {
-    it('如果sessionStorage中没有token，应该生成新的', () => {
+    it('如果sessionStorage中没有token，应该生成新token', () => {
       const token = getOrCreateCsrfToken()
       expect(token).toBeTruthy()
       expect(token.length).toBe(64)
@@ -101,7 +101,7 @@ describe('CSRF Token工具', () => {
       expect(sessionStorage.getItem('csrf_token')).toBeNull()
     })
 
-    it('如果token不存在，应该不报错', () => {
+    it('如果token不存在，应该不报�?, () => {
       expect(() => clearCsrfToken()).not.toThrow()
     })
   })
@@ -132,7 +132,7 @@ describe('CSRF Token工具', () => {
   })
 
   describe('CSRF_TOKEN_HEADER', () => {
-    it('应该是正确的请求头名称', () => {
+    it('应该是正确的请求头名�?, () => {
       expect(CSRF_TOKEN_HEADER).toBe('X-CSRF-Token')
     })
   })

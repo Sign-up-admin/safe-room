@@ -31,13 +31,13 @@ vi.mock('@/utils/csrf', () => ({
   CSRF_TOKEN_HEADER: 'X-CSRF-Token',
 }))
 
-import http, { ApiResponse, CancelToken } from '@/utils/http'
+import http, { ApiResponse, CancelToken } from '../../../src/utils/http'
 
-describe('HTTP客户端', () => {
+describe('HTTP客户�?, () => {
   describe('HTTP实例配置', () => {
     it('应该有正确的默认配置', () => {
-      // 在测试环境中，http实例可能没有完整的defaults配置，跳过这个检查
-      // 实际的配置验证应该在集成测试中进行
+      // 在测试环境中，http实例可能没有完整的defaults配置，跳过这个检�?
+      // 实际的配置验证应该在集成测试中进�?
       expect(typeof http).toBe('function')
       expect(http).toBeDefined()
     })

@@ -391,3 +391,17 @@ CREATE TABLE yonghu (
   youxiaoqizhi DATE,
   status INTEGER DEFAULT 0
 );
+
+DROP TABLE IF EXISTS legal_terms CASCADE;
+CREATE TABLE legal_terms (
+  id BIGSERIAL PRIMARY KEY,
+  addtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  type VARCHAR(100),
+  title VARCHAR(200),
+  version VARCHAR(50),
+  content TEXT,
+  status INTEGER DEFAULT 0,
+  effective_date DATE,
+  update_time TIMESTAMP,
+  create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

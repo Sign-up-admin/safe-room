@@ -122,7 +122,7 @@ const chartSegments = computed(() => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/design-tokens.scss';
+@use '@/styles/design-tokens.scss' as *;
 
 .overview-grid {
   display: grid;

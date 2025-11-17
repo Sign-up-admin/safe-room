@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
-import ConfigList from '@/views/modules/config/list.vue'
+import ConfigList from '../../../../src/views/modules/config/list.vue'
 import http from '@/utils/http'
 import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
 
