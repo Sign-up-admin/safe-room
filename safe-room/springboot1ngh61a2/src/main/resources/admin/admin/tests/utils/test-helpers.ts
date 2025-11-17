@@ -20,12 +20,18 @@ const routes = [
  * Create a test Vue application with admin-specific plugins
  */
 export function createTestApp() {
-  const app = createApp({})
+  const app = createApp({
+    name: 'TestApp',
+    template: '<div id="app"><router-view /></div>'
+  })
   const pinia = createPinia()
   const router = createRouter({
     history: createWebHistory(),
     routes
   })
+
+  // Set active Pinia instance
+  setActivePinia(pinia)
 
   app.use(pinia)
   app.use(router)
@@ -43,13 +49,16 @@ export function mountComponent<T extends Component>(
 ): VueWrapper {
   const app = createTestApp()
 
-  // Set active Pinia instance for stores
-  setActivePinia(createPinia())
+  // Ensure Element Plus is properly configured for Happy DOM
+  if (!document.body) {
+    document.body = document.createElement('body')
+  }
 
   // Default mounting options for admin components
   const defaultOptions: MountingOptions<any> = {
     global: {
       plugins: [app],
+      // Element Plus components will be available through the plugin
       stubs: {
         // Admin-specific stubs
         'el-button': true,
@@ -407,6 +416,79 @@ export function mountFormComponent<T extends Component>(
 }
 
 /**
+ * Create a test component wrapper with Happy DOM environment setup
+ */
+export function createHappyDOMWrapper() {
+  // Ensure Happy DOM environment is properly set up
+  if (typeof window === 'undefined') {
+    ;(globalThis as any).window = globalThis
+  }
+
+  if (!document.body) {
+    document.body = document.createElement('body')
+    document.body.setAttribute('id', 'app')
+  }
+
+  return document
+}
+
+/**
+ * Wait for Element Plus components to be ready in Happy DOM
+ */
+export async function waitForElementPlus() {
+  // Ensure Element Plus is loaded and components are available
+  await nextTick()
+
+  // Small delay to ensure DOM is updated
+  await new Promise(resolve => setTimeout(resolve, 10))
+}
+
+/**
+ * Mock admin authentication for tests requiring logged-in state
+ */
+export function setupAdminAuth() {
+  // Mock localStorage with admin authentication
+  const adminUser = createMockUser({ role: 'admin', permissions: ['all'] })
+  const adminToken = 'mock-admin-jwt-token'
+
+  Object.defineProperty(window, 'localStorage', {
+    value: {
+      getItem: vi.fn((key: string) => {
+        if (key === 'admin-user') return JSON.stringify(adminUser)
+        if (key === 'admin-token') return adminToken
+        return null
+      }),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn()
+    },
+    writable: true
+  })
+
+  return { adminUser, adminToken }
+}
+
+/**
+ * Clean up test environment after each test
+ */
+export function cleanupTestEnvironment() {
+  vi.clearAllMocks()
+  vi.resetModules()
+
+  // Reset document state
+  if (document.body) {
+    document.body.innerHTML = ''
+  }
+
+  // Reset global state
+  delete (window as any).jQuery
+  delete (window as any).$
+  delete (window as any).RotateVerify
+  delete (window as any).localStorage
+  delete (window as any).sessionStorage
+}
+
+/**
  * Setup complete admin mock environment for E2E tests
  */
 export async function mockAdminApi(page: any): Promise<void> {
@@ -497,4 +579,13 @@ export async function navigateToModule(page: any, moduleName: string): Promise<v
   const path = modulePaths[moduleName] || '#/index/home'
   await page.goto(path)
   await page.waitForLoadState('networkidle')
+}
+
+// ========== Re-export shared helpers for E2E tests ==========
+
+export { createTestData, cleanupTestData } from './shared-helpers'
+
+// Direct export for E2E compatibility
+export const logStep = (stepName: string, details?: any): void => {
+  console.log(`[TEST STEP] ${stepName}`, details || '')
 }

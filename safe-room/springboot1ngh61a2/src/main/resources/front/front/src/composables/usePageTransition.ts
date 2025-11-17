@@ -54,5 +54,3 @@ export const usePageTransition = (globalOptions: PageTransitionOptions = {}) => 
     fadeIn,
   }
 }
-
-

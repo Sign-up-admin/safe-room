@@ -43,7 +43,7 @@ watchEffect(() => {
   loading.value = true
   service
     .detail(id)
-    .then((data) => {
+    .then(data => {
       initialData.value = data
     })
     .finally(() => {
@@ -60,5 +60,3 @@ function goBack() {
   router.push(props.listRoute)
 }
 </script>
-
-

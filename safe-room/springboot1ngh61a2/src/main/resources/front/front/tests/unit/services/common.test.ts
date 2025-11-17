@@ -9,6 +9,8 @@ import {
   groupByColumn,
   updateShStatus,
 } from '@/services/common'
+import { createMockUser } from '../../factories/user.factory'
+import { createApiResponse } from '../../utils/mock-response-builder'
 
 const httpMock = vi.hoisted(() => ({
   get: vi.fn(),
@@ -34,12 +36,13 @@ describe('services/common', () => {
     })
     expect(options).toEqual(['A', 'B'])
 
-    getMock.mockResolvedValueOnce({ data: { data: { id: 9 } } })
+    const mockUser = createMockUser({ id: 9 })
+    getMock.mockResolvedValueOnce({ data: createApiResponse(mockUser) })
     const record = await followRecord('table', 'column', 42)
     expect(getMock).toHaveBeenCalledWith('/common/follow/table/column', {
       params: { columnValue: 42 },
     })
-    expect(record).toEqual({ id: 9 })
+    expect(record).toEqual(mockUser)
   })
 
   it('updates sh status and resolves remind counts from different payloads', async () => {
@@ -58,8 +61,9 @@ describe('services/common', () => {
     getMock.mockResolvedValueOnce({ data: { data: { total: 10 } } })
     await expect(calculateColumn('course', 'price', {})).resolves.toEqual({ total: 10 })
 
-    getMock.mockResolvedValueOnce({ data: { data: [{ name: 'A' }] } })
-    await expect(groupByColumn('course', 'category', {})).resolves.toEqual([{ name: 'A' }])
+    const mockGroupData = [{ name: 'A', count: 1 }]
+    getMock.mockResolvedValueOnce({ data: createApiResponse(mockGroupData) })
+    await expect(groupByColumn('course', 'category', {})).resolves.toEqual(mockGroupData)
 
     getMock.mockResolvedValueOnce({ data: { data: [{ x: '2025', y: 12 }] } })
     await expect(getValueStats('course', 'x', 'y', {})).resolves.toEqual([{ x: '2025', y: 12 }])
@@ -130,7 +134,7 @@ describe('services/common', () => {
 
   describe('followRecord 方法 - 详细测试', () => {
     it('成功获取关联记录', async () => {
-      const mockRecord = { id: 123, name: '关联记录', type: 'reference' }
+      const mockRecord = createMockUser({ id: 123, username: '关联记录' })
       getMock.mockResolvedValueOnce({ data: { data: mockRecord } })
 
       const result = await followRecord('course', 'coach', 456)
@@ -142,7 +146,7 @@ describe('services/common', () => {
     })
 
     it('处理字符串类型的关联值', async () => {
-      const mockRecord = { id: 'abc', name: '字符串关联' }
+      const mockRecord = createMockUser({ id: 'abc', username: '字符串关联' })
       getMock.mockResolvedValueOnce({ data: { data: mockRecord } })
 
       const result = await followRecord('course', 'category', 'vip')

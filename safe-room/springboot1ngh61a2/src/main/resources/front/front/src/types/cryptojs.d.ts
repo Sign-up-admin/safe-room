@@ -30,16 +30,8 @@ declare module '@/common/cryptojs.js' {
   }
 
   export interface DES {
-    encrypt(
-      message: string | WordArray,
-      key: WordArray,
-      cfg?: { mode?: any; padding?: any },
-    ): CipherParams
-    decrypt(
-      ciphertext: string | CipherParams,
-      key: WordArray,
-      cfg?: { mode?: any; padding?: any },
-    ): WordArray
+    encrypt(message: string | WordArray, key: WordArray, cfg?: { mode?: any; padding?: any }): CipherParams
+    decrypt(ciphertext: string | CipherParams, key: WordArray, cfg?: { mode?: any; padding?: any }): WordArray
   }
 
   export interface AES {
@@ -65,4 +57,3 @@ declare module '@/common/cryptojs.js' {
   export const DES: DES
   export const AES: AES
 }
-

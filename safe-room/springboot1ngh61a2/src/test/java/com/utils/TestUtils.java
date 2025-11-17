@@ -27,17 +27,25 @@ import com.entity.UsersEntity;
 import com.entity.YonghuEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -46,9 +54,175 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  */
 public final class TestUtils {
 
-    private static final AtomicLong UNIQUE = new AtomicLong(1_000);
+    private static final ConcurrentHashMap<String, AtomicLong> TEST_PREFIX_COUNTERS = new ConcurrentHashMap<>();
+
+    /**
+     * 生成唯一的测试前缀，避免不同测试类之间的数据冲突
+     *
+     * @param testClassName 测试类名
+     * @param basePrefix 基础前缀，如 "test-"
+     * @return 唯一的测试前缀
+     */
+    public static String generateUniqueTestPrefix(String testClassName, String basePrefix) {
+        if (!StringUtils.hasText(testClassName) || !StringUtils.hasText(basePrefix)) {
+            return basePrefix;
+        }
+
+        // 移除类名的包名部分，只保留类名
+        String simpleClassName = testClassName.contains(".")
+            ? testClassName.substring(testClassName.lastIndexOf('.') + 1)
+            : testClassName;
+
+        // 获取或创建计数器
+        AtomicLong counter = TEST_PREFIX_COUNTERS.computeIfAbsent(simpleClassName, k -> new AtomicLong(0));
+        long uniqueId = counter.incrementAndGet();
+
+        // 生成唯一前缀：basePrefix + className + uniqueId
+        // 例如：test-UserControllerTest-1-
+        return basePrefix + simpleClassName + "-" + uniqueId + "-";
+    }
+
+    /**
+     * 生成唯一的测试用户名
+     *
+     * @param testClassName 测试类名
+     * @param baseName 基础名称，如 "user"
+     * @return 唯一的测试用户名
+     */
+    public static String generateUniqueTestUsername(String testClassName, String baseName) {
+        return generateUniqueTestPrefix(testClassName, baseName + "-");
+    }
+
+    /**
+     * 生成唯一的测试标题
+     *
+     * @param testClassName 测试类名
+     * @param baseTitle 基础标题，如 "Test Course"
+     * @return 唯一的测试标题
+     */
+    public static String generateUniqueTestTitle(String testClassName, String baseTitle) {
+        return generateUniqueTestPrefix(testClassName, baseTitle + " ");
+    }
+
+    // UNIQUE常量已废弃，现在统一使用TestDataFactory.nextId()
 
     private TestUtils() {
+    }
+
+    // ==================== 空值安全工具方法 ====================
+
+    /**
+     * 安全地获取对象的值，如果对象为null则返回默认值
+     */
+    public static <T> T safeGet(T value, T defaultValue) {
+        return value != null ? value : defaultValue;
+    }
+
+    /**
+     * 安全地获取对象的字符串表示，如果对象为null则返回默认字符串
+     */
+    public static String safeToString(Object obj, String defaultValue) {
+        return obj != null ? obj.toString() : defaultValue;
+    }
+
+    /**
+     * 安全地获取Long值，如果对象为null或转换失败则返回默认值
+     */
+    public static Long safeToLong(Object obj, Long defaultValue) {
+        if (obj == null) {
+            return defaultValue;
+        }
+        try {
+            if (obj instanceof Long) {
+                return (Long) obj;
+            } else if (obj instanceof Integer) {
+                return ((Integer) obj).longValue();
+            } else if (obj instanceof String) {
+                return Long.parseLong((String) obj);
+            } else {
+                return Long.parseLong(obj.toString());
+            }
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 安全地获取Integer值，如果对象为null或转换失败则返回默认值
+     */
+    public static Integer safeToInteger(Object obj, Integer defaultValue) {
+        if (obj == null) {
+            return defaultValue;
+        }
+        try {
+            if (obj instanceof Integer) {
+                return (Integer) obj;
+            } else if (obj instanceof Long) {
+                return ((Long) obj).intValue();
+            } else if (obj instanceof String) {
+                return Integer.parseInt((String) obj);
+            } else {
+                return Integer.parseInt(obj.toString());
+            }
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 安全地执行操作，如果抛出异常则返回默认值
+     */
+    public static <T> T safeExecute(Supplier<T> operation, T defaultValue) {
+        try {
+            return operation.get();
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 安全地执行操作，如果抛出异常则执行备用操作
+     */
+    public static <T> T safeExecute(Supplier<T> operation, Supplier<T> fallback) {
+        try {
+            return operation.get();
+        } catch (Exception e) {
+            try {
+                return fallback.get();
+            } catch (Exception fallbackException) {
+                throw new RuntimeException("Both primary and fallback operations failed", fallbackException);
+            }
+        }
+    }
+
+    /**
+     * 断言对象不为null，如果为null则抛出有意义的异常
+     */
+    public static <T> T assertNotNull(T obj, String message) {
+        if (obj == null) {
+            throw new AssertionError(message);
+        }
+        return obj;
+    }
+
+    /**
+     * 断言字符串不为空，如果为空则抛出有意义的异常
+     */
+    public static String assertNotBlank(String str, String message) {
+        if (!StringUtils.hasText(str)) {
+            throw new AssertionError(message);
+        }
+        return str;
+    }
+
+    /**
+     * 断言集合不为空，如果为空则抛出有意义的异常
+     */
+    public static <T> java.util.Collection<T> assertNotEmpty(java.util.Collection<T> collection, String message) {
+        if (collection == null || collection.isEmpty()) {
+            throw new AssertionError(message);
+        }
+        return collection;
     }
 
     public static UserEntity createUser(Long id, String username, String password) {
@@ -457,15 +631,17 @@ public final class TestUtils {
     }
 
     private static String uniqueSuffix() {
-        return String.valueOf(UNIQUE.incrementAndGet());
+        // 统一使用TestDataFactory的ID生成器
+        return String.valueOf(com.utils.TestDataFactory.nextId());
     }
 
     private static String randomPhone() {
         return "188" + ThreadLocalRandom.current().nextInt(10000000, 99999999);
     }
 
-    private static long nextId() {
-        return UNIQUE.incrementAndGet() + 1_000L;
+    public static long nextId() {
+        // 统一使用TestDataFactory的ID生成器，避免冲突
+        return com.utils.TestDataFactory.nextId();
     }
 
     public static String loginAndGetToken(MockMvc mockMvc, ObjectMapper mapper, String username, String password) throws Exception {
@@ -536,10 +712,190 @@ public final class TestUtils {
     }
 
     public static TokenEntity createInvalidToken(Long userId, String username) {
-        TokenEntity token = createToken(userId, username, "管理员", "users", 
+        TokenEntity token = createToken(userId, username, "管理员", "users",
                 Date.from(Instant.now().plus(1, ChronoUnit.DAYS)));
         token.setToken(""); // 空token
         return token;
+    }
+
+    /**
+     * 测试数据工厂 - 提供统一的测试数据创建和管理功能
+     */
+    public static class TestDataFactory {
+
+        private static final Logger log = LoggerFactory.getLogger(TestDataFactory.class);
+        private static final Map<String, List<Long>> CREATED_ENTITY_IDS = new ConcurrentHashMap<>();
+
+        /**
+         * 创建用户实体并记录ID用于后续清理
+         *
+         * @param username 用户名
+         * @param password 密码
+         * @param testClassName 测试类名
+         * @return 创建的用户实体
+         */
+        public static UserEntity createUserForTest(String username, String password, String testClassName) {
+            UserEntity user = createUser(null, username, password);
+            recordCreatedEntity(testClassName, "UserEntity", user.getId());
+            return user;
+        }
+
+        /**
+         * 创建会员卡实体并记录ID用于后续清理
+         *
+         * @param namePrefix 名称前缀
+         * @param testClassName 测试类名
+         * @return 创建的会员卡实体
+         */
+        public static HuiyuankaEntity createMembershipCardForTest(String namePrefix, String testClassName) {
+            HuiyuankaEntity card = createMembershipCard(namePrefix);
+            recordCreatedEntity(testClassName, "HuiyuankaEntity", card.getId());
+            return card;
+        }
+
+        /**
+         * 创建健身教练实体并记录ID用于后续清理
+         *
+         * @param namePrefix 名称前缀
+         * @param testClassName 测试类名
+         * @return 创建的教练实体
+         */
+        public static JianshenjiaolianEntity createCoachForTest(String namePrefix, String testClassName) {
+            JianshenjiaolianEntity coach = createCoachTemplate(namePrefix);
+            recordCreatedEntity(testClassName, "JianshenjiaolianEntity", coach.getId());
+            return coach;
+        }
+
+        /**
+         * 创建健身课程实体并记录ID用于后续清理
+         *
+         * @param namePrefix 名称前缀
+         * @param testClassName 测试类名
+         * @return 创建的课程实体
+         */
+        public static JianshenkechengEntity createCourseForTest(String namePrefix, String testClassName) {
+            JianshenkechengEntity course = createCourseTemplate(namePrefix);
+            recordCreatedEntity(testClassName, "JianshenkechengEntity", course.getId());
+            return course;
+        }
+
+        /**
+         * 创建新闻实体并记录ID用于后续清理
+         *
+         * @param title 标题
+         * @param testClassName 测试类名
+         * @return 创建的新闻实体
+         */
+        public static NewsEntity createNewsForTest(String title, String testClassName) {
+            NewsEntity news = createNewsItem(title);
+            recordCreatedEntity(testClassName, "NewsEntity", news.getId());
+            return news;
+        }
+
+        /**
+         * 批量创建测试用户
+         *
+         * @param count 数量
+         * @param baseUsername 用户名前缀
+         * @param testClassName 测试类名
+         * @return 创建的用户列表
+         */
+        public static List<UserEntity> createBatchUsers(int count, String baseUsername, String testClassName) {
+            List<UserEntity> users = new ArrayList<>();
+            for (int i = 1; i <= count; i++) {
+                UserEntity user = createUserForTest(baseUsername + i, "password123", testClassName);
+                users.add(user);
+            }
+            return users;
+        }
+
+        /**
+         * 批量创建测试会员卡
+         *
+         * @param count 数量
+         * @param baseName 名称前缀
+         * @param testClassName 测试类名
+         * @return 创建的会员卡列表
+         */
+        public static List<HuiyuankaEntity> createBatchMembershipCards(int count, String baseName, String testClassName) {
+            List<HuiyuankaEntity> cards = new ArrayList<>();
+            for (int i = 1; i <= count; i++) {
+                HuiyuankaEntity card = createMembershipCardForTest(baseName + i, testClassName);
+                cards.add(card);
+            }
+            return cards;
+        }
+
+        /**
+         * 记录创建的实体ID用于后续清理
+         *
+         * @param testClassName 测试类名
+         * @param entityType 实体类型
+         * @param entityId 实体ID
+         */
+        private static void recordCreatedEntity(String testClassName, String entityType, Long entityId) {
+            String key = testClassName + ":" + entityType;
+            CREATED_ENTITY_IDS.computeIfAbsent(key, k -> new ArrayList<>()).add(entityId);
+        }
+
+        /**
+         * 获取指定测试类的创建实体ID列表
+         *
+         * @param testClassName 测试类名
+         * @param entityType 实体类型
+         * @return 实体ID列表
+         */
+        public static List<Long> getCreatedEntityIds(String testClassName, String entityType) {
+            String key = testClassName + ":" + entityType;
+            return CREATED_ENTITY_IDS.getOrDefault(key, new ArrayList<>());
+        }
+
+        /**
+         * 清理指定测试类的所有创建实体
+         *
+         * @param testClassName 测试类名
+         * @param entityType 实体类型
+         * @param service 服务实例
+         */
+        public static <T> void cleanupCreatedEntities(String testClassName, String entityType, IService<T> service) {
+            List<Long> entityIds = getCreatedEntityIds(testClassName, entityType);
+            if (!entityIds.isEmpty()) {
+                log.info("Cleaning up {} {} entities created by test class: {}",
+                        entityIds.size(), entityType, testClassName);
+
+                for (Long entityId : entityIds) {
+                    try {
+                        service.removeById(entityId);
+                    } catch (Exception e) {
+                        log.warn("Failed to delete {} entity with id {}: {}", entityType, entityId, e.getMessage());
+                    }
+                }
+
+                // 清理记录
+                String key = testClassName + ":" + entityType;
+                CREATED_ENTITY_IDS.remove(key);
+            }
+        }
+
+        /**
+         * 清理指定测试类的所有实体
+         *
+         * @param testClassName 测试类名
+         */
+        public static void cleanupAllCreatedEntities(String testClassName) {
+            List<String> keysToRemove = new ArrayList<>();
+            for (Map.Entry<String, List<Long>> entry : CREATED_ENTITY_IDS.entrySet()) {
+                if (entry.getKey().startsWith(testClassName + ":")) {
+                    keysToRemove.add(entry.getKey());
+                }
+            }
+
+            for (String key : keysToRemove) {
+                CREATED_ENTITY_IDS.remove(key);
+            }
+
+            log.info("Cleaned up all entity tracking records for test class: {}", testClassName);
+        }
     }
 }
 

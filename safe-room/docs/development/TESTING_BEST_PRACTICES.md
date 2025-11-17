@@ -14,9 +14,252 @@ category: development
 - [测试隔离原则](#测试隔离原则)
 - [性能测试指南](#性能测试指南)
 - [测试维护策略](#测试维护策略)
+- [测试代码质量改进](#测试代码质量改进)
 - [代码审查清单](#代码审查清单)
 
-## 📝 测试命名规范
+## 🔧 测试代码质量改进
+
+### 概述
+
+测试代码质量改进是提升测试套件可维护性、稳定性和开发效率的关键。通过应用DRY原则、使用统一的数据工厂和稳定的选择器，可以显著减少测试代码的重复和维护成本。
+
+### DRY原则应用
+
+#### 1. 避免重复的测试设置代码
+
+**❌ 反例：每个测试文件重复beforeEach**
+```typescript
+// 多个E2E测试文件中的重复代码
+test.beforeEach(async ({ page }) => {
+  await setupTestEnvironment(page)
+  await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
+  await seedFrontSession(page)
+  logTestStep('设置测试环境完成')
+})
+```
+
+**✅ 正例：使用场景化设置函数**
+```typescript
+import { setupBookingScenario, setupUserProfileScenario } from '../utils/e2e-test-setup'
+
+// 预约测试
+test.describe('预约流程', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupBookingScenario(page)  // 一行代码搞定
+  })
+})
+
+// 用户资料测试
+test.describe('个人资料管理', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupUserProfileScenario(page)  // 一行代码搞定
+  })
+})
+```
+
+#### 2. 避免重复的组件挂载配置
+
+**❌ 反例：每个测试重复mount配置**
+```typescript
+const wrapper = mount(CourseCard, {
+  props: { course },
+  global: {
+    stubs: {
+      TechCard: { template: '<div><slot /></div>' },
+      TechButton: { template: '<button><slot /></button>' }
+    }
+  }
+})
+```
+
+**✅ 正例：使用共享配置**
+```typescript
+import { createStandardComponentWrapper } from '../utils/unit-test-config'
+
+const mountCourseCard = createStandardComponentWrapper(CourseCard, {
+  TechCard: { template: '<div><slot /></div>' },
+  TechButton: { template: '<button><slot /></button>' }
+})
+
+const wrapper = mountCourseCard({ props: { course } })
+```
+
+### 测试数据工厂模式
+
+#### 1. 统一的数据创建方式
+
+**❌ 反例：硬编码测试数据**
+```typescript
+const course = {
+  id: 1,
+  kechengmingcheng: 'Test Course',
+  jiage: '100',
+  kechengleixing: '瑜伽'
+}
+```
+
+**✅ 正例：使用测试数据工厂**
+```typescript
+import { createCourse, PRESET_COURSES } from '../utils/test-data-factory'
+
+// 方式1：灵活创建
+const course = createCourse({
+  kechengmingcheng: 'Test Course',
+  jiage: '100',
+  kechengleixing: '瑜伽'
+})
+
+// 方式2：使用预设数据
+const yogaCourse = PRESET_COURSES.yogaCourse
+```
+
+#### 2. Builder模式支持复杂场景
+
+```typescript
+import { CourseBuilder } from '../utils/test-data-factory'
+
+const customCourse = new CourseBuilder()
+  .withName('高级瑜伽课程')
+  .withPrice('299')
+  .withType('瑜伽')
+  .withDescription('适合进阶学习者的课程')
+  .build()
+```
+
+### 选择器稳定性优化
+
+#### 1. 优先使用data-testid
+
+**❌ 反例：不稳定的CSS选择器**
+```typescript
+await page.locator('.course-card').click()
+await page.locator('.avatar, .user-avatar, .profile-pic').click()
+await page.locator('text=预约').click()
+```
+
+**✅ 正例：稳定的data-testid选择器**
+```typescript
+import { selectors } from '../utils/selectors'
+
+await page.getByTestId(selectors.courses.courseCard(courseId)).click()
+await page.getByTestId(selectors.profile.avatar()).click()
+await page.getByTestId(selectors.booking.confirmButton()).click()
+```
+
+#### 2. 选择器优先级指南
+
+1. **最高优先级**：`data-testid`属性
+2. **中等优先级**：语义化选择器（role、label等）
+3. **低优先级**：稳定的CSS属性选择器
+4. **最低优先级**：不稳定的选择器（避免使用）
+
+### 代码质量提升实践
+
+#### 1. 测试文件结构优化
+
+```typescript
+/**
+ * CourseCard 组件单元测试
+ *
+ * 测试课程卡片组件的渲染、数据格式化和用户交互功能
+ * 验证组件在不同数据情况下都能正常工作
+ */
+
+import { describe, it, beforeEach, afterEach } from 'vitest'
+import CourseCard from '@/components/courses/CourseCard.vue'
+import { createStandardComponentWrapper, cleanupTestState } from '../../utils/unit-test-config'
+import { createCourse, PRESET_COURSES } from '../../utils/test-data-factory'
+
+// 提取共享配置
+const mountCourseCard = createStandardComponentWrapper(CourseCard, {
+  TechCard: { template: '<div><slot /></div>' },
+  TechButton: { template: '<button><slot /></button>' }
+})
+
+describe('CourseCard 组件', () => {
+  beforeEach(() => {
+    cleanupTestState()
+  })
+
+  afterEach(() => {
+    cleanupTestState()
+  })
+
+  // 测试用例...
+})
+```
+
+#### 2. 测试辅助函数提取
+
+```typescript
+// utils/test-helpers.ts
+export function createMockEvent(type: string, options = {}) {
+  return {
+    type,
+    preventDefault: vi.fn(),
+    stopPropagation: vi.fn(),
+    target: { value: '', checked: false, ...options },
+    ...options
+  }
+}
+
+export function createMockFile(name = 'test.jpg', size = 1024, type = 'image/jpeg') {
+  const file = new File(['test'], name, { type })
+  Object.defineProperty(file, 'size', { value: size })
+  return file
+}
+```
+
+### 重构步骤指南
+
+#### 阶段1：基础设施建设
+1. 创建测试数据工厂（`test-data-factory.ts`）
+2. 创建单元测试共享配置（`unit-test-config.ts`）
+3. 创建E2E测试共享设置（`e2e-test-setup.ts`）
+4. 扩展选择器常量（`selectors.ts`）
+
+#### 阶段2：渐进式重构
+1. 从高频使用的测试文件开始
+2. 优先重构重复度高的代码
+3. 保持向后兼容性
+4. 逐步迁移到新的模式
+
+#### 阶段3：质量验证
+1. 确保所有测试通过
+2. 检查代码重复率降低
+3. 验证选择器稳定性提升
+4. 确认文档完整性
+
+### 质量指标
+
+#### 量化目标
+- **代码重复率**：减少至少30%的重复代码
+- **选择器稳定性**：80%以上使用`data-testid`选择器
+- **数据一致性**：所有测试使用统一的数据工厂
+- **文档覆盖率**：所有测试文件添加头部注释
+
+#### 监控指标
+- 测试执行时间是否改善
+- 测试失败率是否降低
+- 新增测试的开发效率
+- 代码审查意见数量
+
+### 工具和资源
+
+#### 推荐工具
+- **ESLint规则**：检测代码重复和不稳定选择器
+- **测试数据验证器**：确保数据格式一致性
+- **选择器迁移工具**：自动检测和建议替换选择器
+
+#### 相关文档
+- [测试代码质量规范](TESTING_CODE_QUALITY.md)
+- [测试数据工厂](../utils/test-data-factory.ts)
+- [测试选择器](../utils/selectors.ts)
+- [E2E测试ID使用规范](E2E_TEST_ID_GUIDELINES.md)
+
+---
+
+## ✅ 代码审查清单
 
 ### 命名原则
 

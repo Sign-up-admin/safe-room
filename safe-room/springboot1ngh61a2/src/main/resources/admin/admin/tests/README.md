@@ -1,15 +1,22 @@
 # Admin 前端自动化测试文档
 
-本目录包含针对 admin 前端应用的完整测试套件，包括单元测试、集成测试和端到端测试。
+本目录包含针对 admin 前端应用的完整测试套件，包括单元测试、集成测试和端到端测试。通过统一的测试工具库，提供高效、可复用的测试环境。
 
 ## 📁 目录结构
 
 ```
 tests/
 ├── setup/
-│   └── vitest.setup.ts          # 全局测试配置和 mocks
+│   ├── vitest.setup.ts          # 全局测试配置和 mocks
+│   └── global-setup.ts          # 全局测试环境初始化
 ├── utils/
-│   ├── test-helpers.ts          # 通用测试工具和辅助函数
+│   ├── index.ts                 # 统一导出入口 (推荐使用)
+│   ├── test-helpers.ts          # Admin 专用测试辅助函数
+│   ├── unit-test-helpers.ts     # 通用组件测试辅助函数
+│   ├── data-factory.ts          # 测试数据工厂
+│   ├── component-test-helpers.ts # 组件测试专用工具
+│   ├── lifecycle-test-helpers.ts # 生命周期测试工具
+│   ├── shared-helpers.ts        # 共享辅助函数
 │   └── mocks/                   # Mock 工具库
 │       ├── jquery.mock.ts       # jQuery 相关 mocks
 │       ├── element-plus.mock.ts # Element Plus 组件 mocks
@@ -21,15 +28,17 @@ tests/
 │   ├── constants/               # 常量配置测试
 │   ├── views/                   # 页面组件测试
 │   └── integration/             # 集成相关单元测试
-│       ├── jquery-initialization.test.ts
-│       └── element-plus-components.test.ts
 ├── integration/                 # 集成测试
 │   ├── script-loading.test.ts
 │   ├── component-interaction.test.ts
 │   ├── data-flow.test.ts
 │   └── navigation-flow.test.ts
-└── e2e/                         # 端到端测试
-    └── app-initialization.test.ts
+├── e2e/                         # 端到端测试
+│   ├── app-initialization.test.ts
+│   └── admin-journey/           # Admin 用户操作流程测试
+└── shared/                      # 共享测试资源
+    ├── factories/               # 数据工厂
+    └── mocks/                   # 共享 mocks
 ```
 
 ## 🧪 测试类型
@@ -42,6 +51,269 @@ tests/
 
 ### 端到端测试 (E2E Tests)
 测试完整用户流程和应用初始化，位于 `e2e/` 目录下。
+
+## 🛠️ 测试工具库
+
+### 统一导入
+
+```typescript
+// 推荐：从统一入口导入所有工具
+import {
+  ComponentWrappers,
+  MockCreators,
+  DataGenerators,
+  TestScenarios,
+  mountComponent,
+  createMockUser
+} from '@/tests/utils'
+```
+
+### 组件测试
+
+#### 基础组件挂载
+
+```typescript
+import { mountComponent, ComponentWrappers } from '@/tests/utils'
+
+// 基础挂载
+const wrapper = mountComponent(MyComponent, {
+  props: { /* props */ },
+  global: { /* global options */ }
+})
+
+// 智能挂载（自动配置环境）
+const adminWrapper = ComponentWrappers.admin(MyAdminComponent)
+const formWrapper = ComponentWrappers.form(MyFormComponent, formData)
+const tableWrapper = ComponentWrappers.table(MyTableComponent, tableData)
+```
+
+#### 高级组件Wrapper
+
+```typescript
+import { createComponentWrapper } from '@/tests/utils'
+
+const wrapper = createComponentWrapper(MyComponent, {
+  useRouter: true,      // 启用路由
+  usePinia: true,       // 启用状态管理
+  isAdmin: true,        // Admin组件模式
+  authenticated: true,  // 需要认证
+  mocks: { /* 自定义mocks */ },
+  stubs: { /* 自定义stubs */ }
+})
+```
+
+### Mock创建
+
+#### 统一Mock创建器
+
+```typescript
+import { MockCreators, createUnifiedMocks } from '@/tests/utils'
+
+// 快速创建不同类型的mock
+const basicMocks = MockCreators.basic()
+const adminMocks = MockCreators.admin()
+const authMocks = MockCreators.authenticated()
+
+// 自定义mock
+const customMocks = createUnifiedMocks({
+  elementPlus: true,
+  admin: true,
+  authenticated: false,
+  customMocks: { $customApi: vi.fn() }
+})
+```
+
+#### API和数据Mock
+
+```typescript
+import { createApiMocks, createDataMocks } from '@/tests/utils'
+
+const apiMocks = createApiMocks('/api/v1')
+const dataMocks = createDataMocks()
+
+// 使用mock数据
+const users = dataMocks.users(5)
+const tableData = dataMocks.tableData(10)
+```
+
+### 测试数据生成
+
+#### 数据工厂
+
+```typescript
+import { DataGenerators, UserFactory, TestScenarios } from '@/tests/utils'
+
+// 使用预定义工厂
+const user = UserFactory.create({ name: 'John' })
+const users = UserFactory.createMany(5)
+
+// 使用数据生成器
+const testUsers = DataGenerators.users(10)
+const randomUsers = DataGenerators.randomUsers(5)
+const validForm = DataGenerators.validUserForm({ email: 'test@example.com' })
+
+// 使用测试场景
+const emptyData = TestScenarios.empty.users()
+const edgeCase = TestScenarios.edge.unicode.user()
+const adminUser = TestScenarios.permissions.admin()
+```
+
+#### 自定义数据工厂
+
+```typescript
+import { DataFactory } from '@/tests/utils'
+
+const CustomFactory = new DataFactory((index = 0) => ({
+  id: index + 1,
+  name: `Custom ${index + 1}`,
+  value: Math.random()
+}))
+
+const item = CustomFactory.create({ name: 'Special Item' })
+const items = CustomFactory.createMany(10)
+```
+
+### 断言辅助
+
+```typescript
+import { testAssertions } from '@/tests/utils'
+
+describe('MyComponent', () => {
+  it('renders correctly', () => {
+    const wrapper = mountComponent(MyComponent)
+
+    testAssertions.assertComponentRendered(wrapper)
+    testAssertions.assertComponentContainsText(wrapper, 'Hello World')
+    testAssertions.assertEventEmitted(wrapper, 'click')
+    testAssertions.assertProps(wrapper, { disabled: false })
+  })
+})
+```
+
+### 测试环境设置
+
+#### Admin认证环境
+
+```typescript
+import { setupAdminAuth, createHappyDOMWrapper } from '@/tests/utils'
+
+describe('Admin Components', () => {
+  beforeEach(() => {
+    createHappyDOMWrapper()
+    setupAdminAuth()
+  })
+
+  it('works with authentication', () => {
+    // 测试已认证的Admin组件
+  })
+})
+```
+
+## 📋 使用指南
+
+### 编写单元测试
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { ComponentWrappers, DataGenerators } from '@/tests/utils'
+import MyComponent from '@/components/MyComponent.vue'
+
+describe('MyComponent', () => {
+  it('renders user data', () => {
+    const user = DataGenerators.user.create({ name: 'John' })
+    const wrapper = ComponentWrappers.basic(MyComponent, {
+      props: { user }
+    })
+
+    expect(wrapper.text()).toContain('John')
+  })
+
+  it('handles admin interactions', () => {
+    const wrapper = ComponentWrappers.authenticated(MyComponent)
+    const button = wrapper.find('button')
+
+    await button.trigger('click')
+    expect(wrapper.emitted('action')).toBeTruthy()
+  })
+})
+```
+
+### 编写集成测试
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { MockCreators, createCombinedMocks } from '@/tests/utils'
+
+describe('User Management Flow', () => {
+  it('creates and displays user', async () => {
+    const { mocks, data } = createCombinedMocks({
+      api: true,
+      data: true,
+      admin: true,
+      authenticated: true
+    })
+
+    // 设置mock响应
+    mocks.$http.post.mockResolvedValue(data.api.success({ id: 1 }))
+
+    // 执行集成测试逻辑
+    // ...
+  })
+})
+```
+
+### 编写E2E测试
+
+```typescript
+import { test } from '@playwright/test'
+import { setupAdminAuth, loginAsAdmin } from '@/tests/utils'
+
+test('admin user journey', async ({ page }) => {
+  await setupAdminAuth(page)
+  await loginAsAdmin(page)
+
+  // 执行E2E测试流程
+  // ...
+})
+```
+
+## 🔧 配置和扩展
+
+### 自定义Mock
+
+```typescript
+// tests/utils/custom-mocks.ts
+export const customMocks = {
+  $customService: vi.fn(),
+  $externalApi: vi.fn()
+}
+
+// tests/utils/index.ts
+export { customMocks } from './custom-mocks'
+```
+
+### 自定义数据工厂
+
+```typescript
+// tests/utils/custom-factory.ts
+import { DataFactory } from './data-factory'
+
+export const CustomEntityFactory = new DataFactory((index = 0) => ({
+  id: index + 1,
+  title: `Entity ${index + 1}`,
+  description: `Description ${index + 1}`
+}))
+```
+
+## 📊 测试覆盖率
+
+运行测试时自动生成覆盖率报告：
+
+```bash
+npm run test:coverage
+```
+
+覆盖率报告位于 `coverage/index.html`。
 
 ## 🚀 运行测试
 

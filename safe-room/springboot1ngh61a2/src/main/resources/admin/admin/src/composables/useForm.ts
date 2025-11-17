@@ -6,6 +6,7 @@ import { ref, reactive, computed, type Ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import http from '@/utils/http'
+import { errorHandler } from '@/utils/errorHandler'
 import type { ApiResponse } from './useCrud'
 
 export interface FormOptions {
@@ -87,9 +88,15 @@ export function useForm<T extends Record<string, any> = Record<string, any>>(
         onError?.(response.data)
       }
     } catch (error: any) {
-      console.error(error)
-      const message = error?.response?.data?.msg || error?.message || '保存失败'
-      ElMessage.error(message)
+      // 使用统一错误处理器处理错误
+      errorHandler.handleApiError(error, {
+        showToast: true,
+        redirect: false, // 表单错误通常不需要跳转
+        logToConsole: true,
+        context: `${moduleKey} Form Submit`
+      }).catch(() => {
+        // 错误处理器返回rejected promise，这里不需要额外处理
+      })
       onError?.(error)
     } finally {
       submitting.value = false

@@ -18,7 +18,7 @@ export class MembershipListPage {
     logTestStep('会员卡列表页面加载完成')
   }
 
-  async clickMembershipCard(index: number = 0): Promise<void> {
+  async clickMembershipCard(index = 0): Promise<void> {
     const cards = this.page.locator('.membership-card, .card-item')
     await cards.nth(index).click()
     logTestStep(`点击第 ${index + 1} 个会员卡`)
@@ -29,7 +29,7 @@ export class MembershipListPage {
     return await cards.count()
   }
 
-  async getCardPrice(index: number = 0): Promise<string> {
+  async getCardPrice(index = 0): Promise<string> {
     const cards = this.page.locator('.membership-card, .card-item')
     const priceElement = cards.nth(index).locator('.price, .card-price')
     return await priceElement.textContent() || ''

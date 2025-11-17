@@ -5,6 +5,9 @@ import { createPinia } from 'pinia'
 import { ElMessage } from 'element-plus'
 import IndexHeader from '@/components/index/IndexHeader.vue'
 import IndexMain from '@/components/index/IndexMain.vue'
+import storage from '@/utils/storage'
+import http from '@/utils/http'
+import { useTagsViewStore } from '@/stores/tagsView'
 
 // Mock Element Plus
 vi.mock('element-plus', () => ({
@@ -17,40 +20,7 @@ vi.mock('element-plus', () => ({
   }
 }))
 
-// Mock utils
-vi.mock('../../../src/utils/storage', () => ({
-  default: {
-    get: vi.fn(),
-    set: vi.fn(),
-    clear: vi.fn(),
-    remove: vi.fn()
-  }
-}))
-
-vi.mock('../../../src/utils/http', () => ({
-  default: {
-    get: vi.fn(),
-    post: vi.fn()
-  }
-}))
-
-vi.mock('../../../src/utils/base', () => ({
-  default: {
-    get: vi.fn(() => ({
-      url: 'http://localhost:8080',
-      indexUrl: 'http://localhost:8080/front'
-    })),
-    getProjectName: vi.fn(() => ({
-      projectName: 'Gym Management System'
-    }))
-  }
-}))
-
-vi.mock('../../../src/stores/tagsView', () => ({
-  useTagsViewStore: vi.fn(() => ({
-    delAllViews: vi.fn()
-  }))
-}))
+// Note: Global mocks for utils/storage, utils/http, utils/base, and stores/tagsView are defined in vitest.setup.ts
 
 describe('Component Interaction Integration', () => {
   let router: any
@@ -120,7 +90,7 @@ describe('Component Interaction Integration', () => {
   describe('Header and Router Integration', () => {
     it('should handle route navigation from header dropdown', async () => {
       // Mock storage to return admin role (to hide "Visit Frontend" option)
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockStorage = vi.mocked(storage)
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'adminName') return 'Test Admin'
         if (key === 'role') return 'Administrator'
@@ -145,8 +115,8 @@ describe('Component Interaction Integration', () => {
     })
 
     it('should handle logout flow with router navigation', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(storage)
+      const mockTagsViewStore = vi.mocked(useTagsViewStore)
 
       const wrapper = mount(IndexHeader, {
         global: {
@@ -168,8 +138,8 @@ describe('Component Interaction Integration', () => {
 
   describe('Component State Management', () => {
     it('should handle user session data flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockStorage = vi.mocked(storage)
+      const mockHttp = vi.mocked(http)
 
       // Mock session table and successful response
       mockStorage.get.mockImplementation((key: string) => {
@@ -205,8 +175,8 @@ describe('Component Interaction Integration', () => {
     })
 
     it('should handle session errors gracefully', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockStorage = vi.mocked(storage)
+      const mockHttp = vi.mocked(http)
 
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'sessionTable') return 'yonghu'
@@ -231,7 +201,7 @@ describe('Component Interaction Integration', () => {
 
   describe('Store and Component Integration', () => {
     it('should integrate with TagsView store', async () => {
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockTagsViewStore = vi.mocked(useTagsViewStore)
 
       const wrapper = mount(IndexHeader, {
         global: {
@@ -261,8 +231,8 @@ describe('Component Interaction Integration', () => {
 
   describe('Error Handling Integration', () => {
     it('should show error messages for failed operations', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockHttp = vi.mocked(http)
+      const mockStorage = vi.mocked(storage)
 
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'sessionTable') return 'yonghu'
@@ -288,8 +258,8 @@ describe('Component Interaction Integration', () => {
     })
 
     it('should handle network errors in session loading', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockHttp = vi.mocked(http)
+      const mockStorage = vi.mocked(storage)
 
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'sessionTable') return 'yonghu'
@@ -314,9 +284,9 @@ describe('Component Interaction Integration', () => {
 
   describe('Full User Journey', () => {
     it('should support complete login to logout flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(storage)
+      const mockHttp = vi.mocked(http)
+      const mockTagsViewStore = vi.mocked(useTagsViewStore)
 
       // Setup initial state (logged in)
       mockStorage.get.mockImplementation((key: string) => {
@@ -355,7 +325,7 @@ describe('Component Interaction Integration', () => {
     })
 
     it('should handle navigation between different sections', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockStorage = vi.mocked(storage)
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'adminName') return 'Test Admin'
         if (key === 'role') return 'User'

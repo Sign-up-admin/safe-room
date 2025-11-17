@@ -1,5 +1,5 @@
 <template>
-  <div class="coach-detail" v-if="coach">
+  <div v-if="coach" class="coach-detail">
     <section class="coach-hero">
       <div class="coach-hero__media">
         <img :src="resolveAssetUrl(coach.zhaopian)" :alt="coach.jiaolianxingming" />
@@ -57,7 +57,7 @@
           </p>
         </TechCard>
 
-        <TechCard title="授课课程" subtitle="当前负责课程" v-loading="loading.courses">
+        <TechCard v-loading="loading.courses" title="授课课程" subtitle="当前负责课程">
           <div class="coach-courses">
             <article v-for="course in courses" :key="course.id">
               <div>
@@ -85,8 +85,8 @@
                 <button
                   v-for="slot in day.slots"
                   :key="slot.time"
+                  class="schedule-slot"
                   :class="[
-                    'schedule-slot',
                     `schedule-slot--${slot.status}`,
                     { 'schedule-slot--selected': isSelectedSlot(day.label, slot.time) },
                   ]"
@@ -190,9 +190,7 @@ const coachProfile = computed(() => ({
   price: coach.value?.sijiaojiage || 499,
   clients: 220 + ((coach.value?.id ?? 0) % 6) * 40,
   skills: deriveSkills(coach.value),
-  philosophy:
-    coach.value?.gerenjianjie?.slice(0, 120) ||
-    '倡导“科学训练 + 数据反馈 + 生活习惯重塑”的闭环式训练路径。',
+  philosophy: coach.value?.gerenjianjie?.slice(0, 120) || '倡导“科学训练 + 数据反馈 + 生活习惯重塑”的闭环式训练路径。',
 }))
 
 const skillMetrics = computed(() => buildSkillMetrics(coachProfile.value.skills))

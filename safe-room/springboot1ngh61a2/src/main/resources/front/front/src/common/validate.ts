@@ -180,4 +180,3 @@ const validate: Validate = {
 }
 
 export default validate
-

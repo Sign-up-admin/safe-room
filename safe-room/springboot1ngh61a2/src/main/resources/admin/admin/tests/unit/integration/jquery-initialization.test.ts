@@ -3,12 +3,14 @@
  * 测试 jQuery 脚本加载顺序和初始化问题
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 // 模拟 jQuery 未加载的情况
 describe('jQuery Initialization Tests', () => {
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     // 清理全局 jQuery 变量
     delete window.jQuery
     delete window.$
@@ -25,6 +27,8 @@ describe('jQuery Initialization Tests', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
+
     // 清理测试后可能遗留的变量
     delete window.jQuery
     delete window.$
@@ -39,31 +43,30 @@ describe('jQuery Initialization Tests', () => {
   it('should wait for jQuery to load before executing dependent code', async () => {
     let executionCount = 0
 
-    // 模拟需要 jQuery 的代码
+    // 模拟需要 jQuery 的代码 - 简化逻辑
     function codeNeedingJQuery(): Promise<void> {
       return new Promise((resolve) => {
-        if (typeof window.jQuery === 'undefined') {
+        function checkJQuery() {
+          if (typeof window.jQuery === 'undefined') {
+            executionCount++
+            // 如果 jQuery 未加载，继续检查
+            setTimeout(checkJQuery, 10)
+            return
+          }
+
+          // jQuery 已加载，执行依赖代码
           executionCount++
-          // 如果 jQuery 未加载，安排下一次检查
-          setTimeout(() => {
-            resolve(codeNeedingJQuery())
-          }, 10)
-          return
+          const element = window.jQuery('<div>test</div>')
+          expect(element.length).toBe(1)
+          expect(element.text()).toBe('test')
+          resolve()
         }
 
-        // jQuery 已加载，执行依赖代码
-        executionCount++
-        const element = window.jQuery('<div>test</div>')
-        expect(element.length).toBe(1)
-        expect(element.text()).toBe('test')
-        resolve()
+        checkJQuery()
       })
     }
 
-    // 开始执行依赖代码
-    await codeNeedingJQuery()
-
-    // 模拟 jQuery 加载完成
+    // 设置 jQuery 的异步加载逻辑
     setTimeout(() => {
       // 模拟 jQuery 库加载
       window.jQuery = window.$ = function(selector: any) {
@@ -84,12 +87,18 @@ describe('jQuery Initialization Tests', () => {
         return { length: 0 }
       }
       window.jQuery.fn = window.$.fn = {}
-    }, 50)
+    }, 30)
+
+    // 开始执行依赖代码
+    const promise = codeNeedingJQuery()
+
+    // 推进时间，确保异步操作完成
+    vi.advanceTimersByTime(50)
+
+    await promise
 
     // 验证至少执行了一次等待检查
-    setTimeout(() => {
-      expect(executionCount).toBeGreaterThan(1)
-    }, 100)
+    expect(executionCount).toBeGreaterThan(1)
   })
 
   it('should handle DOM ready state correctly', async () => {
@@ -113,11 +122,10 @@ describe('jQuery Initialization Tests', () => {
     // 测试 DOM 未准备好的情况
     expect(document.readyState).toBe('loading')
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadDependentScripts)
-    } else {
+    // 设置事件监听器
+    document.addEventListener('DOMContentLoaded', () => {
       loadDependentScripts()
-    }
+    })
 
     // 模拟 jQuery 加载
     setTimeout(() => {
@@ -128,6 +136,15 @@ describe('jQuery Initialization Tests', () => {
     setTimeout(() => {
       document.dispatchEvent(new Event('DOMContentLoaded'))
     }, 30)
+
+    // 推进时间，确保异步操作完成
+    vi.advanceTimersByTime(50)
+
+    // 等待异步操作完成
+    await Promise.resolve()
+
+    // 验证脚本加载被调用
+    expect(loadScriptsCalled).toBe(true)
   })
 
   it('should prevent jQuery initialization errors', () => {
@@ -158,60 +175,101 @@ describe('jQuery Initialization Tests', () => {
     let successCount = 0
 
     // 模拟脚本加载逻辑
-    function loadScript(src: string, onSuccess?: () => void, onError?: (error: Error) => void) {
-      if (src === 'error.js') {
-        // 模拟加载失败
-        setTimeout(() => {
+    function loadScript(src: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        if (src === 'error.js') {
+          // 模拟加载失败
           errorCount++
-          onError && onError(new Error('Script load failed'))
-        }, 10)
-      } else {
-        // 模拟加载成功
-        setTimeout(() => {
+          reject(new Error('Script load failed'))
+        } else {
+          // 模拟加载成功
           successCount++
-          onSuccess && onSuccess()
-        }, 10)
+          resolve()
+        }
+      })
+    }
+
+    // 测试错误处理 - 顺序加载脚本
+    const scripts = ['working.js', 'error.js', 'another.js']
+
+    // 逐个加载脚本，处理错误
+    for (const script of scripts) {
+      try {
+        await loadScript(script)
+      } catch (error) {
+        // 错误已经被计数，忽略
       }
     }
 
-    // 测试错误处理
-    const scripts = ['working.js', 'error.js', 'another.js']
-    let loadIndex = 0
-
-    function loadNext(): Promise<void> {
-      return new Promise((resolve) => {
-        if (loadIndex >= scripts.length) {
-          // 所有脚本处理完成
-          expect(successCount).toBe(2) // working.js 和 another.js 成功
-          expect(errorCount).toBe(1) // error.js 失败
-          resolve()
-          return
-        }
-
-      const script = scripts[loadIndex]
-      loadScript(
-        script,
-        () => {
-          loadIndex++
-          loadNext()
-        },
-        () => {
-          loadIndex++
-          loadNext()
-        }
-      )
-    }
-
-    await loadNext()
+    // 验证结果
+    expect(successCount).toBe(2) // working.js 和 another.js 成功
+    expect(errorCount).toBe(1) // error.js 失败
   })
 
-  it('should properly initialize jQuery plugins after core load', () => {
+  it('should handle script loading timeouts gracefully', async () => {
+    let timeoutReached = false
+    let scriptLoaded = false
+
+    function loadWithTimeout(): Promise<void> {
+      return new Promise((resolve) => {
+        const startTime = Date.now()
+
+        function checkTimeout() {
+          if (Date.now() - startTime > 5000) { // 5秒超时
+            timeoutReached = true
+            resolve()
+            return
+          }
+
+          if (typeof window.jQuery !== 'undefined') {
+            scriptLoaded = true
+            resolve()
+            return
+          }
+
+          setTimeout(checkTimeout, 100)
+        }
+
+        checkTimeout()
+      })
+    }
+
+    // 开始加载检查
+    const loadPromise = loadWithTimeout()
+
+    // 模拟长时间等待
+    vi.advanceTimersByTime(6000)
+
+    await loadPromise
+    expect(timeoutReached).toBe(true)
+    expect(scriptLoaded).toBe(false)
+
+    // 现在加载 jQuery
+    window.jQuery = window.$ = { version: '3.4.1' }
+
+    // 重新调用
+    const loadPromise2 = loadWithTimeout()
+
+    // 立即加载
+    vi.advanceTimersByTime(10)
+
+    await loadPromise2
+    expect(scriptLoaded).toBe(true)
+  })
+
+  it('should load jQuery core successfully', () => {
     // 先加载 jQuery
     ;(global as any).mockJQuery()
 
     // 确保 jQuery 已加载
     expect(typeof window.jQuery).toBe('function')
     expect(typeof window.$).toBe('function')
+    expect(window.jQuery).toBe(window.$)
+  })
+
+  it('should initialize jQuery plugins after core load', () => {
+    // 先加载 jQuery
+    ;(global as any).mockJQuery()
 
     // 测试依赖 jQuery 的插件代码
     function initializePlugin() {
@@ -233,10 +291,48 @@ describe('jQuery Initialization Tests', () => {
     // 应该成功初始化插件
     expect(() => initializePlugin()).not.toThrow()
     expect(typeof window.jQuery.fn.myPlugin).toBe('function')
+  })
+
+  it('should execute jQuery plugin functionality correctly', () => {
+    // 先加载 jQuery
+    ;(global as any).mockJQuery()
+
+    // 初始化插件 - 直接添加到实例上（mock 环境下）
+    const element = window.jQuery('<div>')
+    element.myPlugin = function(options: { color?: string }) {
+      // 插件逻辑
+      this.css('color', options.color || 'black')
+      return this
+    }
 
     // 测试插件使用
-    const element = window.jQuery('<div>')
     element.myPlugin({ color: 'red' })
     expect(element._css.color).toBe('red')
+
+    // 测试默认颜色
+    const element2 = window.jQuery('<div>')
+    element2.myPlugin = function(options: { color?: string }) {
+      this.css('color', options.color || 'black')
+      return this
+    }
+    element2.myPlugin({})
+    expect(element2._css.color).toBe('black')
+  })
+
+  it('should fail plugin initialization when jQuery not loaded', () => {
+    // 确保 jQuery 未加载
+    delete window.jQuery
+    delete window.$
+
+    // 测试依赖 jQuery 的插件代码
+    function initializePlugin() {
+      if (typeof window.jQuery === 'undefined') {
+        throw new Error('jQuery not loaded')
+      }
+      return true
+    }
+
+    // 应该抛出错误
+    expect(() => initializePlugin()).toThrow('jQuery not loaded')
   })
 })

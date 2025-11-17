@@ -1,0 +1,61 @@
+{
+  "description": "测试性能基准线配置",
+  "version": "1.0.0",
+  "baseline": {
+    "createdAt": null,
+    "updatedAt": null,
+    "samples": [],
+    "averages": {
+      "totalDuration": 0,
+      "averageDuration": 0,
+      "slowTestCount": 0
+    },
+    "trends": {
+      "durationTrend": 0,
+      "performanceChange": 0
+    }
+  },
+  "thresholds": {
+    "slowTestThreshold": 30,
+    "performanceRegressionThreshold": 20,
+    "minSamplesForBaseline": 3,
+    "baselineUpdateIntervalDays": 7,
+    "historyRetentionDays": 90
+  },
+  "environment": {
+    "recommendedNodeVersion": ">=16.0.0",
+    "recommendedNpmVersion": ">=8.0.0",
+    "minCpuCores": 2,
+    "minMemoryGB": 4
+  },
+  "monitoring": {
+    "enabled": true,
+    "alertOnRegression": true,
+    "alertOnImprovement": false,
+    "generateTrendReports": true,
+    "baselineAutoUpdate": true
+  },
+  "exclusions": {
+    "testPatterns": [
+      "**/*.perf.test.*",
+      "**/performance/**",
+      "**/benchmark/**"
+    ],
+    "justifications": {
+      "**/*.perf.test.*": "专门的性能测试，不计入基准线",
+      "**/performance/**": "性能测试目录",
+      "**/benchmark/**": "基准测试目录"
+    }
+  },
+  "reporting": {
+    "includeEnvironmentInfo": true,
+    "includeHistoricalTrends": true,
+    "generateCharts": true,
+    "exportFormats": ["html", "json", "csv"],
+    "schedule": {
+      "daily": true,
+      "weekly": true,
+      "monthly": true
+    }
+  }
+}

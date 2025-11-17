@@ -2,13 +2,11 @@ import { defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@vueup/vue-quill', () => {
-  return {
+vi.mock('@vueup/vue-quill', () => ({
     QuillEditor: defineComponent({
       name: 'QuillEditor',
       props: ['content'],
       emits: ['update:content'],
-      template: '<div class="quill-editor"></div>',
       methods: {
         getQuill() {
           return {
@@ -18,9 +16,9 @@ vi.mock('@vueup/vue-quill', () => {
           }
         },
       },
+      template: '<div class="quill-editor"></div>',
     }),
-  }
-})
+  }))
 
 const elementStubs = {
   'el-upload': defineComponent({

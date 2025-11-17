@@ -1,27 +1,29 @@
 <template>
   <div class="discussion-composer" role="dialog" aria-modal="true" aria-labelledby="composer-title">
     <!-- 发布按钮 -->
-    <div class="composer-trigger" @click="toggleComposer" v-if="!isVisible">
+    <div v-if="!isVisible" class="composer-trigger" @click="toggleComposer">
       <TechButton size="lg" :icon="Plus">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         发布讨论
       </TechButton>
     </div>
 
     <!-- 编辑器界面 -->
-    <div class="composer-editor" v-show="isVisible">
+    <div v-show="isVisible" class="composer-editor">
       <div class="editor-header">
         <h3 id="composer-title">{{ isEditMode ? '编辑讨论' : '发布新讨论' }}</h3>
         <div class="editor-actions">
-          <TechButton size="sm" variant="outline" @click="saveDraft" :disabled="!hasContent">
-            💾 保存草稿
-          </TechButton>
-          <TechButton size="sm" variant="outline" @click="toggleComposer">
-            取消
-          </TechButton>
-          <TechButton size="sm" @click="submitDiscussion" :loading="submitting" :disabled="!canSubmit">
+          <TechButton size="sm" variant="outline" :disabled="!hasContent" @click="saveDraft"> 💾 保存草稿 </TechButton>
+          <TechButton size="sm" variant="outline" @click="toggleComposer"> 取消 </TechButton>
+          <TechButton size="sm" :loading="submitting" :disabled="!canSubmit" @click="submitDiscussion">
             {{ isEditMode ? '更新' : '发布' }}
           </TechButton>
         </div>
@@ -29,9 +31,7 @@
 
       <!-- 讨论标题 -->
       <div class="editor-field">
-        <label for="discussion-title" class="field-label">
-          讨论标题 <span class="required">*</span>
-        </label>
+        <label for="discussion-title" class="field-label"> 讨论标题 <span class="required">*</span> </label>
         <el-input
           id="discussion-title"
           v-model="formData.title"
@@ -39,46 +39,32 @@
           maxlength="50"
           show-word-limit
           aria-required="true"
-          :aria-describedby="'title-help'"
+          aria-describedby="title-help"
         />
         <div id="title-help" class="sr-only">标题最多50个字符，必填项</div>
       </div>
 
       <!-- 关联课程 -->
       <div class="editor-field">
-        <label for="discussion-course" class="field-label">
-          关联课程
-        </label>
+        <label for="discussion-course" class="field-label"> 关联课程 </label>
         <el-select
           id="discussion-course"
           v-model="formData.refid"
           placeholder="选择相关课程（可选）"
           clearable
           filterable
-          :aria-label="'关联课程选择'"
+          aria-label="关联课程选择"
         >
-          <el-option
-            v-for="course in courseOptions"
-            :key="course.value"
-            :label="course.label"
-            :value="course.value"
-          />
+          <el-option v-for="course in courseOptions" :key="course.value" :label="course.label" :value="course.value" />
         </el-select>
       </div>
 
       <!-- 标签选择 -->
       <div class="editor-field">
-        <label class="field-label">
-          话题标签
-        </label>
+        <label class="field-label"> 话题标签 </label>
         <div class="tag-selector" role="group" aria-label="选择话题标签">
           <el-checkbox-group v-model="selectedTags" aria-label="话题标签选择组">
-            <el-checkbox
-              v-for="tag in availableTags"
-              :key="tag"
-              :label="tag"
-              :aria-label="`选择标签 ${tag}`"
-            >
+            <el-checkbox v-for="tag in availableTags" :key="tag" :label="tag" :aria-label="`选择标签 ${tag}`">
               {{ tag }}
             </el-checkbox>
           </el-checkbox-group>
@@ -87,9 +73,7 @@
 
       <!-- 富文本编辑器 -->
       <div class="editor-field">
-        <label class="field-label">
-          讨论内容 <span class="required">*</span>
-        </label>
+        <label class="field-label"> 讨论内容 <span class="required">*</span> </label>
         <div class="editor-container">
           <!-- 工具栏 -->
           <div class="editor-toolbar">
@@ -97,24 +81,36 @@
               v-for="tool in toolbarTools"
               :key="tool.id"
               class="toolbar-btn"
-              @click="executeCommand(tool)"
               :title="tool.title"
               :aria-label="tool.title"
+              @click="executeCommand(tool)"
             >
               <component :is="tool.icon" size="16" />
             </button>
             <div class="toolbar-separator"></div>
-            <button class="toolbar-btn" @click="insertImage" title="插入图片" aria-label="插入图片">
+            <button class="toolbar-btn" title="插入图片" aria-label="插入图片" @click="insertImage">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                <circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="2"/>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" stroke="currentColor" stroke-width="2"/>
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" />
+                <circle cx="9" cy="9" r="2" stroke="currentColor" stroke-width="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" stroke="currentColor" stroke-width="2" />
               </svg>
             </button>
-            <button class="toolbar-btn" @click="insertLink" title="插入链接" aria-label="插入链接">
+            <button class="toolbar-btn" title="插入链接" aria-label="插入链接" @click="insertLink">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -125,28 +121,24 @@
             class="editor-content"
             contenteditable="true"
             :placeholder="'分享你的经验和心得...' + (isEditMode ? '' : '\\n\\n记得选择合适的标签哦！')"
+            aria-label="讨论内容编辑器"
             @input="handleContentInput"
             @paste="handlePaste"
             @keydown="handleKeydown"
-            :aria-label="'讨论内容编辑器'"
           ></div>
 
           <!-- 字数统计 -->
           <div class="editor-footer">
-            <div class="character-count">
-              {{ contentLength }}/2000
-            </div>
+            <div class="character-count">{{ contentLength }}/2000</div>
             <div class="editor-hints">
               <span v-if="isSavingDraft" class="saving-indicator">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                  <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                  <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 正在保存草稿...
               </span>
-              <span v-else-if="lastSaved" class="saved-indicator">
-                ✓ 已保存 {{ formatLastSaved(lastSaved) }}
-              </span>
+              <span v-else-if="lastSaved" class="saved-indicator"> ✓ 已保存 {{ formatLastSaved(lastSaved) }} </span>
             </div>
           </div>
         </div>
@@ -154,9 +146,7 @@
 
       <!-- 附件上传 -->
       <div class="editor-field">
-        <label class="field-label">
-          附件上传
-        </label>
+        <label class="field-label"> 附件上传 </label>
         <div class="attachment-upload">
           <div class="upload-zone" @click="triggerFileSelect" @drop="handleDrop" @dragover.prevent>
             <input
@@ -164,14 +154,30 @@
               type="file"
               multiple
               accept="image/*,.pdf,.doc,.docx,.txt"
-              @change="handleFileSelect"
               style="display: none"
+              @change="handleFileSelect"
             />
             <div class="upload-placeholder">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/>
-                <path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 18v-6M9 15l3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M14 2v6h6"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M12 18v-6M9 15l3 3 3-3"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
               <p>点击上传或拖拽文件到此处</p>
               <small>支持图片、PDF、Word文档等，最多5个文件</small>
@@ -179,18 +185,24 @@
           </div>
 
           <!-- 已上传文件列表 -->
-          <div class="uploaded-files" v-if="uploadedFiles.length > 0">
-            <div
-              v-for="(file, index) in uploadedFiles"
-              :key="index"
-              class="uploaded-file-item"
-            >
+          <div v-if="uploadedFiles.length > 0" class="uploaded-files">
+            <div v-for="(file, index) in uploadedFiles" :key="index" class="uploaded-file-item">
               <div class="file-info">
                 <img v-if="file.type.startsWith('image/')" :src="file.preview" :alt="file.name" class="file-preview" />
                 <div v-else class="file-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/>
-                    <path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M14 2v6h6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </div>
                 <div class="file-details">
@@ -198,9 +210,9 @@
                   <span class="file-size">{{ formatFileSize(file.size) }}</span>
                 </div>
               </div>
-              <button class="remove-file-btn" @click="removeFile(index)" :aria-label="'删除文件' + file.name">
+              <button class="remove-file-btn" :aria-label="'删除文件' + file.name" @click="removeFile(index)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
               </button>
             </div>
@@ -210,12 +222,8 @@
 
       <!-- 发布选项 -->
       <div class="editor-options">
-        <el-checkbox v-model="formData.isAnonymous" :aria-label="'匿名发布'">
-          匿名发布
-        </el-checkbox>
-        <el-checkbox v-model="formData.allowReply" :aria-label="'允许回复'">
-          允许回复
-        </el-checkbox>
+        <el-checkbox v-model="formData.isAnonymous" aria-label="匿名发布"> 匿名发布 </el-checkbox>
+        <el-checkbox v-model="formData.allowReply" aria-label="允许回复"> 允许回复 </el-checkbox>
       </div>
     </div>
   </div>
@@ -228,6 +236,18 @@ import { TechButton } from '@/components/common'
 import { getModuleService } from '@/services/crud'
 import type { Jianshenkecheng } from '@/types/modules'
 
+const props = withDefaults(defineProps<Props>(), {
+  visible: false,
+  courseOptions: () => [],
+})
+
+// Emits
+const emit = defineEmits<{
+  submit: [data: any]
+  cancel: []
+  saveDraft: [data: any]
+}>()
+
 // 图标组件
 const Plus = 'Plus'
 
@@ -237,18 +257,6 @@ interface Props {
   editData?: any
   courseOptions?: Array<{ label: string; value: number }>
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  visible: false,
-  courseOptions: () => []
-})
-
-// Emits
-const emit = defineEmits<{
-  submit: [data: any]
-  cancel: []
-  saveDraft: [data: any]
-}>()
 
 // 状态
 const isVisible = ref(false)
@@ -265,19 +273,21 @@ const formData = ref({
   refid: undefined as number | undefined,
   tags: [] as string[],
   isAnonymous: false,
-  allowReply: true
+  allowReply: true,
 })
 
 const selectedTags = ref<string[]>([])
 
 // 上传文件
-const uploadedFiles = ref<Array<{
-  file: File
-  name: string
-  size: number
-  type: string
-  preview?: string
-}>>([])
+const uploadedFiles = ref<
+  Array<{
+    file: File
+    name: string
+    size: number
+    type: string
+    preview?: string
+  }>
+>([])
 
 // 编辑器工具栏
 const toolbarTools = [
@@ -288,13 +298,27 @@ const toolbarTools = [
   { id: 'code', title: '行内代码', icon: 'Code', command: 'code' },
   { id: 'blockquote', title: '引用', icon: 'Quote', command: 'blockquote' },
   { id: 'list', title: '无序列表', icon: 'List', command: 'insertUnorderedList' },
-  { id: 'ordered-list', title: '有序列表', icon: 'ListOrdered', command: 'insertOrderedList' }
+  { id: 'ordered-list', title: '有序列表', icon: 'ListOrdered', command: 'insertOrderedList' },
 ]
 
 // 可用标签
 const availableTags = [
-  '训练', '饮食', '进阶', '复训', '器材', '心得', '问题', '建议',
-  '教练推荐', '瘦身', '增肌', '塑形', '康复', '瑜伽', '跑步', '游泳'
+  '训练',
+  '饮食',
+  '进阶',
+  '复训',
+  '器材',
+  '心得',
+  '问题',
+  '建议',
+  '教练推荐',
+  '瘦身',
+  '增肌',
+  '塑形',
+  '康复',
+  '瑜伽',
+  '跑步',
+  '游泳',
 ]
 
 // 计算属性
@@ -304,13 +328,20 @@ const canSubmit = computed(() => formData.value.title.trim() && formData.value.c
 const contentLength = computed(() => formData.value.content.length)
 
 // 监听器
-watch(() => props.visible, (newVal) => {
-  isVisible.value = newVal
-})
+watch(
+  () => props.visible,
+  newVal => {
+    isVisible.value = newVal
+  },
+)
 
-watch(selectedTags, (newTags) => {
-  formData.value.tags = newTags
-}, { deep: true })
+watch(
+  selectedTags,
+  newTags => {
+    formData.value.tags = newTags
+  },
+  { deep: true },
+)
 
 // 方法
 const toggleComposer = () => {
@@ -320,7 +351,7 @@ const toggleComposer = () => {
       ElMessageBox.confirm('内容尚未保存，确定要取消吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
       }).then(() => {
         resetForm()
         emit('cancel')
@@ -344,7 +375,7 @@ const resetForm = () => {
     refid: undefined,
     tags: [],
     isAnonymous: false,
-    allowReply: true
+    allowReply: true,
   }
   selectedTags.value = []
   uploadedFiles.value = []
@@ -376,7 +407,7 @@ const insertImage = () => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'image/*'
-  input.onchange = (e) => {
+  input.onchange = e => {
     const file = (e.target as HTMLInputElement).files?.[0]
     if (file) {
       uploadImage(file)
@@ -416,7 +447,11 @@ const uploadImage = async (file: File) => {
 
     // 模拟上传成功
     const imageUrl = URL.createObjectURL(file)
-    document.execCommand('insertHTML', false, `<img src="${imageUrl}" alt="${file.name}" style="max-width: 100%; height: auto;" />`)
+    document.execCommand(
+      'insertHTML',
+      false,
+      `<img src="${imageUrl}" alt="${file.name}" style="max-width: 100%; height: auto;" />`,
+    )
 
     ElMessage.success('图片上传成功')
   } catch (error) {
@@ -450,7 +485,8 @@ const addFile = (file: File) => {
     return
   }
 
-  if (file.size > 10 * 1024 * 1024) { // 10MB
+  if (file.size > 10 * 1024 * 1024) {
+    // 10MB
     ElMessage.warning('文件大小不能超过10MB')
     return
   }
@@ -460,7 +496,7 @@ const addFile = (file: File) => {
     name: file.name,
     size: file.size,
     type: file.type,
-    preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined
+    preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
   }
 
   uploadedFiles.value.push(fileData)
@@ -494,7 +530,7 @@ const saveDraft = async (isAuto = false) => {
       ...formData.value,
       selectedTags: selectedTags.value,
       uploadedFiles: uploadedFiles.value.map(f => ({ name: f.name, size: f.size, type: f.type })),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }
 
     // 保存到localStorage
@@ -526,7 +562,7 @@ const submitDiscussion = async () => {
       ...formData.value,
       tags: selectedTags.value,
       attachments: uploadedFiles.value.map(f => f.file),
-      addtime: new Date().toISOString()
+      addtime: new Date().toISOString(),
     }
 
     // 清除草稿
@@ -575,7 +611,7 @@ onMounted(() => {
         refid: draftData.refid,
         tags: draftData.tags || [],
         isAnonymous: draftData.isAnonymous || false,
-        allowReply: draftData.allowReply !== false
+        allowReply: draftData.allowReply !== false,
       }
       selectedTags.value = draftData.selectedTags || []
       lastSaved.value = new Date(draftData.timestamp)
@@ -610,7 +646,11 @@ onUnmounted(() => {
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {

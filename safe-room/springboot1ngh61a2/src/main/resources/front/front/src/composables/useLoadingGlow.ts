@@ -29,7 +29,9 @@ export const useLoadingGlow = (options: LoadingGlowOptions = {}) => {
     }
 
     animation = gsap.to(target, {
-      boxShadow: `0 0 ${20 + finalConfig.intensity * 30}px ${finalConfig.color}${Math.round(finalConfig.intensity * 255).toString(16).padStart(2, '0')}`,
+      boxShadow: `0 0 ${20 + finalConfig.intensity * 30}px ${finalConfig.color}${Math.round(finalConfig.intensity * 255)
+        .toString(16)
+        .padStart(2, '0')}`,
       duration: finalConfig.duration,
       ease: 'power2.inOut',
       yoyo: true,
@@ -55,4 +57,3 @@ export const useLoadingGlow = (options: LoadingGlowOptions = {}) => {
     stop,
   }
 }
-

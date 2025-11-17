@@ -10,7 +10,7 @@
       playsinline
       @error="handleSectionVideoError"
     />
-    
+
     <!-- 内容层 -->
     <div class="services__content">
       <div class="services__header">
@@ -20,42 +20,40 @@
       </div>
 
       <div class="services__grid">
-      <article
-        v-for="(card, index) in cards"
-        :key="card.title"
-        class="services__card"
-        :class="{ 
-          'services__card--use-first-bg': index >= 3,
-          'services__card--video-only': index === 2
-        }"
-        :style="{
-          '--card-accent': card.accent,
-          backgroundImage: getCardBackground(card, index),
-        }"
-        @mouseenter="() => handleHover(card.title)"
-        @mouseleave="() => handleHover(null)"
-      >
-        <video
-          v-if="shouldShowVideo(card, index)"
-          :src="getVideoSrc(card, index)"
-          autoplay
-          muted
-          loop
-          playsinline
-          @error="(e) => handleVideoError(e, index)"
-          @loadeddata="() => handleVideoLoaded(index)"
-        />
+        <article
+          v-for="(card, index) in cards"
+          :key="card.title"
+          class="services__card"
+          :class="{
+            'services__card--use-first-bg': index >= 3,
+            'services__card--video-only': index === 2,
+          }"
+          :style="{
+            '--card-accent': card.accent,
+            backgroundImage: getCardBackground(card, index),
+          }"
+          @mouseenter="() => handleHover(card.title)"
+          @mouseleave="() => handleHover(null)"
+        >
+          <video
+            v-if="shouldShowVideo(card, index)"
+            :src="getVideoSrc(card, index)"
+            autoplay
+            muted
+            loop
+            playsinline
+            @error="e => handleVideoError(e, index)"
+            @loadeddata="() => handleVideoLoaded(index)"
+          />
 
-        <div class="services__card-overlay" />
-        <div class="services__card-content">
-          <p class="services__card-tag">{{ card.tag }}</p>
-          <h3>{{ card.title }}</h3>
-          <p>{{ card.description }}</p>
-          <button class="services__card-cta" @click="$emit('navigate', card)">
-            查看详情
-          </button>
-        </div>
-      </article>
+          <div class="services__card-overlay" />
+          <div class="services__card-content">
+            <p class="services__card-tag">{{ card.tag }}</p>
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.description }}</p>
+            <button class="services__card-cta" @click="$emit('navigate', card)">查看详情</button>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -148,9 +146,7 @@ const handleVideoLoaded = (index: number) => {
 
 // 获取第一个卡片的背景
 const firstCard = cards[0]
-const firstCardBackground = firstCard.media.type === 'image' 
-  ? `url(${firstCard.media.src})` 
-  : undefined
+const firstCardBackground = firstCard.media.type === 'image' ? `url(${firstCard.media.src})` : undefined
 
 // 获取卡片背景样式：从第三个卡片开始（索引2）使用第一个卡片的背景
 const getCardBackground = (card: ServiceCard, index: number) => {
@@ -270,7 +266,9 @@ const handleSectionVideoError = (event: Event) => {
     background-position: center;
     background-color: rgba(0, 0, 0, 0.3); // 默认背景色
     border: 1px solid rgba(253, 216, 53, 0.18);
-    transition: transform 0.4s ease, border-color 0.4s ease;
+    transition:
+      transform 0.4s ease,
+      border-color 0.4s ease;
 
     video {
       position: absolute;
@@ -375,4 +373,3 @@ const handleSectionVideoError = (event: Event) => {
   }
 }
 </style>
-

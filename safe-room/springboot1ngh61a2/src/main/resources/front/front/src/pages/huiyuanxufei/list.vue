@@ -1,22 +1,15 @@
 <template>
-  <div class="renew-page" v-loading="loading">
+  <div v-loading="loading" class="renew-page">
     <section class="renew-hero">
       <div>
         <p class="section-eyebrow">MEMBERSHIP RENEWAL</p>
         <h1>续费倒计时 · 提前锁定尊享权益</h1>
         <p>系统自动同步到期时间，智能提醒 + 一键续费，避免权益中断。</p>
-        <div class="hero-countdown" v-if="nextExpiry">
+        <div v-if="nextExpiry" class="hero-countdown">
           <div class="countdown-visual">
             <div class="countdown-ring">
               <svg width="120" height="120" viewBox="0 0 120 120">
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.1)"
-                  stroke-width="8"
-                />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="8" />
                 <circle
                   cx="60"
                   cy="60"
@@ -44,23 +37,39 @@
               {{ countdownStatusText }}
             </div>
             <!-- 智能提醒状态 -->
-            <div class="reminder-status" v-if="nextExpiry.daysLeft <= 30">
+            <div v-if="nextExpiry.daysLeft <= 30" class="reminder-status">
               <div class="reminder-channels">
-                <span v-if="reminderChannels.email" class="channel-tag email" @click="sendReminderNotification('email')">
+                <span
+                  v-if="reminderChannels.email"
+                  class="channel-tag email"
+                  @click="sendReminderNotification('email')"
+                >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" stroke-width="2"/>
+                    <path
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
                   </svg>
                   邮件提醒
                 </span>
                 <span v-if="reminderChannels.sms" class="channel-tag sms" @click="sendReminderNotification('sms')">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/>
+                    <path
+                      d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
                   </svg>
                   短信提醒
                 </span>
-                <span v-if="reminderChannels.inApp" class="channel-tag inapp" @click="sendReminderNotification('inApp')">
+                <span
+                  v-if="reminderChannels.inApp"
+                  class="channel-tag inapp"
+                  @click="sendReminderNotification('inApp')"
+                >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" />
                   </svg>
                   站内提醒
                 </span>
@@ -73,7 +82,12 @@
           <TechButton size="lg" variant="outline" @click="goReminder">管理提醒</TechButton>
         </div>
       </div>
-      <TechCard class="hero-card" title="当前会员卡" :subtitle="currentCard?.huiyuankamingcheng || '未绑定'" :interactive="false">
+      <TechCard
+        class="hero-card"
+        title="当前会员卡"
+        :subtitle="currentCard?.huiyuankamingcheng || '未绑定'"
+        :interactive="false"
+      >
         <ul>
           <li>
             <span>有效期至</span>
@@ -85,7 +99,7 @@
           </li>
         </ul>
         <!-- 优惠券展示 -->
-        <div class="coupons-section" v-if="availableCoupons.length">
+        <div v-if="availableCoupons.length" class="coupons-section">
           <h4>可用优惠券</h4>
           <div class="coupons-list">
             <div v-for="coupon in availableCoupons" :key="coupon.id" class="coupon-item">
@@ -123,7 +137,7 @@
               <small>{{ formatDate(item.tixingshijian) }}</small>
             </header>
             <p>{{ item.beizhu || '系统提醒：请尽快续费' }}</p>
-            <span :class="['reminder-tag', `reminder-tag--${item.level}`]">{{ item.levelLabel }}</span>
+            <span class="reminder-tag" :class="[`reminder-tag--${item.level}`]">{{ item.levelLabel }}</span>
           </li>
           <el-empty v-if="!reminderList.length" description="暂无提醒" />
         </ul>
@@ -222,7 +236,7 @@
           >
             <div class="option-header">
               <h3>{{ option.name }}</h3>
-              <div class="option-badge" v-if="option.recommended">智能推荐</div>
+              <div v-if="option.recommended" class="option-badge">智能推荐</div>
             </div>
             <p class="option-duration">{{ option.duration }}</p>
             <div class="option-benefits">
@@ -233,7 +247,13 @@
             <!-- 智能推荐理由 -->
             <div v-if="option.recommended" class="recommendation-reason">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
               <span>{{ option.reasoning }}</span>
             </div>
@@ -244,8 +264,8 @@
                 <del v-if="option.originalPrice">¥{{ option.originalPrice.toLocaleString() }}</del>
               </div>
               <TechButton size="sm" class="option-cta" :variant="option.recommended ? 'primary' : 'outline'">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
-                  <path d="M12 2v20m10-10H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px">
+                  <path d="M12 2v20m10-10H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
                 立即续费
               </TechButton>
@@ -266,15 +286,28 @@
               <div class="chart-placeholder">
                 <svg width="100%" height="200" viewBox="0 0 400 200">
                   <!-- 续费时间线 -->
-                  <line x1="50" y1="150" x2="350" y2="150" stroke="#fdd835" stroke-width="2"/>
+                  <line x1="50" y1="150" x2="350" y2="150" stroke="#fdd835" stroke-width="2" />
                   <text x="30" y="155" font-size="12" fill="#666">时间</text>
 
                   <!-- 模拟续费点 -->
-                  <circle v-for="(renewal, index) in renewals.slice(0, 6)" :key="index"
-                          :cx="50 + index * 50" cy="150" r="8" fill="#fdd835"/>
-                  <text v-for="(renewal, index) in renewals.slice(0, 6)" :key="`text-${index}`"
-                        :x="50 + index * 50" y="130" font-size="10" text-anchor="middle" fill="#666">
-                    ¥{{ (renewal.xufeijine || 0).toFixed(0) }}
+                  <circle
+                    v-for="(renewal, index) in renewals.slice(0, 6)"
+                    :key="index"
+                    :cx="50 + index * 50"
+                    cy="150"
+                    r="8"
+                    fill="#fdd835"
+                  />
+                  <text
+                    v-for="(renewal, index) in renewals.slice(0, 6)"
+                    :key="`text-${index}`"
+                    :x="50 + index * 50"
+                    y="130"
+                    font-size="10"
+                    text-anchor="middle"
+                    fill="#666"
+                  >
+                    ¥{{ (Number(renewal.xufeijine) || 0).toFixed(0) }}
                   </text>
                 </svg>
               </div>
@@ -313,7 +346,9 @@
               </div>
               <div class="metric-item">
                 <span class="metric-label">会员等级</span>
-                <strong class="metric-value">{{ renewalProgress.currentStreak >= 5 ? 'VIP' : renewalProgress.currentStreak >= 3 ? '高级' : '普通' }}</strong>
+                <strong class="metric-value">{{
+                  renewalProgress.currentStreak >= 5 ? 'VIP' : renewalProgress.currentStreak >= 3 ? '高级' : '普通'
+                }}</strong>
               </div>
             </div>
           </div>
@@ -343,7 +378,7 @@ const loading = ref(false)
 const reminderChannels = ref({
   email: true,
   sms: true,
-  inApp: true
+  inApp: true,
 })
 
 // 优惠券数据 - 基于会员等级和到期时间自动发放
@@ -356,7 +391,9 @@ const availableCoupons = ref([
     value: 0.8,
     expiry: '2025-12-31',
     autoGranted: true,
-    condition: '到期前30天自动发放'
+    condition: '到期前30天自动发放',
+    granted: true,
+    grantedAt: '2025-10-01T00:00:00.000Z',
   },
   {
     id: 2,
@@ -366,7 +403,9 @@ const availableCoupons = ref([
     value: 1,
     expiry: '2025-11-30',
     autoGranted: true,
-    condition: '连续续费3次及以上'
+    condition: '连续续费3次及以上',
+    granted: true,
+    grantedAt: '2025-10-01T00:00:00.000Z',
   },
   {
     id: 3,
@@ -377,19 +416,18 @@ const availableCoupons = ref([
     minAmount: 1000,
     expiry: '2025-12-15',
     autoGranted: false,
-    condition: '手动领取'
-  }
+    granted: false,
+    condition: '手动领取',
+  },
 ])
 
 // 自动发放优惠券逻辑
 function autoGrantCoupons() {
   if (!nextExpiry.value || nextExpiry.value.daysLeft > 30) return
 
-  const newCoupons = availableCoupons.value.filter(coupon =>
-    coupon.autoGranted &&
-    !availableCoupons.value.some(existing =>
-      existing.id === coupon.id && existing.granted
-    )
+  const newCoupons = availableCoupons.value.filter(
+    coupon =>
+      coupon.autoGranted && !availableCoupons.value.some(existing => existing.id === coupon.id && existing.granted),
   )
 
   newCoupons.forEach(coupon => {
@@ -412,7 +450,7 @@ const smartRecommendations = ref([
     benefits: ['基础权益', '优先预约', '私教8折'],
     recommended: false,
     score: 0,
-    reasoning: ''
+    reasoning: '',
   },
   {
     id: 'semi-annual',
@@ -424,7 +462,7 @@ const smartRecommendations = ref([
     benefits: ['全部权益', '优先预约', '私教9折', '赠体检'],
     recommended: false,
     score: 0,
-    reasoning: ''
+    reasoning: '',
   },
   {
     id: 'annual',
@@ -436,8 +474,8 @@ const smartRecommendations = ref([
     benefits: ['尊享权益', '最高优先', '私教9折', '专属客服'],
     recommended: false,
     score: 0,
-    reasoning: ''
-  }
+    reasoning: '',
+  },
 ])
 
 // 智能推荐算法 - 基于用户历史行为
@@ -445,7 +483,7 @@ function calculateSmartRecommendations() {
   if (!renewals.value.length) return
 
   const userHistory = renewals.value
-  const totalSpent = userHistory.reduce((sum, renewal) => sum + (renewal.xufeijine || 0), 0)
+  const totalSpent = userHistory.reduce((sum, renewal) => sum + (Number(renewal.xufeijine) || 0), 0)
   const avgSpentPerRenewal = totalSpent / userHistory.length
   const renewalFrequency = userHistory.length / 12 // 年均续费次数
   const consecutiveRenewals = calculateConsecutiveRenewals(userHistory)
@@ -455,7 +493,8 @@ function calculateSmartRecommendations() {
     let reasoning = ''
 
     // 基于消费频率的推荐
-    if (renewalFrequency >= 2) { // 高频用户
+    if (renewalFrequency >= 2) {
+      // 高频用户
       if (option.id === 'annual') {
         score += 30
         reasoning += '高频用户推荐年度方案，节省更多成本；'
@@ -463,12 +502,14 @@ function calculateSmartRecommendations() {
         score += 20
         reasoning += '适合您的续费频率；'
       }
-    } else if (renewalFrequency >= 1) { // 正常用户
+    } else if (renewalFrequency >= 1) {
+      // 正常用户
       if (option.id === 'semi-annual') {
         score += 25
         reasoning += '平衡价格与权益的最佳选择；'
       }
-    } else { // 低频用户
+    } else {
+      // 低频用户
       if (option.id === 'quarterly') {
         score += 20
         reasoning += '适合首次尝试的用户；'
@@ -476,12 +517,14 @@ function calculateSmartRecommendations() {
     }
 
     // 基于消费金额的推荐
-    if (avgSpentPerRenewal >= 2000) { // 高消费用户
+    if (avgSpentPerRenewal >= 2000) {
+      // 高消费用户
       if (option.id === 'annual') {
         score += 25
         reasoning += '高消费用户推荐长期方案，性价比更高；'
       }
-    } else if (avgSpentPerRenewal >= 1000) { // 中等消费用户
+    } else if (avgSpentPerRenewal >= 1000) {
+      // 中等消费用户
       if (option.id === 'semi-annual') {
         score += 20
         reasoning += '符合您的消费水平；'
@@ -499,12 +542,14 @@ function calculateSmartRecommendations() {
     // 到期紧急程度
     if (nextExpiry.value) {
       const daysLeft = nextExpiry.value.daysLeft
-      if (daysLeft <= 7) { // 紧急续费
+      if (daysLeft <= 7) {
+        // 紧急续费
         if (option.id === 'quarterly') {
           score += 20
           reasoning += '到期临近，推荐短期方案快速续费；'
         }
-      } else if (daysLeft <= 30) { // 近期到期
+      } else if (daysLeft <= 30) {
+        // 近期到期
         if (option.id === 'semi-annual') {
           score += 15
           reasoning += '中期方案适合您的到期情况；'
@@ -531,17 +576,18 @@ function calculateSmartRecommendations() {
 function calculateConsecutiveRenewals(history: typeof renewals.value) {
   if (!history.length) return 0
 
-  const sortedHistory = history.sort((a, b) =>
-    new Date(b.xufeishijian || 0).getTime() - new Date(a.xufeishijian || 0).getTime()
+  const sortedHistory = history.sort(
+    (a, b) => new Date(b.xufeishijian || 0).getTime() - new Date(a.xufeishijian || 0).getTime(),
   )
 
   let consecutive = 1
   for (let i = 1; i < sortedHistory.length; i++) {
-    const prevDate = new Date(sortedHistory[i-1].xufeishijian || 0)
+    const prevDate = new Date(sortedHistory[i - 1].xufeishijian || 0)
     const currDate = new Date(sortedHistory[i].xufeishijian || 0)
     const monthsDiff = (prevDate.getTime() - currDate.getTime()) / (1000 * 60 * 60 * 24 * 30)
 
-    if (monthsDiff <= 4) { // 连续续费间隔不超过4个月
+    if (monthsDiff <= 4) {
+      // 连续续费间隔不超过4个月
       consecutive++
     } else {
       break
@@ -554,7 +600,7 @@ function calculateConsecutiveRenewals(history: typeof renewals.value) {
 const currentCard = computed(() => renewals.value[0])
 
 const nextExpiry = computed(() => {
-  const target = renewals.value.find((item) => item.youxiaoqi)
+  const target = renewals.value.find(item => item.youxiaoqi)
   if (!target || !target.youxiaoqi) return null
   const date = new Date(target.youxiaoqi)
   if (Number.isNaN(date.getTime())) return null
@@ -599,14 +645,14 @@ const countdownStatusText = computed(() => {
 })
 
 const renewalTimeline = computed(() =>
-  renewals.value.slice(0, 3).map((item) => ({
+  renewals.value.slice(0, 3).map(item => ({
     ...item,
     status: item.ispay === '已支付' ? '已续费' : '待支付',
   })),
 )
 
 const reminderList = computed(() =>
-  reminders.value.slice(0, 4).map((item) => ({
+  reminders.value.slice(0, 4).map(item => ({
     ...item,
     level: resolveLevel(item),
     levelLabel: resolveLevel(item) === 'urgent' ? '紧急' : '即将到期',
@@ -618,7 +664,7 @@ const renewalProgress = ref({
   currentStreak: 3, // 连续续费次数
   totalRenewals: 8, // 总续费次数
   averageDuration: 6, // 平均续费月数
-  nextBestOffer: '半年续费' // 下次最佳优惠
+  nextBestOffer: '半年续费', // 下次最佳优惠
 })
 
 // 月度消费数据（模拟数据）
@@ -628,7 +674,7 @@ const monthlyConsumption = ref([
   { month: '3月', amount: 399, percentage: 80 },
   { month: '4月', amount: 499, percentage: 100 },
   { month: '5月', amount: 349, percentage: 70 },
-  { month: '6月', amount: 299, percentage: 60 }
+  { month: '6月', amount: 299, percentage: 60 },
 ])
 
 onMounted(() => {
@@ -666,15 +712,15 @@ function goPurchase(cardId?: number) {
   router.push({ path: '/index/huiyuankagoumai', query: cardId ? { cardId } : undefined })
 }
 
-function goPurchaseSmart(option: typeof smartRecommendations.value[0]) {
+function goPurchaseSmart(option: (typeof smartRecommendations.value)[0]) {
   // 传递智能推荐参数到购买页面
   router.push({
     path: '/index/huiyuankagoumai',
     query: {
       smartRecommend: option.id,
       duration: option.duration,
-      price: option.price.toString()
-    }
+      price: option.price.toString(),
+    },
   })
 }
 
@@ -703,8 +749,8 @@ async function sendReminderNotification(type: 'email' | 'sms' | 'inApp') {
         type,
         memberId: currentCard.value?.id,
         daysLeft: nextExpiry.value.daysLeft,
-        expiryDate: nextExpiry.value.label
-      })
+        expiryDate: nextExpiry.value.label,
+      }),
     })
 
     if (response.ok) {
@@ -842,7 +888,8 @@ function calculateTotalSpent() {
 }
 
 @keyframes urgent-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
   }
   50% {

@@ -33,7 +33,16 @@ class MessageServiceImplTest {
                         (message.getTitle().contains("test-message") ||
                          message.getTitle().contains("query-test") ||
                          message.getTitle().contains("update-test") ||
-                         message.getTitle().contains("delete-test")))
+                         message.getTitle().contains("delete-test") ||
+                         message.getTitle().contains("test-message-save") ||
+                         message.getTitle().contains("test-message-update") ||
+                         message.getTitle().contains("test-message-delete") ||
+                         message.getTitle().contains("test-message-vo-list") ||
+                         message.getTitle().contains("test-message-vo-single") ||
+                         message.getTitle().contains("test-message-query-wrapper") ||
+                         message.getTitle().contains("test-message-status") ||
+                         message.getTitle().contains("test-message-view") ||
+                         message.getTitle().contains("test-message-view-list")))
                 .forEach(message -> messageService.removeById(message.getId()));
     }
 
@@ -302,5 +311,181 @@ class MessageServiceImplTest {
         params.put("limit", "1000");
         PageUtils result = messageService.queryPage(params);
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void shouldSaveMessageWithDefaultValues() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-save");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(1L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+
+        assertThat(message.getId()).isNotNull();
+        assertThat(message.getIsread()).isZero(); // 应该默认为0
+        assertThat(message.getAddtime()).isNotNull(); // 应该自动设置
+    }
+
+    @Test
+    void shouldUpdateMessageReadStatus() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-update");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(1L);
+        message.setIsread(0);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+        Long messageId = message.getId();
+
+        // 更新消息为已读
+        MessageEntity updateMessage = new MessageEntity();
+        updateMessage.setId(messageId);
+        updateMessage.setIsread(1);
+        messageService.updateById(updateMessage);
+
+        // 验证更新结果
+        MessageEntity updatedMessage = messageService.getById(messageId);
+        assertThat(updatedMessage.getIsread()).isEqualTo(1);
+    }
+
+    @Test
+    void shouldDeleteMessage() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-delete");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(1L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+        Long messageId = message.getId();
+
+        // 删除消息
+        boolean deleted = messageService.removeById(messageId);
+        assertThat(deleted).isTrue();
+
+        // 验证删除结果
+        MessageEntity deletedMessage = messageService.getById(messageId);
+        assertThat(deletedMessage).isNull();
+    }
+
+    @Test
+    void shouldSelectListVO() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-vo-list");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(2L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+
+        QueryWrapper<MessageEntity> wrapper = new QueryWrapper<MessageEntity>()
+                .eq("userid", 2L);
+        List<MessageVO> vos = messageService.selectListVO(wrapper);
+
+        assertThat(vos).isNotNull();
+        assertThat(vos).isNotEmpty();
+        assertThat(vos.get(0).getUserid()).isEqualTo(2L);
+        assertThat(vos.get(0).getTitle()).isEqualTo("test-message-vo-list");
+    }
+
+    @Test
+    void shouldSelectVO() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-vo-single");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(3L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+        Long messageId = message.getId();
+
+        QueryWrapper<MessageEntity> wrapper = new QueryWrapper<MessageEntity>()
+                .eq("id", messageId);
+        MessageVO vo = messageService.selectVO(wrapper);
+
+        assertThat(vo).isNotNull();
+        assertThat(vo.getTitle()).isEqualTo("test-message-vo-single");
+    }
+
+    @Test
+    void shouldQueryPageWithWrapper() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-query-wrapper");
+        message.setContent("Test message content");
+        message.setType("reminder");
+        message.setUserid(4L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("page", "1");
+        params.put("limit", "10");
+
+        QueryWrapper<MessageEntity> wrapper = new QueryWrapper<MessageEntity>()
+                .eq("type", "reminder");
+
+        PageUtils result = messageService.queryPage(params, wrapper);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getList()).isNotEmpty();
+        // 验证返回的结果包含正确的消息类型
+        MessageEntity resultMessage = (MessageEntity) result.getList().get(0);
+        assertThat(resultMessage.getType()).isEqualTo("reminder");
+    }
+
+    @Test
+    void shouldHandleMessageStatusTransition() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-status");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(5L);
+        message.setIsread(0);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+        Long messageId = message.getId();
+
+        // 验证初始状态为未读
+        MessageEntity savedMessage = messageService.getById(messageId);
+        assertThat(savedMessage.getIsread()).isZero();
+
+        // 更新为已读
+        savedMessage.setIsread(1);
+        messageService.updateById(savedMessage);
+
+        // 验证状态变为已读
+        MessageEntity updatedMessage = messageService.getById(messageId);
+        assertThat(updatedMessage.getIsread()).isEqualTo(1);
+    }
+
+
+    @Test
+    void shouldSelectListView() {
+        MessageEntity message = new MessageEntity();
+        message.setTitle("test-message-view-list");
+        message.setContent("Test message content");
+        message.setType("system");
+        message.setUserid(7L);
+        message.setRelatedType("test");
+
+        messageService.save(message);
+
+        QueryWrapper<MessageEntity> wrapper = new QueryWrapper<MessageEntity>()
+                .eq("userid", 7L);
+        List<MessageView> views = messageService.selectListView(wrapper);
+
+        assertThat(views).isNotNull();
+        assertThat(views).isNotEmpty();
+        assertThat(views.get(0).getUserid()).isEqualTo(7L);
     }
 }

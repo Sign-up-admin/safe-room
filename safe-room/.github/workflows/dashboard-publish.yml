@@ -1,0 +1,308 @@
+name: Publish Test Health Dashboard
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC (2 AM EST)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_publish:
+        description: 'Force publish dashboard even if no new data'
+        required: false
+        default: 'false'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'scripts/generate-test-health-dashboard.js'
+      - 'scripts/collect-test-health-metrics.js'
+      - '.github/workflows/dashboard-publish.yml'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  collect-and-publish-dashboard:
+    name: Collect and Publish Dashboard
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        # Install required Node.js packages
+        npm install xml2js
+
+    - name: Setup Java for Maven
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Setup PostgreSQL
+      uses: harmon758/postgresql-action@v1
+      with:
+        postgresql version: '13'
+        postgresql password: test123
+        postgresql db: springboot1ngh61a2
+        postgresql user: test
+
+    - name: Initialize database
+      run: |
+        cd springboot1ngh61a2
+        PGPASSWORD=test123 psql -h localhost -U postgres -d springboot1ngh61a2 -f db/springboot1ngh61a2.sql
+        PGPASSWORD=test123 psql -h localhost -U postgres -d springboot1ngh61a2 -f src/main/resources/schema-postgresql.sql
+
+    - name: Run tests and collect coverage
+      run: |
+        cd springboot1ngh61a2
+        echo "Running tests with coverage..."
+        mvn clean test jacoco:report -Dspring.profiles.active=test -q
+
+    - name: Collect health metrics
+      run: |
+        cd springboot1ngh61a2
+        echo "Collecting comprehensive health metrics..."
+        node ../scripts/collect-test-health-metrics.js \
+          --test-reports target/surefire-reports \
+          --coverage-reports target/site/jacoco \
+          --output ../test-health-metrics.json \
+          --history ../springboot1ngh61a2/coverage-history \
+          --include-trends \
+          --verbose
+
+    - name: Generate health dashboard
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating health dashboard..."
+        node ../scripts/generate-test-health-dashboard.js \
+          --metrics ../test-health-metrics.json \
+          --output ../test-health-dashboard.html \
+          --title "Test Health Dashboard - $(date +%Y-%m-%d)" \
+          --include-history
+
+    - name: Generate coverage trend report
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating coverage trend analysis..."
+        node ../scripts/generate-coverage-trend-report.js \
+          --input ../springboot1ngh61a2/coverage-history \
+          --output ../coverage-trend-analysis.md \
+          --forecast \
+          --recommendations \
+          --verbose
+
+    - name: Generate HTML test report
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating HTML test report..."
+        node ../scripts/generate-html-test-report.js \
+          --input target/surefire-reports \
+          --output ../test-report.html \
+          --title "Daily Test Report - $(date +%Y-%m-%d)" \
+          --history ../springboot1ngh61a2/coverage-history
+
+    - name: Generate coverage report
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating HTML coverage report..."
+        node ../scripts/generate-coverage-report.js \
+          --input target/site/jacoco/jacoco.xml \
+          --output ../coverage-report.html \
+          --title "Daily Coverage Report - $(date +%Y-%m-%d)" \
+          --history ../springboot1ngh61a2/coverage-history
+
+    - name: Setup GitHub Pages (if not exists)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+        # Create gh-pages branch if it doesn't exist
+        if ! git ls-remote --exit-code --heads origin gh-pages; then
+          echo "Creating gh-pages branch..."
+          git checkout --orphan gh-pages
+          git rm -rf .
+          echo "# Test Health Dashboard" > README.md
+          echo "This branch contains automated test health dashboards." >> README.md
+          git add README.md
+          git commit -m "Initial commit for gh-pages branch"
+          git push origin gh-pages
+          git checkout main
+        fi
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      run: |
+        # Switch to gh-pages branch
+        git fetch origin gh-pages
+        git checkout gh-pages
+
+        # Clean existing files
+        rm -f *.html *.md *.json
+
+        # Copy generated files from main branch
+        cp ../test-health-dashboard.html index.html
+        cp ../coverage-trend-analysis.md coverage-trend-analysis.md
+        cp ../test-report.html test-report.html
+        cp ../coverage-report.html coverage-report.html
+        cp ../test-health-metrics.json test-health-metrics.json
+
+        # Create simple navigation page
+        cat > navigation.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Health Dashboard Navigation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; }
+        .nav-card { padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; }
+        .nav-card h3 { margin-top: 0; }
+        .nav-card a { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+        .nav-card a:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🏗️ Spring Boot Test Health Dashboard</h1>
+    <p>Automated test quality monitoring and reporting</p>
+
+    <div class="nav-grid">
+        <div class="nav-card">
+            <h3>🩺 Health Dashboard</h3>
+            <p>Comprehensive test health overview with metrics and trends</p>
+            <a href="index.html">View Dashboard</a>
+        </div>
+        <div class="nav-card">
+            <h3>📊 Test Report</h3>
+            <p>Detailed test execution results and failure analysis</p>
+            <a href="test-report.html">View Report</a>
+        </div>
+        <div class="nav-card">
+            <h3>📈 Coverage Report</h3>
+            <p>Code coverage analysis with package and class breakdowns</p>
+            <a href="coverage-report.html">View Report</a>
+        </div>
+        <div class="nav-card">
+            <h3>📉 Trend Analysis</h3>
+            <p>Coverage trends and forecasting analysis</p>
+            <a href="coverage-trend-analysis.md">View Analysis</a>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+        <h3>📋 About This Dashboard</h3>
+        <p>This dashboard is automatically updated daily and provides comprehensive insights into the test quality and code coverage of the Spring Boot project.</p>
+        <ul>
+            <li><strong>Health Score</strong>: Overall assessment of test quality (0-100)</li>
+            <li><strong>Coverage Metrics</strong>: Line, branch, and package-level coverage</li>
+            <li><strong>Test Results</strong>: Success rates and failure analysis</li>
+            <li><strong>Trends</strong>: Historical analysis and forecasting</li>
+        </ul>
+        <p><em>Last updated: $(date)</em></p>
+    </div>
+</body>
+</html>
+EOF
+
+        # Add and commit changes
+        git add .
+        if git diff --staged --quiet; then
+          echo "No changes to commit - dashboard is up to date"
+        else
+          git commit -m "Update test health dashboard - $(date +%Y-%m-%d)"
+          git push origin gh-pages
+          echo "Dashboard published to GitHub Pages"
+        fi
+
+        # Switch back to main branch
+        git checkout main
+
+    - name: Create summary comment
+      if: always()
+      run: |
+        # Read the metrics data
+        if [ -f "test-health-metrics.json" ]; then
+          HEALTH_SCORE=$(jq -r '.overallHealthScore' test-health-metrics.json)
+          SUCCESS_RATE=$(jq -r '.testExecution.successRate' test-health-metrics.json)
+          LINE_COVERAGE=$(jq -r '.coverage.lineCoverage' test-health-metrics.json)
+          ALERTS_COUNT=$(jq -r '.alerts | length' test-health-metrics.json)
+
+          echo "Dashboard generation completed:"
+          echo "- Health Score: $HEALTH_SCORE/100"
+          echo "- Test Success Rate: $SUCCESS_RATE%"
+          echo "- Line Coverage: $LINE_COVERAGE%"
+          echo "- Active Alerts: $ALERTS_COUNT"
+
+          # Create summary for workflow
+          echo "dashboard_health_score=$HEALTH_SCORE" >> $GITHUB_OUTPUT
+          echo "dashboard_success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          echo "dashboard_line_coverage=$LINE_COVERAGE" >> $GITHUB_OUTPUT
+          echo "dashboard_alerts=$ALERTS_COUNT" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Notify on dashboard update
+      if: github.ref == 'refs/heads/main' && success()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const healthScore = ${{ steps.create-summary.outputs.dashboard_health_score }};
+          const successRate = ${{ steps.create-summary.outputs.dashboard_success_rate }};
+          const lineCoverage = ${{ steps.create-summary.outputs.dashboard_line_coverage }};
+          const alertsCount = ${{ steps.create-summary.outputs.dashboard_alerts }};
+
+          const status = healthScore >= 80 ? '🟢 Good' : healthScore >= 60 ? '🟡 Needs Attention' : '🔴 Critical';
+
+          const message = `## 🩺 Test Health Dashboard Updated
+
+          **Status**: ${status}
+          **Health Score**: ${healthScore}/100
+          **Test Success Rate**: ${successRate}%
+          **Line Coverage**: ${lineCoverage}%
+          **Active Alerts**: ${alertsCount}
+
+          📊 [View Full Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/index.html)
+
+          ---
+          *Dashboard updated on ${new Date().toLocaleString()}*
+          `;
+
+          // Create or update dashboard status issue
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: ['test-health-dashboard'],
+            state: 'open'
+          });
+
+          if (issues.data.length > 0) {
+            // Update existing issue
+            await github.rest.issues.createComment({
+              issue_number: issues.data[0].number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
+          } else {
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🩺 Test Health Dashboard Status',
+              body: message,
+              labels: ['test-health-dashboard', 'automated']
+            });
+          }

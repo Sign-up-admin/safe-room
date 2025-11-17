@@ -59,9 +59,7 @@ export class ParticleSystem {
   }
 
   private populateParticles() {
-    const particleCount = Math.floor(
-      (this.canvas.width * this.canvas.height) / (1200 / this.options.density),
-    )
+    const particleCount = Math.floor((this.canvas.width * this.canvas.height) / (1200 / this.options.density))
     this.particles = Array.from({ length: particleCount }, this.createParticle)
   }
 
@@ -137,4 +135,3 @@ export class ParticleSystem {
     window.removeEventListener('resize', this.resize)
   }
 }
-

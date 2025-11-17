@@ -158,6 +158,7 @@ import { User } from '@element-plus/icons-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import http from '@/utils/http'
 import { isAuth } from '@/utils/utils'
+import { useUserStore } from '@/stores/user'
 import storage from '@/utils/storage'
 import { API_ENDPOINTS } from '@/constants/apiEndpoints'
 
@@ -165,6 +166,8 @@ interface ListResponse<T = Record<string, unknown>> {
   total: number
   list: T[]
 }
+
+const userStore = useUserStore()
 
 const records = ref<Record<string, unknown>[]>([])
 const loading = ref(false)
@@ -200,7 +203,7 @@ const formRules = {
   role: [{ required: true, message: '请选择角色', trigger: 'change' }],
 }
 
-const currentUserRole = computed(() => storage.get('role') || '')
+const currentUserRole = computed(() => userStore.userRole || '')
 
 const permissions = computed(() => ({
   create: isAuth('users', 'Add') && currentUserRole.value === 'Administrator',
@@ -215,12 +218,9 @@ const formattedDetail = computed(() => (detailRecord.value ? JSON.stringify(deta
 onMounted(() => {
   const sessionInfo = storage.get('sessionTable')
   if (sessionInfo === 'users') {
-    const userInfo = storage.get('user')
-    if (userInfo) {
-      const user = typeof userInfo === 'string' ? JSON.parse(userInfo) : userInfo
-      if (user && user.id) {
-        currentUserId.value = user.id
-      }
+    const user = userStore.user
+    if (user && user.id) {
+      currentUserId.value = user.id
     }
   }
   fetchList()

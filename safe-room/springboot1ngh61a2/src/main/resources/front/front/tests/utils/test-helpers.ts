@@ -1,5 +1,4 @@
 import { mount, VueWrapper, MountingOptions } from '@vue/test-utils'
-import { createApp } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
@@ -7,13 +6,13 @@ import type { Component } from 'vue'
 
 // Routes for testing
 const routes = [
-  { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
-  { path: '/login', name: 'login', component: { template: '<div>Login</div>' } },
-  { path: '/register', name: 'register', component: { template: '<div>Register</div>' } },
-  { path: '/dashboard', name: 'dashboard', component: { template: '<div>Dashboard</div>' } },
-  { path: '/profile', name: 'profile', component: { template: '<div>Profile</div>' } },
-  { path: '/courses', name: 'courses', component: { template: '<div>Courses</div>' } },
-  { path: '/booking', name: 'booking', component: { template: '<div>Booking</div>' } }
+  { path: '/', name: 'home', component: { name: 'Home', template: '<div>Home</div>' } },
+  { path: '/login', name: 'login', component: { name: 'Login', template: '<div>Login</div>' } },
+  { path: '/register', name: 'register', component: { name: 'Register', template: '<div>Register</div>' } },
+  { path: '/dashboard', name: 'dashboard', component: { name: 'Dashboard', template: '<div>Dashboard</div>' } },
+  { path: '/profile', name: 'profile', component: { name: 'Profile', template: '<div>Profile</div>' } },
+  { path: '/courses', name: 'courses', component: { name: 'Courses', template: '<div>Courses</div>' } },
+  { path: '/booking', name: 'booking', component: { name: 'Booking', template: '<div>Booking</div>' } }
 ]
 
 /**
@@ -433,7 +432,7 @@ export async function simulateNetworkDelay(page: any, delayMs: number): Promise<
 /**
  * Simulate network error
  */
-export async function simulateNetworkError(page: any, statusCode: number = 500): Promise<void> {
+export async function simulateNetworkError(page: any, statusCode = 500): Promise<void> {
   await page.route('**/api/**', async (route: any) => {
     await route.fulfill({
       status: statusCode,

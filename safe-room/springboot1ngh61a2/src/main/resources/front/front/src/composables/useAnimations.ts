@@ -39,7 +39,7 @@ export const useAnimations = () => {
   }
 
   onUnmounted(() => {
-    Object.values(timelines).forEach((timeline) => timeline.kill())
+    Object.values(timelines).forEach(timeline => timeline.kill())
   })
 
   return {
@@ -61,16 +61,8 @@ interface HoverGlowOptions {
   duration?: number
 }
 
-export const useHoverGlow = (
-  elementRef: Ref<HTMLElement | null>,
-  options: HoverGlowOptions = {}
-) => {
-  const {
-    scale = 1.02,
-    glowColor = 'var(--color-primary)',
-    glowIntensity = 0.3,
-    duration = 0.3
-  } = options
+export const useHoverGlow = (elementRef: Ref<HTMLElement | null>, options: HoverGlowOptions = {}) => {
+  const { scale = 1.02, glowColor = 'var(--color-primary)', glowIntensity = 0.3, duration = 0.3 } = options
 
   let originalBoxShadow = ''
   let originalTransform = ''
@@ -87,7 +79,7 @@ export const useHoverGlow = (
       ease: 'power2.out',
       scale,
       boxShadow: `0 0 20px rgba(${glowColor}, ${glowIntensity})`,
-      y: -4
+      y: -4,
     })
   }
 
@@ -100,7 +92,7 @@ export const useHoverGlow = (
       ease: 'power2.out',
       scale: 1,
       boxShadow: originalBoxShadow,
-      y: 0
+      y: 0,
     })
   }
 
@@ -132,7 +124,7 @@ export const useHoverGlow = (
     applyGlow,
     removeGlow,
     setupHoverListeners,
-    removeHoverListeners
+    removeHoverListeners,
   }
 }
 
@@ -148,16 +140,13 @@ interface PageTransitionOptions {
   exitDirection?: 'up' | 'down' | 'left' | 'right' | 'fade'
 }
 
-export const usePageTransition = (
-  containerRef: Ref<HTMLElement | null>,
-  options: PageTransitionOptions = {}
-) => {
+export const usePageTransition = (containerRef: Ref<HTMLElement | null>, options: PageTransitionOptions = {}) => {
   const {
     enterDuration = 0.6,
     exitDuration = 0.4,
     stagger = 0.1,
     enterDirection = 'up',
-    exitDirection = 'down'
+    exitDirection = 'down',
   } = options
 
   const isTransitioning = ref(false)
@@ -167,31 +156,32 @@ export const usePageTransition = (
 
     switch (enterDirection) {
       case 'up':
-        return gsap.fromTo(element,
+        return gsap.fromTo(
+          element,
           { y: 50, opacity: 0 },
-          { y: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' }
+          { y: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' },
         )
       case 'down':
-        return gsap.fromTo(element,
+        return gsap.fromTo(
+          element,
           { y: -50, opacity: 0 },
-          { y: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' }
+          { y: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' },
         )
       case 'left':
-        return gsap.fromTo(element,
+        return gsap.fromTo(
+          element,
           { x: -50, opacity: 0 },
-          { x: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' }
+          { x: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' },
         )
       case 'right':
-        return gsap.fromTo(element,
+        return gsap.fromTo(
+          element,
           { x: 50, opacity: 0 },
-          { x: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' }
+          { x: 0, opacity: 1, duration: enterDuration, delay, ease: 'power3.out' },
         )
       case 'fade':
       default:
-        return gsap.fromTo(element,
-          { opacity: 0 },
-          { opacity: 1, duration: enterDuration, delay, ease: 'power3.out' }
-        )
+        return gsap.fromTo(element, { opacity: 0 }, { opacity: 1, duration: enterDuration, delay, ease: 'power3.out' })
     }
   }
 
@@ -222,9 +212,12 @@ export const usePageTransition = (
     })
 
     // Reset transitioning flag after animation
-    setTimeout(() => {
-      isTransitioning.value = false
-    }, (enterDuration + elements.length * stagger) * 1000)
+    setTimeout(
+      () => {
+        isTransitioning.value = false
+      },
+      (enterDuration + elements.length * stagger) * 1000,
+    )
   }
 
   const animateExit = (selector = '.animate-item') => {
@@ -233,7 +226,7 @@ export const usePageTransition = (
     isTransitioning.value = true
     const elements = containerRef.value.querySelectorAll(selector)
 
-    elements.forEach((element) => {
+    elements.forEach(element => {
       getExitAnimation(element as HTMLElement)
     })
 
@@ -246,7 +239,7 @@ export const usePageTransition = (
   return {
     isTransitioning,
     animateEnter,
-    animateExit
+    animateExit,
   }
 }
 
@@ -261,16 +254,8 @@ interface LoadingGlowOptions {
   scale?: number
 }
 
-export const useLoadingGlow = (
-  elementRef: Ref<HTMLElement | null>,
-  options: LoadingGlowOptions = {}
-) => {
-  const {
-    glowColor = 'var(--color-primary)',
-    glowIntensity = 0.6,
-    pulseDuration = 1.5,
-    scale = 1.05
-  } = options
+export const useLoadingGlow = (elementRef: Ref<HTMLElement | null>, options: LoadingGlowOptions = {}) => {
+  const { glowColor = 'var(--color-primary)', glowIntensity = 0.6, pulseDuration = 1.5, scale = 1.05 } = options
 
   let animation: gsap.core.Timeline | null = null
 
@@ -286,7 +271,7 @@ export const useLoadingGlow = (
       boxShadow: `0 0 30px rgba(${glowColor}, ${glowIntensity})`,
       scale,
       yoyo: true,
-      repeat: 1
+      repeat: 1,
     })
   }
 
@@ -301,7 +286,7 @@ export const useLoadingGlow = (
         duration: 0.3,
         boxShadow: 'none',
         scale: 1,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     }
   }
@@ -312,7 +297,7 @@ export const useLoadingGlow = (
 
   return {
     startGlow,
-    stopGlow
+    stopGlow,
   }
 }
 
@@ -325,9 +310,10 @@ export const useCalendarAnimation = (calendarRef: Ref<HTMLElement | null>) => {
     if (!calendarRef.value) return
 
     const calendar = calendarRef.value
-    gsap.fromTo(calendar,
+    gsap.fromTo(
+      calendar,
       { scale: 0.8, opacity: 0, y: 20 },
-      { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.7)' }
+      { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.7)' },
     )
   }
 
@@ -340,7 +326,7 @@ export const useCalendarAnimation = (calendarRef: Ref<HTMLElement | null>) => {
       opacity: 0,
       y: 20,
       duration: 0.3,
-      ease: 'power2.in'
+      ease: 'power2.in',
     })
   }
 
@@ -350,14 +336,14 @@ export const useCalendarAnimation = (calendarRef: Ref<HTMLElement | null>) => {
       duration: 0.15,
       ease: 'power2.out',
       yoyo: true,
-      repeat: 1
+      repeat: 1,
     })
   }
 
   return {
     animateCalendarOpen,
     animateCalendarClose,
-    animateDateSelect
+    animateDateSelect,
   }
 }
 
@@ -378,15 +364,16 @@ export const useStepperAnimation = (stepperRef: Ref<HTMLElement | null>) => {
         scale: 0.9,
         opacity: 0.5,
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     }
 
     // Animate new step in
     if (stepElements[toStep]) {
-      gsap.fromTo(stepElements[toStep],
+      gsap.fromTo(
+        stepElements[toStep],
         { scale: 0.9, opacity: 0.5 },
-        { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out' }
+        { scale: 1, opacity: 1, duration: 0.3, ease: 'power2.out' },
       )
     }
   }
@@ -397,13 +384,13 @@ export const useStepperAnimation = (stepperRef: Ref<HTMLElement | null>) => {
       duration: 0.2,
       ease: 'power2.out',
       yoyo: true,
-      repeat: 1
+      repeat: 1,
     })
   }
 
   return {
     animateStepChange,
-    animateStepComplete
+    animateStepComplete,
   }
 }
 
@@ -422,7 +409,7 @@ export const useCardHoverAnimation = (cardRef: Ref<HTMLElement | null>) => {
         scale: 1.02,
         boxShadow: 'var(--shadow-glow-yellow)',
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     } else {
       gsap.to(card, {
@@ -430,13 +417,12 @@ export const useCardHoverAnimation = (cardRef: Ref<HTMLElement | null>) => {
         scale: 1,
         boxShadow: 'var(--shadow-card)',
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
       })
     }
   }
 
   return {
-    animateHover
+    animateHover,
   }
 }
-

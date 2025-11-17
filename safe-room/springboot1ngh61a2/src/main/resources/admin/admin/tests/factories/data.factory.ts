@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import type { validateApiResponse, validatePageResult } from '../../../../../../../tests/shared/types/api-response.types'
 
 /**
  * Create mock table data for admin lists
@@ -330,4 +331,218 @@ export function createMockFileUpload(overrides: Partial<{
     uploaderName: faker.person.fullName(),
     ...overrides
   }
+}
+
+// ========== 数据一致性检查函数 ==========
+
+/**
+ * 验证表格数据项的基本结构
+ */
+export function validateTableDataItem<T extends Record<string, any>>(
+  item: any,
+  requiredFields: (keyof T)[]
+): item is T & { id: number; createTime: string; status: number } {
+  const baseFieldsValid = (
+    item &&
+    typeof item === 'object' &&
+    typeof item.id === 'number' &&
+    typeof item.createTime === 'string' &&
+    typeof item.status === 'number' &&
+    (item.status === 0 || item.status === 1)
+  )
+
+  if (!baseFieldsValid) return false
+
+  // 检查必需字段
+  return requiredFields.every(field => {
+    const value = item[field as string]
+    return value !== undefined && value !== null
+  })
+}
+
+/**
+ * 验证表格数据列表一致性
+ */
+export function validateTableDataListConsistency<T extends Record<string, any>>(
+  items: any[],
+  requiredFields: (keyof T)[] = []
+): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!Array.isArray(items)) {
+    errors.push('Input is not an array')
+    return { isValid: false, errors, warnings }
+  }
+
+  const ids = new Set<number>()
+
+  items.forEach((item, index) => {
+    if (!validateTableDataItem(item, requiredFields)) {
+      errors.push(`Table data item at index ${index} has invalid structure`)
+    }
+
+    // 检查ID唯一性
+    if (ids.has(item.id)) {
+      warnings.push(`Duplicate ID ${item.id} found`)
+    }
+    ids.add(item.id)
+
+    // 检查创建时间合理性
+    const createDate = new Date(item.createTime)
+    if (isNaN(createDate.getTime())) {
+      warnings.push(`Invalid createTime format for item ${item.id}`)
+    }
+
+    // 检查更新时间（如果存在）
+    if (item.updateTime) {
+      const updateDate = new Date(item.updateTime)
+      if (isNaN(updateDate.getTime())) {
+        warnings.push(`Invalid updateTime format for item ${item.id}`)
+      } else if (updateDate < createDate) {
+        warnings.push(`Update time is before create time for item ${item.id}`)
+      }
+    }
+
+    // 检查状态值合理性
+    if (item.status !== 0 && item.status !== 1) {
+      warnings.push(`Invalid status value ${item.status} for item ${item.id}`)
+    }
+  })
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  }
+}
+
+/**
+ * 验证分页数据
+ */
+export function validatePaginationData(pagination: any): boolean {
+  return (
+    pagination &&
+    typeof pagination === 'object' &&
+    typeof pagination.current === 'number' &&
+    typeof pagination.size === 'number' &&
+    typeof pagination.total === 'number' &&
+    typeof pagination.pages === 'number' &&
+    typeof pagination.hasNext === 'boolean' &&
+    typeof pagination.hasPrevious === 'boolean' &&
+    pagination.current > 0 &&
+    pagination.size > 0 &&
+    pagination.total >= 0 &&
+    pagination.pages >= 0
+  )
+}
+
+/**
+ * 验证API列表响应数据
+ */
+export function validateApiListResponseData<T extends Record<string, any>>(
+  response: any,
+  requiredItemFields: (keyof T)[] = []
+): boolean {
+  return (
+    response &&
+    typeof response === 'object' &&
+    validatePageResult(response) &&
+    Array.isArray(response.list) &&
+    response.list.every((item: any) => validateTableDataItem(item, requiredItemFields))
+  )
+}
+
+/**
+ * 验证统计数据
+ */
+export function validateStatisticsData(stats: any): boolean {
+  const requiredFields = [
+    'totalCount', 'activeCount', 'inactiveCount',
+    'todayCount', 'weekCount', 'monthCount', 'growth'
+  ]
+
+  const baseValid = (
+    stats &&
+    typeof stats === 'object' &&
+    requiredFields.every(field => typeof stats[field] === 'number')
+  )
+
+  if (!baseValid) return false
+
+  // 检查计数逻辑合理性
+  return (
+    stats.totalCount >= 0 &&
+    stats.activeCount >= 0 &&
+    stats.inactiveCount >= 0 &&
+    stats.todayCount >= 0 &&
+    stats.activeCount + stats.inactiveCount <= stats.totalCount &&
+    Array.isArray(stats.chartData)
+  )
+}
+
+/**
+ * 创建验证后的表格数据
+ */
+export function createValidatedTableData<T extends Record<string, any>>(
+  count: number,
+  baseData: T,
+  overrides: Partial<T> = {},
+  requiredFields: (keyof T)[] = []
+): Array<T & { id: number; createTime: string; updateTime?: string; status: number }> {
+  const data = createMockTableData(count, baseData, overrides)
+  const validation = validateTableDataListConsistency(data, requiredFields)
+
+  if (!validation.isValid) {
+    console.warn('Table data validation warnings:', validation.warnings)
+    throw new Error(`Table data validation failed: ${validation.errors.join(', ')}`)
+  }
+
+  return data
+}
+
+/**
+ * 创建验证后的分页数据
+ */
+export function createValidatedPagination(overrides: any = {}): {
+  current: number
+  size: number
+  total: number
+  pages: number
+  hasNext: boolean
+  hasPrevious: boolean
+} {
+  const pagination = createMockPagination(overrides)
+
+  if (!validatePaginationData(pagination)) {
+    throw new Error('Generated pagination data is invalid')
+  }
+
+  return pagination
+}
+
+/**
+ * 创建验证后的统计数据
+ */
+export function createValidatedStatistics(overrides: any = {}): {
+  totalCount: number
+  activeCount: number
+  inactiveCount: number
+  todayCount: number
+  weekCount: number
+  monthCount: number
+  growth: number
+  chartData: Array<{ date: string; value: number }>
+} {
+  const stats = createMockStatistics(overrides)
+
+  if (!validateStatisticsData(stats)) {
+    throw new Error('Generated statistics data is invalid')
+  }
+
+  return stats
 }

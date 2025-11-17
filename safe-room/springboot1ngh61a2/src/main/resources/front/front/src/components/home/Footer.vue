@@ -36,8 +36,6 @@
   </footer>
 </template>
 
-<script setup lang="ts"></script>
-
 <style scoped lang="scss">
 .footer {
   padding: 80px 6vw 60px;
@@ -113,4 +111,3 @@
   }
 }
 </style>
-

@@ -145,7 +145,7 @@ describe('Element Plus Component Registration Tests', () => {
     })
   })
 
-  it('should handle component resolution in templates', () => {
+  it('should handle component resolution in templates', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -214,7 +214,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(resolvedComponent.name).toBe('AsyncSubMenu')
   })
 
-  it('should validate component props correctly', () => {
+  it('should validate component props correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -226,7 +226,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(ElMenuItemComponent.props.index.required).toBe(true)
   })
 
-  it('should handle component slots correctly', () => {
+  it('should handle component slots correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -250,7 +250,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(component.template).toContain('el-menu-item')
   })
 
-  it('should handle component inheritance correctly', () => {
+  it('should handle component inheritance correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 

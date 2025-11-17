@@ -1,13 +1,12 @@
 /**
  * View Model Types
- * 
+ *
  * View models are presentation-layer types that extend or transform entity models
  * for specific UI components and use cases. They may include computed properties,
  * formatted data, or additional UI-specific fields.
  */
 
 import type { CoachNode } from '@/utils/forceGraph'
-import type { Jianshenjiaolian } from './modules'
 
 /**
  * Coach node view for force graph visualization
@@ -70,8 +69,3 @@ export interface EquipmentView {
   video?: string
   modelType?: 'chest' | 'leg' | 'back' | 'core' | 'dumbbell'
 }
-
-
-
-
-

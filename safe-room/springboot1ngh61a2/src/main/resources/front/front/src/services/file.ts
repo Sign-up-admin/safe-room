@@ -14,4 +14,3 @@ export function downloadFile(fileName: string): void {
   link.click()
   document.body.removeChild(link)
 }
-

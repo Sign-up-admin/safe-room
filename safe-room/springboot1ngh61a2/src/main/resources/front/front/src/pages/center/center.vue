@@ -1,5 +1,5 @@
 <template>
-  <div class="center-page" v-loading="loading">
+  <div v-loading="loading" class="center-page">
     <section class="center-hero">
       <TechCard class="profile-summary" :interactive="false">
         <div class="profile-info">
@@ -37,7 +37,13 @@
         <div v-if="!trainingTrend.some(t => t.value > 0)" class="empty-training-state">
           <div class="empty-icon">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </div>
           <h4>暂无训练数据</h4>
@@ -50,8 +56,23 @@
             <article class="metric-item">
               <div class="metric-value">{{ trainingInsights.averageIntensity }}%</div>
               <div class="metric-label">平均训练强度</div>
-              <div class="metric-insight" :class="trainingInsights.averageIntensity > 70 ? 'positive' : trainingInsights.averageIntensity > 40 ? 'neutral' : 'negative'">
-                {{ trainingInsights.averageIntensity > 70 ? '训练积极' : trainingInsights.averageIntensity > 40 ? '训练稳定' : '需加强训练' }}
+              <div
+                class="metric-insight"
+                :class="
+                  trainingInsights.averageIntensity > 70
+                    ? 'positive'
+                    : trainingInsights.averageIntensity > 40
+                      ? 'neutral'
+                      : 'negative'
+                "
+              >
+                {{
+                  trainingInsights.averageIntensity > 70
+                    ? '训练积极'
+                    : trainingInsights.averageIntensity > 40
+                      ? '训练稳定'
+                      : '需加强训练'
+                }}
               </div>
             </article>
             <article class="metric-item">
@@ -62,28 +83,58 @@
             <article class="metric-item">
               <div class="metric-value">{{ trainingInsights.progressRate }}%</div>
               <div class="metric-label">训练进步</div>
-              <div class="metric-insight" :class="trainingInsights.progressRate > 0 ? 'positive' : trainingInsights.progressRate === 0 ? 'neutral' : 'negative'">
-                {{ trainingInsights.progressRate > 0 ? '稳步提升' : trainingInsights.progressRate === 0 ? '保持稳定' : '需要调整' }}
+              <div
+                class="metric-insight"
+                :class="
+                  trainingInsights.progressRate > 0
+                    ? 'positive'
+                    : trainingInsights.progressRate === 0
+                      ? 'neutral'
+                      : 'negative'
+                "
+              >
+                {{
+                  trainingInsights.progressRate > 0
+                    ? '稳步提升'
+                    : trainingInsights.progressRate === 0
+                      ? '保持稳定'
+                      : '需要调整'
+                }}
               </div>
             </article>
             <article class="metric-item">
               <div class="metric-value">{{ trainingInsights.consistency }}%</div>
               <div class="metric-label">训练一致性</div>
-              <div class="metric-insight" :class="trainingInsights.consistency > 70 ? 'positive' : trainingInsights.consistency > 40 ? 'neutral' : 'negative'">
-                {{ trainingInsights.consistency > 70 ? '非常规律' : trainingInsights.consistency > 40 ? '较为规律' : '训练不稳定' }}
+              <div
+                class="metric-insight"
+                :class="
+                  trainingInsights.consistency > 70
+                    ? 'positive'
+                    : trainingInsights.consistency > 40
+                      ? 'neutral'
+                      : 'negative'
+                "
+              >
+                {{
+                  trainingInsights.consistency > 70
+                    ? '非常规律'
+                    : trainingInsights.consistency > 40
+                      ? '较为规律'
+                      : '训练不稳定'
+                }}
               </div>
             </article>
           </div>
 
           <!-- 数据洞察提示 -->
           <div class="data-insights">
-            <div class="insight-item" v-if="trainingInsights.recommendations.length > 0">
+            <div v-if="trainingInsights.recommendations.length > 0" class="insight-item">
               <h5>💡 训练建议</h5>
               <ul>
                 <li v-for="rec in trainingInsights.recommendations" :key="rec">{{ rec }}</li>
               </ul>
             </div>
-            <div class="insight-item" v-if="trainingInsights.achievements.length > 0">
+            <div v-if="trainingInsights.achievements.length > 0" class="insight-item">
               <h5>🏆 训练成就</h5>
               <ul>
                 <li v-for="achievement in trainingInsights.achievements" :key="achievement">{{ achievement }}</li>
@@ -111,19 +162,20 @@
 
       <TechCard title="预约管理" subtitle="智能提醒 · 批量操作">
         <!-- 预约筛选和批量操作 -->
-        <div class="booking-controls" v-if="allBookings.length > 0">
+        <div v-if="allBookings.length > 0" class="booking-controls">
           <div class="filter-tabs">
             <button
               v-for="filter in bookingFilters"
               :key="filter.value"
-              :class="['filter-tab', { 'filter-tab--active': bookingFilter === filter.value }]"
+              class="filter-tab"
+              :class="[{ 'filter-tab--active': bookingFilter === filter.value }]"
               @click="bookingFilter = filter.value"
             >
               {{ filter.label }}
             </button>
           </div>
 
-          <div class="bulk-actions" v-if="selectedBookings.length > 0">
+          <div v-if="selectedBookings.length > 0" class="bulk-actions">
             <span class="selection-info">已选择 {{ selectedBookings.length }} 项</span>
             <TechButton size="sm" variant="outline" @click="batchCancelBookings">批量取消</TechButton>
             <TechButton size="sm" variant="outline" @click="batchReschedule">批量改期</TechButton>
@@ -131,10 +183,16 @@
         </div>
 
         <!-- 智能提醒 -->
-        <div class="smart-reminders" v-if="urgentBookings.length > 0">
+        <div v-if="urgentBookings.length > 0" class="smart-reminders">
           <div class="reminder-alert">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
             <div>
               <strong>{{ urgentBookings.length }} 个预约即将开始</strong>
@@ -153,15 +211,14 @@
               :class="{ 'booking-item--selected': booking.selected, 'booking-item--urgent': booking.isUrgent }"
             >
               <div class="booking-checkbox">
-                <el-checkbox
-                  :model-value="booking.selected"
-                  @change="(value) => toggleBookingSelection(booking.id)"
-                />
+                <el-checkbox :model-value="booking.selected" @change="value => toggleBookingSelection(booking.id)" />
               </div>
               <div class="booking-content">
                 <div class="booking-header">
                   <p class="booking-title">{{ booking.title }}</p>
-                  <span class="booking-tag" :class="`booking-tag--${booking.type.toLowerCase()}`">{{ booking.type }}</span>
+                  <span class="booking-tag" :class="`booking-tag--${booking.type.toLowerCase()}`">{{
+                    booking.type
+                  }}</span>
                 </div>
                 <div class="booking-meta">
                   <small class="booking-time">{{ booking.time }}</small>
@@ -171,7 +228,11 @@
                 </div>
                 <div v-if="booking.reminder" class="booking-reminder">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" stroke="currentColor" stroke-width="2"/>
+                    <path
+                      d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
                   </svg>
                   {{ booking.reminder }}
                 </div>
@@ -211,7 +272,13 @@
             <div class="service-item" @click="router.push('/index/huiyuanxufei')">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -223,7 +290,13 @@
             <div class="service-item" @click="router.push('/index/storeup')">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -235,7 +308,13 @@
             <div class="service-item" @click="router.push('/index/daoqitixing')">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -247,7 +326,13 @@
             <div class="service-item" @click="openCustomerService">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -259,7 +344,13 @@
             <div class="service-item" @click="router.push('/index/jianshenqicai')">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -271,7 +362,13 @@
             <div class="service-item" @click="router.push('/index/news')">
               <div class="service-icon">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div class="service-content">
@@ -393,15 +490,8 @@ const trainingInsights = reactive({
   peakIntensity: 85,
   progressRate: 12,
   consistency: 78,
-  recommendations: [
-    '建议增加有氧训练时间',
-    '可以尝试高强度间歇训练',
-    '注意训练后恢复质量'
-  ],
-  achievements: [
-    '连续训练7天达成',
-    '训练强度提升15%'
-  ]
+  recommendations: ['建议增加有氧训练时间', '可以尝试高强度间歇训练', '注意训练后恢复质量'],
+  achievements: ['连续训练7天达成', '训练强度提升15%'],
 })
 
 // 预约管理数据
@@ -410,7 +500,7 @@ const bookingFilters = [
   { label: '全部', value: 'all' },
   { label: '今日', value: 'today' },
   { label: '本周', value: 'week' },
-  { label: '待确认', value: 'pending' }
+  { label: '待确认', value: 'pending' },
 ]
 const bookingFilter = ref('all')
 const selectedBookings = ref<Array<number>>([])
@@ -454,7 +544,7 @@ const trainingTrend = computed(() => {
   const trends = []
   for (let i = 3; i >= 0; i--) {
     const date = new Date(now)
-    date.setDate(date.getDate() - (i * 7))
+    date.setDate(date.getDate() - i * 7)
     const weekLabel = `W-${i + 1}`
     // 模拟更真实的训练数据：基础值 + 随机波动
     const baseValue = 50 + Math.random() * 40
@@ -462,7 +552,7 @@ const trainingTrend = computed(() => {
     trends.push({
       label: weekLabel,
       value: Math.round(trendValue),
-      date: date.toISOString().split('T')[0]
+      date: date.toISOString().split('T')[0],
     })
   }
   return trends
@@ -501,8 +591,12 @@ async function fetchProfile() {
 async function fetchReminderStats() {
   try {
     const [weekRes, monthRes] = await Promise.all([
-      http.get<ApiResponse<{ count: number }>>('/yonghu/remind/youxiaoqizhi/2', { params: { remindstart: 0, remindend: 7 } }),
-      http.get<ApiResponse<{ count: number }>>('/yonghu/remind/youxiaoqizhi/2', { params: { remindstart: 0, remindend: 30 } }),
+      http.get<ApiResponse<{ count: number }>>('/yonghu/remind/youxiaoqizhi/2', {
+        params: { remindstart: 0, remindend: 7 },
+      }),
+      http.get<ApiResponse<{ count: number }>>('/yonghu/remind/youxiaoqizhi/2', {
+        params: { remindstart: 0, remindend: 30 },
+      }),
     ])
     remindStats.week = (weekRes.data as any).count ?? 0
     remindStats.month = (monthRes.data as any).count ?? 0
@@ -518,14 +612,14 @@ async function fetchBookings() {
       coachBookingService.list({ page: 1, limit: 3, order: 'asc' }),
     ])
     const courseItems =
-      courses.list?.map((item) => ({
+      courses.list?.map(item => ({
         id: item.id!,
         title: item.kechengmingcheng || '健身课程',
         time: item.yuyueshijian ? formatDate(item.yuyueshijian) : '待定',
         type: '课程',
       })) ?? []
     const coachItems =
-      coaches.list?.map((item) => ({
+      coaches.list?.map(item => ({
         id: item.id!,
         title: item.jiaolianxingming || '私教预约',
         time: item.yuyueshijian ? formatDate(item.yuyueshijian) : '待定',
@@ -628,7 +722,7 @@ const urgentBookings = computed(() =>
     const now = new Date()
     const hoursDiff = (bookingTime.getTime() - now.getTime()) / (1000 * 60 * 60)
     return hoursDiff <= 24 && hoursDiff > 0
-  })
+  }),
 )
 
 const toggleBookingSelection = (bookingId: number) => {
@@ -649,7 +743,7 @@ const batchCancelBookings = async () => {
     await ElMessageBox.confirm('确定要取消选中的预约吗？', '确认操作', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
     })
     // 这里应该调用实际的取消API
     ElMessage.success('批量取消成功')
@@ -676,7 +770,7 @@ const cancelBooking = async (booking: any) => {
     await ElMessageBox.confirm('确定要取消此预约吗？', '确认操作', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
     })
     // 这里应该调用实际的取消API
     ElMessage.success('取消成功')
@@ -704,7 +798,8 @@ function goBooking() {
 .center-page {
   min-height: 100vh;
   padding: 48px 4vw 80px;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
+  background:
+    radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.1), transparent 50%), #020202;
   display: flex;
   flex-direction: column;
@@ -1008,5 +1103,3 @@ function goBooking() {
   }
 }
 </style>
-
-

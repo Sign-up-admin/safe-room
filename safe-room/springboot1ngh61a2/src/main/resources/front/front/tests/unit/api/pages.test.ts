@@ -9,15 +9,13 @@ const mockCurrentRoute = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('@/router', () => {
-  return {
+vi.mock('@/router', () => ({
     default: {
       push: mockPush,
       replace: mockReplace,
       currentRoute: mockCurrentRoute,
     },
-  }
-})
+  }))
 
 import http from '@/common/http'
 import { API_ENDPOINTS } from '@/constants/apiEndpoints'

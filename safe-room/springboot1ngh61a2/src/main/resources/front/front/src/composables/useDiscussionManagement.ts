@@ -3,7 +3,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 // 类型定义
 export interface DiscussionItem {
-  id: number
+  id?: number
   userid?: number
   nickname?: string
   content: string
@@ -30,7 +30,7 @@ export function useDiscussionManagement() {
   const currentUser = ref({
     id: 1,
     nickname: '当前用户',
-    role: 'admin' // 模拟管理员权限
+    role: 'admin', // 模拟管理员权限
   })
 
   const followingUsers = ref(new Set<number>())
@@ -42,7 +42,7 @@ export function useDiscussionManagement() {
     { value: 'harassment', label: '骚扰行为' },
     { value: 'inappropriate', label: '不当内容' },
     { value: 'copyright', label: '版权侵权' },
-    { value: 'other', label: '其他' }
+    { value: 'other', label: '其他' },
   ]
 
   // 方法
@@ -94,36 +94,42 @@ export function useDiscussionManagement() {
 
   const reportDiscussion = async (discussion: DiscussionItem): Promise<boolean> => {
     try {
-      const { value: reportType } = await ElMessageBox.prompt('请选择举报类型', '举报讨论', {
-        confirmButtonText: '提交举报',
-        cancelButtonText: '取消',
-        inputType: 'select',
-        inputOptions: reportTypes.reduce((options, type) => {
-          options[type.value] = type.label
-          return options
-        }, {} as Record<string, string>),
-        inputPlaceholder: '选择举报类型'
-      })
+      // Create a select input for report types
+      const selectOptions = reportTypes.map(type => ({
+        label: type.label,
+        value: type.value,
+      }))
+
+      // Create a simple select using prompt with custom validation
+      const reportTypeOptions = selectOptions.map(opt => `${opt.label} (${opt.value})`).join('\n')
+      const { value: selectedOption } = await ElMessageBox.prompt(
+        `请选择举报类型：\n${reportTypeOptions}`,
+        '举报讨论',
+        {
+          confirmButtonText: '提交举报',
+          cancelButtonText: '取消',
+          inputPlaceholder: '输入举报类型编号',
+        },
+      )
+
+      // Parse the selected value
+      const reportType = selectOptions.find(opt => opt.value === selectedOption)?.value || selectedOption
 
       if (!reportType) return false
 
       // 获取举报理由
-      const { value: reason } = await ElMessageBox.prompt(
-        '请详细描述举报理由',
-        '举报详情',
-        {
-          confirmButtonText: '提交',
-          cancelButtonText: '取消',
-          inputType: 'textarea',
-          inputPlaceholder: '请详细说明举报原因...',
-          inputValidator: (value) => {
-            if (!value || value.trim().length < 10) {
-              return '举报理由至少需要10个字符'
-            }
-            return true
+      const { value: reason } = await ElMessageBox.prompt('请详细描述举报理由', '举报详情', {
+        confirmButtonText: '提交',
+        cancelButtonText: '取消',
+        inputType: 'textarea',
+        inputPlaceholder: '请详细说明举报原因...',
+        inputValidator: value => {
+          if (!value || value.trim().length < 10) {
+            return '举报理由至少需要10个字符'
           }
-        }
-      )
+          return true
+        },
+      })
 
       if (!reason) return false
 
@@ -131,7 +137,7 @@ export function useDiscussionManagement() {
         discussionId: discussion.id,
         reportType: reportType as ReportData['reportType'],
         reason: reason.trim(),
-        description: `举报用户: ${discussion.nickname || '未知用户'}`
+        description: `举报用户: ${discussion.nickname || '未知用户'}`,
       }
 
       // 模拟API调用
@@ -182,15 +188,11 @@ export function useDiscussionManagement() {
     }
 
     try {
-      await ElMessageBox.confirm(
-        '确定要删除这个讨论吗？此操作不可撤销。',
-        '删除讨论',
-        {
-          confirmButtonText: '确定删除',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
+      await ElMessageBox.confirm('确定要删除这个讨论吗？此操作不可撤销。', '删除讨论', {
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
 
       // 模拟API调用
       console.log('删除讨论:', discussion.id)
@@ -207,40 +209,26 @@ export function useDiscussionManagement() {
   }
 
   // 权限检查
-  const isAdmin = (): boolean => {
-    return currentUser.value.role === 'admin'
-  }
+  const isAdmin = (): boolean => currentUser.value.role === 'admin'
 
-  const canPinDiscussion = (discussion: DiscussionItem): boolean => {
-    return isAdmin()
-  }
+  const canPinDiscussion = (discussion: DiscussionItem): boolean => isAdmin()
 
-  const canFeatureDiscussion = (discussion: DiscussionItem): boolean => {
-    return isAdmin()
-  }
+  const canFeatureDiscussion = (discussion: DiscussionItem): boolean => isAdmin()
 
-  const canDeleteDiscussion = (discussion: DiscussionItem): boolean => {
-    return isAdmin() || discussion.userid === currentUser.value.id
-  }
+  const canDeleteDiscussion = (discussion: DiscussionItem): boolean =>
+    isAdmin() || discussion.userid === currentUser.value.id
 
-  const canReportDiscussion = (discussion: DiscussionItem): boolean => {
-    return discussion.userid !== currentUser.value.id && !reportedDiscussions.value.has(discussion.id)
-  }
+  const canReportDiscussion = (discussion: DiscussionItem): boolean =>
+    discussion.userid !== currentUser.value.id && !reportedDiscussions.value.has(discussion.id)
 
-  const canFollowUser = (userId: number): boolean => {
-    return userId !== currentUser.value.id
-  }
+  const canFollowUser = (userId: number): boolean => userId !== currentUser.value.id
 
   // 计算属性
   const followingCount = computed(() => followingUsers.value.size)
 
-  const isFollowingUser = (userId: number): boolean => {
-    return followingUsers.value.has(userId)
-  }
+  const isFollowingUser = (userId: number): boolean => followingUsers.value.has(userId)
 
-  const hasReportedDiscussion = (discussionId: number): boolean => {
-    return reportedDiscussions.value.has(discussionId)
-  }
+  const hasReportedDiscussion = (discussionId: number): boolean => reportedDiscussions.value.has(discussionId)
 
   return {
     // 状态
@@ -267,6 +255,6 @@ export function useDiscussionManagement() {
     // 计算属性
     followingCount,
     isFollowingUser,
-    hasReportedDiscussion
+    hasReportedDiscussion,
   }
 }

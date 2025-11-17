@@ -20,7 +20,7 @@
         <span>商品数量</span>
         <span>{{ quantity }}</span>
       </div>
-      <div class="detail-row" v-if="discount > 0">
+      <div v-if="discount > 0" class="detail-row">
         <span>优惠金额</span>
         <span class="discount">-¥{{ formatCurrency(discount) }}</span>
       </div>
@@ -31,28 +31,22 @@
     </div>
 
     <div class="payment-actions">
-      <button
-        class="payment-btn payment-btn--primary"
-        @click="$emit('confirm')"
-        :disabled="loading"
-      >
+      <button class="payment-btn payment-btn--primary" :disabled="loading" @click="$emit('confirm')">
         <span v-if="loading">处理中...</span>
         <span v-else>确认支付</span>
       </button>
-      <button
-        class="payment-btn payment-btn--secondary"
-        @click="$emit('cancel')"
-        :disabled="loading"
-      >
-        取消支付
-      </button>
+      <button class="payment-btn payment-btn--secondary" :disabled="loading" @click="$emit('cancel')">取消支付</button>
     </div>
 
     <!-- 安全提示 -->
     <div class="security-notice">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z" stroke="currentColor" stroke-width="2"/>
-        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path
+          d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"
+          stroke="currentColor"
+          stroke-width="2"
+        />
+        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <span>支付过程安全加密，保护您的隐私和资金安全</span>
     </div>

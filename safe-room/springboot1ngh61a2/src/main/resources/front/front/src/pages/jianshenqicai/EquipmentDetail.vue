@@ -1,12 +1,12 @@
 <template>
-  <div class="equipment-detail" v-loading="loading">
+  <div v-loading="loading" class="equipment-detail">
     <section class="detail-hero">
       <div class="hero-content">
         <div class="breadcrumb">
           <TechButton size="sm" variant="text" @click="$emit('back')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 12H5"/>
-              <path d="M12 19l-7-7 7-7"/>
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
             </svg>
             返回列表
           </TechButton>
@@ -16,34 +16,40 @@
         <div class="equipment-meta">
           <span class="meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 7h-3V6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/>
-              <path d="M14 12v3"/>
-              <path d="M8 12v3"/>
+              <path
+                d="M20 7h-3V6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"
+              />
+              <path d="M14 12v3" />
+              <path d="M8 12v3" />
             </svg>
             {{ record?.pinpai || '智能器材' }}
           </span>
           <span class="meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polygon points="10,8 16,12 10,16 10,8"/>
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="10,8 16,12 10,16 10,8" />
             </svg>
             {{ deriveDifficulty(record) }}
           </span>
           <span class="meta-item">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              <path
+                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+              />
             </svg>
             {{ record?.shoushenxiaoguo || '综合训练' }}
           </span>
         </div>
       </div>
       <div class="hero-visual">
-        <div class="equipment-image" v-if="record?.tupian">
+        <div v-if="record?.tupian" class="equipment-image">
           <img :src="resolveAssetUrl(record.tupian)" :alt="record.qicaimingcheng" />
         </div>
-        <div class="equipment-placeholder" v-else>
+        <div v-else class="equipment-placeholder">
           <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            <path
+              d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+            />
           </svg>
           <p>器材图片</p>
         </div>
@@ -55,7 +61,8 @@
         <button
           v-for="tab in tabs"
           :key="tab.key"
-          :class="['tab-button', { 'tab-button--active': activeTab === tab.key }]"
+          class="tab-button"
+          :class="[{ 'tab-button--active': activeTab === tab.key }]"
           @click="activeTab = tab.key"
         >
           {{ tab.label }}
@@ -104,13 +111,13 @@
         <!-- 使用教程标签页 -->
         <div v-if="activeTab === 'tutorial'" class="tab-panel">
           <TechCard title="使用教程" subtitle="图文指导 · 安全要点">
-            <div class="tutorial-content" v-if="record?.shiyongfangfa">
+            <div v-if="record?.shiyongfangfa" class="tutorial-content">
               <SafeHtml :html="record.shiyongfangfa" />
             </div>
-            <div class="tutorial-placeholder" v-else>
+            <div v-else class="tutorial-placeholder">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                <circle cx="12" cy="12" r="10"/>
-                <polygon points="10,8 16,12 10,16 10,8"/>
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="10,8 16,12 10,16 10,8" />
               </svg>
               <h3>教程内容制作中</h3>
               <p>我们正在准备详细的使用教程，请稍后查看。</p>
@@ -122,26 +129,24 @@
         <div v-if="activeTab === 'booking'" class="tab-panel">
           <TechCard title="预约体验" subtitle="立即预约 · 专业指导">
             <div class="booking-section">
-              <p class="booking-intro">
-                体验这款专业器材，感受科技带来的训练革新。我们的教练将为您提供个性化指导。
-              </p>
+              <p class="booking-intro">体验这款专业器材，感受科技带来的训练革新。我们的教练将为您提供个性化指导。</p>
               <div class="booking-actions">
                 <TechButton size="lg" @click="goBooking">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                   预约体验
                 </TechButton>
                 <TechButton size="lg" variant="outline" @click="goCourseList">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                    <polyline points="10,9 9,9 8,9"/>
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10,9 9,9 8,9" />
                   </svg>
                   查看课程
                 </TechButton>
@@ -195,10 +200,18 @@ onMounted(() => {
 async function loadEquipmentDetail() {
   loading.value = true
   try {
-    const { detail } = await equipmentService.detail(props.id!)
-    record.value = detail ?? null
+    const detail = await equipmentService.detail(props.id!)
+    // detail 可能是字符串或对象，根据实际API返回调整
+    if (typeof detail === 'string') {
+      // 如果是字符串，可能需要额外处理或这是错误的情况
+      console.warn('Detail returned as string:', detail)
+      record.value = null
+    } else {
+      record.value = detail as Jianshenqicai
+    }
   } catch (error) {
     console.error(error)
+    record.value = null
   } finally {
     loading.value = false
   }
@@ -231,7 +244,8 @@ function goCourseList() {
 <style scoped lang="scss">
 .equipment-detail {
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
+  background:
+    radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.12), transparent 45%), #020202;
   padding: 48px 24px 80px;
 }
@@ -409,7 +423,8 @@ function goCourseList() {
     line-height: 1.6;
   }
 
-  :deep(ul), :deep(ol) {
+  :deep(ul),
+  :deep(ol) {
     margin-bottom: 16px;
     padding-left: 24px;
   }

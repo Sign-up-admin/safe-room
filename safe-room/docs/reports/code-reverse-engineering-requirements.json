@@ -1113,8 +1113,8 @@
           "DiscussionReplies",
           "RecommendationCard",
           "DiscussionComposer",
-          "Discussjianshenkecheng",
           "Array",
+          "Discussjianshenkecheng",
           "HTMLElement"
         ],
         "businessPurpose": "展示discussjianshenkecheng列表信息，支持查询和筛选"
@@ -1321,6 +1321,7 @@
           "TechButton",
           "CoachNetwork",
           "CoachView",
+          "CoachMeta",
           "CoachLink"
         ],
         "businessPurpose": "展示jianshenjiaolian列表信息，支持查询和筛选"
@@ -4417,5 +4418,5 @@
       ]
     }
   ],
-  "analysisTime": "2025-11-17T01:41:08.719Z"
+  "analysisTime": "2025-11-17T05:20:53.433Z"
 }

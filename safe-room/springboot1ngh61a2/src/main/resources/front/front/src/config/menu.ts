@@ -58,7 +58,17 @@ const menuData: MenuRole[] = [
       {
         child: [
           {
-            allButtons: ['新增', '查看', '修改', '删除', '课程类型统计', '教练课程统计', '查看评论', '首页总数', '课程预约'],
+            allButtons: [
+              '新增',
+              '查看',
+              '修改',
+              '删除',
+              '课程类型统计',
+              '教练课程统计',
+              '查看评论',
+              '首页总数',
+              '课程预约',
+            ],
             appFrontIcon: 'cuIcon-attentionfavor',
             buttons: ['新增', '查看', '修改', '删除', '查看评论'],
             menu: '健身课程',
@@ -210,7 +220,17 @@ const menuData: MenuRole[] = [
       {
         child: [
           {
-            allButtons: ['新增', '查看', '修改', '删除', '课程类型统计', '教练课程统计', '查看评论', '首页总数', '课程预约'],
+            allButtons: [
+              '新增',
+              '查看',
+              '修改',
+              '删除',
+              '课程类型统计',
+              '教练课程统计',
+              '查看评论',
+              '首页总数',
+              '课程预约',
+            ],
             appFrontIcon: 'cuIcon-rank',
             buttons: ['查看', '课程预约'],
             menu: '健身课程列表',
@@ -352,7 +372,17 @@ const menuData: MenuRole[] = [
       {
         child: [
           {
-            allButtons: ['新增', '查看', '修改', '删除', '课程类型统计', '教练课程统计', '查看评论', '首页总数', '课程预约'],
+            allButtons: [
+              '新增',
+              '查看',
+              '修改',
+              '删除',
+              '课程类型统计',
+              '教练课程统计',
+              '查看评论',
+              '首页总数',
+              '课程预约',
+            ],
             appFrontIcon: 'cuIcon-rank',
             buttons: ['查看', '课程预约'],
             menu: '健身课程列表',
@@ -414,7 +444,17 @@ const menuData: MenuRole[] = [
       {
         child: [
           {
-            allButtons: ['新增', '查看', '修改', '删除', '课程类型统计', '教练课程统计', '查看评论', '首页总数', '课程预约'],
+            allButtons: [
+              '新增',
+              '查看',
+              '修改',
+              '删除',
+              '课程类型统计',
+              '教练课程统计',
+              '查看评论',
+              '首页总数',
+              '课程预约',
+            ],
             appFrontIcon: 'cuIcon-attentionfavor',
             buttons: ['查看'],
             menu: '健身课程',
@@ -468,7 +508,17 @@ const menuData: MenuRole[] = [
       {
         child: [
           {
-            allButtons: ['新增', '查看', '修改', '删除', '课程类型统计', '教练课程统计', '查看评论', '首页总数', '课程预约'],
+            allButtons: [
+              '新增',
+              '查看',
+              '修改',
+              '删除',
+              '课程类型统计',
+              '教练课程统计',
+              '查看评论',
+              '首页总数',
+              '课程预约',
+            ],
             appFrontIcon: 'cuIcon-rank',
             buttons: ['查看', '课程预约'],
             menu: '健身课程列表',
@@ -521,4 +571,3 @@ const menu = {
 }
 
 export default menu
-

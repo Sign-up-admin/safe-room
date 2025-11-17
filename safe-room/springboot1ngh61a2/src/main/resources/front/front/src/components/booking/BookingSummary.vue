@@ -15,18 +15,41 @@
       </article>
     </div>
 
-    <el-form label-position="top" class="booking-summary__form" :model="formData" :rules="formRules" ref="formRef">
+    <el-form
+      ref="formRef"
+      label-position="top"
+      class="booking-summary__form"
+      :model="formData"
+      :rules="formRules"
+      data-testid="booking-info-form"
+    >
       <el-form-item label="联系人" prop="contact">
-        <el-input v-model="contactModel" placeholder="请输入姓名" maxlength="20" show-word-limit />
+        <el-input
+          v-model="contactModel"
+          placeholder="请输入姓名"
+          maxlength="20"
+          show-word-limit
+          data-testid="booking-name-input"
+        />
       </el-form-item>
       <el-form-item label="联系电话" prop="phone">
-        <el-input v-model="phoneModel" placeholder="请输入手机号" maxlength="11" />
+        <el-input v-model="phoneModel" placeholder="请输入手机号" maxlength="11" data-testid="booking-phone-input" />
       </el-form-item>
       <el-form-item label="备注">
-        <el-input v-model="remarkModel" type="textarea" :rows="3" placeholder="可填写训练目标、特殊需求" maxlength="200" show-word-limit />
+        <el-input
+          v-model="remarkModel"
+          type="textarea"
+          :rows="3"
+          placeholder="可填写训练目标、特殊需求"
+          maxlength="200"
+          show-word-limit
+          data-testid="booking-remark-input"
+        />
       </el-form-item>
       <el-form-item prop="agreement">
-        <el-checkbox v-model="agreementModel">我已阅读并同意预约规则</el-checkbox>
+        <el-checkbox v-model="agreementModel" data-testid="booking-agreement-checkbox"
+          >我已阅读并同意预约规则</el-checkbox
+        >
       </el-form-item>
     </el-form>
 
@@ -181,4 +204,3 @@ defineExpose({
   }
 }
 </style>
-

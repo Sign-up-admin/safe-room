@@ -28,10 +28,10 @@ const DEFAULT_CONFIG: Required<FileUploadConfig> = {
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   ],
   maxSize: 10 * 1024 * 1024, // 10MB
-  minSize: 0
+  minSize: 0,
 }
 
 /**
@@ -50,48 +50,48 @@ export interface FileValidationResult {
  */
 export function validateFile(file: File, config: FileUploadConfig = {}): FileValidationResult {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
-  
+
   // 校验文件扩展名
   if (finalConfig.allowedExtensions.length > 0) {
     if (!validateFileExtension(file.name, finalConfig.allowedExtensions)) {
       return {
         valid: false,
-        error: `文件类型不支持，仅支持：${finalConfig.allowedExtensions.join(', ')}`
+        error: `文件类型不支持，仅支持：${finalConfig.allowedExtensions.join(', ')}`,
       }
     }
   }
-  
+
   // 校验MIME类型
   if (finalConfig.allowedMimeTypes.length > 0 && file.type) {
     if (!validateMimeType(file.type, finalConfig.allowedMimeTypes)) {
       return {
         valid: false,
-        error: `文件类型不支持，仅支持：${finalConfig.allowedMimeTypes.join(', ')}`
+        error: `文件类型不支持，仅支持：${finalConfig.allowedMimeTypes.join(', ')}`,
       }
     }
   }
-  
+
   // 校验文件大小
   if (finalConfig.maxSize > 0) {
     if (!validateFileSize(file.size, finalConfig.maxSize)) {
       const maxSizeMB = (finalConfig.maxSize / 1024 / 1024).toFixed(2)
       return {
         valid: false,
-        error: `文件大小超过限制，最大允许：${maxSizeMB}MB`
+        error: `文件大小超过限制，最大允许：${maxSizeMB}MB`,
       }
     }
   }
-  
+
   if (finalConfig.minSize > 0) {
     if (file.size < finalConfig.minSize) {
       const minSizeKB = (finalConfig.minSize / 1024).toFixed(2)
       return {
         valid: false,
-        error: `文件大小过小，最小要求：${minSizeKB}KB`
+        error: `文件大小过小，最小要求：${minSizeKB}KB`,
       }
     }
   }
-  
+
   return { valid: true }
 }
 
@@ -103,12 +103,12 @@ export function validateFile(file: File, config: FileUploadConfig = {}): FileVal
 export function createBeforeUpload(config: FileUploadConfig = {}) {
   return (file: File): boolean => {
     const result = validateFile(file, config)
-    
+
     if (!result.valid && result.error) {
       ElMessage.error(result.error)
       return false
     }
-    
+
     return true
   }
 }
@@ -120,11 +120,11 @@ export function createBeforeUpload(config: FileUploadConfig = {}) {
  */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B'
-  
+
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  
+
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
 }
 
@@ -182,4 +182,3 @@ export function isVideoFile(filename: string): boolean {
   const ext = getFileExtension(filename)
   return VIDEO_EXTENSIONS.includes(ext)
 }
-

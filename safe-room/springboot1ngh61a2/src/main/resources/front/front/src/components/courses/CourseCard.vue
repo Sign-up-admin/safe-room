@@ -1,13 +1,13 @@
 <template>
-  <TechCard class="course-card" variant="solid">
-    <div class="course-card__media" :style="mediaStyle">
-      <span class="course-card__tag">{{ course.kechengleixing || '特色课程' }}</span>
-      <span class="course-card__badge">{{ intensityLabel }}</span>
+  <TechCard class="course-card" variant="solid" data-testid="course-card">
+    <div class="course-card__media" :style="mediaStyle" data-testid="course-card-media">
+      <span class="course-card__tag" data-testid="course-card-tag">{{ course.kechengleixing || '特色课程' }}</span>
+      <span class="course-card__badge" data-testid="course-card-badge">{{ intensityLabel }}</span>
     </div>
-    <div class="course-card__body">
-      <header class="course-card__header">
-        <h3>{{ course.kechengmingcheng }}</h3>
-        <p>{{ course.kechengjianjie || '沉浸式智能训练体验，匹配个人体能数据与训练目标。' }}</p>
+    <div class="course-card__body" data-testid="course-card-body">
+      <header class="course-card__header" data-testid="course-card-header">
+        <h3 data-testid="course-card-title">{{ course.kechengmingcheng }}</h3>
+        <p data-testid="course-card-description">{{ course.kechengjianjie || '沉浸式智能训练体验，匹配个人体能数据与训练目标。' }}</p>
       </header>
       <ul class="course-card__meta">
         <li>
@@ -32,13 +32,9 @@
           <p>单次</p>
           <strong>{{ formattedPrice }}</strong>
         </div>
-        <div class="course-card__actions">
-          <TechButton size="sm" variant="ghost" @click="$emit('view', course)">
-            查看详情
-          </TechButton>
-          <TechButton size="sm" @click="$emit('book', course)">
-            预约体验
-          </TechButton>
+        <div class="course-card__actions" data-testid="course-card-actions">
+          <TechButton size="sm" variant="ghost" data-testid="course-card-view-button" @click="$emit('view', course)"> 查看详情 </TechButton>
+          <TechButton size="sm" data-testid="course-card-book-button" @click="$emit('book', course)"> 预约体验 </TechButton>
         </div>
       </div>
     </div>
@@ -60,9 +56,7 @@ const formattedDate = computed(() =>
   props.course.shangkeshijian ? formatDate(props.course.shangkeshijian) : '随时预约',
 )
 
-const formattedPrice = computed(() =>
-  props.course.kechengjiage ? formatCurrency(props.course.kechengjiage) : '¥198',
-)
+const formattedPrice = computed(() => (props.course.kechengjiage ? formatCurrency(props.course.kechengjiage) : '¥198'))
 
 const mediaStyle = computed(() => {
   const url = resolveAssetUrl(props.course.tupian)
@@ -121,7 +115,7 @@ const resolveAssetUrl = (path?: string) => {
     backdrop-filter: blur(10px);
     color: $color-yellow;
     border: 1px solid rgba(253, 216, 53, 0.3);
-    box-shadow: 
+    box-shadow:
       0 2px 8px rgba(0, 0, 0, 0.3),
       0 0 12px rgba(253, 216, 53, 0.15),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -129,11 +123,11 @@ const resolveAssetUrl = (path?: string) => {
     letter-spacing: 0.15em;
     padding: 6px 16px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     &:hover {
       background: linear-gradient(135deg, rgba(253, 216, 53, 0.2), rgba(253, 216, 53, 0.12));
       border-color: rgba(253, 216, 53, 0.5);
-      box-shadow: 
+      box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.4),
         0 0 16px rgba(253, 216, 53, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
@@ -217,4 +211,3 @@ const resolveAssetUrl = (path?: string) => {
   }
 }
 </style>
-

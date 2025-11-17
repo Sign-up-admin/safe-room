@@ -15,14 +15,7 @@ export interface CoachRecommendOptions {
 }
 
 export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRecommendOptions = {}) {
-  const {
-    keyword = '',
-    skill = '',
-    price,
-    userHistory = [],
-    userPreferences = {},
-    currentGoals = []
-  } = options
+  const { keyword = '', skill = '', price, userHistory = [], userPreferences = {}, currentGoals = [] } = options
 
   // 计算教练评分（基于多维度因素）
   const calculateRating = (coach: Jianshenjiaolian): number => {
@@ -47,7 +40,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     if (currentGoals.length > 0) {
       const tags = extractTags(coach)
       const goalMatchCount = currentGoals.filter(goal =>
-        tags.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))
+        tags.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0])),
       ).length
       rating += (goalMatchCount / currentGoals.length) * 0.2
     }
@@ -56,7 +49,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     if (userPreferences.preferredGoals?.length) {
       const tags = extractTags(coach)
       const preferenceMatch = userPreferences.preferredGoals.some(pref =>
-        tags.some(tag => pref.includes(tag) || tag.includes(pref.split('')[0]))
+        tags.some(tag => pref.includes(tag) || tag.includes(pref.split('')[0])),
       )
       if (preferenceMatch) rating += 0.15
     }
@@ -98,7 +91,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     if (keyword) {
       const lowerKeyword = keyword.toLowerCase()
       filtered = filtered.filter(
-        (coach) =>
+        coach =>
           coach.jiaolianxingming?.toLowerCase().includes(lowerKeyword) ||
           coach.gerenjianjie?.toLowerCase().includes(lowerKeyword),
       )
@@ -106,7 +99,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
 
     // 技能过滤
     if (skill) {
-      filtered = filtered.filter((coach) => {
+      filtered = filtered.filter(coach => {
         const tags = extractTags(coach)
         return tags.includes(skill) || coach.gerenjianjie?.includes(skill)
       })
@@ -114,7 +107,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
 
     // 价格过滤
     if (price) {
-      filtered = filtered.filter((coach) => {
+      filtered = filtered.filter(coach => {
         const coachPrice = coach.sijiaojiage || 499
         return coachPrice <= price
       })
@@ -140,12 +133,12 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
       if (currentGoals.length > 0) {
         const tagsA = extractTags(a)
         const tagsB = extractTags(b)
-        const matchScoreA = currentGoals.filter(goal =>
-          tagsA.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))
-        ).length / currentGoals.length
-        const matchScoreB = currentGoals.filter(goal =>
-          tagsB.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))
-        ).length / currentGoals.length
+        const matchScoreA =
+          currentGoals.filter(goal => tagsA.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))).length /
+          currentGoals.length
+        const matchScoreB =
+          currentGoals.filter(goal => tagsB.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))).length /
+          currentGoals.length
 
         if (Math.abs(matchScoreA - matchScoreB) > 0.1) {
           return matchScoreB - matchScoreA
@@ -178,7 +171,7 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     if (currentGoals.length > 0) {
       const tags = extractTags(coach)
       const matchingGoals = currentGoals.filter(goal =>
-        tags.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0]))
+        tags.some(tag => goal.includes(tag) || tag.includes(goal.split('')[0])),
       )
       if (matchingGoals.length > 0) {
         reasons.push(`擅长${matchingGoals.join('、')}`)
@@ -212,8 +205,8 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     recommendedCoaches.value.map(coach => ({
       ...coach,
       recommendReason: generateRecommendReason(coach),
-      rating: calculateRating(coach)
-    }))
+      rating: calculateRating(coach),
+    })),
   )
 
   return {
@@ -224,4 +217,3 @@ export function useCoachRecommend(coaches: Jianshenjiaolian[], options: CoachRec
     generateRecommendReason,
   }
 }
-

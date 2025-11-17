@@ -268,6 +268,7 @@ public class NewsController {
         params.put("sort", "id");
         params.put("order", "desc");
         PageUtils page = newsService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, news), params), params));
+        @SuppressWarnings("unchecked")
         List<NewsEntity> pageList = (List<NewsEntity>)page.getList();
         if(newsList.size()<limit) {
             int toAddNum = (limit-newsList.size())<=pageList.size()?(limit-newsList.size()):pageList.size();

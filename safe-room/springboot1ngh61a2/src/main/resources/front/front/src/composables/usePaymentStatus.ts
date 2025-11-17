@@ -106,4 +106,3 @@ export function usePaymentStatus(fetcher: Fetcher, options: PaymentStatusOptions
     reset,
   }
 }
-

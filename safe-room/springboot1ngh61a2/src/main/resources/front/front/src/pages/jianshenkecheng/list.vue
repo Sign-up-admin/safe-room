@@ -10,20 +10,10 @@
 
     <TechCard as="section" class="courses-page__filters" :interactive="false" variant="layered">
       <div class="filters__grid">
-        <el-input
-          v-model="filters.keyword"
-          placeholder="搜索课程名称 / 关键词"
-          :prefix-icon="Search"
-          clearable
-        />
+        <el-input v-model="filters.keyword" placeholder="搜索课程名称 / 关键词" :prefix-icon="Search" clearable />
 
         <el-select v-model="filters.type" placeholder="课程类型" clearable>
-          <el-option
-            v-for="type in typeOptions"
-            :key="type"
-            :label="type"
-            :value="type"
-          />
+          <el-option v-for="type in typeOptions" :key="type" :label="type" :value="type" />
         </el-select>
 
         <el-select v-model="filters.intensity" placeholder="训练强度">
@@ -36,12 +26,7 @@
         </el-select>
 
         <el-select v-model="filters.sort" placeholder="排序">
-          <el-option
-            v-for="option in sortOptions"
-            :key="option.value"
-            :label="option.label"
-            :value="option.value"
-          />
+          <el-option v-for="option in sortOptions" :key="option.value" :label="option.label" :value="option.value" />
         </el-select>
       </div>
 
@@ -51,7 +36,8 @@
           <button
             v-for="segment in priceSegments"
             :key="segment.value"
-            :class="['filters__chip', { 'filters__chip--active': filters.price === segment.value }]"
+            class="filters__chip"
+            :class="[{ 'filters__chip--active': filters.price === segment.value }]"
             @click="filters.price = segment.value"
           >
             {{ segment.label }}
@@ -83,7 +69,7 @@
       </TechCard>
     </div>
 
-    <div class="courses-page__tags" v-if="tagCards.length > 0">
+    <div v-if="tagCards.length > 0" class="courses-page__tags">
       <TechCard
         v-for="tag in tagCards"
         :key="tag.key"
@@ -101,7 +87,7 @@
     </div>
 
     <div class="courses-page__content">
-      <div class="courses-page__grid" v-loading="loading.list">
+      <div v-loading="loading.list" class="courses-page__grid">
         <CourseCard
           v-for="course in courses"
           :key="course.id"
@@ -136,16 +122,16 @@
           variant="layered"
         >
           <template #footer>
-            <TechButton block size="sm" @click="handleBook()">开启智能推荐</TechButton>
+            <TechButton block size="sm" @click="handleBook">开启智能推荐</TechButton>
           </template>
         </TechCard>
 
         <TechCard
+          v-loading="recommendations.loadingHeat"
           class="recommend-card"
           title="系统热推"
           subtitle="根据点击热度实时排序"
           :interactive="false"
-          v-loading="recommendations.loadingHeat"
         >
           <ul class="recommend-card__list">
             <li v-for="item in recommendations.trending" :key="item.id">
@@ -160,11 +146,11 @@
         </TechCard>
 
         <TechCard
+          v-loading="recommendations.loadingCollaborative"
           class="recommend-card"
           title="猜你想练"
           subtitle="基于收藏协同过滤"
           :interactive="false"
-          v-loading="recommendations.loadingCollaborative"
         >
           <ul class="recommend-card__list">
             <li v-for="item in recommendations.collaborative" :key="`collab-${item.id}`">
@@ -267,42 +253,37 @@ const filters = reactive({
 const metrics = computed(() => ({
   totalCourses: pagination.total,
   avgPrice: courses.value.length
-    ? formatCurrency(
-        courses.value.reduce((sum, item) => sum + (item.kechengjiage || 0), 0) /
-          courses.value.length,
-      )
+    ? formatCurrency(courses.value.reduce((sum, item) => sum + (item.kechengjiage || 0), 0) / courses.value.length)
     : '¥0',
   trendingTag: courses.value[0]?.kechengleixing || '智能训练',
 }))
 
 const leaderboardCourses = computed(() =>
-  [...courses.value]
-    .sort((a, b) => (b.clicknum ?? 0) - (a.clicknum ?? 0))
-    .slice(0, 3),
+  [...courses.value].sort((a, b) => (b.clicknum ?? 0) - (a.clicknum ?? 0)).slice(0, 3),
 )
 
 // 标签卡片数据
 const tagCards = computed(() => {
   const typeMap = new Map<string, number>()
   const intensityMap = new Map<string, number>()
-  
+
   // 统计课程类型
-  allCourses.value.forEach((course) => {
+  allCourses.value.forEach(course => {
     const type = course.kechengleixing
     if (type) {
       typeMap.set(type, (typeMap.get(type) || 0) + 1)
     }
   })
-  
+
   // 统计强度标签
-  allCourses.value.forEach((course) => {
+  allCourses.value.forEach(course => {
     const intensityLabel = getCourseIntensityLabel(course)
     intensityMap.set(intensityLabel, (intensityMap.get(intensityLabel) || 0) + 1)
   })
-  
+
   // 合并类型和强度标签
   const tags: Array<{ key: string; label: string; count: number; filterType: string }> = []
-  
+
   // 添加课程类型标签
   typeMap.forEach((count, label) => {
     tags.push({
@@ -312,7 +293,7 @@ const tagCards = computed(() => {
       filterType: 'type',
     })
   })
-  
+
   // 添加强度标签
   intensityMap.forEach((count, label) => {
     tags.push({
@@ -322,17 +303,17 @@ const tagCards = computed(() => {
       filterType: 'intensity',
     })
   })
-  
+
   // 排序并限制数量
   return tags
-    .filter((tag) => tag.count > 0)
+    .filter(tag => tag.count > 0)
     .sort((a, b) => b.count - a.count)
     .slice(0, 6) // 最多显示6个标签
 })
 
 watch(
   () => route.query.focus,
-  (focus) => {
+  focus => {
     if (typeof focus === 'string') {
       applyFocus(focus)
     }
@@ -351,7 +332,7 @@ async function loadCourseTypes() {
   loading.types = true
   try {
     const { list } = await typeService.list({ page: 1, limit: 50 })
-    typeOptions.value = list.map((item) => item.kechengleixing).filter(Boolean) as string[]
+    typeOptions.value = list.map(item => item.kechengleixing).filter(Boolean) as string[]
   } catch (error) {
     console.error(error)
   } finally {
@@ -370,7 +351,7 @@ async function loadCourses() {
     if (filters.keyword) params.keyword = filters.keyword
     if (filters.type) params.kechengleixing = filters.type
 
-    const priceRange = priceSegments.find((segment) => segment.value === filters.price)
+    const priceRange = priceSegments.find(segment => segment.value === filters.price)
     if (priceRange?.min !== undefined) params.minprice = priceRange.min
     if (priceRange?.max !== undefined) params.maxprice = priceRange.max
 
@@ -427,7 +408,7 @@ async function loadCollaborativeRecommendations() {
 
 function applyIntensityFilter(list: Jianshenkecheng[]) {
   if (filters.intensity === 'all') return list
-  return list.filter((course) => deriveIntensity(course) === filters.intensity)
+  return list.filter(course => deriveIntensity(course) === filters.intensity)
 }
 
 function deriveIntensity(course: Jianshenkecheng): string {
@@ -510,10 +491,10 @@ function applyTagFilter(tag: { key: string; label: string; filterType: string })
   } else {
     // 强度标签
     const intensityMap: Record<string, string> = {
-      '入门': 'starter',
-      '燃脂': 'burn',
-      '进阶': 'advance',
-      '康复': 'rehab',
+      入门: 'starter',
+      燃脂: 'burn',
+      进阶: 'advance',
+      康复: 'rehab',
     }
     filters.intensity = intensityMap[tag.label] || 'all'
     filters.type = ''

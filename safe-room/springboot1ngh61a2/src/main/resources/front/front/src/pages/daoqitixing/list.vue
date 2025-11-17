@@ -1,14 +1,12 @@
 <template>
-  <div class="remind-page" v-loading="loading">
+  <div v-loading="loading" class="remind-page">
     <section class="remind-hero">
       <div>
         <p class="section-eyebrow">EXPIRY ALERT CENTER</p>
         <h1>多通道提醒 · 不错过任何到期窗口</h1>
         <p>系统根据会员卡有效期推送提醒，可配置短信/站内/邮箱三种渠道，并与续费页联动。</p>
-        <div class="message-integration" v-if="unreadCount > 0">
-          <TechButton size="sm" variant="outline" @click="viewMessages">
-            📬 未读消息 ({{ unreadCount }})
-          </TechButton>
+        <div v-if="unreadCount > 0" class="message-integration">
+          <TechButton size="sm" variant="outline" @click="viewMessages"> 📬 未读消息 ({{ unreadCount }}) </TechButton>
         </div>
       </div>
       <div class="hero-stats">
@@ -32,17 +30,17 @@
         <!-- 筛选和批量操作栏 -->
         <div class="timeline-controls">
           <div class="filter-group">
-            <el-select v-model="filterType" placeholder="筛选类型" size="small" style="width: 120px;">
+            <el-select v-model="filterType" placeholder="筛选类型" size="small" style="width: 120px">
               <el-option label="全部" value="all" />
               <el-option label="紧急提醒" value="urgent" />
               <el-option label="普通提醒" value="normal" />
             </el-select>
-            <el-select v-model="sortBy" placeholder="排序方式" size="small" style="width: 120px;">
+            <el-select v-model="sortBy" placeholder="排序方式" size="small" style="width: 120px">
               <el-option label="到期时间" value="date" />
               <el-option label="优先级" value="priority" />
             </el-select>
           </div>
-          <div class="batch-actions" v-if="selectedItems.length > 0">
+          <div v-if="selectedItems.length > 0" class="batch-actions">
             <TechButton size="sm" variant="outline" @click="markAsProcessed">标记已处理</TechButton>
             <TechButton size="sm" variant="outline" @click="postponeReminders">延期提醒</TechButton>
             <TechButton size="sm" variant="outline" @click="deleteSelected">删除选中</TechButton>
@@ -61,7 +59,7 @@
               <!-- 时间轴节点 -->
               <div class="timeline-node">
                 <div class="timeline-dot" :class="`timeline-dot--${item.level}`"></div>
-                <div class="timeline-line" v-if="index !== filteredReminders.length - 1"></div>
+                <div v-if="index !== filteredReminders.length - 1" class="timeline-line"></div>
               </div>
 
               <!-- 主要内容 -->
@@ -79,7 +77,7 @@
                   </div>
                   <div class="timeline-actions">
                     <el-checkbox v-model="item.selected" @change="updateSelection" />
-                    <span :class="['timeline-badge', `timeline-badge--${item.level}`]">{{ item.levelLabel }}</span>
+                    <span class="timeline-badge" :class="[`timeline-badge--${item.level}`]">{{ item.levelLabel }}</span>
                     <TechButton size="sm" variant="text" @click.stop="goRenew(item)">续费</TechButton>
                     <svg
                       class="expand-icon"
@@ -90,25 +88,31 @@
                       fill="none"
                       @click.stop="toggleExpand(item)"
                     >
-                      <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path
+                        d="M6 9l6 6 6-6"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
                     </svg>
                   </div>
                 </div>
 
                 <!-- 展开详情 -->
-                <div class="timeline-details" v-show="item.expanded">
+                <div v-show="item.expanded" class="timeline-details">
                   <div class="details-grid">
                     <div class="detail-item">
                       <label>会员卡类型</label>
-                      <span>{{ item.huiyuankamingcheng || '—' }}</span>
+                      <span>{{ (item as any).huiyuankamingcheng || '—' }}</span>
                     </div>
                     <div class="detail-item">
                       <label>联系方式</label>
-                      <span>{{ item.shoujihaoma || '—' }}</span>
+                      <span>{{ (item as any).shoujihaoma || '—' }}</span>
                     </div>
 
                     <!-- 智能建议 -->
-                    <div class="smart-suggestions" v-if="generateSmartSuggestions(item).length > 0">
+                    <div v-if="generateSmartSuggestions(item).length > 0" class="smart-suggestions">
                       <h5>智能建议</h5>
                       <div class="suggestions-list">
                         <div
@@ -120,7 +124,7 @@
                         >
                           <div class="suggestion-header">
                             <span class="suggestion-title">{{ suggestion.title }}</span>
-                            <span class="suggestion-priority" v-if="suggestion.priority <= 2">优先处理</span>
+                            <span v-if="suggestion.priority <= 2" class="suggestion-priority">优先处理</span>
                           </div>
                           <p class="suggestion-desc">{{ suggestion.description }}</p>
                           <span class="suggestion-action">{{ suggestion.action }}</span>
@@ -132,11 +136,7 @@
                     <div class="reminder-history">
                       <h5>提醒历史</h5>
                       <div class="history-timeline">
-                        <div
-                          v-for="history in getReminderHistory(item)"
-                          :key="history.date"
-                          class="history-item"
-                        >
+                        <div v-for="history in getReminderHistory(item)" :key="history.date" class="history-item">
                           <div class="history-dot"></div>
                           <div class="history-content">
                             <div class="history-header">
@@ -169,14 +169,14 @@
                   <div class="related-info">
                     <h5>关联信息</h5>
                     <div class="related-grid">
-                      <div class="related-item" v-for="booking in getRelatedBookings(item)" :key="booking.id">
+                      <div v-for="booking in getRelatedBookings(item)" :key="booking.id" class="related-item">
                         <div class="related-icon">📅</div>
                         <div class="related-content">
                           <p>{{ booking.name }}</p>
                           <small>{{ formatDate(booking.date) }}</small>
                         </div>
                       </div>
-                      <div class="related-item" v-for="order in getRelatedOrders(item)" :key="order.id">
+                      <div v-for="order in getRelatedOrders(item)" :key="order.id" class="related-item">
                         <div class="related-icon">🛒</div>
                         <div class="related-content">
                           <p>{{ order.name }}</p>
@@ -212,15 +212,11 @@
                   <div class="reminder-history">
                     <h5>提醒历史</h5>
                     <div class="history-timeline">
-                      <div
-                        v-for="history in getReminderHistory(item)"
-                        :key="history.id"
-                        class="history-item"
-                      >
+                      <div v-for="(history, index) in getReminderHistory(item)" :key="index" class="history-item">
                         <div class="history-dot"></div>
                         <div class="history-content">
-                          <p>{{ history.message }}</p>
-                          <small>{{ formatDate(history.timestamp) }}</small>
+                          <p>{{ history.action }} - {{ history.note }}</p>
+                          <small>{{ formatDate(history.date) }}</small>
                         </div>
                       </div>
                     </div>
@@ -309,21 +305,35 @@ const strategy = reactive({
 
 // 增强的提醒列表计算
 const enhancedReminders = computed(() =>
-  reminders.value.map((item) => ({
-    ...item,
-    daysLeft: item.tixingshijian ? Math.ceil((new Date(item.tixingshijian).getTime() - Date.now()) / 86400000) : 0,
-    selected: false,
-    expanded: false,
-    priority: item.tixingshijian ? (Math.ceil((new Date(item.tixingshijian).getTime() - Date.now()) / 86400000) <= 3 ? 1 : 2) : 0,
-  })),
+  reminders.value.map(item => {
+    const daysLeft = item.tixingshijian
+      ? Math.ceil((new Date(item.tixingshijian).getTime() - Date.now()) / 86400000)
+      : 0
+    return {
+      ...item,
+      daysLeft,
+      selected: false,
+      expanded: false,
+      priority: item.tixingshijian
+        ? Math.ceil((new Date(item.tixingshijian).getTime() - Date.now()) / 86400000) <= 3
+          ? 1
+          : 2
+        : 0,
+      level: daysLeft <= 3 ? 'urgent' : daysLeft <= 7 ? 'warning' : 'normal',
+      levelLabel: daysLeft <= 3 ? '紧急' : daysLeft <= 7 ? '警告' : '正常',
+      processed: false,
+      status: '待处理',
+      postponed: false,
+    }
+  }),
 )
 
 const filteredReminders = computed(() => {
-  let filtered = enhancedReminders.value.filter((item) => item.daysLeft >= -1)
+  let filtered = enhancedReminders.value.filter(item => item.daysLeft >= -1)
 
   // 按类型筛选
   if (filterType.value !== 'all') {
-    filtered = filtered.filter((item) => item.level === filterType.value)
+    filtered = filtered.filter(item => item.level === filterType.value)
   }
 
   // 排序
@@ -333,7 +343,7 @@ const filteredReminders = computed(() => {
     filtered.sort((a, b) => a.priority - b.priority)
   }
 
-  return filtered.slice(0, 10).map((item) => ({
+  return filtered.slice(0, 10).map(item => ({
     ...item,
     level: item.daysLeft <= 3 ? 'urgent' : 'normal',
     levelLabel: item.daysLeft <= 3 ? '紧急' : '提醒中',
@@ -341,13 +351,10 @@ const filteredReminders = computed(() => {
 })
 
 const upcomingReminders = computed(() => filteredReminders.value.slice(0, 6))
-const urgentCount = computed(() => upcomingReminders.value.filter((item) => item.level === 'urgent').length)
+const urgentCount = computed(() => upcomingReminders.value.filter(item => item.level === 'urgent').length)
 
 onMounted(async () => {
-  await Promise.all([
-    fetchReminders(),
-    loadUnreadCount()
-  ])
+  await Promise.all([fetchReminders(), loadUnreadCount()])
 })
 
 async function fetchReminders() {
@@ -370,7 +377,7 @@ function openList() {
   router.push('/index/daoqitixingDetail')
 }
 
-function goRenew() {
+function goRenew(item?: any) {
   router.push('/index/huiyuanxufei')
 }
 
@@ -391,9 +398,7 @@ function toggleExpand(item: any) {
 }
 
 function updateSelection() {
-  selectedItems.value = filteredReminders.value
-    .filter(item => item.selected)
-    .map(item => item.id)
+  selectedItems.value = filteredReminders.value.filter(item => item.selected).map(item => item.id)
 }
 
 // 批量操作功能增强
@@ -422,7 +427,6 @@ async function markAsProcessed() {
 
     // 显示成功反馈
     console.log(`✅ 成功标记 ${selectedReminders.length} 个提醒为已处理`)
-
   } catch (error) {
     console.error('批量标记失败:', error)
     // 这里可以显示错误提示
@@ -460,7 +464,6 @@ async function postponeReminders() {
     await fetchReminders()
 
     console.log(`✅ 成功延期 ${selectedReminders.length} 个提醒`)
-
   } catch (error) {
     console.error('延期提醒失败:', error)
   }
@@ -487,7 +490,6 @@ async function deleteSelected() {
     selectedItems.value = []
 
     console.log(`✅ 成功删除 ${selectedReminders.length} 个提醒`)
-
   } catch (error) {
     console.error('批量删除失败:', error)
   }
@@ -510,7 +512,7 @@ function generateSmartSuggestions(item: any) {
       title: '立即续费',
       description: '会员卡即将到期，建议立即办理续费',
       action: '续费',
-      priority: 1
+      priority: 1,
     })
   } else if (item.daysLeft <= 7) {
     suggestions.push({
@@ -518,7 +520,7 @@ function generateSmartSuggestions(item: any) {
       title: '提前续费',
       description: '建议选择更长期的续费方案，享受更多优惠',
       action: '查看优惠',
-      priority: 2
+      priority: 2,
     })
   } else {
     suggestions.push({
@@ -526,7 +528,7 @@ function generateSmartSuggestions(item: any) {
       title: '规划续费',
       description: '可以开始规划续费方案，对比不同优惠',
       action: '了解详情',
-      priority: 3
+      priority: 3,
     })
   }
 
@@ -537,7 +539,7 @@ function generateSmartSuggestions(item: any) {
       title: '智能推荐',
       description: '根据您的使用习惯，推荐最适合的续费方案',
       action: '查看推荐',
-      priority: 4
+      priority: 4,
     })
   }
 
@@ -553,20 +555,20 @@ function getReminderHistory(item: any) {
       date: '2025-11-01',
       action: '创建提醒',
       operator: '系统自动',
-      note: '距离到期还有30天'
+      note: '距离到期还有30天',
     },
     {
       date: '2025-11-10',
       action: '发送邮件提醒',
       operator: '系统自动',
-      note: '已发送到期提醒邮件'
+      note: '已发送到期提醒邮件',
     },
     {
       date: '2025-11-15',
       action: '发送短信提醒',
       operator: '系统自动',
-      note: '已发送到期提醒短信'
-    }
+      note: '已发送到期提醒短信',
+    },
   ]
 }
 
@@ -596,16 +598,16 @@ function customizeMessageTemplate(item: any, channel: string) {
         祝您生活愉快！
 
         健身房管理系统
-      `
+      `,
     },
     sms: {
-      content: `${memberName}，您的${cardName}还有${daysLeft}天到期，请及时续费。客服电话：400-800-8888`
+      content: `${memberName}，您的${cardName}还有${daysLeft}天到期，请及时续费。客服电话：400-800-8888`,
     },
     inApp: {
       title: '会员卡到期提醒',
       content: `您的${cardName}还有${daysLeft}天到期，点击查看续费优惠`,
-      action: '立即续费'
-    }
+      action: '立即续费',
+    },
   }
 
   return templates[channel as keyof typeof templates]
@@ -624,7 +626,7 @@ function handleSuggestionClick(suggestion: any, item: any) {
     case '续费':
       router.push({
         path: '/index/huiyuanxufei',
-        query: { memberId: item.yonghuzhanghao }
+        query: { memberId: item.yonghuzhanghao },
       })
       break
     case '查看优惠':
@@ -634,14 +636,14 @@ function handleSuggestionClick(suggestion: any, item: any) {
       // 跳转到会员卡详情页
       router.push({
         path: '/index/huiyuanka',
-        query: { cardId: item.huiyuankaid }
+        query: { cardId: item.huiyuankaid },
       })
       break
     case '查看推荐':
       // 跳转到续费页面，显示智能推荐
       router.push({
         path: '/index/huiyuanxufei',
-        query: { showRecommendation: 'true', memberId: item.yonghuzhanghao }
+        query: { showRecommendation: 'true', memberId: item.yonghuzhanghao },
       })
       break
     default:
@@ -656,8 +658,8 @@ function getRelatedBookings(item: any) {
     {
       id: 1,
       name: '瑜伽课程预约',
-      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
-    }
+      date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+    },
   ].filter(() => item.yonghuxingming) // 只有当有用户信息时才显示
 }
 
@@ -668,8 +670,8 @@ function getRelatedOrders(item: any) {
     {
       id: 1,
       name: '季度会员卡',
-      amount: 1299
-    }
+      amount: 1299,
+    },
   ].filter(() => item.huiyuankamingcheng) // 只有当有会员卡信息时才显示
 }
 
@@ -685,8 +687,8 @@ function getRenewalSuggestion(item: any) {
       options: [
         { id: 'quarter', label: '续费3个月' },
         { id: 'semi-annual', label: '续费6个月' },
-        { id: 'annual', label: '续费12个月' }
-      ]
+        { id: 'annual', label: '续费12个月' },
+      ],
     }
   } else if (daysLeft <= 7) {
     return {
@@ -695,8 +697,8 @@ function getRenewalSuggestion(item: any) {
       message: '会员卡即将到期，建议提前续费享受优惠',
       options: [
         { id: 'quarter', label: '季度续费' },
-        { id: 'semi-annual', label: '半年续费' }
-      ]
+        { id: 'semi-annual', label: '半年续费' },
+      ],
     }
   } else {
     return {
@@ -705,12 +707,11 @@ function getRenewalSuggestion(item: any) {
       message: '建议选择长期续费方案，享受更多优惠',
       options: [
         { id: 'semi-annual', label: '半年优惠' },
-        { id: 'annual', label: '年度特惠' }
-      ]
+        { id: 'annual', label: '年度特惠' },
+      ],
     }
   }
 }
-
 
 // 应用续费建议
 function applySuggestion(item: any, option: any) {
@@ -721,8 +722,8 @@ function applySuggestion(item: any, option: any) {
     query: {
       suggestion: option.id,
       memberId: item.id,
-      cardType: item.huiyuankamingcheng
-    }
+      cardType: item.huiyuankamingcheng,
+    },
   })
 }
 </script>

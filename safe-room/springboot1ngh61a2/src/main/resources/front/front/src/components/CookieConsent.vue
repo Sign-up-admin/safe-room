@@ -1,5 +1,5 @@
 <template>
-  <el-dialog
+  <ElDialog
     v-model="dialogVisible"
     :title="null"
     width="580px"
@@ -14,8 +14,15 @@
       <div class="cookie-header">
         <div class="cookie-icon">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor" opacity="0.3"/>
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 13h2v2h-2v-2zm0-8h2v6h-2V7zm4.5 2.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S14 6.17 14 7s.67 1.5 1.5 1.5zm-7 5c.83 0 1.5-.67 1.5-1.5S9.33 11.5 8.5 11.5 7 12.17 7 13s.67 1.5 1.5 1.5zm7 2c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5z" fill="currentColor"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+              fill="currentColor"
+              opacity="0.3"
+            />
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 13h2v2h-2v-2zm0-8h2v6h-2V7zm4.5 2.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S14 6.17 14 7s.67 1.5 1.5 1.5zm-7 5c.83 0 1.5-.67 1.5-1.5S9.33 11.5 8.5 11.5 7 12.17 7 13s.67 1.5 1.5 1.5zm7 2c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5z"
+              fill="currentColor"
+            />
           </svg>
         </div>
         <h2 class="cookie-title">Cookie 使用提示</h2>
@@ -27,29 +34,29 @@
         <p class="cookie-description">
           我们使用 Cookie 来提升您的浏览体验、分析网站流量并个性化内容。继续使用本网站即表示您同意我们使用 Cookie。
         </p>
-        
-        <div class="cookie-types" v-if="showCustom">
+
+        <div v-if="showCustom" class="cookie-types">
           <div class="cookie-type-item">
             <div class="cookie-type-header">
-              <el-checkbox v-model="cookieSettings.necessary" disabled>
+              <ElCheckbox v-model="cookieSettings.necessary" disabled>
                 <span class="cookie-type-name">必要 Cookie</span>
-              </el-checkbox>
+              </ElCheckbox>
             </div>
             <p class="cookie-desc">这些 Cookie 是网站运行所必需的，无法关闭。</p>
           </div>
           <div class="cookie-type-item">
             <div class="cookie-type-header">
-              <el-checkbox v-model="cookieSettings.analytics">
+              <ElCheckbox v-model="cookieSettings.analytics">
                 <span class="cookie-type-name">分析 Cookie</span>
-              </el-checkbox>
+              </ElCheckbox>
             </div>
             <p class="cookie-desc">帮助我们了解访客如何使用网站。</p>
           </div>
           <div class="cookie-type-item">
             <div class="cookie-type-header">
-              <el-checkbox v-model="cookieSettings.marketing">
+              <ElCheckbox v-model="cookieSettings.marketing">
                 <span class="cookie-type-name">营销 Cookie</span>
-              </el-checkbox>
+              </ElCheckbox>
             </div>
             <p class="cookie-desc">用于跟踪访客并显示相关广告。</p>
           </div>
@@ -58,32 +65,24 @@
 
       <!-- Footer Actions -->
       <div class="cookie-footer">
-        <button 
-          v-if="!showCustom" 
-          class="custom-settings-btn" 
-          @click="showCustom = true"
-        >
-          自定义设置
-        </button>
-        <button 
-          v-if="showCustom" 
-          class="back-btn" 
-          @click="showCustom = false"
-        >
-          返回
-        </button>
+        <button v-if="!showCustom" class="custom-settings-btn" @click="showCustom = true">自定义设置</button>
+        <button v-if="showCustom" class="back-btn" @click="showCustom = false">返回</button>
         <div class="footer-actions">
           <button class="reject-btn" @click="handleReject">拒绝</button>
           <button class="accept-btn" @click="handleAccept">接受</button>
         </div>
       </div>
     </div>
-  </el-dialog>
+  </ElDialog>
 </template>
 
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
 import { ElDialog, ElButton, ElCheckbox } from 'element-plus'
+
+defineOptions({
+  name: 'CookieConsent'
+})
 
 const STORAGE_KEY = 'cookie_consent'
 const STORAGE_SETTINGS_KEY = 'cookie_settings'
@@ -110,9 +109,9 @@ function checkCookieConsent() {
   if (hasChecked.value && dialogVisible.value === false) {
     return
   }
-  
+
   const consent = localStorage.getItem(STORAGE_KEY)
-  
+
   // 如果已经有consent记录，不显示弹窗，只加载设置
   if (consent) {
     const savedSettings = localStorage.getItem(STORAGE_SETTINGS_KEY)
@@ -128,7 +127,7 @@ function checkCookieConsent() {
     dialogVisible.value = false
     return
   }
-  
+
   // 只有在没有consent记录时才显示弹窗
   // 延迟显示，避免影响页面加载
   setTimeout(() => {
@@ -144,10 +143,10 @@ function handleAccept() {
   // 保存用户选择
   localStorage.setItem(STORAGE_KEY, 'accepted')
   localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(cookieSettings.value))
-  
+
   // 应用 Cookie 设置
   applyCookieSettings()
-  
+
   dialogVisible.value = false
 }
 
@@ -155,25 +154,25 @@ function handleReject() {
   // 只接受必要 Cookie
   cookieSettings.value.analytics = false
   cookieSettings.value.marketing = false
-  
+
   localStorage.setItem(STORAGE_KEY, 'rejected')
   localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(cookieSettings.value))
-  
+
   // 应用 Cookie 设置
   applyCookieSettings()
-  
+
   dialogVisible.value = false
 }
 
 function applyCookieSettings() {
   // 这里可以根据设置启用或禁用相应的 Cookie
   // 例如：Google Analytics、广告追踪等
-  
+
   if (cookieSettings.value.analytics) {
     // 启用分析 Cookie
     console.log('Analytics cookies enabled')
   }
-  
+
   if (cookieSettings.value.marketing) {
     // 启用营销 Cookie
     console.log('Marketing cookies enabled')
@@ -189,7 +188,9 @@ function applyCookieSettings() {
     background: $color-panel-strong;
     border: 1px solid $color-border;
     border-radius: $card-radius;
-    box-shadow: $shadow-soft, 0 0 40px rgba(253, 216, 53, 0.15);
+    box-shadow:
+      $shadow-soft,
+      0 0 40px rgba(253, 216, 53, 0.15);
     overflow: hidden;
   }
 
@@ -463,4 +464,3 @@ function applyCookieSettings() {
   }
 }
 </style>
-

@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 /**
  * 全局错误处理工具
  * 捕获所有前端运行时错误，包括：
@@ -110,6 +112,27 @@ export function clearErrorDedupeCache(): void {
 }
 
 /**
+ * 创建简化的错误报告HTTP客户端（避免循环依赖）
+ */
+function createErrorReportClient() {
+  const client = axios.create({
+    timeout: 5000, // 5秒超时
+    baseURL: '/springboot1ngh61a2',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  })
+
+  // 简化的请求拦截器，只添加基本header
+  client.interceptors.request.use(config => {
+    config.headers['X-Error-Report'] = 'true'
+    return config
+  })
+
+  return client
+}
+
+/**
  * 发送错误到后端API
  */
 async function sendErrorToServer(errorInfo: ErrorInfo, retryCount = 0): Promise<void> {
@@ -123,10 +146,9 @@ async function sendErrorToServer(errorInfo: ErrorInfo, retryCount = 0): Promise<
   }
 
   try {
-    // 动态导入http以避免循环依赖
-    const http = (await import('./http')).default
-
-    await http.post(ERROR_REPORT_CONFIG.apiEndpoint, errorInfo)
+    // 使用独立的HTTP客户端，避免与主HTTP实例的循环依赖
+    const errorClient = createErrorReportClient()
+    await errorClient.post(ERROR_REPORT_CONFIG.apiEndpoint, errorInfo)
   } catch (error) {
     // 重试机制
     if (retryCount < ERROR_REPORT_CONFIG.maxRetries) {
@@ -351,4 +373,341 @@ export function getStoredErrors(): ErrorInfo[] {
 export function clearStoredErrors() {
   localStorage.removeItem('admin_errors')
 }
+
+// ========================================
+// 统一错误处理服务类
+// ========================================
+
+import { AxiosError } from 'axios'
+import { ElMessage } from 'element-plus'
+import router from '@/router/index'
+import type { ApiResponse } from './http'
+
+/**
+ * 错误处理选项
+ */
+export interface ErrorHandlerOptions {
+  showToast?: boolean
+  redirect?: boolean
+  logToConsole?: boolean
+  context?: string
+}
+
+/**
+ * 表单验证错误
+ */
+export interface ValidationError {
+  field: string
+  message: string
+  rule?: any
+}
+
+/**
+ * 错误类型枚举
+ */
+export enum ErrorType {
+  NETWORK = 'network',
+  HTTP = 'http',
+  BUSINESS = 'business',
+  VALIDATION = 'validation',
+  SYSTEM = 'system'
+}
+
+/**
+ * 统一错误处理服务类
+ */
+export class ErrorHandlerService {
+  private static instance: ErrorHandlerService
+
+  static getInstance(): ErrorHandlerService {
+    if (!ErrorHandlerService.instance) {
+      ErrorHandlerService.instance = new ErrorHandlerService()
+    }
+    return ErrorHandlerService.instance
+  }
+
+  /**
+   * 处理API错误（主要用于HTTP拦截器）
+   */
+  handleApiError(error: AxiosError | Error, options: ErrorHandlerOptions = {}): Promise<any> {
+    const {
+      showToast = true,
+      redirect = true,
+      logToConsole = true,
+      context = ''
+    } = options
+
+    if (logToConsole) {
+      console.error(`[${context}] API Error:`, error)
+    }
+
+    // 网络错误
+    if (this.isNetworkError(error)) {
+      return this.handleNetworkError(error, showToast, redirect)
+    }
+
+    // HTTP状态码错误
+    if (this.isHttpError(error)) {
+      return this.handleHttpError(error as AxiosError, showToast, redirect, context)
+    }
+
+    // 业务错误（后端返回的错误码）
+    if (this.isBusinessError(error)) {
+      return this.handleBusinessError(error, showToast, context)
+    }
+
+    // 系统错误
+    return this.handleSystemError(error, showToast)
+  }
+
+  /**
+   * 处理表单验证错误
+   */
+  handleFormValidationError(errors: ValidationError[]): void {
+    if (!errors || errors.length === 0) return
+
+    // 显示第一个错误
+    const firstError = errors[0]
+    ElMessage.error(firstError.message)
+
+    // 可以扩展：显示所有错误或字段级错误
+    if (errors.length > 1) {
+      console.warn('表单验证错误:', errors)
+    }
+  }
+
+  /**
+   * 处理业务逻辑错误
+   */
+  handleBusinessError(error: Error, context?: string): Promise<any> {
+    const message = this.extractErrorMessage(error)
+    console.error(`[${context}] 业务错误:`, message)
+
+    ElMessage.error(message)
+    return Promise.reject(error)
+  }
+
+  /**
+   * 统一提取错误消息
+   */
+  extractErrorMessage(error: any): string {
+    // 优先级：error.response?.data?.msg → error.response?.data?.message → error.message → '操作失败'
+
+    if (error?.response?.data) {
+      const data = error.response.data
+      if (typeof data === 'string') return data
+      if (data?.msg) return data.msg
+      if (data?.message) return data.message
+      if (data?.error) return data.error
+    }
+
+    if (error?.message) return error.message
+    if (typeof error === 'string') return error
+
+    return '操作失败'
+  }
+
+  /**
+   * 统一显示错误提示
+   */
+  showError(message: string, type: 'error' | 'warning' | 'info' = 'error'): void {
+    switch (type) {
+      case 'warning':
+        ElMessage.warning(message)
+        break
+      case 'info':
+        ElMessage.info(message)
+        break
+      default:
+        ElMessage.error(message)
+    }
+  }
+
+  /**
+   * 判断是否需要路由跳转
+   */
+  shouldRedirect(error: any): boolean {
+    if (error?.response?.status) {
+      const status = error.response.status
+      return [401, 403, 500].includes(status)
+    }
+
+    if (this.isNetworkError(error)) {
+      return true
+    }
+
+    return false
+  }
+
+  /**
+   * 统一处理路由跳转
+   */
+  handleRedirect(error: any): void {
+    if (!this.shouldRedirect(error)) return
+
+    const currentPath = router.currentRoute?.value?.path || window.location.pathname
+
+    // 避免在错误页面重复跳转
+    if (currentPath.startsWith('/error/')) return
+
+    if (error?.response?.status) {
+      const status = error.response.status
+      switch (status) {
+        case 401:
+          // 清除认证信息并跳转登录
+          this.clearAuthAndRedirect('/login')
+          break
+        case 403:
+          router.push({
+            path: '/error/403',
+            query: { from: currentPath }
+          }).catch(() => {})
+          break
+        case 500:
+          // 检查是否为登录接口，登录接口不跳转错误页面
+          const url = error.config?.url || ''
+          if (!url.includes('/login')) {
+            router.push({
+              path: '/error/500',
+              query: { from: currentPath }
+            }).catch(() => {})
+          }
+          break
+      }
+    } else if (this.isNetworkError(error)) {
+      router.push({
+        path: '/error/network',
+        query: { from: currentPath }
+      }).catch(() => {})
+    }
+  }
+
+  // ========================================
+  // 私有方法
+  // ========================================
+
+  private isNetworkError(error: any): boolean {
+    return (
+      error.code === 'ECONNABORTED' ||
+      error.code === 'ERR_NETWORK' ||
+      error.message?.includes('timeout') ||
+      error.message === 'Network Error'
+    )
+  }
+
+  private isHttpError(error: any): boolean {
+    return !!(error.response?.status && error.response.status >= 400)
+  }
+
+  private isBusinessError(error: any): boolean {
+    // 后端业务错误通常有response.data.code
+    return !!(
+      error.response?.data &&
+      typeof error.response.data === 'object' &&
+      'code' in error.response.data &&
+      error.response.data.code !== 0
+    )
+  }
+
+  private handleNetworkError(error: AxiosError | Error, showToast: boolean, redirect: boolean): Promise<any> {
+    let message = '网络连接失败，请检查网络设置'
+
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      message = '网络请求超时，请稍后重试'
+    }
+
+    if (showToast) {
+      this.showError(message, 'warning')
+    }
+
+    if (redirect) {
+      this.handleRedirect(error)
+    }
+
+    return Promise.reject(error)
+  }
+
+  private handleHttpError(error: AxiosError, showToast: boolean, redirect: boolean, context: string): Promise<any> {
+    const status = error.response?.status
+    const data = error.response?.data as ApiResponse
+
+    let message = this.extractErrorMessage(error)
+
+    // 根据状态码提供友好提示
+    switch (status) {
+      case 400:
+        message = message || '请求参数错误'
+        break
+      case 404:
+        message = message || '请求的资源不存在'
+        break
+      case 408:
+        message = '请求超时，请稍后重试'
+        break
+      case 429:
+        message = '请求过于频繁，请稍后重试'
+        break
+      case 500:
+        message = message || '服务器内部错误，请稍后重试'
+        break
+      case 502:
+        message = '服务器暂时不可用，请稍后重试'
+        break
+      case 503:
+        message = '服务维护中，请稍后重试'
+        break
+      default:
+        message = message || `请求失败 (${status})`
+    }
+
+    if (showToast && status !== 401 && status !== 403) {
+      this.showError(message)
+    }
+
+    if (redirect) {
+      this.handleRedirect(error)
+    }
+
+    // 对于401/403，直接拒绝，不显示toast
+    if (status === 401 || status === 403) {
+      return Promise.reject(error)
+    }
+
+    // 对于业务错误码，直接返回错误消息
+    if (data?.code && data.code !== 0) {
+      return Promise.reject(new Error(message))
+    }
+
+    return Promise.reject(error)
+  }
+
+  private handleSystemError(error: Error, showToast: boolean): Promise<any> {
+    const message = this.extractErrorMessage(error)
+
+    if (showToast) {
+      this.showError(message)
+    }
+
+    return Promise.reject(error)
+  }
+
+  private clearAuthAndRedirect(loginPath: string): void {
+    // 清除认证信息
+    const tokenStorage = require('@/utils/secureStorage').tokenStorage
+    const storage = require('@/utils/storage')
+
+    tokenStorage.clearToken()
+    storage.remove('Token')
+    storage.clear()
+    sessionStorage.clear()
+
+    // 跳转登录页
+    router.push({
+      name: 'login'
+    }).catch(() => {})
+  }
+}
+
+// 导出单例实例
+export const errorHandler = ErrorHandlerService.getInstance()
 

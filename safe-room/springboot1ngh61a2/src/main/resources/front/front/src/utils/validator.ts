@@ -62,15 +62,15 @@ export function validateUrl(url: string): boolean {
  */
 export function containsSqlInjection(input: string): boolean {
   if (!input) return false
-  
+
   // 常见的SQL注入关键词和模式
   const sqlPatterns = [
     /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/gi,
     /(--|#|\/\*|\*\/|;)/g, // SQL注释符号
     /(\bOR\b.*=.*=|\bAND\b.*=.*=)/gi, // OR 1=1, AND 1=1
-    /('|('')|;|--|\*|xp_|sp_)/gi // 特殊字符
+    /('|('')|;|--|\*|xp_|sp_)/gi, // 特殊字符
   ]
-  
+
   return sqlPatterns.some(pattern => pattern.test(input))
 }
 
@@ -81,16 +81,16 @@ export function containsSqlInjection(input: string): boolean {
  */
 export function containsXss(input: string): boolean {
   if (!input) return false
-  
+
   const xssPatterns = [
-    /<script[^>]*>/gi,  // Detect script tags (including incomplete ones)
+    /<script[^>]*>/gi, // Detect script tags (including incomplete ones)
     /javascript:/gi,
     /on\w+\s*=/gi,
     /<iframe[^>]*>/gi,
     /<object[^>]*>/gi,
-    /<embed[^>]*>/gi
+    /<embed[^>]*>/gi,
   ]
-  
+
   return xssPatterns.some(pattern => pattern.test(input))
 }
 
@@ -100,15 +100,12 @@ export function containsXss(input: string): boolean {
  * @param allowedExtensions - 允许的扩展名列表（不包含点号）
  * @returns 验证通过返回true，否则返回false
  */
-export function validateFileExtension(
-  filename: string,
-  allowedExtensions: string[]
-): boolean {
+export function validateFileExtension(filename: string, allowedExtensions: string[]): boolean {
   if (!filename || !allowedExtensions.length) return false
-  
+
   const ext = filename.split('.').pop()?.toLowerCase()
   if (!ext) return false
-  
+
   return allowedExtensions.map(e => e.toLowerCase()).includes(ext)
 }
 
@@ -118,12 +115,9 @@ export function validateFileExtension(
  * @param allowedMimeTypes - 允许的MIME类型列表
  * @returns 验证通过返回true，否则返回false
  */
-export function validateMimeType(
-  mimeType: string,
-  allowedMimeTypes: string[]
-): boolean {
+export function validateMimeType(mimeType: string, allowedMimeTypes: string[]): boolean {
   if (!mimeType || !allowedMimeTypes.length) return false
-  
+
   return allowedMimeTypes.map(m => m.toLowerCase()).includes(mimeType.toLowerCase())
 }
 
@@ -143,16 +137,13 @@ export function validateFileSize(size: number, maxSize: number): boolean {
  * @param minLength - 最小长度，默认8
  * @returns 验证通过返回true，否则返回false
  */
-export function validatePasswordStrength(
-  password: string,
-  minLength = 8
-): boolean {
+export function validatePasswordStrength(password: string, minLength = 8): boolean {
   if (!password || password.length < minLength) return false
-  
+
   // 至少包含字母和数字
   const hasLetter = /[a-zA-Z]/.test(password)
   const hasNumber = /\d/.test(password)
-  
+
   return hasLetter && hasNumber
 }
 
@@ -163,16 +154,12 @@ export function validatePasswordStrength(
  * @param maxLength - 最大长度，默认20
  * @returns 验证通过返回true，否则返回false
  */
-export function validateUsername(
-  username: string,
-  minLength = 3,
-  maxLength = 20
-): boolean {
+export function validateUsername(username: string, minLength = 3, maxLength = 20): boolean {
   if (!username) return false
-  
+
   const trimmed = username.trim()
   if (trimmed.length < minLength || trimmed.length > maxLength) return false
-  
+
   // 只允许字母、数字、下划线、中划线
   const usernameRegex = /^[a-zA-Z0-9_-]+$/
   return usernameRegex.test(trimmed)
@@ -188,22 +175,21 @@ export function validateInput(input: string): {
   errors: string[]
 } {
   const errors: string[] = []
-  
+
   if (!input) {
     return { isValid: false, errors: ['输入不能为空'] }
   }
-  
+
   if (containsSqlInjection(input)) {
     errors.push('输入包含非法字符，疑似SQL注入攻击')
   }
-  
+
   if (containsXss(input)) {
     errors.push('输入包含非法字符，疑似XSS攻击')
   }
-  
+
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   }
 }
-

@@ -3,15 +3,15 @@
     <!-- 基础搜索栏 -->
     <div class="search-bar" role="search" aria-label="关键词搜索">
       <el-input
+        ref="searchInput"
         v-model="filters.keyword"
         placeholder="搜索标题、内容、作者..."
         prefix-icon="Search"
         clearable
-        @input="handleKeywordChange"
-        @keyup.enter="handleSearch"
         aria-label="搜索讨论内容"
         role="searchbox"
-        ref="searchInput"
+        @input="handleKeywordChange"
+        @keyup.enter="handleSearch"
       />
       <div v-if="searchSuggestions.length > 0" class="search-suggestions">
         <div class="suggestion-header">
@@ -23,14 +23,20 @@
             v-for="suggestion in searchSuggestions.slice(0, 5)"
             :key="suggestion"
             class="suggestion-item"
+            role="option"
+            :aria-label="`应用搜索建议：${suggestion}`"
             @click="applySuggestion(suggestion)"
             @keydown.enter="applySuggestion(suggestion)"
             @keydown.space.prevent="applySuggestion(suggestion)"
-            role="option"
-            :aria-label="`应用搜索建议：${suggestion}`"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
             {{ suggestion }}
           </button>
@@ -43,14 +49,26 @@
       <TechButton
         size="sm"
         variant="outline"
-        @click="showAdvanced = !showAdvanced"
         :aria-expanded="showAdvanced"
-        :aria-controls="'advanced-filters-panel'"
+        aria-controls="advanced-filters-panel"
         aria-label="切换高级筛选面板"
+        @click="showAdvanced = !showAdvanced"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path v-if="!showAdvanced" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke="currentColor" stroke-width="2"/>
-          <path v-else d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            v-if="!showAdvanced"
+            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            stroke="currentColor"
+            stroke-width="2"
+          />
+          <path
+            v-else
+            d="M19 9l-7 7-7-7"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         高级筛选 {{ activeFiltersCount > 0 ? `(${activeFiltersCount})` : '' }}
       </TechButton>
@@ -79,8 +97,8 @@
               collapse-tags
               collapse-tags-tooltip
               :loading="coursesLoading"
-              @change="handleFilterChange"
               aria-label="按课程筛选"
+              @change="handleFilterChange"
             >
               <el-option
                 v-for="course in availableCourses"
@@ -98,16 +116,19 @@
               <button
                 v-for="tag in availableTags"
                 :key="tag.name"
-                :class="['tag-filter-chip', {
-                  'tag-filter-chip--active': filters.tags.includes(tag.name),
-                  'tag-filter-chip--hot': tag.level === 'hot'
-                }]"
-                @click="toggleTag(tag.name)"
-                @keydown.enter="toggleTag(tag.name)"
-                @keydown.space.prevent="toggleTag(tag.name)"
+                class="tag-filter-chip"
+                :class="[
+                  {
+                    'tag-filter-chip--active': filters.tags.includes(tag.name),
+                    'tag-filter-chip--hot': tag.level === 'hot',
+                  },
+                ]"
                 :aria-pressed="filters.tags.includes(tag.name)"
                 :aria-label="`筛选${tag.name}标签${filters.tags.includes(tag.name) ? '（已选中）' : ''}`"
                 role="checkbox"
+                @click="toggleTag(tag.name)"
+                @keydown.enter="toggleTag(tag.name)"
+                @keydown.space.prevent="toggleTag(tag.name)"
               >
                 {{ tag.name }}
                 <span v-if="tag.count" class="tag-count">{{ tag.count }}</span>
@@ -122,8 +143,8 @@
               v-model="filters.timeRange"
               placeholder="选择时间范围"
               clearable
-              @change="handleFilterChange"
               aria-label="按发布时间筛选"
+              @change="handleFilterChange"
             >
               <el-option label="全部时间" value="" />
               <el-option label="最近24小时" value="1d" />
@@ -151,10 +172,10 @@
             <label class="filter-label">排序方式</label>
             <el-radio-group
               v-model="filters.sort"
-              @change="handleFilterChange"
               class="sort-options"
               role="radiogroup"
               aria-label="排序方式"
+              @change="handleFilterChange"
             >
               <el-radio-button label="latest" aria-label="按最新发布时间排序">最新发布</el-radio-button>
               <el-radio-button label="hot" aria-label="按热度排序">热门程度</el-radio-button>
@@ -171,9 +192,9 @@
               v-model="filters.author"
               placeholder="输入作者用户名"
               clearable
+              aria-label="按作者筛选"
               @input="handleAuthorChange"
               @keyup.enter="handleFilterChange"
-              aria-label="按作者筛选"
             />
           </div>
         </div>
@@ -183,19 +204,13 @@
           <TechButton
             size="sm"
             variant="outline"
-            @click="resetFilters"
             :disabled="activeFiltersCount === 0"
             aria-label="重置所有筛选条件"
+            @click="resetFilters"
           >
             重置筛选
           </TechButton>
-          <TechButton
-            size="sm"
-            @click="applyFilters"
-            aria-label="应用当前筛选条件"
-          >
-            应用筛选
-          </TechButton>
+          <TechButton size="sm" aria-label="应用当前筛选条件" @click="applyFilters"> 应用筛选 </TechButton>
         </div>
 
         <!-- 筛选结果统计 -->
@@ -263,7 +278,7 @@ const props = withDefaults(defineProps<Props>(), {
   availableCourses: () => [],
   availableTags: () => [],
   resultStats: undefined,
-  coursesLoading: false
+  coursesLoading: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -314,7 +329,7 @@ const generateSearchSuggestions = (keyword: string) => {
     `${keyword} 饮食建议`,
     `${keyword} 教练推荐`,
     `${keyword} 健身计划`,
-    `${keyword} 运动经验`
+    `${keyword} 运动经验`,
   ]
   searchSuggestions.value = suggestions
 }
@@ -372,7 +387,7 @@ const resetFilters = () => {
     timeRange: '',
     status: [],
     sort: 'latest',
-    author: ''
+    author: '',
   }
   emit('update:modelValue', resetFilters)
   emit('reset')
@@ -381,9 +396,13 @@ const resetFilters = () => {
 }
 
 // 监听外部筛选变化
-watch(() => props.modelValue, (newFilters) => {
-  // 可以在这里处理外部筛选变化的逻辑
-}, { deep: true })
+watch(
+  () => props.modelValue,
+  newFilters => {
+    // 可以在这里处理外部筛选变化的逻辑
+  },
+  { deep: true },
+)
 
 onMounted(() => {
   // 初始化时可以加载一些数据

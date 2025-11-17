@@ -51,7 +51,7 @@ const themeConfigs: Record<ThemeType, Record<string, string>> = {
     '--tech-color-text-muted': '#5b7083',
     '--tech-color-border': 'rgba(29, 161, 242, 0.25)',
     '--tech-color-divider': 'rgba(255, 255, 255, 0.08)',
-  }
+  },
 }
 
 // 应用主题到DOM
@@ -93,7 +93,7 @@ export function useTheme() {
   })
 
   // 监听主题变化并应用
-  watch(currentTheme, (newTheme) => {
+  watch(currentTheme, newTheme => {
     applyTheme(newTheme)
     saveTheme(newTheme)
   })
@@ -113,6 +113,6 @@ export function useTheme() {
     currentTheme: readonly(currentTheme),
     setTheme,
     toggleTheme,
-    themes: Object.keys(themeConfigs) as ThemeType[]
+    themes: Object.keys(themeConfigs) as ThemeType[],
   }
 }

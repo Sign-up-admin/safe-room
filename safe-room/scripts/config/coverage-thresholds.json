@@ -1,0 +1,93 @@
+{
+  "description": "前端测试覆盖率阈值配置",
+  "version": "1.0.0",
+  "thresholds": {
+    "global": {
+      "lines": 85,
+      "functions": 85,
+      "branches": 80,
+      "statements": 85
+    },
+    "projects": {
+      "front": {
+        "lines": 85,
+        "functions": 85,
+        "branches": 80,
+        "statements": 85,
+        "description": "前端用户界面覆盖率要求"
+      },
+      "admin": {
+        "lines": 85,
+        "functions": 85,
+        "branches": 80,
+        "statements": 85,
+        "description": "管理后台覆盖率要求"
+      }
+    },
+    "criticalPaths": {
+      "api": {
+        "lines": 90,
+        "functions": 90,
+        "branches": 85,
+        "description": "API相关代码的更高覆盖率要求"
+      },
+      "utils": {
+        "lines": 90,
+        "functions": 90,
+        "branches": 85,
+        "description": "工具函数的更高覆盖率要求"
+      },
+      "stores": {
+        "lines": 85,
+        "functions": 85,
+        "branches": 80,
+        "description": "状态管理代码覆盖率要求"
+      }
+    }
+  },
+  "gradualIncrease": {
+    "enabled": true,
+    "schedule": "monthly",
+    "increment": {
+      "lines": 2,
+      "functions": 2,
+      "branches": 2,
+      "statements": 2
+    },
+    "maxThresholds": {
+      "lines": 95,
+      "functions": 95,
+      "branches": 90,
+      "statements": 95
+    }
+  },
+  "reporting": {
+    "failOnThresholdBreach": true,
+    "generateReports": true,
+    "reportFormats": ["html", "json", "lcov", "text"],
+    "historyTracking": true,
+    "trendAnalysis": true
+  },
+  "exclusions": {
+    "patterns": [
+      "**/*.config.{ts,js}",
+      "**/*.d.ts",
+      "**/env.d.ts",
+      "**/*.spec.{ts,js}",
+      "**/*.test.{ts,js}",
+      "**/tests/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/coverage/**"
+    ],
+    "justifications": {
+      "**/*.config.{ts,js}": "配置文件通常不需要单元测试覆盖",
+      "**/*.d.ts": "TypeScript类型定义文件",
+      "**/*.test.{ts,js}": "测试文件本身",
+      "**/tests/**": "测试目录",
+      "**/node_modules/**": "第三方依赖",
+      "**/dist/**": "构建输出目录",
+      "**/coverage/**": "覆盖率报告目录"
+    }
+  }
+}

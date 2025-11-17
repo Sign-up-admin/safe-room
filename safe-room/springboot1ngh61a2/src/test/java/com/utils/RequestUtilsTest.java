@@ -154,4 +154,44 @@ class RequestUtilsTest {
         String ip = RequestUtils.getClientIp(request);
         assertThat(ip).isEqualTo("127.0.0.1");
     }
+
+    @Test
+    void shouldHandleIpWithSpecialCharacters() {
+        // 测试包含特殊字符的IP地址
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.1.100<script>alert('xss')</script>");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        String ip = RequestUtils.getClientIp(request);
+        // 特殊字符会被保留，因为RequestUtils不进行清理
+        assertThat(ip).isEqualTo("192.168.1.100<script>alert('xss')</script>");
+    }
+
+    @Test
+    void shouldHandleVeryLongIpAddress() {
+        // 测试超长IP地址
+        StringBuilder longIp = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            longIp.append("192.168.1.").append(i % 255).append(",");
+        }
+        longIp.append("10.0.0.1");
+
+        when(request.getHeader("X-Forwarded-For")).thenReturn(longIp.toString());
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        String ip = RequestUtils.getClientIp(request);
+        // 应该返回逗号分割后的第一个IP
+        assertThat(ip).startsWith("192.168.1.");
+        assertThat(ip).doesNotContain(",");
+    }
+
+    @Test
+    void shouldHandleMultipleIpAddressesWithSpecialChars() {
+        // 测试多个IP地址，其中包含特殊字符
+        when(request.getHeader("X-Forwarded-For")).thenReturn("192.168.1.100<malicious>, 10.0.0.1, 172.16.0.1");
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
+        String ip = RequestUtils.getClientIp(request);
+        // 应该返回第一个IP，包含特殊字符
+        assertThat(ip).isEqualTo("192.168.1.100<malicious>");
+    }
 }

@@ -1,22 +1,16 @@
 <template>
-  <section class="hero" ref="heroRef">
+  <section ref="heroRef" class="hero">
     <canvas ref="particleCanvasRef" class="hero__canvas hero__canvas--particles" aria-hidden="true" />
     <div ref="canvasRef" class="hero__canvas hero__canvas--model" aria-hidden="true" />
 
     <div class="hero__content">
       <p class="hero__eyebrow">TECH · PERFORMANCE · AI COACHING</p>
-      <h1 class="hero__title">
-        觉醒更强的自己<span>.</span>
-      </h1>
+      <h1 class="hero__title">觉醒更强的自己<span>.</span></h1>
       <p class="hero__subtitle">专业设备 · 明星教练 · 智能训练</p>
 
       <div class="hero__cta-group">
-        <button class="hero__cta hero__cta--primary" @click="$emit('book')">
-          立即预约体验
-        </button>
-        <button class="hero__cta hero__cta--secondary" @click="$emit('viewCourses')">
-          查看课程项目
-        </button>
+        <button class="hero__cta hero__cta--primary" @click="$emit('book')">立即预约体验</button>
+        <button class="hero__cta hero__cta--secondary" @click="$emit('viewCourses')">查看课程项目</button>
       </div>
     </div>
 
@@ -113,11 +107,11 @@ function createModel() {
   // 如果已有模型，先移除并清理资源
   if (model) {
     scene.remove(model)
-    model.traverse((child) => {
+    model.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose()
         if (Array.isArray(child.material)) {
-          child.material.forEach((mat) => mat.dispose())
+          child.material.forEach(mat => mat.dispose())
         } else {
           child.material.dispose()
         }
@@ -141,19 +135,28 @@ function createModel() {
   const size = 2.5
   const vertices: number[] = []
   const indices: number[] = []
-  
+
   // 定义菱形十二面体的顶点（基于立方体顶点和面心）
   const cubeVertices = [
-    [size, size, size], [size, size, -size], [size, -size, size], [size, -size, -size],
-    [-size, size, size], [-size, size, -size], [-size, -size, size], [-size, -size, -size]
+    [size, size, size],
+    [size, size, -size],
+    [size, -size, size],
+    [size, -size, -size],
+    [-size, size, size],
+    [-size, size, -size],
+    [-size, -size, size],
+    [-size, -size, -size],
   ]
-  
+
   const faceCenters = [
-    [2 * size, 0, 0], [-2 * size, 0, 0],
-    [0, 2 * size, 0], [0, -2 * size, 0],
-    [0, 0, 2 * size], [0, 0, -2 * size]
+    [2 * size, 0, 0],
+    [-2 * size, 0, 0],
+    [0, 2 * size, 0],
+    [0, -2 * size, 0],
+    [0, 0, 2 * size],
+    [0, 0, -2 * size],
   ]
-  
+
   // 创建12个菱形面（标准定义）
   // 每个菱形面由4个顶点组成：2个立方体顶点(±1,±1,±1) + 2个面心顶点(±2,0,0)等
   // 面的顺序：+X面2个、-X面2个、+Y面2个、-Y面2个、+Z面2个、-Z面2个
@@ -161,34 +164,34 @@ function createModel() {
   // 每个面的顶点按逆时针顺序排列（从外部观察），确保法线方向正确
   const rhombusFaces = [
     // +X方向（右面）2个菱形
-    [cubeVertices[0], faceCenters[2], cubeVertices[1], faceCenters[0]],  // (1,1,1)-(0,2,0)-(1,1,-1)-(2,0,0)
-    [cubeVertices[2], faceCenters[0], cubeVertices[3], faceCenters[3]],  // (1,-1,1)-(2,0,0)-(1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[0], faceCenters[2], cubeVertices[1], faceCenters[0]], // (1,1,1)-(0,2,0)-(1,1,-1)-(2,0,0)
+    [cubeVertices[2], faceCenters[0], cubeVertices[3], faceCenters[3]], // (1,-1,1)-(2,0,0)-(1,-1,-1)-(0,-2,0)
+
     // -X方向（左面）2个菱形
-    [cubeVertices[4], faceCenters[2], cubeVertices[5], faceCenters[1]],  // (-1,1,1)-(0,2,0)-(-1,1,-1)-(-2,0,0)
-    [cubeVertices[6], faceCenters[1], cubeVertices[7], faceCenters[3]],  // (-1,-1,1)-(-2,0,0)-(-1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[4], faceCenters[2], cubeVertices[5], faceCenters[1]], // (-1,1,1)-(0,2,0)-(-1,1,-1)-(-2,0,0)
+    [cubeVertices[6], faceCenters[1], cubeVertices[7], faceCenters[3]], // (-1,-1,1)-(-2,0,0)-(-1,-1,-1)-(0,-2,0)
+
     // +Y方向（上面）2个菱形
-    [cubeVertices[0], faceCenters[4], cubeVertices[4], faceCenters[2]],  // (1,1,1)-(0,0,2)-(-1,1,1)-(0,2,0)
-    [cubeVertices[1], faceCenters[5], cubeVertices[5], faceCenters[2]],  // (1,1,-1)-(0,0,-2)-(-1,1,-1)-(0,2,0)
-    
+    [cubeVertices[0], faceCenters[4], cubeVertices[4], faceCenters[2]], // (1,1,1)-(0,0,2)-(-1,1,1)-(0,2,0)
+    [cubeVertices[1], faceCenters[5], cubeVertices[5], faceCenters[2]], // (1,1,-1)-(0,0,-2)-(-1,1,-1)-(0,2,0)
+
     // -Y方向（下面）2个菱形
-    [cubeVertices[2], faceCenters[4], cubeVertices[6], faceCenters[3]],  // (1,-1,1)-(0,0,2)-(-1,-1,1)-(0,-2,0)
-    [cubeVertices[3], faceCenters[5], cubeVertices[7], faceCenters[3]],  // (1,-1,-1)-(0,0,-2)-(-1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[2], faceCenters[4], cubeVertices[6], faceCenters[3]], // (1,-1,1)-(0,0,2)-(-1,-1,1)-(0,-2,0)
+    [cubeVertices[3], faceCenters[5], cubeVertices[7], faceCenters[3]], // (1,-1,-1)-(0,0,-2)-(-1,-1,-1)-(0,-2,0)
+
     // +Z方向（前面）2个菱形
-    [cubeVertices[0], faceCenters[0], cubeVertices[2], faceCenters[4]],  // (1,1,1)-(2,0,0)-(1,-1,1)-(0,0,2)
-    [cubeVertices[4], faceCenters[4], cubeVertices[6], faceCenters[1]],  // (-1,1,1)-(0,0,2)-(-1,-1,1)-(-2,0,0)
-    
+    [cubeVertices[0], faceCenters[0], cubeVertices[2], faceCenters[4]], // (1,1,1)-(2,0,0)-(1,-1,1)-(0,0,2)
+    [cubeVertices[4], faceCenters[4], cubeVertices[6], faceCenters[1]], // (-1,1,1)-(0,0,2)-(-1,-1,1)-(-2,0,0)
+
     // -Z方向（后面）2个菱形
-    [cubeVertices[1], faceCenters[0], cubeVertices[3], faceCenters[5]],  // (1,1,-1)-(2,0,0)-(1,-1,-1)-(0,0,-2)
-    [cubeVertices[5], faceCenters[5], cubeVertices[7], faceCenters[1]]   // (-1,1,-1)-(0,0,-2)-(-1,-1,-1)-(-2,0,0)
+    [cubeVertices[1], faceCenters[0], cubeVertices[3], faceCenters[5]], // (1,1,-1)-(2,0,0)-(1,-1,-1)-(0,0,-2)
+    [cubeVertices[5], faceCenters[5], cubeVertices[7], faceCenters[1]], // (-1,1,-1)-(0,0,-2)-(-1,-1,-1)-(-2,0,0)
   ]
-  
+
   // 构建顶点和索引
   const vertexMap = new Map<string, number>()
   let vertexIndex = 0
-  
+
   function getVertexIndex(vertex: number[]): number {
     const key = vertex.join(',')
     if (!vertexMap.has(key)) {
@@ -197,17 +200,17 @@ function createModel() {
     }
     return vertexMap.get(key)!
   }
-  
-  rhombusFaces.forEach((face) => {
+
+  rhombusFaces.forEach(face => {
     const v0 = getVertexIndex(face[0])
     const v1 = getVertexIndex(face[1])
     const v2 = getVertexIndex(face[2])
     const v3 = getVertexIndex(face[3])
-    
+
     // 创建两个三角形组成菱形
     indices.push(v0, v1, v2, v0, v2, v3)
   })
-  
+
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
   geometry.setIndex(indices)
@@ -305,11 +308,11 @@ onUnmounted(() => {
   // 清理模型资源
   if (model && scene) {
     scene.remove(model)
-    model.traverse((child) => {
+    model.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose()
         if (Array.isArray(child.material)) {
-          child.material.forEach((mat) => mat.dispose())
+          child.material.forEach(mat => mat.dispose())
         } else {
           child.material.dispose()
         }
@@ -341,8 +344,7 @@ onUnmounted(() => {
   align-items: center;
   padding: 0 6vw;
   overflow: hidden;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.1), transparent),
-    #020202;
+  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.1), transparent), #020202;
   color: #fafafa;
 
   &__canvas {
@@ -408,7 +410,9 @@ onUnmounted(() => {
     font-size: 1rem;
     letter-spacing: 0.1em;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
 
     &--primary {
       background: linear-gradient(120deg, #fdd835, #f6c300);
@@ -495,4 +499,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

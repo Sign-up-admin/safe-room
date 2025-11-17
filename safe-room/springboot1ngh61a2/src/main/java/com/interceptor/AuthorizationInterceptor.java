@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -36,6 +38,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired(required = false)
+    private Environment environment;
+
+    @Value("${test.authentication.skip:false}")
+    private boolean skipAuthentication;
     
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -44,6 +52,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 		if (request.getMethod().equals(RequestMethod.OPTIONS.name())) {
         	response.setStatus(HttpStatus.OK.value());
             return false;
+        }
+
+        // 检查是否跳过认证（测试环境配置）
+        if (skipAuthentication) {
+            logger.debug("Authentication skipped for request: {} due to test configuration", request.getRequestURI());
+            return true;
         }
         
         IgnoreAuth annotation;

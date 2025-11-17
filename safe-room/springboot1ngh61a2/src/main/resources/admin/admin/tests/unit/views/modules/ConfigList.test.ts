@@ -4,16 +4,11 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import ConfigList from '@/views/modules/config/list.vue'
 import http from '@/utils/http'
+import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
 
-vi.mock('element-plus', () => ({
-  ElMessage: {
-    success: vi.fn(),
-    error: vi.fn()
-  },
-  ElMessageBox: {
-    confirm: vi.fn()
-  }
-}))
+// Mock Element Plus components using unified helpers
+const elMocks = createElementPlusMocks()
+vi.mock('element-plus', () => elMocks)
 
 vi.mock('@/utils/http', () => ({
   default: {
@@ -23,6 +18,14 @@ vi.mock('@/utils/http', () => ({
     delete: vi.fn()
   }
 }))
+
+// Mock HTTP for testing
+const mockHttp = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn()
+}
 
 describe('ConfigList', () => {
   let router: any
@@ -41,7 +44,7 @@ describe('ConfigList', () => {
 
   describe('Component Rendering', () => {
     it('should render the config list component', () => {
-      const wrapper = mount(ConfigList, {
+      const wrapper = mountComponent(ConfigList, {
         global: {
           plugins: [router, pinia]
         }
@@ -64,7 +67,7 @@ describe('ConfigList', () => {
         }
       })
 
-      const wrapper = mount(ConfigList, {
+      const wrapper = mountComponent(ConfigList, {
         global: {
           plugins: [router, pinia]
         }
@@ -76,7 +79,7 @@ describe('ConfigList', () => {
     })
 
     it('should handle config operations', () => {
-      const wrapper = mount(ConfigList, {
+      const wrapper = mountComponent(ConfigList, {
         global: {
           plugins: [router, pinia]
         }

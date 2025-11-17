@@ -94,6 +94,7 @@
               v-for="(child, sort) in menu.child"
               :key="sort"
               :index="'/' + child.tableName"
+              :style="submenuMenuStyle"
               @click="menuHandler(child.tableName)"
               >{{ child.menu }}</el-menu-item>
             >
@@ -174,6 +175,7 @@ const isCollapse = computed(() => props.isCollapse ?? localCollapse.value)
 const verticalStyle2 = VERTICAL_STYLE_2
 const verticalIsMultiple = ref(true)
 const menulistBorderBottom = ref({})
+const submenuMenuStyle = ref<Record<string, string>>({})
 
 const icons = ref([
   'el-icon-s-cooperation',
@@ -338,13 +340,11 @@ function collapse() {
 
 function styleChange() {
   nextTick(() => {
-    document.querySelectorAll('.el-menu-vertical-2 .el-submenu .el-menu').forEach(el => {
-      el.removeAttribute('style')
-      const icon = { border: 'none', display: 'none' }
-      Object.keys(icon).forEach(key => {
-        ;(el as HTMLElement).style[key as any] = icon[key as keyof typeof icon]
-      })
-    })
+    // Apply submenu menu styles reactively instead of direct DOM manipulation
+    submenuMenuStyle.value = {
+      border: 'none',
+      display: 'none'
+    }
   })
 }
 

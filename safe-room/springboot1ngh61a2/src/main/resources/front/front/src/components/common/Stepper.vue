@@ -3,7 +3,7 @@
     <li
       v-for="(step, index) in steps"
       :key="step.key ?? index"
-      :ref="(el) => setStepRef(el, index)"
+      :ref="el => setStepRef(el, index)"
       class="tech-stepper__item"
       :class="`tech-stepper__item--${statusFor(index)}`"
     >
@@ -19,12 +19,7 @@
         <p v-if="step.description" class="tech-stepper__description">
           {{ step.description }}
         </p>
-        <button
-          v-if="step.cta"
-          class="tech-stepper__cta"
-          type="button"
-          @click="step.cta?.()"
-        >
+        <button v-if="step.cta" class="tech-stepper__cta" type="button" @click="step.cta?.()">
           {{ step.ctaLabel ?? '查看详情' }}
         </button>
       </div>
@@ -68,7 +63,7 @@ const { transition, highlightStep, resetGlow } = useStepTransition()
 
 const setStepRef = (el: unknown, index: number) => {
   if (el) {
-    stepRefs.value[index] = (el as HTMLElement)
+    stepRefs.value[index] = el as HTMLElement
   } else {
     stepRefs.value[index] = null
   }
@@ -267,4 +262,3 @@ onMounted(async () => {
   }
 }
 </style>
-

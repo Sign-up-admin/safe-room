@@ -116,7 +116,7 @@ export class UserCenterPage {
     return 0
   }
 
-  async cancelBooking(index: number = 0): Promise<void> {
+  async cancelBooking(index = 0): Promise<void> {
     const bookingSelectors = [
       '.booking-item',
       '.reservation-item'

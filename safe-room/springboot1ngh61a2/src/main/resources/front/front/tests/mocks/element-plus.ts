@@ -160,16 +160,16 @@ const ElementPlus = {
     app.component('ElSubMenu', ElSubMenu)
 
     // Register kebab-case versions
-    app.component('el-button', ElButton)
-    app.component('el-input', ElInput)
-    app.component('el-table', ElTable)
-    app.component('el-table-column', ElTableColumn)
-    app.component('el-form', ElForm)
-    app.component('el-form-item', ElFormItem)
-    app.component('el-dialog', ElDialog)
-    app.component('el-menu', ElMenu)
-    app.component('el-menu-item', ElMenuItem)
-    app.component('el-submenu', ElSubMenu)
+    app.component('ElButton', ElButton)
+    app.component('ElInput', ElInput)
+    app.component('ElTable', ElTable)
+    app.component('ElTableColumn', ElTableColumn)
+    app.component('ElForm', ElForm)
+    app.component('ElFormItem', ElFormItem)
+    app.component('ElDialog', ElDialog)
+    app.component('ElMenu', ElMenu)
+    app.component('ElMenuItem', ElMenuItem)
+    app.component('ElSubmenu', ElSubMenu)
   }),
 
   // Export components

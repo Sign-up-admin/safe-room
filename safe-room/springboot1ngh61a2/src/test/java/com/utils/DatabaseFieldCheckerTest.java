@@ -8,6 +8,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * DatabaseFieldChecker单元测试
@@ -223,5 +224,99 @@ class DatabaseFieldCheckerTest {
     void shouldReturnEmptyStringWhenNullMissingFields() {
         String hint = DatabaseFieldChecker.generateMigrationHint(null);
         assertThat(hint).isEmpty();
+    }
+
+    @Test
+    void shouldHandleDatabaseConnectionException() {
+        // 测试数据库连接完全失败的情况
+        JdbcTemplate failingTemplate = new JdbcTemplate() {
+            @Override
+            public <T> T queryForObject(String sql, Class<T> requiredType, Object... args) {
+                throw new org.springframework.jdbc.CannotGetJdbcConnectionException("Connection refused");
+            }
+        };
+
+        DatabaseFieldChecker failingChecker = new DatabaseFieldChecker(failingTemplate);
+        List<String> missingFields = failingChecker.checkUsersTableFields();
+        boolean operationLogExists = failingChecker.checkOperationLogTable();
+
+        assertThat(missingFields)
+            .contains("password_hash")
+            .contains("failed_login_attempts")
+            .contains("lock_until");
+        assertThat(operationLogExists).isFalse();
+    }
+
+    @Test
+    void shouldHandleSqlSyntaxException() {
+        // 测试SQL语法错误的情况
+        JdbcTemplate failingTemplate = new JdbcTemplate() {
+            @Override
+            public <T> T queryForObject(String sql, Class<T> requiredType, Object... args) {
+                throw new org.springframework.jdbc.BadSqlGrammarException("Bad SQL grammar", sql, new java.sql.SQLException("Bad SQL grammar"));
+            }
+        };
+
+        DatabaseFieldChecker failingChecker = new DatabaseFieldChecker(failingTemplate);
+        List<String> missingFields = failingChecker.checkUsersTableFields();
+
+        assertThat(missingFields)
+            .contains("password_hash")
+            .contains("failed_login_attempts")
+            .contains("lock_until");
+    }
+
+    @Test
+    void shouldHandleDataAccessException() {
+        // 测试一般数据访问异常
+        JdbcTemplate failingTemplate = new JdbcTemplate() {
+            @Override
+            public <T> T queryForObject(String sql, Class<T> requiredType, Object... args) {
+                throw new org.springframework.dao.DataAccessException("Data access failed") {};
+            }
+        };
+
+        DatabaseFieldChecker failingChecker = new DatabaseFieldChecker(failingTemplate);
+        List<String> missingFields = failingChecker.checkUsersTableFields();
+        boolean operationLogExists = failingChecker.checkOperationLogTable();
+
+        assertThat(missingFields)
+            .contains("password_hash")
+            .contains("failed_login_attempts")
+            .contains("lock_until");
+        assertThat(operationLogExists).isFalse();
+    }
+
+    @Test
+    void shouldHandleNullJdbcTemplate() {
+        // 测试JdbcTemplate为null的情况
+        DatabaseFieldChecker checker = new DatabaseFieldChecker(null);
+
+        assertThatThrownBy(() -> checker.checkUsersTableFields())
+            .isInstanceOf(NullPointerException.class);
+
+        assertThatThrownBy(() -> checker.checkOperationLogTable())
+            .isInstanceOf(NullPointerException.class);
+    }
+
+
+
+    @Test
+    void shouldHandleQueryReturningNull() {
+        // 测试queryForObject返回null的情况
+        JdbcTemplate nullReturningTemplate = new JdbcTemplate() {
+            @Override
+            public <T> T queryForObject(String sql, Class<T> requiredType, Object... args) {
+                return null; // 模拟查询返回null
+            }
+        };
+
+        DatabaseFieldChecker checker = new DatabaseFieldChecker(nullReturningTemplate);
+        List<String> missingFields = checker.checkUsersTableFields();
+        boolean operationLogExists = checker.checkOperationLogTable();
+
+        // 即使queryForObject返回null，也应该正常处理
+        assertThat(missingFields).hasSize(3); // 所有字段都被认为是缺失的
+        assertThat(operationLogExists).isFalse();
     }
 }

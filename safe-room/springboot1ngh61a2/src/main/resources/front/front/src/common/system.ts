@@ -46,13 +46,8 @@ export function getCurDateTime(): string {
   const currentTime = new Date()
   const year = currentTime.getFullYear()
   const month =
-    currentTime.getMonth() + 1 < 10
-      ? '0' + (currentTime.getMonth() + 1)
-      : String(currentTime.getMonth() + 1)
-  const day =
-    currentTime.getDate() < 10
-      ? '0' + currentTime.getDate()
-      : String(currentTime.getDate())
+    currentTime.getMonth() + 1 < 10 ? '0' + (currentTime.getMonth() + 1) : String(currentTime.getMonth() + 1)
+  const day = currentTime.getDate() < 10 ? '0' + currentTime.getDate() : String(currentTime.getDate())
   const hour = currentTime.getHours()
   const minute = currentTime.getMinutes()
   const second = currentTime.getSeconds()
@@ -66,13 +61,7 @@ export function getCurDate(): string {
   const currentTime = new Date()
   const year = currentTime.getFullYear()
   const month =
-    currentTime.getMonth() + 1 < 10
-      ? '0' + (currentTime.getMonth() + 1)
-      : String(currentTime.getMonth() + 1)
-  const day =
-    currentTime.getDate() < 10
-      ? '0' + currentTime.getDate()
-      : String(currentTime.getDate())
+    currentTime.getMonth() + 1 < 10 ? '0' + (currentTime.getMonth() + 1) : String(currentTime.getMonth() + 1)
+  const day = currentTime.getDate() < 10 ? '0' + currentTime.getDate() : String(currentTime.getDate())
   return `${year}-${month}-${day}`
 }
-

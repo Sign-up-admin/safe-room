@@ -1,5 +1,6 @@
 package com.config;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -21,8 +22,8 @@ public class InterceptorConfig extends WebMvcConfigurationSupport{
     }
 
 	@Bean
-    public MetricsInterceptor getMetricsInterceptor() {
-        return new MetricsInterceptor();
+    public MetricsInterceptor getMetricsInterceptor(MeterRegistry meterRegistry, MetricsConfig metricsConfig) {
+        return new MetricsInterceptor(meterRegistry, metricsConfig);
     }
 	
 	// @Autowired(required = false)
@@ -30,6 +31,12 @@ public class InterceptorConfig extends WebMvcConfigurationSupport{
 	
 	@Autowired(required = false)
 	private Environment environment;
+
+	@Autowired
+	private MeterRegistry meterRegistry;
+
+	@Autowired
+	private MetricsConfig metricsConfig;
 	
 	@Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -46,7 +53,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport{
                 .excludePathPatterns("/static/**");
 
         // 指标收集拦截器
-        registry.addInterceptor(getMetricsInterceptor())
+        registry.addInterceptor(getMetricsInterceptor(meterRegistry, metricsConfig))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/static/**", "/actuator/**", "/favicon.ico");
 

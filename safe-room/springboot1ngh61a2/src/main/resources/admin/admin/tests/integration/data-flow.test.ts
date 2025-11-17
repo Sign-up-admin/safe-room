@@ -72,8 +72,8 @@ describe('Data Flow Integration', () => {
 
   describe('Authentication Data Flow', () => {
     it('should handle complete login data flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock login response
       mockHttp.post.mockResolvedValue({
@@ -115,8 +115,8 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle session management data flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock session check
       mockStorage.get.mockImplementation((key: string) => {
@@ -150,8 +150,8 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle logout data cleanup flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockTagsViewStore = vi.mocked(require('@/stores/tagsView').useTagsViewStore)
 
       // Setup initial state
       tokenStorage.setToken('test-token')
@@ -178,7 +178,7 @@ describe('Data Flow Integration', () => {
 
   describe('API Data Flow', () => {
     it('should handle successful API response flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock successful API call
       mockHttp.get.mockResolvedValue({
@@ -203,7 +203,7 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle API error flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock API error
       mockHttp.get.mockResolvedValue({
@@ -221,7 +221,7 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle network error flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock network error
       mockHttp.get.mockRejectedValue(new Error('Network Error'))
@@ -299,7 +299,7 @@ describe('Data Flow Integration', () => {
 
   describe('Form Data Flow', () => {
     it('should handle form submission data flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       const formData = {
         name: 'Test Item',
@@ -368,7 +368,7 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle permission error data flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock permission denied response
       mockHttp.get.mockResolvedValue({
@@ -385,7 +385,7 @@ describe('Data Flow Integration', () => {
     })
 
     it('should handle timeout error data flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
 
       // Mock timeout error
       mockHttp.get.mockRejectedValue({
@@ -447,8 +447,8 @@ describe('Data Flow Integration', () => {
 
   describe('Complete Data Pipeline', () => {
     it('should handle end-to-end data flow', async () => {
-      const mockHttp = vi.mocked(require('../../../src/utils/http').default)
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockHttp = vi.mocked(require('@/utils/http').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
 
       // 1. User authentication
       const loginData = { username: 'admin', password: 'password' }

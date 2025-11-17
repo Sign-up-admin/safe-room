@@ -163,11 +163,11 @@ function analyzeBookingPattern(bookings: Kechengyuyue[]): BookingPattern {
 }
 
 function calculateRecommendationScore(
-  timeSlot: typeof TIME_SLOTS[0],
+  timeSlot: (typeof TIME_SLOTS)[0],
   pattern: BookingPattern,
   hasConflict: boolean,
   remainingCapacity: number,
-  date: Date
+  date: Date,
 ): { score: number; reason: string; confidence: number } {
   let score = 5 // 基础分数
   let reason = '可用时间段'
@@ -253,7 +253,7 @@ export function useBookingRecommend(userAccount?: string) {
         limit: 100, // 获取更多历史数据进行分析
         yonghuzhanghao: account.value,
         sort: 'yuyueshijian',
-        order: 'desc'
+        order: 'desc',
       })
 
       bookingHistory.value = response.list ?? []
@@ -267,7 +267,7 @@ export function useBookingRecommend(userAccount?: string) {
   const getTimeRecommendations = (
     targetDate: string,
     conflictChecker: (date: string, time: string) => boolean,
-    capacityChecker: (date: string, time: string) => number
+    capacityChecker: (date: string, time: string) => number,
   ): RecommendationResult[] => {
     if (!pattern.value) {
       // 如果没有分析出模式，返回默认推荐
@@ -277,7 +277,7 @@ export function useBookingRecommend(userAccount?: string) {
         score: 5,
         reason: '默认推荐时间',
         confidence: 0.5,
-        isBest: false
+        isBest: false,
       }))
     }
 
@@ -293,7 +293,7 @@ export function useBookingRecommend(userAccount?: string) {
         pattern.value!,
         hasConflict,
         remainingCapacity,
-        date
+        date,
       )
 
       recommendations.push({
@@ -302,7 +302,7 @@ export function useBookingRecommend(userAccount?: string) {
         score,
         reason,
         confidence,
-        isBest: false
+        isBest: false,
       })
     })
 
@@ -321,7 +321,7 @@ export function useBookingRecommend(userAccount?: string) {
   const getBestRecommendation = (
     targetDate: string,
     conflictChecker: (date: string, time: string) => boolean,
-    capacityChecker: (date: string, time: string) => number
+    capacityChecker: (date: string, time: string) => number,
   ): RecommendationResult | null => {
     const recommendations = getTimeRecommendations(targetDate, conflictChecker, capacityChecker)
     return recommendations.find(r => r.confidence >= 0.7) || recommendations[0] || null
@@ -340,7 +340,7 @@ export function useBookingRecommend(userAccount?: string) {
       pattern.value,
       false, // 假设无冲突
       10, // 假设充足容量
-      date
+      date,
     )
 
     // 基于置信度和历史成功率计算预测成功率

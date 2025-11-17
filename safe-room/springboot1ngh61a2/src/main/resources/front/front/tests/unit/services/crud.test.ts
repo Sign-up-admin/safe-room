@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createMockUser, createValidatedUser } from '../../factories/user.factory'
+import { createMockCourse, createValidatedCourse } from '../../factories/course.factory'
+import { createApiResponse, createListResponse } from '../../utils/mock-response-builder'
 
 const getMock = vi.fn()
 const postMock = vi.fn()
@@ -30,12 +33,14 @@ describe('services/crud', () => {
     const { getModuleService } = await import('../../../src/services/crud')
     const service = getModuleService('yonghu')
 
-    getMock.mockResolvedValueOnce({ data: { data: { list: [{ id: 1 }], total: 1 } } })
-    await expect(service.list({ page: 2 })).resolves.toEqual({ list: [{ id: 1 }], total: 1 })
+    const mockUserList = [createMockUser({ id: 1 })]
+    getMock.mockResolvedValueOnce({ data: createListResponse(mockUserList, {}, 1) })
+    await expect(service.list({ page: 2 })).resolves.toEqual({ list: mockUserList, total: 1 })
     expect(getMock).toHaveBeenCalledWith('/yonghu/list', { params: { page: 2 } })
 
-    getMock.mockResolvedValueOnce({ data: { data: { id: 5 } } })
-    await expect(service.detail(5)).resolves.toEqual({ id: 5 })
+    const mockUserDetail = createMockUser({ id: 5 })
+    getMock.mockResolvedValueOnce({ data: createApiResponse(mockUserDetail) })
+    await expect(service.detail(5)).resolves.toEqual(mockUserDetail)
     expect(getMock).toHaveBeenCalledWith('/yonghu/detail/5')
 
     postMock.mockResolvedValue({})

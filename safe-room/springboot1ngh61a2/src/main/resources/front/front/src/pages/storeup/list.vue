@@ -21,7 +21,9 @@
 
     <!-- 收藏概览 -->
     <FavoritesOverview
-      :categories="categories.slice(1).map(cat => ({ name: cat.label, count: cat.count, color: getCategoryColor(cat.value) }))"
+      :categories="
+        categories.slice(1).map(cat => ({ name: cat.label, count: cat.count, color: getCategoryColor(cat.value) }))
+      "
       :total-count="favorites.length"
       :recent-count="recentCount"
     />
@@ -31,7 +33,8 @@
         <button
           v-for="category in categories"
           :key="category.value"
-          :class="['filter-tab', { 'filter-tab--active': filters.category === category.value }]"
+          class="filter-tab"
+          :class="[{ 'filter-tab--active': filters.category === category.value }]"
           @click="filters.category = category.value"
         >
           {{ category.label }} <span>{{ category.count }}</span>
@@ -46,7 +49,7 @@
           >
             全选 {{ favorites.length }} 项
           </el-checkbox>
-          <div class="bulk-selection-info" v-if="selectedIds.length">
+          <div v-if="selectedIds.length" class="bulk-selection-info">
             <span class="selection-count">已选择 {{ selectedIds.length }} 项</span>
             <TechButton size="sm" variant="ghost" @click="clearSelection">清空选择</TechButton>
           </div>
@@ -55,7 +58,13 @@
           <TechButton size="sm" variant="outline" :disabled="!selectedIds.length" @click="batchBook">
             <template #icon>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </template>
             批量预约
@@ -63,7 +72,11 @@
           <TechButton size="sm" variant="outline" :disabled="!selectedIds.length" @click="batchConsult">
             <template #icon>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2"/>
+                <path
+                  d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
               </svg>
             </template>
             批量咨询
@@ -71,7 +84,12 @@
           <TechButton size="sm" variant="outline" :disabled="!selectedIds.length" @click="batchRemove">
             <template #icon>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 7L5 7M10 11V17M14 11V17M22 7V19C22 20.1046 21.1046 21 20 21H8C6.89543 21 6 20.1046 6 19V7M4 7H2M4 7H6M4 7V5C4 3.89543 4.89543 3 6 3H8M20 7V5C20 3.89543 19.1046 3 18 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path
+                  d="M19 7L5 7M10 11V17M14 11V17M22 7V19C22 20.1046 21.1046 21 20 21H8C6.89543 21 6 20.1046 6 19V7M4 7H2M4 7H6M4 7V5C4 3.89543 4.89543 3 6 3H8M20 7V5C20 3.89543 19.1046 3 18 3H16"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
               </svg>
             </template>
             批量删除
@@ -79,7 +97,13 @@
           <TechButton size="sm" variant="outline" :disabled="!selectedIds.length" @click="batchShare">
             <template #icon>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8.684 13.342C8.886 12.938 9 12.482 9 12C9 11.518 8.886 11.062 8.684 10.658M8.684 13.342L6 16M8.684 13.342L6.658 16.316M8.684 10.658L6 8M8.684 10.658L6.658 7.684M15 7L15 17M18 10L15 7L12 10M18 14L15 17L12 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12C9 11.518 8.886 11.062 8.684 10.658M8.684 13.342L6 16M8.684 13.342L6.658 16.316M8.684 10.658L6 8M8.684 10.658L6.658 7.684M15 7L15 17M18 10L15 7L12 10M18 14L15 17L12 14"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </template>
             批量分享
@@ -87,8 +111,20 @@
           <TechButton size="sm" variant="outline" :disabled="!selectedIds.length" @click="batchExport">
             <template #icon>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 10V16M12 16L9 13M12 16L15 13M17 7H7C5.89543 7 5 7.89543 5 9V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V9C19 7.89543 18.1046 7 17 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M12 10V16M12 16L9 13M12 16L15 13M17 7H7C5.89543 7 5 7.89543 5 9V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V9C19 7.89543 18.1046 7 17 7Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </template>
             导出列表
@@ -97,17 +133,18 @@
       </div>
     </section>
 
-    <section class="favorites-grid" v-loading="loading">
+    <section v-loading="loading" class="favorites-grid">
       <TechCard
         v-for="item in filteredFavorites"
         :key="item.id"
-        :class="['favorite-card', { 'favorite-card--selected': selectionState[item.id!] }]"
+        class="favorite-card"
+        :class="[{ 'favorite-card--selected': selectionState[item.id!] }]"
         :interactive="false"
       >
         <div class="card-media">
           <img v-if="item.picture" :src="resolveAssetUrl(item.picture)" :alt="item.name" />
           <div class="card-type">{{ translateTableName(item.tablename) }}</div>
-          <el-checkbox v-model="selectionState[item.id!]" @change="(value) => handleSelectChange(item.id!, value)" />
+          <el-checkbox v-model="selectionState[item.id!]" @change="value => handleSelectChange(item.id!, value)" />
         </div>
         <div class="card-body">
           <h3>{{ item.name }}</h3>
@@ -140,12 +177,7 @@
     <section v-if="recommendedItems.length > 0" class="recommendations-section">
       <TechCard title="为你推荐" subtitle="根据你的收藏偏好推荐">
         <div class="recommendations-grid">
-          <TechCard
-            v-for="item in recommendedItems"
-            :key="item.id"
-            class="recommendation-card"
-            :interactive="false"
-          >
+          <TechCard v-for="item in recommendedItems" :key="item.id" class="recommendation-card" :interactive="false">
             <div class="recommendation-media">
               <img v-if="item.picture" :src="resolveAssetUrl(item.picture)" :alt="item.name" />
               <div class="recommendation-type">{{ translateTableName(item.tablename) }}</div>
@@ -173,6 +205,7 @@ import http from '@/common/http'
 import config from '@/config/config'
 import type { ApiResponse, PageResult } from '@/types/api'
 import type { StoreupItem } from '@/types/content'
+import type { ModuleEntityMap } from '@/types/modules'
 import { formatDate } from '@/utils/formatters'
 import { TechButton, TechCard } from '@/components/common'
 import FavoritesOverview from '@/components/favorites/FavoritesOverview.vue'
@@ -187,7 +220,11 @@ const selectionState = reactive<Record<number, boolean>>({})
 const selectAll = ref(false)
 const userId = localStorage.getItem('userid')
 
-const selectedIds = computed(() => Object.entries(selectionState).filter(([, checked]) => checked).map(([id]) => Number(id)))
+const selectedIds = computed(() =>
+  Object.entries(selectionState)
+    .filter(([, checked]) => checked)
+    .map(([id]) => Number(id)),
+)
 
 const recommendedItems = ref<StoreupItem[]>([])
 
@@ -209,14 +246,14 @@ function getCategoryColor(category: string): string {
     jianshenjiaolian: '#f44336',
     jianshenqicai: '#4caf50',
     news: '#ff9800',
-    other: '#9c27b0'
+    other: '#9c27b0',
   }
   return colors[category] || '#666'
 }
 
 const categories = computed(() => {
   const map: Record<string, number> = {}
-  favorites.value.forEach((item) => {
+  favorites.value.forEach(item => {
     const key = item.tablename || 'other'
     map[key] = (map[key] || 0) + 1
   })
@@ -229,7 +266,7 @@ const categories = computed(() => {
 })
 
 const filteredFavorites = computed(() =>
-  favorites.value.filter((item) => {
+  favorites.value.filter(item => {
     const matchCategory = filters.category === 'all' || item.tablename === filters.category
     const keyword = filters.keyword.trim().toLowerCase()
     const matchKeyword =
@@ -273,7 +310,7 @@ async function loadFavorites() {
 }
 
 function resetSelection() {
-  Object.keys(selectionState).forEach((key) => delete selectionState[Number(key)])
+  Object.keys(selectionState).forEach(key => delete selectionState[Number(key)])
 }
 
 function handlePageChange(page: number) {
@@ -338,7 +375,7 @@ function handleSelectChange(id: number, value: boolean) {
 
 function handleSelectAll(value: boolean) {
   selectAll.value = value
-  favorites.value.forEach((item) => {
+  favorites.value.forEach(item => {
     if (item.id) {
       selectionState[item.id] = value
     }
@@ -358,7 +395,7 @@ function updateSelectAllState() {
 }
 
 function clearSelection() {
-  Object.keys(selectionState).forEach((key) => delete selectionState[Number(key)])
+  Object.keys(selectionState).forEach(key => delete selectionState[Number(key)])
 }
 
 async function batchShare() {
@@ -372,7 +409,7 @@ async function batchShare() {
       await navigator.share({
         title: '我的收藏列表',
         text: shareText,
-        url: window.location.href
+        url: window.location.href,
       })
     } else {
       // Fallback for browsers that don't support Web Share API
@@ -390,12 +427,14 @@ async function batchExport() {
   const selectedItems = favorites.value.filter(item => selectedIds.value.includes(item.id!))
   const csvContent = [
     ['名称', '类型', '收藏时间', '来源ID'].join(','),
-    ...selectedItems.map(item => [
-      `"${item.name || ''}"`,
-      `"${translateTableName(item.tablename)}"`,
-      `"${formatDate(item.addtime)}"`,
-      `"${item.refid || ''}"`
-    ].join(','))
+    ...selectedItems.map(item =>
+      [
+        `"${item.name || ''}"`,
+        `"${translateTableName(item.tablename)}"`,
+        `"${formatDate(item.addtime)}"`,
+        `"${item.refid || ''}"`,
+      ].join(','),
+    ),
   ].join('\n')
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -425,15 +464,15 @@ async function batchBook() {
 
   try {
     // 批量创建预约记录
-    const bookingPromises = bookableItems.map(async (item) => {
+    const bookingPromises = bookableItems.map(async item => {
       const bookingData = {
         kechengyuyue: {
           kechengmingcheng: item.name,
           kechengid: item.refid,
           yuyueshijian: new Date().toISOString(),
           yonghuzhanghao: userId,
-          yuyuezhuangtai: '待确认'
-        }
+          yuyuezhuangtai: '待确认',
+        },
       }
       return http.post('/kechengyuyue/save', bookingData)
     })
@@ -445,7 +484,6 @@ async function batchBook() {
 
     // 可以跳转到预约管理页面
     // router.push('/index/yuyueguanli')
-
   } catch (error) {
     console.error('批量预约失败:', error)
     ElMessage.error('批量预约失败，请稍后重试')
@@ -457,8 +495,8 @@ async function batchConsult() {
   if (!selectedIds.value.length) return
 
   const selectedItems = favorites.value.filter(item => selectedIds.value.includes(item.id!))
-  const consultableItems = selectedItems.filter(item =>
-    item.tablename === 'jianshenjiaolian' || item.tablename === 'jianshenqicai'
+  const consultableItems = selectedItems.filter(
+    item => item.tablename === 'jianshenjiaolian' || item.tablename === 'jianshenqicai',
   )
 
   if (consultableItems.length === 0) {
@@ -468,14 +506,14 @@ async function batchConsult() {
 
   try {
     // 创建咨询记录或发送咨询消息
-    const consultPromises = consultableItems.map(async (item) => {
+    const consultPromises = consultableItems.map(async item => {
       const consultData = {
         consultType: item.tablename,
         targetId: item.refid,
         targetName: item.name,
         userId: userId,
         message: `对收藏的${translateTableName(item.tablename)}"${item.name}"感兴趣，想咨询更多详情`,
-        createTime: new Date().toISOString()
+        createTime: new Date().toISOString(),
       }
       return http.post('/consult/save', consultData)
     })
@@ -484,7 +522,6 @@ async function batchConsult() {
 
     ElMessage.success(`已发送 ${consultableItems.length} 个咨询请求`)
     clearSelection()
-
   } catch (error) {
     console.error('批量咨询失败:', error)
     ElMessage.error('批量咨询失败，请稍后重试')
@@ -496,17 +533,17 @@ async function loadRecommendations() {
   try {
     // 根据收藏类型推荐相关内容
     const favoriteTypes = [...new Set(favorites.value.map(item => item.tablename).filter(Boolean))]
-    
+
     if (favoriteTypes.length === 0) {
       // 如果没有收藏，推荐热门内容
       const courseService = getModuleService('jianshenkecheng')
       const coachService = getModuleService('jianshenjiaolian')
-      
+
       const [courses, coaches] = await Promise.all([
         courseService.list({ page: 1, limit: 3, sort: 'clicknum', order: 'desc' }),
         coachService.list({ page: 1, limit: 3, sort: 'addtime', order: 'desc' }),
       ])
-      
+
       recommendedItems.value = [
         ...(courses.list?.map(item => ({
           id: item.id,
@@ -529,52 +566,60 @@ async function loadRecommendations() {
       ].slice(0, 6)
       return
     }
-    
+
     // 根据收藏类型推荐
     const recommendations: StoreupItem[] = []
-    
+
     for (const type of favoriteTypes.slice(0, 2)) {
       try {
-        const service = getModuleService(type)
+        const service = getModuleService(type as keyof ModuleEntityMap)
         const { list } = await service.list({ page: 1, limit: 3, sort: 'clicknum', order: 'desc' })
-        
-        const items = list?.map(item => {
-          const name = type === 'jianshenkecheng' ? (item as any).kechengmingcheng 
-            : type === 'jianshenjiaolian' ? (item as any).jiaolianxingming
-            : (item as any).qicaimingcheng || ''
-          
-          const picture = type === 'jianshenkecheng' ? (item as any).tupian
-            : type === 'jianshenjiaolian' ? (item as any).touxiang
-            : (item as any).tupian || ''
-          
-          const remark = type === 'jianshenkecheng' ? (item as any).kechengjieshao
-            : type === 'jianshenjiaolian' ? (item as any).jiaolianjieshao
-            : (item as any).qicaijieshao || ''
-          
-          return {
-            id: item.id,
-            name,
-            tablename: type,
-            refid: item.id,
-            picture,
-            remark,
-            addtime: (item as any).addtime,
-          } as StoreupItem
-        }) || []
-        
+
+        const items =
+          list?.map(item => {
+            const name =
+              type === 'jianshenkecheng'
+                ? (item as any).kechengmingcheng
+                : type === 'jianshenjiaolian'
+                  ? (item as any).jiaolianxingming
+                  : (item as any).qicaimingcheng || ''
+
+            const picture =
+              type === 'jianshenkecheng'
+                ? (item as any).tupian
+                : type === 'jianshenjiaolian'
+                  ? (item as any).touxiang
+                  : (item as any).tupian || ''
+
+            const remark =
+              type === 'jianshenkecheng'
+                ? (item as any).kechengjieshao
+                : type === 'jianshenjiaolian'
+                  ? (item as any).jiaolianjieshao
+                  : (item as any).qicaijieshao || ''
+
+            return {
+              id: item.id,
+              name,
+              tablename: type,
+              refid: item.id,
+              picture,
+              remark,
+              addtime: (item as any).addtime,
+            } as StoreupItem
+          }) || []
+
         recommendations.push(...items)
       } catch (error) {
         console.warn(`Failed to load recommendations for ${type}`, error)
       }
     }
-    
+
     // 过滤掉已收藏的内容
     const favoriteRefIds = new Set(
-      favorites.value
-        .filter(item => item.refid)
-        .map(item => `${item.tablename}-${item.refid}`)
+      favorites.value.filter(item => item.refid).map(item => `${item.tablename}-${item.refid}`),
     )
-    
+
     recommendedItems.value = recommendations
       .filter(item => !favoriteRefIds.has(`${item.tablename}-${item.refid}`))
       .slice(0, 6)
@@ -589,7 +634,7 @@ async function addToFavorites(item: StoreupItem) {
     ElMessage.warning('无法添加收藏')
     return
   }
-  
+
   try {
     await http.post<ApiResponse>('/storeup/add', {
       refid: item.refid,
@@ -612,7 +657,8 @@ async function addToFavorites(item: StoreupItem) {
 
 .favorites-page {
   min-height: 100vh;
-  background: radial-gradient(circle at 15% 20%, rgba(253, 216, 53, 0.2), transparent 45%),
+  background:
+    radial-gradient(circle at 15% 20%, rgba(253, 216, 53, 0.2), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.12), transparent 45%), #020202;
   padding: 48px 24px 64px;
   display: flex;
@@ -888,4 +934,3 @@ async function addToFavorites(item: StoreupItem) {
   }
 }
 </style>
-

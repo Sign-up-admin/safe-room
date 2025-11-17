@@ -23,11 +23,7 @@ export interface ForceGraphConfig {
   enable3D?: boolean
 }
 
-export const createForceGraph = (
-  nodes: CoachNode[],
-  links: CoachLink[],
-  config: ForceGraphConfig = {},
-) => {
+export const createForceGraph = (nodes: CoachNode[], links: CoachLink[], config: ForceGraphConfig = {}) => {
   // 如果是 3D 模式，初始化 z 坐标
   if (config.enable3D) {
     nodes.forEach((node, i) => {
@@ -45,7 +41,7 @@ export const createForceGraph = (
     .force(
       'link',
       forceLink<CoachNode, CoachLink>(links)
-        .id((node) => node.id)
+        .id(node => node.id)
         .distance(config.linkDistance ?? 120)
         .strength(0.85),
     )
@@ -88,4 +84,3 @@ export const createForceGraph = (
     destroy,
   }
 }
-

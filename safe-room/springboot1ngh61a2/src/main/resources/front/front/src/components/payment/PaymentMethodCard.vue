@@ -1,5 +1,11 @@
 <template>
-  <button class="payment-method" :class="{ 'payment-method--active': active, 'payment-method--hovered': isHovered }" @click="$emit('select', method.id)" @mouseenter="isHovered = true" @mouseleave="isHovered = false">
+  <button
+    class="payment-method"
+    :class="{ 'payment-method--active': active, 'payment-method--hovered': isHovered }"
+    @click="$emit('select', method.id)"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+  >
     <div class="payment-method__icon">
       <img :src="method.icon" :alt="method.name" loading="lazy" />
     </div>
@@ -207,4 +213,3 @@ const isHovered = ref(false)
   }
 }
 </style>
-

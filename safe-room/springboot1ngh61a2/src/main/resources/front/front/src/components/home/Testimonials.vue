@@ -5,12 +5,7 @@
       <h2>好评如潮 · 真实体验</h2>
     </div>
 
-    <div
-      class="testimonials__track"
-      @mouseenter="pause"
-      @mouseleave="resume"
-      ref="trackRef"
-    >
+    <div ref="trackRef" class="testimonials__track" @mouseenter="pause" @mouseleave="resume">
       <article v-for="item in visibleTestimonials" :key="item.id" class="testimonials__card">
         <div class="testimonials__user">
           <img :src="item.avatar" :alt="item.user" width="40" height="40" />
@@ -104,7 +99,7 @@ const resume = () => {
 
 const { observe, disconnect } = useScrollAnimation(
   () => trackRef.value,
-  (entry) => {
+  entry => {
     if (entry.isIntersecting) {
       resume()
     } else {
@@ -213,4 +208,3 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-

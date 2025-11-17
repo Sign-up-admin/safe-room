@@ -3,5 +3,7 @@
 </template>
 
 <script setup lang="ts" name="NotFound">
-import ErrorPage from './error/ErrorPage.vue'
+import { defineAsyncComponent } from 'vue'
+
+const ErrorPage = defineAsyncComponent(() => import('./error/ErrorPage.vue'))
 </script>

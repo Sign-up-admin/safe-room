@@ -3,6 +3,7 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.YonghuEntity;
 import com.service.YonghuService;
+import com.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
@@ -100,7 +101,7 @@ class YonghuControllerTest extends AbstractControllerIntegrationTest {
 
     private YonghuEntity createTestUser(String username, String name) {
         YonghuEntity user = new YonghuEntity();
-        user.setId(System.currentTimeMillis()); // 设置ID
+        user.setId(TestUtils.nextId()); // 使用安全的ID生成器
         user.setYonghuzhanghao(username);
         user.setYonghuxingming(name);
         user.setMima("12345678"); // 密码至少8位

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock constants/menu
-vi.mock('../../../src/constants/menu', () => ({
+vi.mock('@/constants/menu', () => ({
   getMenuList: vi.fn(),
 }))
 
-import menu from '../../../src/utils/menu'
-import { getMenuList } from '../../../src/constants/menu'
+import menu from '@/utils/menu'
+import { getMenuList } from '@/constants/menu'
 
 describe('Menu工具', () => {
   beforeEach(() => {

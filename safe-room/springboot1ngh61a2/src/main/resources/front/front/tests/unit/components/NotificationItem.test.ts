@@ -16,8 +16,7 @@ describe('NotificationItem 组件', () => {
     createdAt: '2024-01-15T10:00:00Z'
   }
 
-  const mountComponent = (props = {}) => {
-    return mount(NotificationItem, {
+  const mountComponent = (props = {}) => mount(NotificationItem, {
       props: {
         notification: mockNotification,
         ...props
@@ -33,7 +32,6 @@ describe('NotificationItem 组件', () => {
         }
       }
     })
-  }
 
   describe('渲染', () => {
     it('应该正确渲染通知内容', () => {

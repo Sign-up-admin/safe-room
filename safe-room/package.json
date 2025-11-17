@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "npm run test:unit:front; npm run test:unit:admin",
+    "test": "npm run test:unit",
+    "test:unit": "npm run test:unit:front && npm run test:unit:admin",
     "test:unit:front": "cd springboot1ngh61a2/src/main/resources/front/front && npm run test:unit",
     "test:unit:admin": "cd springboot1ngh61a2/src/main/resources/admin/admin && npm run test:unit",
     "test:unit:watch": "npm run test:unit:watch:front",
@@ -10,7 +10,13 @@
     "test:unit:ui": "npm run test:unit:ui:front",
     "test:unit:ui:front": "cd springboot1ngh61a2/src/main/resources/front/front && npm run test:unit:ui",
     "test:unit:ui:admin": "cd springboot1ngh61a2/src/main/resources/admin/admin && npm run test:unit:ui",
-    "test:e2e": "npm run test:e2e:front && npm run test:e2e:admin",
+    "test:e2e": "npm run test:e2e:serial",
+    "test:e2e:serial": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App both",
+    "test:e2e:parallel": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App both -Parallel",
+    "test:e2e:serial:admin": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App admin",
+    "test:e2e:serial:front": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App front",
+    "test:e2e:parallel:admin": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App admin -Parallel",
+    "test:e2e:parallel:front": "powershell -ExecutionPolicy Bypass -File concurrent-frontend-e2e-runner.ps1 -App front -Parallel",
     "test:e2e:front": "cd springboot1ngh61a2/src/main/resources/front/front && npm run test:e2e",
     "test:e2e:admin": "cd springboot1ngh61a2/src/main/resources/admin/admin && npm run test:e2e",
     "test:e2e:ui": "npm run test:e2e:ui:front",
@@ -26,9 +32,11 @@
     "coverage:report:front": "cd springboot1ngh61a2/src/main/resources/front/front && npm run test:coverage:report",
     "coverage:report:admin": "cd springboot1ngh61a2/src/main/resources/admin/admin && npm run test:coverage:report",
     "test:automation": "powershell -ExecutionPolicy Bypass -File frontend-test-automation.ps1",
+    "test:quality-gate": "powershell -ExecutionPolicy Bypass -File scripts/frontend-test-quality-gate.ps1 -GenerateReport",
     "test:automation:parallel": "powershell -ExecutionPolicy Bypass -File frontend-test-automation.ps1 -Parallel",
     "coverage:monitor": "powershell -ExecutionPolicy Bypass -File frontend-coverage-monitor.ps1",
     "aggregate:results": "node scripts/aggregate-test-results.js",
+    "report:e2e:aggregate": "node concurrent-e2e-report-aggregator.js",
     "test:all": "npm run test:unit && npm run test:coverage && npm run test:e2e",
     "report:generate": "npm run aggregate:results",
     "docs:check": "node docs/scripts/frontend-doc-checker.js",
@@ -73,6 +81,7 @@
     "docs:list": "echo '\n📚 Documentation Management Commands:' && echo '  docs:check              - 文档质量检查' && echo '  docs:generate           - 文档自动生成' && echo '  docs:ai-generate        - AI文档生成器' && echo '  docs:ai-api             - AI生成API文档' && echo '  docs:ai-component       - AI生成组件文档' && echo '  docs:ai-enhance         - AI优化文档' && echo '  docs:ai-batch           - AI批量生成文档' && echo '  docs:index              - 文档索引更新' && echo '  docs:lifecycle          - 文档生命周期管理' && echo '  docs:review             - 文档审查工作流' && echo '  docs:quality            - 文档质量评估' && echo '  docs:dashboard          - 质量监控仪表板' && echo '  docs:usage              - 文档使用分析' && echo '  docs:contribution       - 贡献统计跟踪' && echo '  docs:feedback           - 用户反馈收集' && echo '  docs:ci                 - CI质量检查套件' && echo '  docs:assess             - 批量质量评估' && echo '  docs:stats              - 文档统计概览' && echo '  docs:monitor            - 实时质量监控' && echo '  docs:train              - 培训资源导航' && echo ''"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vitest/coverage-v8": "^4.0.9",
@@ -82,12 +91,16 @@
     "eslint": "^8.56.0",
     "happy-dom": "^20.0.10",
     "jsdom": "^27.0.1",
+    "madge": "^8.0.0",
     "vitest": "^4.0.9",
     "vue-tsc": "^3.1.4"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.17.1",
+    "@vueuse/core": "^14.0.0",
+    "@vueuse/shared": "^14.0.0",
     "glob": "^11.0.3",
-    "openai": "^4.24.7"
+    "openai": "^4.24.7",
+    "xml2js": "^0.6.2"
   }
 }

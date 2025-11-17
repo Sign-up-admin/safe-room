@@ -81,7 +81,10 @@ const hasHeader = computed(() => !!(props.title || props.subtitle || props.eyebr
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+  transition:
+    transform $transition-base,
+    box-shadow $transition-base,
+    border-color $transition-base;
 
   &--variant-layered {
     background: linear-gradient(160deg, rgba(253, 216, 53, 0.08), rgba(10, 10, 10, 0.92));
@@ -169,4 +172,3 @@ const hasHeader = computed(() => !!(props.title || props.subtitle || props.eyebr
   }
 }
 </style>
-

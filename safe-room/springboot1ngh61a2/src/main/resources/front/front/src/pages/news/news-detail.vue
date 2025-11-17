@@ -1,6 +1,6 @@
 <template>
-  <div class="detail-page" v-loading="loading">
-    <section class="detail-hero" v-if="detail">
+  <div v-loading="loading" class="detail-page">
+    <section v-if="detail" class="detail-hero">
       <div>
         <p class="detail-tag">{{ detail.typename || '公告' }}</p>
         <h1>{{ detail.title }}</h1>
@@ -22,7 +22,7 @@
 
     <TechCard v-if="detail" class="detail-card" :interactive="false">
       <img v-if="detail.picture" :src="resolveAssetUrl(detail.picture)" alt="公告封面" class="detail-hero-img" />
-      <SafeHtml :html="detail.content || detail.introduction" className="detail-content" />
+      <SafeHtml :html="detail.content || detail.introduction" class-name="detail-content" />
       <div class="detail-actions">
         <TechButton size="sm" variant="ghost" :loading="thumbLoading && pendingThumbType === 1" @click="handleThumb(1)">
           👍 点赞
@@ -33,13 +33,11 @@
       </div>
     </TechCard>
 
-    <section class="cta-card" v-if="detail">
+    <section v-if="detail" class="cta-card">
       <TechCard title="延伸阅读 · 预约体验" subtitle="将灵感转化为行动" :interactive="false">
         <p>想深入体验文章提到的课程或教练？立即预约体验或查看课程详情。</p>
         <div class="cta-actions">
-          <TechButton size="sm" @click="router.push('/index/kechengyuyue')">
-            📅 预约课程
-          </TechButton>
+          <TechButton size="sm" @click="router.push('/index/kechengyuyue')"> 📅 预约课程 </TechButton>
           <TechButton size="sm" variant="outline" @click="router.push('/index/jianshenjiaolian')">
             👨‍💼 查看教练
           </TechButton>
@@ -48,7 +46,7 @@
           </TechButton>
         </div>
 
-        <div class="cta-features" v-if="relatedCourses.length">
+        <div v-if="relatedCourses.length" class="cta-features">
           <h4>推荐课程</h4>
           <div class="course-grid">
             <div
@@ -61,7 +59,7 @@
                 <strong>{{ course.jianshenkecheng }}</strong>
                 <small>{{ course.jianshenleixing }}</small>
               </div>
-              <TechButton size="xs" variant="text">查看</TechButton>
+              <TechButton variant="text">查看</TechButton>
             </div>
           </div>
         </div>
@@ -165,7 +163,7 @@ async function loadRelated() {
     const response = await http.get<ApiResponse<PageResult<NewsItem>>>('/news/list', {
       params: { page: 1, limit: 5, sort: 'addtime', order: 'desc' },
     })
-    relatedNews.value = response.data.data?.list?.filter((item) => item.id !== detail.value?.id) ?? []
+    relatedNews.value = response.data.data?.list?.filter(item => item.id !== detail.value?.id) ?? []
   } catch (error) {
     console.warn('加载推荐公告失败', error)
   }
@@ -239,7 +237,7 @@ function getThemeIcon() {
   const icons = {
     dark: '🌙',
     light: '☀️',
-    blue: '🌊'
+    blue: '🌊',
   }
   return icons[currentTheme.value] || '🎨'
 }
@@ -248,7 +246,7 @@ function getThemeLabel() {
   const labels = {
     dark: '深色',
     light: '浅色',
-    blue: '蓝色'
+    blue: '蓝色',
   }
   return labels[currentTheme.value] || '主题'
 }
@@ -513,4 +511,3 @@ function getThemeLabel() {
   }
 }
 </style>
-

@@ -4,7 +4,8 @@
       <button
         v-for="goal in goals"
         :key="goal"
-        :class="['goal-chip', { 'goal-chip--active': selectedGoalsModel.includes(goal) }]"
+        class="goal-chip"
+        :class="[{ 'goal-chip--active': selectedGoalsModel.includes(goal) }]"
         @click="toggleGoal(goal)"
       >
         {{ goal }}
@@ -23,13 +24,36 @@
           </defs>
           <!-- 网格线 -->
           <g class="chart-grid">
-            <line v-for="i in 4" :key="`grid-h-${i}`" :x1="0" :y1="i * 50" :x2="400" :y2="i * 50" stroke="rgba(255,255,255,0.05)" />
-            <line v-for="i in packageOptions.length" :key="`grid-v-${i}`" :x1="(i * 400) / (packageOptions.length + 1)" :y1="0" :x2="(i * 400) / (packageOptions.length + 1)" :y2="200" stroke="rgba(255,255,255,0.05)" />
+            <line
+              v-for="i in 4"
+              :key="`grid-h-${i}`"
+              :x1="0"
+              :y1="i * 50"
+              :x2="400"
+              :y2="i * 50"
+              stroke="rgba(255,255,255,0.05)"
+            />
+            <line
+              v-for="i in packageOptions.length"
+              :key="`grid-v-${i}`"
+              :x1="(i * 400) / (packageOptions.length + 1)"
+              :y1="0"
+              :x2="(i * 400) / (packageOptions.length + 1)"
+              :y2="200"
+              stroke="rgba(255,255,255,0.05)"
+            />
           </g>
           <!-- 价格曲线区域 -->
           <path :d="priceAreaPath" fill="url(#priceGradient)" />
           <!-- 价格曲线 -->
-          <path :d="priceLinePath" fill="none" stroke="#fdd835" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path
+            :d="priceLinePath"
+            fill="none"
+            stroke="#fdd835"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
           <!-- 数据点 -->
           <circle
             v-for="(point, index) in chartPoints"
@@ -42,7 +66,7 @@
             stroke-width="2"
             class="chart-point"
             @mouseenter="highlightPoint(index)"
-            @mouseleave="unhighlightPoint()"
+            @mouseleave="unhighlightPoint"
           />
           <!-- 标签 -->
           <text
@@ -65,10 +89,11 @@
       <article
         v-for="(pkg, index) in packageOptions"
         :key="pkg.label"
-        :class="['package-card', { 'package-card--active': pkg.label === selectedPackage?.label }]"
+        class="package-card"
+        :class="[{ 'package-card--active': pkg.label === selectedPackage?.label }]"
         @click="$emit('update:selectedPackage', pkg)"
         @mouseenter="highlightPoint(index)"
-        @mouseleave="unhighlightPoint()"
+        @mouseleave="unhighlightPoint"
       >
         <div class="package-card__badge">{{ pkg.sessions }} 次 · {{ pkg.duration }}</div>
         <h3>{{ pkg.label }}</h3>
@@ -119,7 +144,7 @@ const chartGradientEnd = '#f6c300'
 const chartPoints = computed(() => {
   if (props.packageOptions.length === 0) return []
 
-  const prices = props.packageOptions.map((pkg) => props.priceCalculator(pkg))
+  const prices = props.packageOptions.map(pkg => props.priceCalculator(pkg))
   const maxPrice = Math.max(...prices)
   const minPrice = Math.min(...prices)
   const priceRange = maxPrice - minPrice || 1
@@ -189,7 +214,7 @@ const priceAreaPath = computed(() => {
 
 function toggleGoal(goal: string) {
   if (selectedGoalsModel.value.includes(goal)) {
-    selectedGoalsModel.value = selectedGoalsModel.value.filter((item) => item !== goal)
+    selectedGoalsModel.value = selectedGoalsModel.value.filter(item => item !== goal)
   } else {
     selectedGoalsModel.value = [...selectedGoalsModel.value, goal]
   }
@@ -208,7 +233,7 @@ watch(
   () => props.selectedPackage,
   () => {
     if (props.selectedPackage) {
-      const index = props.packageOptions.findIndex((pkg) => pkg.label === props.selectedPackage?.label)
+      const index = props.packageOptions.findIndex(pkg => pkg.label === props.selectedPackage?.label)
       if (index >= 0) {
         highlightedIndex.value = index
       }
@@ -335,4 +360,3 @@ watch(
   }
 }
 </style>
-

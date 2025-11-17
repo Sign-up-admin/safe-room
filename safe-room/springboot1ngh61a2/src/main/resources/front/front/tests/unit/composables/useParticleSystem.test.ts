@@ -3,13 +3,11 @@ import { describe, expect, it, vi } from 'vitest'
 const startMock = vi.fn()
 const destroyMock = vi.fn()
 
-const ParticleSystemMock = vi.hoisted(() => {
-  return class {
+const ParticleSystemMock = vi.hoisted(() => class {
     constructor(_options: any) {}
     start = startMock
     destroy = destroyMock
-  }
-})
+  })
 
 vi.mock('@/utils/particleSystem', () => ({
   ParticleSystem: ParticleSystemMock,

@@ -1,25 +1,19 @@
 <template>
-  <div class="discuss-page" v-loading="loading" role="main" aria-labelledby="discuss-heading">
+  <div v-loading="loading" class="discuss-page" role="main" aria-labelledby="discuss-heading">
     <!-- 跳过链接 -->
     <a href="#main-content" class="skip-link sr-only">跳到主要内容</a>
     <a href="#search-section" class="skip-link sr-only">跳到搜索区域</a>
     <a href="#hot-topics-section" class="skip-link sr-only">跳到热门话题</a>
     <a href="#discussions-section" class="skip-link sr-only">跳到讨论列表</a>
 
-    <header class="discuss-hero" id="main-content">
+    <header id="main-content" class="discuss-hero">
       <div>
         <p class="section-eyebrow">COMMUNITY LAB</p>
         <h1 id="discuss-heading">课程讨论区</h1>
         <p class="hero-description">围绕课程体验、训练技巧与饮食分享，随时发声。</p>
       </div>
       <div class="hero-actions">
-        <TechButton
-          size="sm"
-          @click="showComposer = true"
-          aria-label="发布新讨论"
-        >
-          发布讨论
-        </TechButton>
+        <TechButton size="sm" aria-label="发布新讨论" @click="showComposer = true"> 发布讨论 </TechButton>
       </div>
     </header>
 
@@ -31,10 +25,11 @@
           <button
             v-for="range in timeRangeOptions"
             :key="range.value"
-            :class="['time-range-btn', { 'active': selectedTimeRange === range.value }]"
-            @click="changeTimeRange(range.value)"
+            class="time-range-btn"
+            :class="[{ active: selectedTimeRange === range.value }]"
             :aria-pressed="selectedTimeRange === range.value"
             :aria-label="`查看${range.label}热门话题`"
+            @click="changeTimeRange(range.value)"
           >
             {{ range.label }}
           </button>
@@ -53,10 +48,10 @@
             v-for="(topic, index) in currentHotTopics"
             :key="topic.id"
             class="topic-card"
-            @click="handleTopicClick(topic, index)"
             role="listitem"
             tabindex="-1"
             :aria-label="`${topic.title}话题，热度${topic.heat}，${topic.postCount}个讨论`"
+            @click="handleTopicClick(topic, index)"
             @keydown.enter="handleTopicClick(topic, index)"
             @keydown.space.prevent="handleTopicClick(topic, index)"
           >
@@ -66,9 +61,21 @@
                 <span class="topic-heat">{{ topic.heat }}</span>
                 <span class="topic-trend" :class="`trend--${topic.trend}`">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path v-if="topic.trend === 'up'" d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path v-else-if="topic.trend === 'hot'" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2"/>
-                    <circle v-else cx="12" cy="12" r="3" fill="currentColor"/>
+                    <path
+                      v-if="topic.trend === 'up'"
+                      d="M7 17L17 7M17 7H7M17 7V17"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      v-else-if="topic.trend === 'hot'"
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <circle v-else cx="12" cy="12" r="3" fill="currentColor" />
                   </svg>
                 </span>
               </div>
@@ -146,7 +153,7 @@
         :class="{
           'discuss-card--pinned': item.isPinned,
           'discuss-card--featured': item.isFeatured,
-          'discuss-card--hot': item.isHot
+          'discuss-card--hot': item.isHot,
         }"
         :interactive="false"
         role="article"
@@ -158,22 +165,34 @@
         @keydown.space.prevent="handleDiscussionClick(item, index)"
       >
         <!-- 置顶/精华/热门标识 -->
-        <div class="discuss-badges" v-if="item.isPinned || item.isFeatured || item.isHot">
+        <div v-if="item.isPinned || item.isFeatured || item.isHot" class="discuss-badges">
           <span v-if="item.isPinned" class="badge badge--pinned">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path d="M21 5H3v14h18V5zM7 7h10v2H7V7zm0 4h10v2H7v9zm0 4h7v2H7v-2z" stroke="currentColor" stroke-width="2"/>
+              <path
+                d="M21 5H3v14h18V5zM7 7h10v2H7V7zm0 4h10v2H7v9zm0 4h7v2H7v-2z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
             置顶
           </span>
           <span v-if="item.isFeatured" class="badge badge--featured">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2"/>
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
             精华
           </span>
           <span v-if="item.isHot" class="badge badge--hot">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2"/>
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
             热门
           </span>
@@ -182,19 +201,19 @@
         <header class="discuss-card__header">
           <div class="avatar">
             <img :src="resolveAssetUrl(item.avatarurl)" alt="头像" />
-            <div class="user-level" v-if="item.userLevel">{{ item.userLevel }}</div>
+            <div v-if="item.userLevel" class="user-level">{{ item.userLevel }}</div>
           </div>
           <div class="user-info">
             <div class="user-meta">
               <strong>{{ item.nickname || '匿名会员' }}</strong>
-                <button
-                  v-if="canFollowUser(item.userid || 0)"
-                  class="follow-btn"
-                  :class="{ 'follow-btn--following': isFollowingUser(item.userid || 0) }"
-                  @click="toggleFollow(item)"
-                >
-                  {{ isFollowingUser(item.userid || 0) ? '已关注' : '+ 关注' }}
-                </button>
+              <button
+                v-if="canFollowUser(item.userid || 0)"
+                class="follow-btn"
+                :class="{ 'follow-btn--following': isFollowingUser(item.userid || 0) }"
+                @click="toggleFollow(item)"
+              >
+                {{ isFollowingUser(item.userid || 0) ? '已关注' : '+ 关注' }}
+              </button>
             </div>
             <small>{{ formatCourseName(item.refid) }}</small>
           </div>
@@ -203,9 +222,9 @@
             <div class="more-menu">
               <button class="more-btn" @click="toggleMoreMenu(item)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="1" fill="currentColor"/>
-                  <circle cx="12" cy="5" r="1" fill="currentColor"/>
-                  <circle cx="12" cy="19" r="1" fill="currentColor"/>
+                  <circle cx="12" cy="12" r="1" fill="currentColor" />
+                  <circle cx="12" cy="5" r="1" fill="currentColor" />
+                  <circle cx="12" cy="19" r="1" fill="currentColor" />
                 </svg>
               </button>
               <div v-if="item.showMenu" class="more-dropdown">
@@ -222,31 +241,39 @@
         </header>
 
         <!-- 标签系统 -->
-        <div class="discuss-tags" v-if="item.tags && item.tags.length">
-          <span v-for="tag in item.tags" :key="tag" class="tag-item" @click="filterByTag(tag)">
-            #{{ tag }}
-          </span>
+        <div v-if="item.tags && item.tags.length" class="discuss-tags">
+          <span v-for="tag in item.tags" :key="tag" class="tag-item" @click="filterByTag(tag)"> #{{ tag }} </span>
         </div>
 
         <div class="discuss-content">
           <p :id="`discuss-content-${item.id}`" class="discuss-card__content">{{ item.content }}</p>
 
           <!-- 图片附件 -->
-          <div class="discuss-attachments" v-if="item.attachments && item.attachments.length">
+          <div v-if="item.attachments && item.attachments.length" class="discuss-attachments">
             <div class="attachment-grid">
               <div
                 v-for="(attachment, index) in item.attachments.slice(0, 4)"
                 :key="index"
                 class="attachment-item"
-                @click="openAttachment(attachment)"
+                @click="openAttachment(attachment as unknown as Attachment)"
               >
-                <img v-if="attachment.type === 'image'" :src="attachment.url" :alt="attachment.name" />
+                <img v-if="(attachment as unknown as Attachment).type === 'image'" :src="(attachment as unknown as Attachment).url" :alt="(attachment as unknown as Attachment).name" />
                 <div v-else class="attachment-file">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/>
-                    <path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
+                    <path
+                      d="M14 2v6h6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
-                  <span>{{ attachment.name }}</span>
+                  <span>{{ (attachment as unknown as Attachment).name }}</span>
                 </div>
                 <div v-if="item.attachments.length > 4 && index === 3" class="attachment-overlay">
                   +{{ item.attachments.length - 4 }}
@@ -269,40 +296,25 @@
               size="sm"
               variant="text"
               :loading="likeLoading === item.id"
-              @click="handleLike(item)"
               :aria-label="`点赞讨论，当前${item.likes || 0}个赞`"
+              @click="handleLike(item)"
             >
               👍 {{ item.likes || 0 }}
             </TechButton>
-            <TechButton
-              size="sm"
-              variant="text"
-              @click="toggleReply(item)"
-              :aria-label="`回复讨论，展开回复表单`"
-            >
+            <TechButton size="sm" variant="text" aria-label="回复讨论，展开回复表单" @click="toggleReply(item)">
               💬 回复
             </TechButton>
-            <TechButton
-              size="sm"
-              variant="text"
-              @click="shareDiscussion(item)"
-              :aria-label="`分享讨论`"
-            >
+            <TechButton size="sm" variant="text" aria-label="分享讨论" @click="shareDiscussion(item)">
               📤 分享
             </TechButton>
-            <TechButton
-              size="sm"
-              variant="outline"
-              @click="goDetail(item)"
-              :aria-label="`查看讨论详情`"
-            >
+            <TechButton size="sm" variant="outline" aria-label="查看讨论详情" @click="goDetail(item)">
               查看详情
             </TechButton>
           </div>
         </footer>
 
         <!-- 快速回复 -->
-        <div v-if="item.showReply" class="quick-reply" role="form" aria-label="快速回复表单">
+        <div v-if="(item as any).showReply" class="quick-reply" role="form" aria-label="快速回复表单">
           <div class="reply-input-group">
             <label :for="`reply-textarea-${item.id}`" class="sr-only">回复内容</label>
             <textarea
@@ -318,33 +330,32 @@
               <div :id="`reply-count-${item.id}`" class="character-count" aria-live="polite">
                 {{ (item.replyContent || '').length }}/500
               </div>
-              <button
-                class="reply-attach-btn"
-                @click="attachToReply(item)"
-                aria-label="添加附件"
-                type="button"
-              >
+              <button class="reply-attach-btn" aria-label="添加附件" type="button" @click="attachToReply(item)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M14 2v6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M14 2v6h6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </button>
               <div class="reply-buttons">
-                <TechButton
-                  size="sm"
-                  variant="outline"
-                  @click="cancelReply(item)"
-                  aria-label="取消回复"
-                  type="button"
-                >
+                <TechButton size="sm" variant="outline" aria-label="取消回复" type="button" @click="cancelReply(item)">
                   取消
                 </TechButton>
                 <TechButton
                   size="sm"
-                  @click="submitReply(item)"
                   :disabled="!item.replyContent?.trim()"
                   :aria-label="`提交回复，${item.replyContent?.trim() ? '内容已填写' : '请填写内容'}`"
                   type="submit"
+                  @click="submitReply(item)"
                 >
                   回复
                 </TechButton>
@@ -366,7 +377,12 @@
     </section>
 
     <!-- 个性化推荐区域 -->
-    <section id="recommendations-section" class="recommendations-section" v-if="personalizedRecommendations.length > 0" aria-labelledby="recommendations-heading">
+    <section
+      v-if="personalizedRecommendations.length > 0"
+      id="recommendations-section"
+      class="recommendations-section"
+      aria-labelledby="recommendations-heading"
+    >
       <TechCard title="为您推荐" subtitle="基于您的兴趣智能推荐">
         <div class="recommendations-grid">
           <RecommendationCard
@@ -417,14 +433,6 @@ const discussService = getModuleService('discussjianshenkecheng')
 const courseService = getModuleService('jianshenkecheng')
 
 // 使用热门话题组合式API
-const {
-  hotTopics,
-  recommendedTopics,
-  topicsByTimeRange,
-  setTimeRange,
-  setUserInterests
-} = useHotTopics(discussions)
-
 // 使用讨论管理组合式API
 const {
   togglePinDiscussion,
@@ -435,7 +443,7 @@ const {
   canFeatureDiscussion: canFeature,
   canReportDiscussion: canReport,
   canFollowUser,
-  isFollowingUser
+  isFollowingUser,
 } = useDiscussionManagement()
 
 // 使用高级搜索组合式API
@@ -457,36 +465,30 @@ const {
   applyFilters,
   toggleTag,
   updateFilters,
-  init: initAdvancedSearch
+  init: initAdvancedSearch,
 } = useAdvancedSearch({
   enableSuggestions: true,
   enableHistory: true,
-  maxSuggestions: 8
+  maxSuggestions: 8,
 })
 
 // 使用屏幕阅读器公告
-const {
-  announce,
-  announceStatus,
-  announceError,
-  announceSuccess,
-  announceNavigation,
-  announceLoading
-} = useScreenReaderAnnouncements()
+const { announce, announceStatus, announceError, announceSuccess, announceNavigation, announceLoading } =
+  useScreenReaderAnnouncements()
 
 // 使用智能推荐系统
-const {
-  recommendations,
-  personalizedRecommendations,
-  setAvailableItems,
-  addInteraction,
-  dismissRecommendation
-} = useRecommendation()
+const { recommendations, personalizedRecommendations, setAvailableItems, addInteraction, dismissRecommendation } =
+  useRecommendation()
 
 const loading = ref(false)
-const discussions = ref<Discussjianshenkecheng[]>([])
 const courseOptions = ref<Array<{ label: string; value: number }>>([])
 const likeLoading = ref<number | null>(null)
+
+// 讨论数据 - 必须在useHotTopics之前定义
+const discussions = ref<Discussjianshenkecheng[]>([])
+
+// 使用热门话题组合式API
+const { hotTopics, recommendedTopics, topicsByTimeRange, setTimeRange, setUserInterests } = useHotTopics(discussions)
 
 // 热门话题相关状态
 const selectedTimeRange = ref<'24h' | '7d' | '30d'>('7d')
@@ -500,16 +502,16 @@ const hotTopicsContainer = ref<HTMLElement>()
 const {
   currentIndex: hotTopicIndex,
   activate: activateHotTopicsNav,
-  setCurrentIndex: setHotTopicIndex
+  setCurrentIndex: setHotTopicIndex,
 } = useKeyboardNavigation(ref([]), {
   vertical: true,
   horizontal: true,
   loop: true,
-  onActivate: (index) => {
+  onActivate: index => {
     if (currentHotTopics.value[index]) {
       goToTopic(currentHotTopics.value[index])
     }
-  }
+  },
 })
 
 // 讨论列表键盘导航
@@ -517,26 +519,26 @@ const discussionsContainer = ref<HTMLElement>()
 const {
   currentIndex: discussionIndex,
   activate: activateDiscussionsNav,
-  setCurrentIndex: setDiscussionIndex
+  setCurrentIndex: setDiscussionIndex,
 } = useKeyboardNavigation(ref([]), {
   vertical: true,
   loop: false,
-  onActivate: (index) => {
+  onActivate: index => {
     if (discussions.value[index]) {
       goDetail(discussions.value[index])
     }
-  }
+  },
 })
 const timeRangeOptions = [
   { label: '24小时', value: '24h' as const },
   { label: '7天', value: '7d' as const },
-  { label: '30天', value: '30d' as const }
+  { label: '30天', value: '30d' as const },
 ]
 
 // 当前用户信息（模拟）
 const currentUser = ref({
   id: 1,
-  nickname: '当前用户'
+  nickname: '当前用户',
 })
 
 // 关注状态管理
@@ -577,7 +579,7 @@ const allTags = computed(() => {
     name,
     count: stats.count,
     level: getTagLevel(stats.count),
-    trend: stats.trend
+    trend: stats.trend,
   }))
 })
 
@@ -590,9 +592,7 @@ function getTagLevel(count: number): 'low' | 'medium' | 'high' | 'hot' {
 }
 
 // 当前热门话题（基于选择的时间范围）
-const currentHotTopics = computed(() => {
-  return topicsByTimeRange.value[selectedTimeRange.value] || hotTopics.value
-})
+const currentHotTopics = computed(() => topicsByTimeRange.value[selectedTimeRange.value] || hotTopics.value)
 
 // 热门话题相关方法
 function changeTimeRange(range: '24h' | '7d' | '30d') {
@@ -621,7 +621,7 @@ function goToTopic(topic: any) {
     itemId: String(topic.id),
     itemType: 'topic',
     action: 'view',
-    weight: 1
+    weight: 1,
   })
 }
 
@@ -638,8 +638,8 @@ function updateRecommendationItems() {
       type: 'topic' as const,
       meta: [
         { label: '讨论数', value: String(topic.postCount) },
-        { label: '热度', value: String(topic.heat) }
-      ]
+        { label: '热度', value: String(topic.heat) },
+      ],
     })),
     // 从讨论中生成推荐（排除当前显示的）
     ...discussions.value.slice(5).map(discussion => ({
@@ -651,9 +651,9 @@ function updateRecommendationItems() {
       type: 'discussion' as const,
       meta: [
         { label: '回复', value: String(discussion.replyCount || 0) },
-        { label: '查看', value: String(discussion.viewCount || 0) }
-      ]
-    }))
+        { label: '查看', value: String(discussion.viewCount || 0) },
+      ],
+    })),
   ]
 
   setAvailableItems(recommendationItems)
@@ -701,7 +701,7 @@ async function loadDiscussions() {
       showReply: false,
       showMenu: false,
       replyContent: '',
-      replies: generateMockReplies(item.id) // 生成模拟回复数据
+      replies: generateMockReplies(item.id), // 生成模拟回复数据
     }))
 
     discussions.value = applyClientFilters(enhancedList)
@@ -734,7 +734,7 @@ function generateAttachments() {
     id: i + 1,
     type: types[Math.floor(Math.random() * types.length)],
     name: `attachment_${i + 1}.jpg`,
-    url: `https://via.placeholder.com/200x150?text=Attachment+${i + 1}`
+    url: `https://via.placeholder.com/200x150?text=Attachment+${i + 1}`,
   }))
 }
 
@@ -754,7 +754,7 @@ function generateMockReplies(discussionId: number) {
       '这个方法不错，值得学习',
       '我有不同的看法，大家可以一起讨论',
       '感谢教练的指导！',
-      '这个课程安排很合理'
+      '这个课程安排很合理',
     ]
 
     const reply = {
@@ -771,7 +771,7 @@ function generateMockReplies(discussionId: number) {
       parentId: null,
       parentUserNickname: null,
       attachments: Math.random() > 0.95 ? generateAttachments() : [],
-      children: []
+      children: [],
     }
 
     replies.push(reply)
@@ -792,7 +792,7 @@ function generateMockReplies(discussionId: number) {
         parentId: replyId,
         parentUserNickname: reply.userNickname,
         attachments: [],
-        children: []
+        children: [],
       }
       reply.children = [childReply]
     }
@@ -803,7 +803,7 @@ function generateMockReplies(discussionId: number) {
 
 function applyClientFilters(list: Discussjianshenkecheng[]) {
   return list
-    .filter((item) => (filters.tag ? (item.content || '').includes(filters.tag) : true))
+    .filter(item => (filters.tag ? (item.content || '').includes(filters.tag) : true))
     .sort((a, b) => {
       if (filters.sort === 'hot') return (b.reply?.length || 0) - (a.reply?.length || 0)
       if (filters.sort === 'official') {
@@ -836,13 +836,15 @@ function handleAdvancedSearch(searchFilters: any) {
   performSearch()
 
   // 公告搜索结果
-  announce(`搜索完成，找到 ${filterStats.value.total} 个讨论${filterStats.value.filtered > 0 ? `，显示 ${filterStats.value.filtered} 个` : ''}`)
+  announce(
+    `搜索完成，找到 ${filterStats.value.total} 个讨论${filterStats.value.filtered > 0 ? `，显示 ${filterStats.value.filtered} 个` : ''}`,
+  )
 }
 
 function handleResetFilters() {
   // 重置本地筛选状态
   filters.keyword = ''
-  filters.courseId = ''
+  filters.courseId = undefined
   filters.tag = ''
   filters.sort = 'latest'
 
@@ -884,7 +886,7 @@ async function handleLike(item: Discussjianshenkecheng) {
 
 function formatCourseName(refId?: number) {
   if (!refId) return '未关联课程'
-  const course = courseOptions.value.find((option) => option.value === refId)
+  const course = courseOptions.value.find(option => option.value === refId)
   return course ? course.label : `#${refId}`
 }
 
@@ -922,7 +924,7 @@ async function toggleFollow(item: any) {
   const userData = {
     userId,
     nickname: item.nickname || '用户',
-    isFollowing: isFollowingUser(userId)
+    isFollowing: isFollowingUser(userId),
   }
 
   await toggleFollowUser(userData)
@@ -933,7 +935,6 @@ async function toggleFollow(item: any) {
 function toggleMoreMenu(item: any) {
   item.showMenu = !item.showMenu
 }
-
 
 async function togglePin(item: any) {
   const success = await togglePinDiscussion(item)
@@ -1004,7 +1005,7 @@ function submitReply(item: any) {
     parentId: null,
     parentUserNickname: null,
     attachments: [],
-    children: []
+    children: [],
   }
 
   // 添加到讨论的回复列表
@@ -1029,8 +1030,16 @@ function attachToReply(item: any) {
   ElMessage.info('文件上传功能开发中')
 }
 
+// 附件类型定义
+interface Attachment {
+  id: number
+  type: 'image' | 'file'
+  name: string
+  url: string
+}
+
 // 附件查看
-function openAttachment(attachment: any) {
+function openAttachment(attachment: Attachment) {
   if (attachment.type === 'image') {
     // 打开图片预览
     window.open(attachment.url, '_blank')
@@ -1051,7 +1060,7 @@ function shareDiscussion(item: any) {
     navigator.share({
       title: item.content,
       text: '快来看看这个有趣的讨论',
-      url: url
+      url: url,
     })
   } else {
     // 复制到剪贴板
@@ -1151,7 +1160,7 @@ async function handleDiscussionSubmit(discussionData: any) {
       userid: currentUser.value.id,
       nickname: discussionData.isAnonymous ? '匿名用户' : currentUser.value.nickname,
       content: discussionData.content,
-      addtime: discussionData.addtime
+      addtime: discussionData.addtime,
     }
 
     // 调用API保存讨论
@@ -1173,7 +1182,7 @@ async function handleDiscussionSubmit(discussionData: any) {
       showReply: false,
       showMenu: false,
       replyContent: '',
-      replies: []
+      replies: [],
     }
 
     discussions.value.unshift(newDiscussion)
@@ -1212,7 +1221,7 @@ function handleRecommendationClick(item: any) {
     itemId: String(item.id),
     itemType: item.type,
     action: 'view',
-    weight: 2
+    weight: 2,
   })
 }
 
@@ -1222,7 +1231,7 @@ function handleRecommendationLike(item: any) {
     itemId: String(item.id),
     itemType: item.type,
     action: 'like',
-    weight: 3
+    weight: 3,
   })
 
   ElMessage.success('感谢您的反馈！')
@@ -1234,7 +1243,7 @@ function handleRecommendationShare(item: any) {
     itemId: String(item.id),
     itemType: item.type,
     action: 'share',
-    weight: 2
+    weight: 2,
   })
 }
 
@@ -1246,7 +1255,7 @@ function handleRecommendationDismiss(item: any) {
     itemId: String(item.id),
     itemType: item.type,
     action: 'view',
-    weight: -1 // 负权重表示不感兴趣
+    weight: -1, // 负权重表示不感兴趣
   })
 }
 </script>
@@ -1704,179 +1713,179 @@ function handleRecommendationDismiss(item: any) {
   }
 
   // 热门话题样式
-.hot-topics {
-  margin-bottom: 24px;
-}
-
-.time-range-selector {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.time-range-btn {
-  padding: 6px 12px;
-  border: 1px solid rgba(253, 216, 53, 0.3);
-  border-radius: 16px;
-  background: transparent;
-  color: $color-yellow;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(253, 216, 53, 0.1);
-    border-color: rgba(253, 216, 53, 0.5);
+  .hot-topics {
+    margin-bottom: 24px;
   }
 
-  &.active {
-    background: rgba(253, 216, 53, 0.1);
-    border-color: rgba(253, 216, 53, 0.8);
-    box-shadow: $shadow-glow;
+  .time-range-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-}
 
-.topics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
-}
+  .time-range-btn {
+    padding: 6px 12px;
+    border: 1px solid rgba(253, 216, 53, 0.3);
+    border-radius: 16px;
+    background: transparent;
+    color: $color-yellow;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
 
-.topic-card {
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  cursor: pointer;
-  transition: all 0.3s ease;
+    &:hover {
+      background: rgba(253, 216, 53, 0.1);
+      border-color: rgba(253, 216, 53, 0.5);
+    }
 
-  &:hover {
-    border-color: rgba(253, 216, 53, 0.3);
-    background: rgba(253, 216, 53, 0.05);
-    transform: translateY(-2px);
+    &.active {
+      background: rgba(253, 216, 53, 0.1);
+      border-color: rgba(253, 216, 53, 0.8);
+      box-shadow: $shadow-glow;
+    }
   }
-}
 
-.topic-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
 
-  h4 {
-    color: $color-text-primary;
-    font-size: 1rem;
+  .topic-card {
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(253, 216, 53, 0.3);
+      background: rgba(253, 216, 53, 0.05);
+      transform: translateY(-2px);
+    }
+  }
+
+  .topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+
+    h4 {
+      color: $color-text-primary;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .topic-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topic-heat {
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: rgba(253, 216, 53, 0.2);
+    color: $color-yellow;
+    font-size: 0.7rem;
     font-weight: 600;
-    margin: 0;
-  }
-}
-
-.topic-badges {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.topic-heat {
-  padding: 2px 6px;
-  border-radius: 10px;
-  background: rgba(253, 216, 53, 0.2);
-  color: $color-yellow;
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.topic-trend {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 600;
-
-  &.trend--up {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
   }
 
-  &.trend--hot {
-    background: rgba(255, 152, 0, 0.2);
-    color: #ff9800;
+  .topic-trend {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+
+    &.trend--up {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+    }
+
+    &.trend--hot {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ff9800;
+    }
+
+    &.trend--new {
+      background: rgba(74, 144, 226, 0.2);
+      color: #4a90e2;
+    }
   }
 
-  &.trend--new {
-    background: rgba(74, 144, 226, 0.2);
-    color: #4a90e2;
-  }
-}
-
-.topic-desc {
-  color: $color-text-secondary;
-  font-size: 0.85rem;
-  line-height: 1.4;
-  margin: 8px 0;
-}
-
-.topic-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: $color-text-secondary;
-}
-
-.topic-posts {
-  &::after {
-    content: '·';
-    margin: 0 6px;
-  }
-}
-
-.recommendation-hint {
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.recommendations-list {
-  margin-top: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-
-  h5 {
-    color: $color-text-primary;
+  .topic-desc {
+    color: $color-text-secondary;
     font-size: 0.85rem;
-    margin: 0 0 8px 0;
-    font-weight: 600;
+    line-height: 1.4;
+    margin: 8px 0;
   }
-}
 
-.recommendation-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.recommendation-tag {
-  padding: 4px 8px;
-  background: rgba(74, 144, 226, 0.1);
-  border: 1px solid rgba(74, 144, 226, 0.2);
-  border-radius: 12px;
-  color: #4a90e2;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(74, 144, 226, 0.2);
-    border-color: rgba(74, 144, 226, 0.4);
+  .topic-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: $color-text-secondary;
   }
-}
 
-// 移动端标签优化
+  .topic-posts {
+    &::after {
+      content: '·';
+      margin: 0 6px;
+    }
+  }
+
+  .recommendation-hint {
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .recommendations-list {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+
+    h5 {
+      color: $color-text-primary;
+      font-size: 0.85rem;
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+  }
+
+  .recommendation-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .recommendation-tag {
+    padding: 4px 8px;
+    background: rgba(74, 144, 226, 0.1);
+    border: 1px solid rgba(74, 144, 226, 0.2);
+    border-radius: 12px;
+    color: #4a90e2;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(74, 144, 226, 0.2);
+      border-color: rgba(74, 144, 226, 0.4);
+    }
+  }
+
+  // 移动端标签优化
   .discuss-tags {
     justify-content: center;
   }

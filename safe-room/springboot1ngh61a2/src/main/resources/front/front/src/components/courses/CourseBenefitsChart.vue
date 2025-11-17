@@ -2,21 +2,11 @@
   <div class="course-chart">
     <svg :viewBox="`0 0 ${size} ${size}`" role="img" aria-label="课程收益雷达图">
       <g class="course-chart__grid">
-        <polygon
-          v-for="level in 4"
-          :key="level"
-          :points="gridPoints(level / 4)"
-        />
+        <polygon v-for="level in 4" :key="level" :points="gridPoints(level / 4)" />
       </g>
       <polyline class="course-chart__outline" :points="points" />
       <g class="course-chart__dots">
-        <circle
-          v-for="(point, index) in polarPoints"
-          :key="metrics[index].label"
-          :cx="point.x"
-          :cy="point.y"
-          r="4"
-        />
+        <circle v-for="(point, index) in polarPoints" :key="metrics[index].label" :cx="point.x" :cy="point.y" r="4" />
       </g>
     </svg>
 
@@ -55,7 +45,7 @@ const radius = computed(() => props.size / 2 - 10)
 
 const polarPoints = computed(() =>
   props.metrics.map((metric, index) => {
-    const angle = (-Math.PI / 2 + (index * 2 * Math.PI) / props.metrics.length)
+    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / props.metrics.length
     const valueRadius = (metric.value / 100) * radius.value
     return {
       x: center.value + valueRadius * Math.cos(angle),
@@ -64,12 +54,12 @@ const polarPoints = computed(() =>
   }),
 )
 
-const points = computed(() => polarPoints.value.map((point) => `${point.x},${point.y}`).join(' '))
+const points = computed(() => polarPoints.value.map(point => `${point.x},${point.y}`).join(' '))
 
 const gridPoints = (ratio: number) =>
   props.metrics
     .map((_, index) => {
-      const angle = (-Math.PI / 2 + (index * 2 * Math.PI) / props.metrics.length)
+      const angle = -Math.PI / 2 + (index * 2 * Math.PI) / props.metrics.length
       const valueRadius = ratio * radius.value
       const x = center.value + valueRadius * Math.cos(angle)
       const y = center.value + valueRadius * Math.sin(angle)
@@ -154,4 +144,3 @@ const gridPoints = (ratio: number) =>
   }
 }
 </style>
-

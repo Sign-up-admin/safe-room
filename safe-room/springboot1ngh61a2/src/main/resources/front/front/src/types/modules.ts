@@ -201,7 +201,8 @@ export interface Discussjianshenkecheng extends BaseEntity {
   reply?: string
   // Extended properties for frontend use
   tags?: string[]
-  replies?: any[]
+  replies?: Discussjianshenkecheng[]
+  children?: Discussjianshenkecheng[]
   replyCount?: number
   likes?: number
   viewCount?: number
@@ -211,7 +212,7 @@ export interface Discussjianshenkecheng extends BaseEntity {
   userLevel?: number
   showMenu?: boolean
   replyContent?: string
-  attachments?: any[]
+  attachments?: Record<string, unknown>[]
 }
 
 export interface Chat extends BaseEntity {
@@ -281,5 +282,3 @@ export interface ModuleEntityMap {
 export type ModuleKey = keyof ModuleEntityMap
 
 export type ModuleEntity<K extends ModuleKey = ModuleKey> = ModuleEntityMap[K]
-
-

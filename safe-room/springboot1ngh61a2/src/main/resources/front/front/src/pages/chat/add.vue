@@ -6,12 +6,7 @@
           <el-input v-model="form.ask" maxlength="100" show-word-limit placeholder="请描述问题或需求" />
         </el-form-item>
         <el-form-item label="备注">
-          <el-input
-            v-model="form.remark"
-            type="textarea"
-            :rows="4"
-            placeholder="可补充设备编号、课程名称等信息"
-          />
+          <el-input v-model="form.remark" type="textarea" :rows="4" placeholder="可补充设备编号、课程名称等信息" />
         </el-form-item>
         <div class="actions">
           <el-button @click="resetForm">重置</el-button>
@@ -90,4 +85,3 @@ async function handleSubmit() {
   }
 }
 </style>
-

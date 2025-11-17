@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import type { validateApiResponse, validatePageResult } from '../../../../../../../../tests/shared/types/api-response.types'
 
 export interface Course {
   id: number
@@ -78,7 +79,7 @@ export function createMockCourse(overrides: Partial<Course> = {}): Course {
 /**
  * Create mock course schedule
  */
-export function createMockCourseSchedule(count: number = 3, courseId?: number): CourseSchedule[] {
+export function createMockCourseSchedule(count = 3, courseId?: number): CourseSchedule[] {
   return Array.from({ length: count }, () => ({
     id: faker.number.int({ min: 1, max: 1000 }),
     courseId: courseId || faker.number.int({ min: 1, max: 1000 }),
@@ -150,7 +151,7 @@ export function createMockCourses(count: number, overrides: Partial<Course> = {}
 /**
  * Create mock courses by category
  */
-export function createMockCoursesByCategory(category: string, count: number = 5): Course[] {
+export function createMockCoursesByCategory(category: string, count = 5): Course[] {
   return createMockCourses(count, { category })
 }
 
@@ -238,4 +239,128 @@ export function createMockCourseCategory(overrides: Partial<{
     status: 1,
     ...overrides
   }
+}
+
+// ========== 数据一致性检查函数 ==========
+
+/**
+ * 验证Course对象是否符合接口规范
+ */
+export function validateCourseData(course: any): course is Course {
+  return (
+    course &&
+    typeof course === 'object' &&
+    typeof course.id === 'number' &&
+    typeof course.name === 'string' &&
+    typeof course.description === 'string' &&
+    typeof course.category === 'string' &&
+    typeof course.instructor === 'string' &&
+    typeof course.instructorId === 'number' &&
+    typeof course.price === 'number' &&
+    typeof course.duration === 'number' &&
+    typeof course.difficulty === 'string' &&
+    Array.isArray(course.tags) &&
+    Array.isArray(course.schedule) &&
+    Array.isArray(course.features) &&
+    typeof course.status === 'string' &&
+    typeof course.createTime === 'string'
+  )
+}
+
+/**
+ * 验证Course数组数据一致性
+ */
+export function validateCourseListConsistency(courses: Course[]): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!Array.isArray(courses)) {
+    errors.push('Input is not an array')
+    return { isValid: false, errors, warnings }
+  }
+
+  courses.forEach((course, index) => {
+    if (!validateCourseData(course)) {
+      errors.push(`Course at index ${index} has invalid structure`)
+    }
+
+    // 检查ID唯一性
+    const duplicateIds = courses.filter((c, i) => c.id === course.id && i !== index)
+    if (duplicateIds.length > 0) {
+      warnings.push(`Duplicate course ID ${course.id} found`)
+    }
+
+    // 检查价格合理性
+    if (course.price < 0) {
+      warnings.push(`Course ${course.name} has negative price`)
+    }
+
+    // 检查容量合理性
+    if (course.capacity < 0) {
+      warnings.push(`Course ${course.name} has negative capacity`)
+    }
+
+    // 检查评分范围
+    if (course.rating < 0 || course.rating > 5) {
+      warnings.push(`Course ${course.name} has invalid rating ${course.rating}`)
+    }
+  })
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  }
+}
+
+/**
+ * 验证课程统计数据
+ */
+export function validateCourseStats(stats: any): boolean {
+  return (
+    stats &&
+    typeof stats === 'object' &&
+    typeof stats.totalCourses === 'number' &&
+    typeof stats.activeCourses === 'number' &&
+    typeof stats.totalEnrollments === 'number' &&
+    typeof stats.averageRating === 'number' &&
+    Array.isArray(stats.popularCategories) &&
+    typeof stats.revenue === 'number' &&
+    stats.totalCourses >= 0 &&
+    stats.activeCourses >= 0 &&
+    stats.totalEnrollments >= 0 &&
+    stats.revenue >= 0
+  )
+}
+
+/**
+ * 创建验证后的课程数据（带类型检查）
+ */
+export function createValidatedCourse(overrides: Partial<Course> = {}): Course {
+  const course = createMockCourse(overrides)
+
+  if (!validateCourseData(course)) {
+    throw new Error('Generated course data does not match Course interface')
+  }
+
+  return course
+}
+
+/**
+ * 创建验证后的课程列表
+ */
+export function createValidatedCourses(count: number, overrides: Partial<Course> = {}): Course[] {
+  const courses = createMockCourses(count, overrides)
+  const validation = validateCourseListConsistency(courses)
+
+  if (!validation.isValid) {
+    console.warn('Course list validation warnings:', validation.warnings)
+    throw new Error(`Course list validation failed: ${validation.errors.join(', ')}`)
+  }
+
+  return courses
 }

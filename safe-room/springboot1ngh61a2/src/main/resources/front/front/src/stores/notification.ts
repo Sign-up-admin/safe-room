@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
-import type {
-  Notification,
-  NotificationPreferences,
-  NotificationStats
-} from '@/types/notification'
-import {
-  NotificationStatus,
-  NotificationType,
-  NotificationChannel
-} from '@/types/notification'
+import type { Notification, NotificationPreferences, NotificationStats } from '@/types/notification'
+import { NotificationStatus, NotificationType, NotificationChannel } from '@/types/notification'
+
+// Node.js 环境变量类型声明
+declare const process: {
+  env: {
+    NODE_ENV: string
+    [key: string]: string | undefined
+  }
+}
 import {
   getNotifications,
   getNotificationStats,
@@ -18,8 +18,7 @@ import {
   markAllAsRead,
   deleteNotification,
   batchUpdateNotifications,
-  getUnreadCount,
-  createMockNotifications
+  createMockNotifications,
 } from '@/services/notification'
 
 interface NotificationState {
@@ -65,36 +64,31 @@ export const useNotificationStore = defineStore('notification', {
       list: false,
       stats: false,
       preferences: false,
-      actions: {}
+      actions: {},
     },
     pagination: {
       current: 1,
       total: 0,
-      hasMore: false
+      hasMore: false,
     },
     filters: {},
     wsConnected: false,
-    lastUpdated: null
+    lastUpdated: null,
   }),
 
   getters: {
     // 获取未读通知数量
-    unreadCount: (state) => state.unreadNotifications.length,
+    unreadCount: state => state.unreadNotifications.length,
 
     // 获取所有通知（按时间倒序）
-    allNotifications: (state) => {
-      return [...state.notifications].sort((a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-    },
+    allNotifications: state =>
+      [...state.notifications].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
 
     // 获取已读通知
-    readNotifications: (state) => {
-      return state.notifications.filter(n => n.status === NotificationStatus.READ)
-    },
+    readNotifications: state => state.notifications.filter(n => n.status === NotificationStatus.READ),
 
     // 按类型分组的通知
-    notificationsByType: (state) => {
+    notificationsByType: state => {
       const grouped: Record<NotificationType, Notification[]> = {} as Record<NotificationType, Notification[]>
       state.notifications.forEach(notification => {
         if (!grouped[notification.type]) {
@@ -106,14 +100,11 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     // 获取高优先级通知
-    highPriorityNotifications: (state) => {
-      return state.notifications.filter(n => n.priority === 'high' || n.priority === 'urgent')
-    },
+    highPriorityNotifications: state =>
+      state.notifications.filter(n => n.priority === 'high' || n.priority === 'urgent'),
 
     // 检查是否有新的高优先级通知
-    hasUrgentNotifications: (state) => {
-      return state.unreadNotifications.some(n => n.priority === 'urgent')
-    }
+    hasUrgentNotifications: state => state.unreadNotifications.some(n => n.priority === 'urgent'),
   },
 
   actions: {
@@ -131,7 +122,7 @@ export const useNotificationStore = defineStore('notification', {
         const response = await getNotifications({
           page: this.pagination.current,
           limit: 20,
-          ...this.filters
+          ...this.filters,
         })
 
         if (refresh || page === 1) {
@@ -191,11 +182,11 @@ export const useNotificationStore = defineStore('notification', {
           quietHours: {
             enabled: false,
             startTime: '22:00',
-            endTime: '08:00'
+            endTime: '08:00',
           },
           emailFrequency: 'immediate',
           smsEnabled: true,
-          pushEnabled: true
+          pushEnabled: true,
         }
         // 不重新抛出错误，返回undefined
         return undefined
@@ -291,7 +282,10 @@ export const useNotificationStore = defineStore('notification', {
     },
 
     // 批量操作通知
-    async batchUpdateNotifications(action: { notificationIds: string[]; action: 'mark_read' | 'mark_unread' | 'delete' | 'archive' }) {
+    async batchUpdateNotifications(action: {
+      notificationIds: string[]
+      action: 'mark_read' | 'mark_unread' | 'delete' | 'archive'
+    }) {
       const actionKey = 'batchUpdate'
       this.loading.actions[actionKey] = true
       try {
@@ -361,10 +355,10 @@ export const useNotificationStore = defineStore('notification', {
       this.pagination = {
         current: 1,
         total: 0,
-        hasMore: false
+        hasMore: false,
       }
       this.filters = {}
       this.lastUpdated = null
-    }
-  }
+    },
+  },
 })

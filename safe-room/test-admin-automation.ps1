@@ -27,6 +27,22 @@ param(
 
 $ErrorActionPreference = "Continue"  # 改为 Continue 以便更好地处理错误
 
+# 导入统一的环境检查函数库
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$envLibPath = Join-Path $scriptRoot "scripts\common\Test-Environment.ps1"
+if (Test-Path $envLibPath) {
+    . $envLibPath
+} else {
+    Write-Error "错误: 找不到环境检查函数库: $envLibPath"
+    exit 1
+}
+
+# 兼容性检查 - 确保使用PowerShell 5.1+兼容的语法
+if ($PSVersionTable.PSVersion.Major -lt 5) {
+    Write-Error "此脚本需要 PowerShell 5.1 或更高版本。当前版本: $($PSVersionTable.PSVersion)"
+    exit 1
+}
+
 # 测试统计信息
 $global:TestStats = @{
     TotalTests = 0
@@ -126,10 +142,18 @@ function Invoke-TestCommand {
 
     try {
         if ($captureOutput -and $logFile) {
-            $output = Invoke-Expression "$command 2>&1" | Tee-Object -FilePath $logFile
+            # 创建日志目录（如果不存在）
+            $logDir = Split-Path $logFile -Parent
+            if (-not (Test-Path $logDir)) {
+                New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+            }
+
+            $output = Invoke-CrossPlatformCommand -Command $command
+            # 将输出写入日志文件
+            $output | Out-File -FilePath $logFile -Encoding UTF8 -Append
             return @{ Success = ($LASTEXITCODE -eq 0); Output = $output; ExitCode = $LASTEXITCODE }
         } else {
-            Invoke-Expression $command
+            $null = Invoke-CrossPlatformCommand -Command $command
             return @{ Success = ($LASTEXITCODE -eq 0); Output = ""; ExitCode = $LASTEXITCODE }
         }
     } catch {
@@ -209,36 +233,13 @@ Write-Info ""
 Push-Location $AdminPath
 
 try {
-    # 检查依赖
-    Write-Verbose "检查项目依赖..."
-    if (-not (Test-Path "node_modules")) {
-        Write-Warning "⚠️  未找到 node_modules，正在安装依赖..."
-        $installResult = Invoke-TestCommand "npm install" $null $false
-        if (-not $installResult.Success) {
-            Write-Error "❌ 依赖安装失败"
-            Write-Error "请检查网络连接或 package.json 配置"
-            exit 1
-        }
-        Write-Success "✅ 依赖安装完成"
-    } else {
-        Write-Verbose "✅ 依赖已存在"
-    }
+    # 使用统一的依赖检查和安装
+    $installPlaywright = ($Type -eq "e2e" -or $Type -eq "all") -and -not $Watch
+    $envCheckPassed = Test-TestEnvironment -RequiredCommands @("node", "npm", "npx") -ProjectPaths @($AdminPath) -InstallDependencies -InstallPlaywright:$installPlaywright -AutoRepair -Verbose:$Verbose
 
-    # 检查 Playwright 浏览器（E2E 测试需要）
-    if (($Type -eq "e2e" -or $Type -eq "all") -and -not $Watch) {
-        Write-Verbose "检查 Playwright 浏览器..."
-        $playwrightCache = "node_modules\.cache\playwright"
-        if (-not (Test-Path $playwrightCache)) {
-            Write-Warning "⚠️  Playwright 浏览器未安装，正在安装..."
-            $installResult = Invoke-TestCommand "npx playwright install --with-deps" $null $false
-            if ($installResult.Success) {
-                Write-Success "✅ Playwright 浏览器安装完成"
-            } else {
-                Write-Warning "⚠️  Playwright 浏览器安装失败，E2E 测试可能无法运行"
-            }
-        } else {
-            Write-Verbose "✅ Playwright 浏览器已安装"
-        }
+    if (-not $envCheckPassed) {
+        Write-Error "❌ 环境检查失败"
+        exit 1
     }
 
     # 初始化测试结果

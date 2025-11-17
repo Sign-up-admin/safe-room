@@ -8,12 +8,7 @@ import '@/assets/css/iconfont.css'
 import '@/styles/theme.scss'
 import config from './config/config'
 import validate from './common/validate'
-import {
-  isAuth,
-  getCurDateTime,
-  getCurDate,
-  isBackAuth,
-} from './common/system'
+import { isAuth, getCurDateTime, getCurDate, isBackAuth } from './common/system'
 import { TechButton, TechCard, Stepper } from '@/components/common'
 // @ts-ignore - Vue component type declarations
 import Breadcrumb from '@/components/Breadcrumb.vue'
@@ -42,8 +37,8 @@ app.use(ElementPlus)
 
 // Register global components
 app.component('Breadcrumb', Breadcrumb)
-app.component('file-upload', FileUpload)
-app.component('editor', Editor)
+app.component('FileUpload', FileUpload)
+app.component('Editor', Editor)
 app.component('TechCard', TechCard)
 app.component('TechButton', TechButton)
 app.component('Stepper', Stepper)
@@ -70,4 +65,3 @@ router.afterEach((_to, from) => {
 
 // Mount app
 app.mount('#app')
-

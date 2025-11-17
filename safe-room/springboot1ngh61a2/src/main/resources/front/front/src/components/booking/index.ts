@@ -4,4 +4,3 @@ export { default as BookingSummary } from './BookingSummary.vue'
 export { default as CoachRecommend } from './CoachRecommend.vue'
 export { default as GoalSelector } from './GoalSelector.vue'
 export { default as SchedulePlanner } from './SchedulePlanner.vue'
-

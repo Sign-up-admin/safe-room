@@ -12,6 +12,15 @@ param(
 $SCRIPT_VERSION = "1.0.0"
 $LOG_FILE = ".\fitness-gym-tests_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
 
+# 导入统一的环境检查函数库
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$envLibPath = Join-Path (Split-Path -Parent $scriptRoot) "scripts\common\Test-Environment.ps1"
+if (Test-Path $envLibPath) {
+    . $envLibPath
+} else {
+    Write-LogWarn "警告: 找不到环境检查函数库: $envLibPath，将使用原有逻辑"
+}
+
 # Colors for output
 $Colors = @{
     Red = [ConsoleColor]::Red
@@ -116,10 +125,13 @@ function Invoke-FrontendUnitTests {
     Push-Location $ProjectDir
 
     try {
-        # Install dependencies if needed
-        if (-not (Test-Path "node_modules")) {
-            Write-LogInfo "Installing dependencies for $ProjectName..."
-            & npm ci
+        # 使用统一的环境检查和依赖安装
+        if (-not (Install-Dependencies -ProjectPath $ProjectDir -ProjectName "$ProjectName 项目" -Verbose)) {
+            Write-LogError "Failed to install dependencies for $ProjectName"
+            $TEST_RESULTS += "${ProjectName}_unit: FAILED"
+            $script:FAILED_TESTS++
+            $result = $false
+            return $result
         }
 
         # Run unit tests

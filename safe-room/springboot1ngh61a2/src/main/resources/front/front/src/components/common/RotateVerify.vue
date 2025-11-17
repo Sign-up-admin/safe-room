@@ -32,7 +32,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   initText: '滑动将图片转正',
   slideImage: '',
-  slideAreaNum: 10
+  slideAreaNum: 10,
 })
 
 // Emits
@@ -127,13 +127,20 @@ function initDom() {
   const canvas = rotateCanRef.value
   xPos.value = canvas.width / 2
   yPos.value = canvas.height / 2
-  aveRot.value = Math.round((360 / (slideDragWrapRef.value.offsetWidth - slideDragBtnRef.value.offsetWidth)) * 100) / 100
+  aveRot.value =
+    Math.round((360 / (slideDragWrapRef.value.offsetWidth - slideDragBtnRef.value.offsetWidth)) * 100) / 100
 }
 
 function initCanvasImg() {
   randRot.value = getRandomNumber(30, 270)
-  sucLenMin.value = (360 - props.slideAreaNum - randRot.value) * ((slideDragWrapRef.value?.offsetWidth || 0) - (slideDragBtnRef.value?.offsetWidth || 0)) / 360
-  sucLenMax.value = (360 + props.slideAreaNum - randRot.value) * ((slideDragWrapRef.value?.offsetWidth || 0) - (slideDragBtnRef.value?.offsetWidth || 0)) / 360
+  sucLenMin.value =
+    ((360 - props.slideAreaNum - randRot.value) *
+      ((slideDragWrapRef.value?.offsetWidth || 0) - (slideDragBtnRef.value?.offsetWidth || 0))) /
+    360
+  sucLenMax.value =
+    ((360 + props.slideAreaNum - randRot.value) *
+      ((slideDragWrapRef.value?.offsetWidth || 0) - (slideDragBtnRef.value?.offsetWidth || 0))) /
+    360
   disLf.value = 0
   initImgSrc()
 }
@@ -168,14 +175,14 @@ function drawImgCan(val?: number) {
   if (!ctx) return
 
   ctx.beginPath()
-  ctx.arc(xPos.value, yPos.value, xPos.value, 0, 360 * Math.PI / 180, false)
+  ctx.arc(xPos.value, yPos.value, xPos.value, 0, (360 * Math.PI) / 180, false)
   ctx.closePath()
   ctx.clip()
 
   ctx.save()
   ctx.clearRect(0, 0, xPos.value * 2, yPos.value * 2)
   ctx.translate(xPos.value, yPos.value)
-  ctx.rotate(randRot.value * Math.PI / 180 + disLf.value * aveRot.value * Math.PI / 180)
+  ctx.rotate((randRot.value * Math.PI) / 180 + (disLf.value * aveRot.value * Math.PI) / 180)
   ctx.translate(-xPos.value, -yPos.value)
   ctx.drawImage(slideImage.value, 0, 0, xPos.value * 2, yPos.value * 2)
   ctx.restore()
@@ -213,7 +220,7 @@ function initMouse() {
     }
 
     slideDragBtnRef.value.style.left = x + 'px'
-    controlBorWrapRef.value.style.width = (x + slideDragBtnRef.value.offsetWidth) + 'px'
+    controlBorWrapRef.value.style.width = x + slideDragBtnRef.value.offsetWidth + 'px'
     disLf.value = x
     drawImgCan()
   }
@@ -298,7 +305,7 @@ function initTouch() {
     }
 
     slideDragBtnRef.value!.style.left = x + 'px'
-    controlBorWrapRef.value!.style.width = (x + slideDragBtnRef.value!.offsetWidth) + 'px'
+    controlBorWrapRef.value!.style.width = x + slideDragBtnRef.value!.offsetWidth + 'px'
     disLf.value = x
     drawImgCan()
   }
@@ -356,7 +363,14 @@ function refreshSlide() {
 }
 
 function resetSlide() {
-  if (!slideDragBtnRef.value || !controlBorWrapRef.value || !slideDragWrapRef.value || !statusBgRef.value || !cTipsTxtRef.value) return
+  if (
+    !slideDragBtnRef.value ||
+    !controlBorWrapRef.value ||
+    !slideDragWrapRef.value ||
+    !statusBgRef.value ||
+    !cTipsTxtRef.value
+  )
+    return
 
   slideDragBtnRef.value.style.left = '0px'
   controlBorWrapRef.value.style.width = slideDragBtnRef.value.offsetWidth + 'px'
@@ -374,7 +388,7 @@ function resetSlide() {
 // Expose methods
 defineExpose({
   resetSlide,
-  refreshSlide
+  refreshSlide,
 })
 
 // Lifecycle
@@ -387,9 +401,13 @@ onMounted(() => {
 })
 
 // Watch for prop changes
-watch(() => props.slideImage, () => {
-  initCanvasImg()
-}, { deep: true })
+watch(
+  () => props.slideImage,
+  () => {
+    initCanvasImg()
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>

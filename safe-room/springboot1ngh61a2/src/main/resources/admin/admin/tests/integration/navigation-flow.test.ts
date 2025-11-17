@@ -35,7 +35,7 @@ vi.mock('@/utils/base', () => ({
   }
 }))
 
-vi.mock('../../../src/stores/tagsView', () => ({
+vi.mock('@/stores/tagsView', () => ({
   useTagsViewStore: vi.fn(() => ({
     delAllViews: vi.fn()
   }))
@@ -128,7 +128,7 @@ describe('Navigation Flow Integration', () => {
 
   describe('Header Navigation Integration', () => {
     it('should navigate to center from header dropdown', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'adminName') return 'Test Admin'
         if (key === 'role') return 'Administrator'
@@ -154,7 +154,7 @@ describe('Navigation Flow Integration', () => {
     })
 
     it('should navigate to home from header dropdown', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'adminName') return 'Test Admin'
         if (key === 'role') return 'Administrator'
@@ -180,8 +180,8 @@ describe('Navigation Flow Integration', () => {
     })
 
     it('should navigate to login on logout', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockTagsViewStore = vi.mocked(require('@/stores/tagsView').useTagsViewStore)
 
       const wrapper = mount(IndexHeader, {
         global: {
@@ -265,7 +265,7 @@ describe('Navigation Flow Integration', () => {
     })
 
     it('should maintain component state across navigation', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
       mockStorage.get.mockImplementation((key: string) => {
         if (key === 'adminName') return 'Test Admin'
         if (key === 'role') return 'Administrator'
@@ -309,8 +309,8 @@ describe('Navigation Flow Integration', () => {
     })
 
     it('should handle logout navigation errors gracefully', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockTagsViewStore = vi.mocked(require('@/stores/tagsView').useTagsViewStore)
 
       const wrapper = mount(IndexHeader, {
         global: {
@@ -334,8 +334,8 @@ describe('Navigation Flow Integration', () => {
 
   describe('Complete Navigation Scenarios', () => {
     it('should support login -> dashboard -> logout flow', async () => {
-      const mockStorage = vi.mocked(require('../../../src/utils/storage').default)
-      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+      const mockStorage = vi.mocked(require('@/utils/storage').default)
+      const mockTagsViewStore = vi.mocked(require('@/stores/tagsView').useTagsViewStore)
 
       const appWrapper = mount(App, {
         global: {

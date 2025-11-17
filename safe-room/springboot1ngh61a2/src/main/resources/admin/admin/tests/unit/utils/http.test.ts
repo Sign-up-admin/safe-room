@@ -31,7 +31,7 @@ vi.mock('@/utils/csrf', () => ({
   CSRF_TOKEN_HEADER: 'X-CSRF-Token',
 }))
 
-import http, { ApiResponse, CancelToken } from '../../../src/utils/http'
+import http, { ApiResponse, CancelToken } from '@/utils/http'
 
 describe('HTTP客户端', () => {
   describe('HTTP实例配置', () => {

@@ -1,10 +1,12 @@
 package com.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.annotation.TestData;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.UserEntity;
 import com.service.UserService;
 import com.utils.TestUtils;
+import com.utils.TestDataFactory;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -28,16 +30,7 @@ class UserControllerTest extends AbstractControllerIntegrationTest {
     @Autowired
     private UserService userService;
 
-    @AfterEach
-    void cleanupTestData() {
-        // Clean up test user data to prevent conflicts between test runs
-        userService.remove(new QueryWrapper<UserEntity>()
-                .like("username", "user")
-                .or()
-                .like("username", "test")
-                .or()
-                .like("username", "admin"));
-    }
+    // 数据清理现在通过@Transactional和@Rollback自动处理，无需手动清理
 
     @Test
     void shouldLoginSuccessfullyWhenCredentialsAreCorrect() throws Exception {
@@ -287,6 +280,7 @@ class UserControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         UserEntity updated = userService.getById(target.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getPassword()).isEqualTo("newPwd");
     }
 
@@ -415,6 +409,160 @@ class UserControllerTest extends AbstractControllerIntegrationTest {
         mockMvc.perform(get("/user/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(401));
+    }
+
+    @Test
+    void shouldHandleInvalidLoginParameters() throws Exception {
+        // 测试空用户名
+        mockMvc.perform(post("/user/login")
+                        .param("username", "")
+                        .param("password", "password"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+
+        // 测试空密码
+        mockMvc.perform(post("/user/login")
+                        .param("username", "testuser")
+                        .param("password", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+
+        // 测试空用户名和密码
+        mockMvc.perform(post("/user/login")
+                        .param("username", "")
+                        .param("password", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+    }
+
+    @Test
+    void shouldHandleRegisterWithInvalidData() throws Exception {
+        // 测试注册空用户名
+        mockMvc.perform(post("/user/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"\",\"password\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+
+        // 测试注册空密码
+        mockMvc.perform(post("/user/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"testuser\",\"password\":\"\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+
+        // 测试注册超短密码
+        mockMvc.perform(post("/user/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"testuser\",\"password\":\"123\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500));
+    }
+
+    @Test
+    void shouldHandleMalformedJsonInRegister() throws Exception {
+        // 测试无效的JSON格式
+        mockMvc.perform(post("/user/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("invalid json"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldHandleInvalidPageParameters() throws Exception {
+        mockMvc.perform(get("/user/page")
+                        .header("Token", loginAndExtractToken("admin", "admin"))
+                        .param("page", "0")
+                        .param("limit", "0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    @TestData(entities = {
+        @TestData.Entity(type = UserEntity.class, count = 3)
+    })
+    @Test
+    void shouldListUsersWithTestDataAnnotation() throws Exception {
+        mockMvc.perform(get("/user/list")
+                        .header("Token", loginAndExtractToken("admin", "admin")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @TestData(entities = {
+        @TestData.Entity(type = UserEntity.class, count = 5)
+    })
+    @Test
+    void shouldPageUsersWithTestDataAnnotation() throws Exception {
+        mockMvc.perform(get("/user/page")
+                        .header("Token", loginAndExtractToken("admin", "admin"))
+                        .param("page", "1")
+                        .param("limit", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.list").isArray())
+                .andExpect(jsonPath("$.data.total").value(Matchers.greaterThanOrEqualTo(5)));
+    }
+
+    @Test
+    void shouldHandleLargePageSize() throws Exception {
+        mockMvc.perform(get("/user/page")
+                        .header("Token", loginAndExtractToken("admin", "admin"))
+                        .param("page", "1")
+                        .param("limit", "1000"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    @Test
+    void shouldHandleNegativePageNumber() throws Exception {
+        mockMvc.perform(get("/user/page")
+                        .header("Token", loginAndExtractToken("admin", "admin"))
+                        .param("page", "-1")
+                        .param("limit", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    @Test
+    void shouldHandleSpecialCharactersInUsername() throws Exception {
+        String specialUsername = "test@#$%^&*()";
+        persistUser(specialUsername, "password123", 0);
+
+        mockMvc.perform(post("/user/login")
+                        .param("username", specialUsername)
+                        .param("password", "password123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+    @Test
+    void shouldHandleVeryLongUsername() throws Exception {
+        String longUsername = "a".repeat(200); // 超出常规长度
+        persistUser(longUsername, "password123", 0);
+
+        mockMvc.perform(post("/user/login")
+                        .param("username", longUsername)
+                        .param("password", "password123"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    @Test
+    void shouldHandleConcurrentLoginAttempts() throws Exception {
+        String username = "concurrent" + System.nanoTime();
+        persistUser(username, "password123", 0);
+
+        // 模拟并发登录请求
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post("/user/login")
+                            .param("username", username)
+                            .param("password", "password123"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(0));
+        }
     }
 
     private UserEntity persistUser(String username, String password, int status) {

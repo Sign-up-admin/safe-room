@@ -1,5 +1,5 @@
 <template>
-  <div class="pay-page" v-loading="submitting">
+  <div v-loading="submitting" class="pay-page">
     <section class="pay-header">
       <div>
         <p class="section-eyebrow">ORDER PAYMENT</p>
@@ -41,25 +41,29 @@
             @select="handleSelectMethod"
           />
         </div>
-        <el-input
-          v-model="payment.remark"
-          class="mt-16"
-          placeholder="备注（可选）"
-          type="textarea"
-          :rows="2"
-        />
+        <el-input v-model="payment.remark" class="mt-16" placeholder="备注（可选）" type="textarea" :rows="2" />
         <!-- 余额支付提示 -->
-        <div v-if="selectedMethod === 'balance' && balanceTip" class="balance-tip" :class="{ 'balance-tip--insufficient': !hasEnoughBalance }">
+        <div
+          v-if="selectedMethod === 'balance' && balanceTip"
+          class="balance-tip"
+          :class="{ 'balance-tip--insufficient': !hasEnoughBalance }"
+        >
           <svg v-if="balanceLoading" class="loading-icon" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="loading-circle"></circle>
           </svg>
           <svg v-else-if="hasEnoughBalance" viewBox="0 0 24 24" fill="none">
-            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M9 12l2 2 4-4"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           <svg v-else viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            <path d="M15 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+            <path d="M15 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <path d="M9 9l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
           <span>{{ balanceTip }}</span>
         </div>
@@ -104,7 +108,11 @@
           <el-button @click="goBack">返回</el-button>
           <el-button
             type="primary"
-            :disabled="!canSubmit || (selectedMethod === 'balance' && !hasEnoughBalance) || (selectedMethod === 'installment' && !selectedInstallment)"
+            :disabled="
+              !canSubmit ||
+              (selectedMethod === 'balance' && !hasEnoughBalance) ||
+              (selectedMethod === 'installment' && !selectedInstallment)
+            "
             @click="handlePay"
           >
             确认支付
@@ -160,7 +168,11 @@
           <div class="security-badge">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="3" y="11" width="18" height="11" rx="2" stroke="#fdd835" stroke-width="2" />
-              <path d="M7 11V7C7 4.79086 8.79086 3 11 3H13C15.2091 3 17 4.79086 17 7V11" stroke="#fdd835" stroke-width="2" />
+              <path
+                d="M7 11V7C7 4.79086 8.79086 3 11 3H13C15.2091 3 17 4.79086 17 7V11"
+                stroke="#fdd835"
+                stroke-width="2"
+              />
               <circle cx="12" cy="16" r="1" fill="#fdd835" />
             </svg>
             <span>PCI DSS认证</span>
@@ -363,7 +375,7 @@ const resultStatus = computed(() => {
 
 watch(
   () => paymentStatus.status.value,
-  (value) => {
+  value => {
     if (value === 'success' || value === 'failed' || value === 'timeout') {
       currentStep.value = 4
       if (value === 'timeout') {
@@ -388,7 +400,7 @@ const installmentOptions = [
   { periods: 6, monthlyRate: 0.009, description: '6期分期' },
   { periods: 12, monthlyRate: 0.012, description: '12期分期' },
 ]
-const selectedInstallment = ref<typeof installmentOptions[0] | null>(null)
+const selectedInstallment = ref<(typeof installmentOptions)[0] | null>(null)
 
 // 检查用户余额
 async function checkUserBalance() {
@@ -433,8 +445,8 @@ const installmentDetails = computed(() => {
   const monthlyRate = selectedInstallment.value.monthlyRate
 
   // 计算每月还款额（等额本息）
-  const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, periods)) /
-                        (Math.pow(1 + monthlyRate, periods) - 1)
+  const monthlyPayment =
+    (principal * monthlyRate * Math.pow(1 + monthlyRate, periods)) / (Math.pow(1 + monthlyRate, periods) - 1)
 
   // 计算总利息
   const totalInterest = monthlyPayment * periods - principal
@@ -449,7 +461,7 @@ const installmentDetails = computed(() => {
 })
 
 // 监听支付方式变化，检查余额或重置分期选项
-watch(selectedMethod, async (newMethod) => {
+watch(selectedMethod, async newMethod => {
   if (newMethod === 'balance') {
     await checkUserBalance()
   } else if (newMethod === 'installment') {
@@ -536,7 +548,8 @@ function goBack() {
 
 .pay-page {
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
+  background:
+    radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.12), transparent 50%), #020202;
   padding: 48px 24px 80px;
   display: flex;
@@ -943,14 +956,24 @@ function goBack() {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes loading-dash {
-  0% { stroke-dasharray: 0 62.8; }
-  50% { stroke-dasharray: 31.4 31.4; }
-  100% { stroke-dasharray: 0 62.8; }
+  0% {
+    stroke-dasharray: 0 62.8;
+  }
+  50% {
+    stroke-dasharray: 31.4 31.4;
+  }
+  100% {
+    stroke-dasharray: 0 62.8;
+  }
 }
 
 // 分期支付样式
@@ -1055,4 +1078,3 @@ function goBack() {
   }
 }
 </style>
-

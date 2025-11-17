@@ -35,7 +35,7 @@ export function useDiscussionInteraction() {
   // 状态
   const currentUser = ref({
     id: 1,
-    nickname: '当前用户'
+    nickname: '当前用户',
   })
 
   const followingUsers = ref(new Set<number>())
@@ -92,7 +92,7 @@ export function useDiscussionInteraction() {
         isLiked: false,
         parentId: reply.id,
         parentUserNickname: reply.userNickname,
-        children: []
+        children: [],
       }
 
       // 添加到父回复的子回复列表
@@ -153,10 +153,7 @@ export function useDiscussionInteraction() {
     if (!content) return ''
 
     // 处理@用户提醒
-    let formattedContent = content.replace(
-      /@(\w+)/g,
-      '<span class="mention">@$1</span>'
-    )
+    let formattedContent = content.replace(/@(\w+)/g, '<span class="mention">@$1</span>')
 
     // 处理换行
     formattedContent = formattedContent.replace(/\n/g, '<br>')
@@ -182,19 +179,13 @@ export function useDiscussionInteraction() {
   }
 
   // 检查是否可以举报
-  const canReport = (reply: DiscussionReply): boolean => {
-    return reply.userId !== currentUser.value.id
-  }
+  const canReport = (reply: DiscussionReply): boolean => reply.userId !== currentUser.value.id
 
   // 检查是否是当前用户
-  const isCurrentUser = (userId: number): boolean => {
-    return userId === currentUser.value.id
-  }
+  const isCurrentUser = (userId: number): boolean => userId === currentUser.value.id
 
   // 检查是否已关注
-  const isFollowing = (userId: number): boolean => {
-    return followingUsers.value.has(userId)
-  }
+  const isFollowing = (userId: number): boolean => followingUsers.value.has(userId)
 
   return {
     // 状态
@@ -212,6 +203,6 @@ export function useDiscussionInteraction() {
     formatTimeAgo,
     canReport,
     isCurrentUser,
-    isFollowing
+    isFollowing,
   }
 }

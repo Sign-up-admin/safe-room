@@ -3,7 +3,7 @@
  * Provides menu list functionality with backward compatibility
  * @deprecated Use constants/menu.ts instead
  */
-import { getMenuList } from '../constants/menu'
+import { getMenuList } from '@/constants/menu'
 
 const menu = {
   /**

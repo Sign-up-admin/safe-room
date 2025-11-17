@@ -46,7 +46,7 @@ const availableCoupons: Coupon[] = [
     value: 15,
     minOrder: 1000,
     validUntil: new Date('2025-12-31'),
-    description: '首次预约优惠'
+    description: '首次预约优惠',
   },
   {
     code: 'VIP_DISCOUNT',
@@ -54,7 +54,7 @@ const availableCoupons: Coupon[] = [
     value: 20,
     minOrder: 1500,
     validUntil: new Date('2025-12-31'),
-    description: 'VIP会员专享'
+    description: 'VIP会员专享',
   },
   {
     code: 'NEW_USER',
@@ -62,8 +62,8 @@ const availableCoupons: Coupon[] = [
     value: 200,
     minOrder: 800,
     validUntil: new Date('2025-11-30'),
-    description: '新用户立减'
-  }
+    description: '新用户立减',
+  },
 ]
 
 export function usePricingEngine() {
@@ -72,7 +72,7 @@ export function usePricingEngine() {
     package: null,
     goals: [],
     location: 'store',
-    userLevel: 'normal'
+    userLevel: 'normal',
   })
 
   // 计算套餐折扣系数
@@ -121,13 +121,14 @@ export function usePricingEngine() {
   }
 
   // 应用优惠券
-  const applyCoupon = (couponCode: string | undefined, subtotal: number): { discount: number; coupon: Coupon | null } => {
+  const applyCoupon = (
+    couponCode: string | undefined,
+    subtotal: number,
+  ): { discount: number; coupon: Coupon | null } => {
     if (!couponCode) return { discount: 0, coupon: null }
 
-    const coupon = availableCoupons.find(c =>
-      c.code === couponCode &&
-      c.validUntil > new Date() &&
-      subtotal >= c.minOrder
+    const coupon = availableCoupons.find(
+      c => c.code === couponCode && c.validUntil > new Date() && subtotal >= c.minOrder,
     )
 
     if (!coupon) return { discount: 0, coupon: null }
@@ -156,7 +157,7 @@ export function usePricingEngine() {
         couponDiscount: 0,
         finalPrice: 0,
         savings: 0,
-        savingsPercentage: 0
+        savingsPercentage: 0,
       }
     }
 
@@ -197,17 +198,18 @@ export function usePricingEngine() {
       couponDiscount,
       finalPrice,
       savings,
-      savingsPercentage
+      savingsPercentage,
     }
   })
 
   // 格式化价格显示
-  const formatPrice = (price: number): string => {
-    return `¥${price.toFixed(2)}`
-  }
+  const formatPrice = (price: number): string => `¥${price.toFixed(2)}`
 
   // 验证优惠券
-  const validateCoupon = (code: string, subtotal: number): { valid: boolean; coupon: Coupon | null; message: string } => {
+  const validateCoupon = (
+    code: string,
+    subtotal: number,
+  ): { valid: boolean; coupon: Coupon | null; message: string } => {
     const coupon = availableCoupons.find(c => c.code === code)
 
     if (!coupon) {
@@ -226,11 +228,8 @@ export function usePricingEngine() {
   }
 
   // 获取可用优惠券
-  const getAvailableCoupons = (subtotal: number): Coupon[] => {
-    return availableCoupons.filter(coupon =>
-      coupon.validUntil > new Date() && subtotal >= coupon.minOrder
-    )
-  }
+  const getAvailableCoupons = (subtotal: number): Coupon[] =>
+    availableCoupons.filter(coupon => coupon.validUntil > new Date() && subtotal >= coupon.minOrder)
 
   // 更新定价上下文
   const updateContext = (updates: Partial<PricingContext>) => {
@@ -244,7 +243,7 @@ export function usePricingEngine() {
       package: null,
       goals: [],
       location: 'store',
-      userLevel: 'normal'
+      userLevel: 'normal',
     }
   }
 
@@ -255,6 +254,6 @@ export function usePricingEngine() {
     validateCoupon,
     getAvailableCoupons,
     updateContext,
-    resetContext
+    resetContext,
   }
 }

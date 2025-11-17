@@ -12,14 +12,14 @@
  */
 export function maskPhone(phone: string | null | undefined, start = 3, end = 4): string {
   if (!phone) return ''
-  
+
   const str = String(phone).trim()
   if (str.length < start + end) return str
-  
+
   const prefix = str.substring(0, start)
   const suffix = str.substring(str.length - end)
   const mask = '*'.repeat(str.length - start - end)
-  
+
   return `${prefix}${mask}${suffix}`
 }
 
@@ -32,14 +32,14 @@ export function maskPhone(phone: string | null | undefined, start = 3, end = 4):
  */
 export function maskIdCard(idCard: string | null | undefined, start = 3, end = 4): string {
   if (!idCard) return ''
-  
+
   const str = String(idCard).trim()
   if (str.length < start + end) return str
-  
+
   const prefix = str.substring(0, start)
   const suffix = str.substring(str.length - end)
   const mask = '*'.repeat(str.length - start - end)
-  
+
   return `${prefix}${mask}${suffix}`
 }
 
@@ -52,14 +52,14 @@ export function maskIdCard(idCard: string | null | undefined, start = 3, end = 4
  */
 export function maskBankCard(cardNumber: string | null | undefined, start = 4, end = 4): string {
   if (!cardNumber) return ''
-  
+
   const str = String(cardNumber).trim().replace(/\s/g, '')
   if (str.length < start + end) return str
-  
+
   const prefix = str.substring(0, start)
   const suffix = str.substring(str.length - end)
   const mask = '*'.repeat(str.length - start - end)
-  
+
   return `${prefix}${mask}${suffix}`
 }
 
@@ -71,25 +71,25 @@ export function maskBankCard(cardNumber: string | null | undefined, start = 4, e
  */
 export function maskEmail(email: string | null | undefined, showDomain = true): string {
   if (!email) return ''
-  
+
   const str = String(email).trim()
   const atIndex = str.indexOf('@')
-  
+
   if (atIndex === -1) {
     // 没有@符号，当作普通字符串处理
     if (str.length <= 2) return str
     return `${str[0]}***${str[str.length - 1]}`
   }
-  
+
   const localPart = str.substring(0, atIndex)
   const domain = str.substring(atIndex)
-  
+
   if (localPart.length <= 2) {
     return `${localPart}***${domain}`
   }
-  
+
   const maskedLocal = `${localPart[0]}***${localPart[localPart.length - 1]}`
-  
+
   if (showDomain) {
     return `${maskedLocal}${domain}`
   } else {
@@ -104,11 +104,11 @@ export function maskEmail(email: string | null | undefined, showDomain = true): 
  */
 export function maskName(name: string | null | undefined): string {
   if (!name) return ''
-  
+
   const str = String(name).trim()
   if (str.length === 1) return str
   if (str.length === 2) return `${str[0]}*`
-  
+
   // 3个字符及以上：保留第一个，其余用*替代
   return `${str[0]}${'*'.repeat(str.length - 1)}`
 }
@@ -121,10 +121,10 @@ export function maskName(name: string | null | undefined): string {
  */
 export function maskAddress(address: string | null | undefined, keepLength = 6): string {
   if (!address) return ''
-  
+
   const str = String(address).trim()
   if (str.length <= keepLength) return str
-  
+
   const prefix = str.substring(0, keepLength)
   return `${prefix}***`
 }
@@ -137,10 +137,10 @@ export function maskAddress(address: string | null | undefined, keepLength = 6):
  */
 export function maskSensitiveData(
   value: string | null | undefined,
-  type: 'phone' | 'idCard' | 'bankCard' | 'email' | 'name' | 'address'
+  type: 'phone' | 'idCard' | 'bankCard' | 'email' | 'name' | 'address',
 ): string {
   if (!value) return ''
-  
+
   switch (type) {
     case 'phone':
       return maskPhone(value)
@@ -158,4 +158,3 @@ export function maskSensitiveData(
       return value
   }
 }
-

@@ -3,8 +3,8 @@
     <el-alert v-if="!recordId && !shouldFollow" type="warning" title="未指定要查看的数据" show-icon class="mb-16" />
     <ModuleDetail
       v-else-if="recordId || followRecordData"
-      :module-key="moduleKey"
       :id="recordId"
+      :module-key="moduleKey"
       :prefetched="followRecordData"
       @back="goBack"
     />
@@ -68,5 +68,3 @@ async function loadFollowRecord(column: string, value: string) {
   margin-bottom: 16px;
 }
 </style>
-
-

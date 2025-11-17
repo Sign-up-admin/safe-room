@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import base from '../../../src/utils/base'
+import base from '@/utils/base'
 
 describe('Base Utils', () => {
   describe('get()', () => {

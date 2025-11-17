@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { isAuth, getCurDateTime, getCurDate } from '../../../src/utils/utils'
-import storage from '../../../src/utils/storage'
-import menu from '../../../src/utils/menu'
+import { isAuth, getCurDateTime, getCurDate } from '@/utils/utils'
+import storage from '@/utils/storage'
+import menu from '@/utils/menu'
 
 // Mock dependencies
-vi.mock('../../../src/utils/storage', () => ({
+vi.mock('@/utils/storage', () => ({
   default: {
     get: vi.fn(),
   },
 }))
 
-vi.mock('../../../src/utils/menu', () => ({
+vi.mock('@/utils/menu', () => ({
   default: {
     list: vi.fn(() => [
       {

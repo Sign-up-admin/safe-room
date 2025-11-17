@@ -1,239 +1,17 @@
 import { vi } from 'vitest'
+import {
+  createComponentMocks,
+  createServiceMocks,
+  createElementPlusMock
+} from '../utils/mocks/element-plus.mock'
 
-// Mock Element Plus components
-const ElButton = {
-  name: 'ElButton',
-  props: {
-    type: { type: String, default: 'default' },
-    size: { type: String, default: 'default' },
-    disabled: { type: Boolean, default: false },
-    loading: { type: Boolean, default: false }
-  },
-  template: '<button :class="buttonClass" @click="$emit(\'click\')"><slot /></button>',
-  computed: {
-    buttonClass() {
-      return ['el-button', `el-button--${this.type}`, `el-button--${this.size}`]
-    }
-  }
-}
+// Use unified mock factory functions
+const componentMocks = createComponentMocks()
+const serviceMocks = createServiceMocks()
+const elementPlusMock = createElementPlusMock()
 
-const ElInput = {
-  name: 'ElInput',
-  props: {
-    modelValue: { type: [String, Number], default: '' },
-    placeholder: { type: String, default: '' },
-    disabled: { type: Boolean, default: false },
-    readonly: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false }
-  },
-  template: '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-  emits: ['update:modelValue']
-}
-
-const ElTable = {
-  name: 'ElTable',
-  props: {
-    data: { type: Array, default: () => [] },
-    stripe: { type: Boolean, default: false },
-    border: { type: Boolean, default: false },
-    size: { type: String, default: 'default' }
-  },
-  template: '<table class="el-table"><tbody><slot /></tbody></table>'
-}
-
-const ElTableColumn = {
-  name: 'ElTableColumn',
-  props: {
-    prop: { type: String, default: '' },
-    label: { type: String, default: '' },
-    width: { type: [String, Number], default: '' },
-    minWidth: { type: [String, Number], default: '' }
-  },
-  template: '<col :style="{ width: width + \'px\', minWidth: minWidth + \'px\' }" />'
-}
-
-const ElForm = {
-  name: 'ElForm',
-  props: {
-    model: { type: Object, default: () => ({}) },
-    rules: { type: Object, default: () => ({}) },
-    labelWidth: { type: [String, Number], default: '80px' }
-  },
-  template: '<form class="el-form"><slot /></form>'
-}
-
-const ElFormItem = {
-  name: 'ElFormItem',
-  props: {
-    label: { type: String, default: '' },
-    prop: { type: String, default: '' },
-    required: { type: Boolean, default: false }
-  },
-  template: '<div class="el-form-item"><label v-if="label">{{ label }}</label><slot /></div>'
-}
-
-const ElDialog = {
-  name: 'ElDialog',
-  props: {
-    modelValue: { type: Boolean, default: false },
-    title: { type: String, default: '' },
-    width: { type: [String, Number], default: '50%' },
-    center: { type: Boolean, default: false }
-  },
-  template: '<div v-if="modelValue" class="el-dialog"><div class="el-dialog__header"><span>{{ title }}</span></div><div class="el-dialog__body"><slot /></div></div>',
-  emits: ['update:modelValue']
-}
-
-const ElMenu = {
-  name: 'ElMenu',
-  props: {
-    mode: { type: String, default: 'vertical' },
-    collapse: { type: Boolean, default: false },
-    backgroundColor: { type: String, default: '#ffffff' },
-    textColor: { type: String, default: '#303133' },
-    activeTextColor: { type: String, default: '#409eff' }
-  },
-  template: '<ul class="el-menu"><slot /></ul>'
-}
-
-const ElMenuItem = {
-  name: 'ElMenuItem',
-  props: {
-    index: { type: String, required: true },
-    disabled: { type: Boolean, default: false }
-  },
-  template: '<li class="el-menu-item" @click="$emit(\'click\')"><slot /></li>',
-  emits: ['click']
-}
-
-const ElSubMenu = {
-  name: 'ElSubMenu',
-  props: {
-    index: { type: String, required: true },
-    disabled: { type: Boolean, default: false }
-  },
-  template: '<li class="el-submenu"><div class="el-submenu__title"><slot name="title" /></div><ul class="el-menu"><slot /></ul></li>'
-}
-
-// Additional components for admin interface
-const ElSelect = {
-  name: 'ElSelect',
-  props: {
-    modelValue: { type: [String, Number, Array], default: '' },
-    placeholder: { type: String, default: '' },
-    disabled: { type: Boolean, default: false },
-    multiple: { type: Boolean, default: false }
-  },
-  template: '<select :value="modelValue" :disabled="disabled" @change="$emit(\'update:modelValue\', $event.target.value)"><slot /></select>',
-  emits: ['update:modelValue']
-}
-
-const ElOption = {
-  name: 'ElOption',
-  props: {
-    value: { type: [String, Number], required: true },
-    label: { type: String, default: '' },
-    disabled: { type: Boolean, default: false }
-  },
-  template: '<option :value="value" :disabled="disabled">{{ label || value }}</option>'
-}
-
-const ElPagination = {
-  name: 'ElPagination',
-  props: {
-    currentPage: { type: Number, default: 1 },
-    pageSize: { type: Number, default: 10 },
-    total: { type: Number, default: 0 },
-    layout: { type: String, default: 'prev, pager, next' }
-  },
-  template: '<div class="el-pagination"><slot /></div>',
-  emits: ['current-change', 'size-change']
-}
-
-const ElBreadcrumb = {
-  name: 'ElBreadcrumb',
-  props: {
-    separator: { type: String, default: '/' }
-  },
-  template: '<div class="el-breadcrumb"><slot /></div>'
-}
-
-const ElBreadcrumbItem = {
-  name: 'ElBreadcrumbItem',
-  props: {
-    to: { type: [String, Object], default: '' }
-  },
-  template: '<span class="el-breadcrumb__item"><slot /></span>'
-}
-
-// Mock Element Plus services
-const ElMessage = {
-  success: vi.fn(),
-  warning: vi.fn(),
-  info: vi.fn(),
-  error: vi.fn(),
-  closeAll: vi.fn()
-}
-
-const ElMessageBox = {
-  alert: vi.fn().mockResolvedValue(),
-  confirm: vi.fn().mockResolvedValue(),
-  prompt: vi.fn().mockResolvedValue()
-}
-
-const ElNotification = {
-  success: vi.fn(),
-  warning: vi.fn(),
-  info: vi.fn(),
-  error: vi.fn(),
-  closeAll: vi.fn()
-}
-
-const ElLoading = {
-  service: vi.fn(() => ({
-    close: vi.fn()
-  }))
-}
-
-// Main Element Plus mock
-const ElementPlus = {
-  install: vi.fn((app) => {
-    // Register components
-    app.component('ElButton', ElButton)
-    app.component('ElInput', ElInput)
-    app.component('ElTable', ElTable)
-    app.component('ElTableColumn', ElTableColumn)
-    app.component('ElForm', ElForm)
-    app.component('ElFormItem', ElFormItem)
-    app.component('ElDialog', ElDialog)
-    app.component('ElMenu', ElMenu)
-    app.component('ElMenuItem', ElMenuItem)
-    app.component('ElSubMenu', ElSubMenu)
-    app.component('ElSelect', ElSelect)
-    app.component('ElOption', ElOption)
-    app.component('ElPagination', ElPagination)
-    app.component('ElBreadcrumb', ElBreadcrumb)
-    app.component('ElBreadcrumbItem', ElBreadcrumbItem)
-
-    // Register kebab-case versions
-    app.component('ElButton', ElButton)
-    app.component('ElInput', ElInput)
-    app.component('ElTable', ElTable)
-    app.component('ElTableColumn', ElTableColumn)
-    app.component('ElForm', ElForm)
-    app.component('ElFormItem', ElFormItem)
-    app.component('ElDialog', ElDialog)
-    app.component('ElMenu', ElMenu)
-    app.component('ElMenuItem', ElMenuItem)
-    app.component('ElSubmenu', ElSubMenu)
-    app.component('ElSelect', ElSelect)
-    app.component('ElOption', ElOption)
-    app.component('ElPagination', ElPagination)
-    app.component('ElBreadcrumb', ElBreadcrumb)
-    app.component('ElBreadcrumbItem', ElBreadcrumbItem)
-  }),
-
-  // Export components
+// Extract individual components for backward compatibility
+const {
   ElButton,
   ElInput,
   ElTable,
@@ -249,17 +27,83 @@ const ElementPlus = {
   ElPagination,
   ElBreadcrumb,
   ElBreadcrumbItem,
+  ElContainer,
+  ElHeader,
+  ElAside,
+  ElMain,
+  ElFooter,
+  ElRow,
+  ElCol,
+  ElCard,
+  ElCheckbox,
+  ElRadio,
+  ElRadioGroup,
+  ElRadioButton,
+  ElInputNumber,
+  ElSwitch,
+  ElRate,
+  ElSlider,
+  ElDatePicker,
+  ElTimePicker,
+  ElColorPicker,
+  ElCascader,
+  ElTransfer,
+  ElTreeSelect,
+  ElTag,
+  ElDescriptions,
+  ElDescriptionsItem,
+  ElAvatar,
+  ElImage,
+  ElIcon,
+  ElText,
+  ElStatistic,
+  ElCountdown,
+  ElCalendar,
+  ElProgress,
+  ElTree,
+  ElTabs,
+  ElTabPane,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
+  ElSteps,
+  ElStep,
+  ElPopover,
+  ElTooltip,
+  ElResult,
+  ElEmpty,
+  ElAlert,
+  ElDivider,
+  ElSpace,
+  ElCollapse,
+  ElCollapseItem,
+  ElUpload
+} = componentMocks
+
+const { ElMessage, ElMessageBox, ElNotification, ElLoading } = serviceMocks
+
+// Main Element Plus mock using unified factory
+const ElementPlus = {
+  install: vi.fn((app) => {
+    // Register all components using the unified mock
+    Object.entries(componentMocks).forEach(([name, component]) => {
+      app.component(name, component)
+      // Also register kebab-case versions
+      const kebabName = name.replace(/([A-Z])/g, '-$1').toLowerCase()
+      app.component(kebabName, component)
+    })
+  }),
+
+  // Export components
+  ...componentMocks,
 
   // Export services
-  ElMessage,
-  ElMessageBox,
-  ElNotification,
-  ElLoading
+  ...serviceMocks
 }
 
 export default ElementPlus
 
-// Named exports
+// Named exports for backward compatibility
 export {
   ElButton,
   ElInput,
@@ -276,6 +120,57 @@ export {
   ElPagination,
   ElBreadcrumb,
   ElBreadcrumbItem,
+  ElContainer,
+  ElHeader,
+  ElAside,
+  ElMain,
+  ElFooter,
+  ElRow,
+  ElCol,
+  ElCard,
+  ElCheckbox,
+  ElRadio,
+  ElRadioGroup,
+  ElRadioButton,
+  ElInputNumber,
+  ElSwitch,
+  ElRate,
+  ElSlider,
+  ElDatePicker,
+  ElTimePicker,
+  ElColorPicker,
+  ElCascader,
+  ElTransfer,
+  ElTreeSelect,
+  ElTag,
+  ElDescriptions,
+  ElDescriptionsItem,
+  ElAvatar,
+  ElImage,
+  ElIcon,
+  ElText,
+  ElStatistic,
+  ElCountdown,
+  ElCalendar,
+  ElProgress,
+  ElTree,
+  ElTabs,
+  ElTabPane,
+  ElDropdown,
+  ElDropdownMenu,
+  ElDropdownItem,
+  ElSteps,
+  ElStep,
+  ElPopover,
+  ElTooltip,
+  ElResult,
+  ElEmpty,
+  ElAlert,
+  ElDivider,
+  ElSpace,
+  ElCollapse,
+  ElCollapseItem,
+  ElUpload,
   ElMessage,
   ElMessageBox,
   ElNotification,

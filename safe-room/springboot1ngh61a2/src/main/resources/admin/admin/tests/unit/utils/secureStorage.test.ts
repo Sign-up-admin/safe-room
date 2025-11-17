@@ -4,7 +4,7 @@ import { setupBrowserAPIs } from './test-helpers'
 // Setup browser APIs
 setupBrowserAPIs()
 
-import { secureStorage, tokenStorage } from '../../../src/utils/secureStorage'
+import { secureStorage, tokenStorage } from '@/utils/secureStorage'
 
 describe('secureStorage', () => {
   beforeEach(() => {

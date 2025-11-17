@@ -10,15 +10,13 @@
     <template #header-actions>
       <div class="module-list-toolbar">
         <el-button type="primary" @click="goCreate">新增{{ config.name }}</el-button>
-        <el-tag v-if="totalCount !== null" type="info" class="module-list-count">
-          总数：{{ totalCount }}
-        </el-tag>
+        <el-tag v-if="totalCount !== null" type="info" class="module-list-count"> 总数：{{ totalCount }} </el-tag>
         <el-button text type="primary" @click="refreshStats">统计</el-button>
         <template v-if="showAuditActions">
           <el-button
             :disabled="!selectedRows.length || shLoading"
-            @click="handleBatchAudit('已通过')"
             :loading="shLoading && auditOperation === '已通过'"
+            @click="handleBatchAudit('已通过')"
           >
             批量通过
           </el-button>
@@ -26,8 +24,8 @@
             type="danger"
             plain
             :disabled="!selectedRows.length || shLoading"
-            @click="handleBatchAudit('已拒绝')"
             :loading="shLoading && auditOperation === '已拒绝'"
+            @click="handleBatchAudit('已拒绝')"
           >
             批量拒绝
           </el-button>
@@ -108,7 +106,7 @@ async function handleBatchAudit(status: '已通过' | '已拒绝') {
     return
   }
   const ids = selectedRows.value
-    .map((row) => row[config.primaryKey])
+    .map(row => row[config.primaryKey])
     .filter((id): id is number | string => id !== undefined && id !== null)
   if (!ids.length) return
   const confirmMsg = `确认将选中的 ${ids.length} 条记录标记为「${status}」吗？`
@@ -138,5 +136,3 @@ async function handleBatchAudit(status: '已通过' | '已拒绝') {
   align-self: center;
 }
 </style>
-
-

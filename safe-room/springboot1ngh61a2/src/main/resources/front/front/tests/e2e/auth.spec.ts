@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { setupTestEnvironment } from '../utils/shared-helpers'
+import { waitForPageFullyLoaded, waitForFormSubmission } from '../utils/wait-helpers'
+import { selectors } from '../utils/selectors'
+import { applyCommonMock } from '../utils/mock-manager'
+import { SCENARIO_NAMES } from '../utils/mock-presets'
 
 test.describe('Front authentication', () => {
   test.beforeEach(async ({ page }) => {
@@ -8,52 +12,53 @@ test.describe('Front authentication', () => {
   })
 
   test('logs in successfully with valid credentials', async ({ page }) => {
-    await page.route('**/yonghu/login**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 0, token: 'token-123' }),
-      })
-    })
-    await page.route('**/yonghu/session**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 0, data: { id: 1, username: 'user01' } }),
-      })
-    })
+    // 使用预设的登录成功场景
+    await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
 
     await page.goto('/#/login')
-    // Use more specific selector to avoid ambiguity with checkbox
-    await page.getByPlaceholder('请输入会员账号').fill('user01')
-    await page.getByLabel('密码', { exact: false }).fill('123456')
-    await page.getByRole('button', { name: '登录' }).click()
+    await waitForPageFullyLoaded(page)
 
-    await expect(page).toHaveURL(/#\/index\/home/)
+    // 使用稳定的data-testid选择器
+    await page.getByTestId(selectors.login.usernameInput()).fill('user01')
+    await page.getByTestId(selectors.login.passwordInput()).fill('123456')
+    await page.getByTestId(selectors.login.submitButton()).click()
+
+    // 等待表单提交完成
+    const result = await waitForFormSubmission(page, {
+      successSelectors: ['text=登录成功'],
+      errorSelectors: [selectors.login.errorMessage]
+    })
+
+    if (result.success) {
+      await expect(page).toHaveURL(/#\/index\/home/)
+    } else {
+      throw new Error(`登录失败: ${result.message}`)
+    }
   })
 
   test('shows error message when credentials are invalid', async ({ page }) => {
-    await page.route('**/yonghu/login**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ code: 1, msg: '账号或密码错误' }),
-      })
-    })
+    // 使用预设的登录失败场景
+    await applyCommonMock(page, SCENARIO_NAMES.LOGIN_FAILURE)
 
     await page.goto('/#/login')
-    // Use more specific selector to avoid ambiguity with checkbox
-    await page.getByPlaceholder('请输入会员账号').fill('wrong-user')
-    await page.getByLabel('密码', { exact: false }).fill('wrong-pass')
-    await page.getByRole('button', { name: '登录' }).click()
+    await waitForPageFullyLoaded(page)
 
-    await expect(page.getByText('账号或密码错误')).toBeVisible()
+    // 使用稳定的data-testid选择器
+    await page.getByTestId(selectors.login.usernameInput()).fill('wrong-user')
+    await page.getByTestId(selectors.login.passwordInput()).fill('wrong-pass')
+    await page.getByTestId(selectors.login.submitButton()).click()
+
+    // 等待错误消息出现
+    await expect(page.getByTestId(selectors.login.errorMessage)).toBeVisible()
+    await expect(page.getByTestId(selectors.login.errorMessage)).toContainText('账号或密码错误')
   })
 
   test('navigates to register page', async ({ page }) => {
     await page.goto('/#/login')
-    // The "立即注册" text is not a link, but a clickable element
-    await page.getByText('立即注册').click()
+    await waitForPageFullyLoaded(page)
+
+    // 使用稳定的data-testid选择器
+    await page.getByTestId(selectors.login.registerLink).click()
     await expect(page).toHaveURL(/#\/register/)
   })
 })

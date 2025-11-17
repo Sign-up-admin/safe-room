@@ -24,19 +24,45 @@ declare global {
  */
 export function sanitizeHtml(html: string, options?: DOMPurify.Config): string {
   if (!html) return ''
-  
+
   // 默认配置：允许常见的HTML标签和属性，但移除脚本和事件处理器
   const defaultOptions: DOMPurify.Config = {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'img', 'table',
-      'thead', 'tbody', 'tr', 'th', 'td', 'div', 'span', 'hr'
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      's',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'pre',
+      'code',
+      'a',
+      'img',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'th',
+      'td',
+      'div',
+      'span',
+      'hr',
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target'],
     ALLOW_DATA_ATTR: false,
-    ...options
+    ...options,
   }
-  
+
   return DOMPurify.sanitize(html, defaultOptions)
 }
 
@@ -47,17 +73,17 @@ export function sanitizeHtml(html: string, options?: DOMPurify.Config): string {
  */
 export function escapeHtml(text: string | number | null | undefined): string {
   if (text == null) return ''
-  
+
   const str = String(text)
   const map: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
   }
-  
-  return str.replace(/[&<>"']/g, (m) => map[m])
+
+  return str.replace(/[&<>"']/g, m => map[m])
 }
 
 /**
@@ -67,7 +93,7 @@ export function escapeHtml(text: string | number | null | undefined): string {
  */
 export function stripHtml(html: string | null | undefined): string {
   if (!html) return ''
-  
+
   // 先清理HTML，然后提取文本
   const clean = DOMPurify.sanitize(html, { ALLOWED_TAGS: [] })
   return clean.trim()
@@ -80,7 +106,7 @@ export function stripHtml(html: string | null | undefined): string {
  */
 export function containsXss(input: string): boolean {
   if (!input) return false
-  
+
   // 检测常见的XSS攻击模式
   const xssPatterns = [
     /<script[^>]*>.*?<\/script>/gi,
@@ -91,9 +117,9 @@ export function containsXss(input: string): boolean {
     /<embed[^>]*>/gi,
     /<link[^>]*>/gi,
     /<meta[^>]*>/gi,
-    /<style[^>]*>.*?<\/style>/gi
+    /<style[^>]*>.*?<\/style>/gi,
   ]
-  
+
   return xssPatterns.some(pattern => pattern.test(input))
 }
 
@@ -105,11 +131,10 @@ export function containsXss(input: string): boolean {
  */
 export function sanitizeInput(input: string, allowHtml = false): string {
   if (!input) return ''
-  
+
   if (allowHtml) {
     return sanitizeHtml(input)
   } else {
     return escapeHtml(input)
   }
 }
-

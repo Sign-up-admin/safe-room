@@ -7,7 +7,7 @@ import {
   maskName,
   maskAddress,
   maskSensitiveData,
-} from '../../../src/utils/mask'
+} from '@/utils/mask'
 
 describe('敏感数据脱敏工具', () => {
   describe('maskPhone', () => {

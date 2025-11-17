@@ -35,11 +35,11 @@ export interface RecommendationItem {
 
 // 推荐算法权重
 const RECOMMENDATION_WEIGHTS = {
-  interestMatch: 0.4,      // 兴趣匹配度
-  popularity: 0.2,         // 流行度
-  recency: 0.15,           // 新鲜度
-  socialProof: 0.15,       // 社交证明
-  diversity: 0.1           // 多样性
+  interestMatch: 0.4, // 兴趣匹配度
+  popularity: 0.2, // 流行度
+  recency: 0.15, // 新鲜度
+  socialProof: 0.15, // 社交证明
+  diversity: 0.1, // 多样性
 }
 
 // 兴趣衰减因子（基于时间）
@@ -54,7 +54,7 @@ export function useRecommendation() {
     viewedItems: [],
     likedItems: [],
     followedUsers: [],
-    interactionHistory: []
+    interactionHistory: [],
   })
 
   const availableItems = ref<RecommendationItem[]>([])
@@ -70,7 +70,7 @@ export function useRecommendation() {
       .map(item => ({
         ...item,
         score: calculateRecommendationScore(item),
-        reason: generateRecommendationReason(item)
+        reason: generateRecommendationReason(item),
       }))
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .slice(0, 10) // 取前10个
@@ -78,13 +78,11 @@ export function useRecommendation() {
     return scoredItems
   })
 
-  const personalizedRecommendations = computed(() => {
-    return recommendations.value.filter(item => (item.score || 0) > 70)
-  })
+  const personalizedRecommendations = computed(() => recommendations.value.filter(item => (item.score || 0) > 70))
 
-  const trendingRecommendations = computed(() => {
-    return recommendations.value.filter(item => item.type === 'topic' || (item.score || 0) > 60)
-  })
+  const trendingRecommendations = computed(() =>
+    recommendations.value.filter(item => item.type === 'topic' || (item.score || 0) > 60),
+  )
 
   // 方法
   const updateUserProfile = (updates: Partial<UserProfile>) => {
@@ -94,7 +92,7 @@ export function useRecommendation() {
   const addInteraction = (record: Omit<InteractionRecord, 'timestamp'>) => {
     const interaction: InteractionRecord = {
       ...record,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
 
     userProfile.interactionHistory.push(interaction)
@@ -191,11 +189,10 @@ export function useRecommendation() {
     return (likes / maxLikes) * 100
   }
 
-  const calculateRecencyScore = (item: RecommendationItem): number => {
+  const calculateRecencyScore = (item: RecommendationItem): number =>
     // 简单的随机新鲜度分数（实际应用中应该基于创建时间）
     // 这里可以根据项目的创建时间来计算
-    return Math.random() * 100
-  }
+    Math.random() * 100
 
   const calculateSocialProof = (item: RecommendationItem): number => {
     // 基于用户是否关注了相关用户或点赞了类似内容
@@ -226,7 +223,7 @@ export function useRecommendation() {
   const generateRecommendationReason = (item: RecommendationItem): string => {
     const itemTags = item.tags || []
     const matchingInterests = userProfile.interests.filter(interest =>
-      itemTags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
+      itemTags.some(tag => tag.toLowerCase().includes(interest.toLowerCase())),
     )
 
     if (matchingInterests.length > 0) {
@@ -261,10 +258,11 @@ export function useRecommendation() {
         const age = Date.now() - record.timestamp
         return age < MAX_INTERACTION_AGE
       })
-      .filter(record => {
-        // 检查是否与该兴趣相关
-        return record.itemType === 'discussion' || record.itemType === 'topic'
-      })
+      .filter(
+        record =>
+          // 检查是否与该兴趣相关
+          record.itemType === 'discussion' || record.itemType === 'topic',
+      )
 
     let weight = 1
     relevantInteractions.forEach(record => {
@@ -306,6 +304,6 @@ export function useRecommendation() {
     addInteraction,
     setAvailableItems,
     dismissRecommendation,
-    resetDismissedItems
+    resetDismissedItems,
   }
 }

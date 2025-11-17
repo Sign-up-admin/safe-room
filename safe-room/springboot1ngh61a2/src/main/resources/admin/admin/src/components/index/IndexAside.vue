@@ -3,30 +3,50 @@
     <div class="index-aside-inner">
       <el-menu default-active="1" class="admin-menu">
         <el-menu-item index="1" @click="menuHandler('/')"> 首页 </el-menu-item>
-        <SubMenu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamic-menu-routes="dynamicMenuRoutes" />
+        <SubMenu v-for="menu in convertToSubMenuFormat(menuList)" :key="menu.menuId" :menu="menu" :dynamic-menu-routes="convertToSubMenuFormat(dynamicMenuRoutes)" />
       </el-menu>
     </div>
   </el-aside>
 </template>
 
 <script setup lang="ts" name="IndexAside">
-import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import SubMenu from '@/components/index/IndexAsideSub.vue'
+import type { MenuRole } from '@/types/menu'
+import { useMenuStore } from '@/stores/menu'
+
+// 定义SubMenu期望的菜单项接口
+interface SubMenuItem {
+  menuId: number | string
+  name: string
+  list?: SubMenuItem[]
+}
 
 const router = useRouter()
-const menuList = ref<MenuRole[]>([])
-const dynamicMenuRoutes = ref<MenuRole[]>([])
+const menuStore = useMenuStore()
+
+// 使用store的响应式状态
+const { menuList, dynamicMenuRoutes } = menuStore
+
+// 转换MenuRole为SubMenu期望的格式
+function convertToSubMenuFormat(menuRoles: MenuRole[]): SubMenuItem[] {
+  return menuRoles.map((role, roleIndex) => ({
+    menuId: roleIndex,
+    name: role.roleName,
+    list: role.backMenu.map((menuItem, menuIndex) => ({
+      menuId: `${roleIndex}-${menuIndex}`,
+      name: menuItem.menu,
+      list: menuItem.child.map((child, childIndex) => ({
+        menuId: `${roleIndex}-${menuIndex}-${childIndex}`,
+        name: child.menu
+      }))
+    }))
+  }))
+}
 
 function menuHandler(path: string) {
   router.push({ path })
 }
-
-onMounted(() => {
-  // 获取动态菜单数据并且渲染
-  menuList.value = JSON.parse(sessionStorage.getItem('menuList') || '[]')
-  dynamicMenuRoutes.value = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
-})
 </script>
 
 <style lang="scss" scoped>

@@ -52,4 +52,3 @@ export const decryptAes = (msg: string): string => {
   const originText = bytes.toString(CryptoJS.enc.Utf8)
   return originText
 }
-

@@ -3,5 +3,5 @@
 </template>
 
 <script setup lang="ts">
-import ModuleCrudPage from '@/views/modules/components/ModuleCrudPage.vue'
+import ModuleCrudPage from '@/components/common/ModuleCrudPage.vue'
 </script>

@@ -1,11 +1,28 @@
 import { vi } from 'vitest'
+import {
+  createApiResponse,
+  createPageResponse,
+  createErrorResponse,
+  createSuccessResponse,
+  createFailureResponse,
+  createListResponse,
+  createDetailResponse,
+  createCreateResponse,
+  createUpdateResponse,
+  createDeleteResponse,
+  createLoginResponse,
+  createLogoutResponse,
+  createMenuListResponse,
+  createUserListResponse,
+  createConfigListResponse
+} from '../utils/mock-response-builder'
 
 // Mock axios
 const axios = {
-  get: vi.fn(),
-  post: vi.fn(),
-  put: vi.fn(),
-  patch: vi.fn(),
+  get: vi.fn() as any,
+  post: vi.fn() as any,
+  put: vi.fn() as any,
+  patch: vi.fn() as any,
   delete: vi.fn(),
   head: vi.fn(),
   options: vi.fn(),
@@ -110,67 +127,279 @@ const mockAdminResponses = {
   }
 }
 
-// Helper functions for tests
-export const mockApiGet = (url: string, response: any) => {
+// ========== Admin特定的Mock响应 ==========
+
+const mockAdminResponses = {
+  login: createLoginResponse('mock-admin-token-12345', {
+    id: 1,
+    username: 'admin',
+    role: 'admin',
+    permissions: ['all']
+  }),
+  userList: createUserListResponse([
+    { id: 1, username: 'admin', role: 'admin', status: 1 },
+    { id: 2, username: 'user1', role: 'user', status: 1 }
+  ], { total: 2, page: 1, limit: 10 }),
+  menuList: createMenuListResponse([
+    { id: 1, name: '首页', path: '/dashboard', icon: 'dashboard' },
+    { id: 2, name: '用户管理', path: '/users', icon: 'user' },
+    { id: 3, name: '系统设置', path: '/settings', icon: 'setting' }
+  ])
+}
+
+// ========== 增强的Mock API函数 ==========
+
+/**
+ * Mock GET请求 - 使用统一的响应格式
+ */
+export const mockApiGet = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  let response: any
+
+  // Admin-specific defaults
+  if (url.includes('/login')) {
+    response = mockAdminResponses.login
+  } else if (url.includes('/users') && url.includes('/list')) {
+    response = mockAdminResponses.userList
+  } else if (url.includes('/menu')) {
+    response = mockAdminResponses.menuList
+  } else {
+    response = createApiResponse(data, { code: 0, msg: 'success', ...options })
+  }
+
   axios.get.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
-      return Promise.resolve(createMockResponse(response))
+      return Promise.resolve({ data: response })
     }
-    // Admin-specific defaults
-    if (url.includes('/login')) {
-      return Promise.resolve(createMockResponse(mockAdminResponses.login))
-    }
-    if (url.includes('/users')) {
-      return Promise.resolve(createMockResponse(mockAdminResponses.userList))
-    }
-    if (url.includes('/menu')) {
-      return Promise.resolve(createMockResponse(mockAdminResponses.menuList))
-    }
-    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve(createMockResponse({}))
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
   })
 }
 
-export const mockApiPost = (url: string, response: any) => {
+/**
+ * Mock POST请求 - 使用统一的响应格式
+ */
+export const mockApiPost = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  let response: any
+
+  // Admin-specific defaults
+  if (url.includes('/login')) {
+    response = mockAdminResponses.login
+  } else {
+    response = createApiResponse(data, { code: 0, msg: 'success', ...options })
+  }
+
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
-      return Promise.resolve(createMockResponse(response))
+      return Promise.resolve({ data: response })
     }
-    // Admin-specific defaults
-    if (url.includes('/login')) {
-      return Promise.resolve(createMockResponse(mockAdminResponses.login))
-    }
-    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve(createMockResponse({}))
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
   })
 }
 
-export const mockApiPut = (url: string, response: any) => {
+/**
+ * Mock PUT请求 - 使用统一的响应格式
+ */
+export const mockApiPut = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.put.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
-      return Promise.resolve(createMockResponse(response))
+      return Promise.resolve({ data: response })
     }
-    return axios.put.getMockImplementation()?.(requestUrl) || Promise.resolve(createMockResponse({}))
+    return axios.put.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
   })
 }
 
-export const mockApiDelete = (url: string, response: any) => {
+/**
+ * Mock DELETE请求 - 使用统一的响应格式
+ */
+export const mockApiDelete = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.delete.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
-      return Promise.resolve(createMockResponse(response))
+      return Promise.resolve({ data: response })
     }
-    return axios.delete.getMockImplementation()?.(requestUrl) || Promise.resolve(createMockResponse({}))
+    return axios.delete.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
   })
 }
 
-export const mockApiError = (url: string, error: any) => {
+/**
+ * Mock用户列表查询
+ */
+export const mockUserList = (url: string, users: any[], pagination?: any) => {
+  const response = createUserListResponse(users, pagination)
+  axios.get.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock菜单列表查询
+ */
+export const mockMenuList = (url: string, menus: any[]) => {
+  const response = createMenuListResponse(menus)
+  axios.get.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock配置列表查询
+ */
+export const mockConfigList = (url: string, configs: any[], pagination?: any) => {
+  const response = createConfigListResponse(configs, pagination)
+  axios.get.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock通用列表查询
+ */
+export const mockApiList = (url: string, items: any[], pagination?: any, options?: { code?: number; msg?: string }) => {
+  const response = createListResponse(items, pagination, options)
+  axios.get.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock详情查询
+ */
+export const mockApiDetail = (url: string, data: any, options?: { code?: number; msg?: string }) => {
+  const response = createDetailResponse(data, options?.msg || '查询成功')
+  axios.get.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.get.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock创建操作
+ */
+export const mockApiCreate = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  const response = createCreateResponse(data, options?.msg || '新增成功')
+  axios.post.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock更新操作
+ */
+export const mockApiUpdate = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  const response = createUpdateResponse(data, options?.msg || '更新成功')
+  axios.post.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock删除操作
+ */
+export const mockApiRemove = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+  const response = createDeleteResponse(data?.count, options?.msg || '删除成功')
+  axios.post.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock登录
+ */
+export const mockApiLogin = (url: string, token: string, user: any, options?: { code?: number; msg?: string }) => {
+  const response = createLoginResponse(token, user, options?.msg || '登录成功')
+  axios.post.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock登出
+ */
+export const mockApiLogout = (url: string, options?: { code?: number; msg?: string }) => {
+  const response = createLogoutResponse(options?.msg || '登出成功')
+  axios.post.mockImplementation((requestUrl: string) => {
+    if (requestUrl === url || requestUrl.includes(url)) {
+      return Promise.resolve({ data: response })
+    }
+    return axios.post.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+  })
+}
+
+/**
+ * Mock错误响应
+ */
+export const mockApiError = (url: string, code = 500, msg = '操作失败', error?: string) => {
+  const response = createErrorResponse(code, msg, error)
   const methods = ['get', 'post', 'put', 'patch', 'delete']
+
   methods.forEach(method => {
     (axios as any)[method].mockImplementation((requestUrl: string) => {
       if (requestUrl === url || requestUrl.includes(url)) {
-        return Promise.reject(createMockError(error.message || 'API Error', error.status || 500))
+        return Promise.reject({ response: { data: response, status: code } })
       }
       return (axios as any)[method].getMockImplementation()?.(requestUrl)
     })
   })
+}
+
+/**
+ * Mock成功响应（通用）
+ */
+export const mockApiSuccess = (method: string, url: string, data?: any, msg = '操作成功') => {
+  const response = createSuccessResponse(data, msg)
+  const axiosMethod = (axios as any)[method.toLowerCase()]
+
+  if (axiosMethod) {
+    axiosMethod.mockImplementation((requestUrl: string) => {
+      if (requestUrl === url || requestUrl.includes(url)) {
+        return Promise.resolve({ data: response })
+      }
+      return axiosMethod.getMockImplementation()?.(requestUrl) || Promise.resolve({ data: createApiResponse({}) })
+    })
+  }
+}
+
+/**
+ * Mock失败响应（通用）
+ */
+export const mockApiFailure = (method: string, url: string, code = 500, msg = '操作失败') => {
+  const response = createFailureResponse(msg, code)
+  const axiosMethod = (axios as any)[method.toLowerCase()]
+
+  if (axiosMethod) {
+    axiosMethod.mockImplementation((requestUrl: string) => {
+      if (requestUrl === url || requestUrl.includes(url)) {
+        return Promise.reject({ response: { data: response, status: code } })
+      }
+      return axiosMethod.getMockImplementation()?.(requestUrl)
+    })
+  }
 }
 
 export const resetApiMocks = () => {

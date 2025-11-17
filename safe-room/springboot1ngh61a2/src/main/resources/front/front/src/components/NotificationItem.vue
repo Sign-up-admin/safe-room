@@ -4,7 +4,7 @@
     :class="{
       'notification-item--unread': notification.status === NotificationStatus.UNREAD,
       'notification-item--read': notification.status === NotificationStatus.READ,
-      'notification-item--high-priority': isHighPriority
+      'notification-item--high-priority': isHighPriority,
     }"
     @click="handleClick"
   >
@@ -34,41 +34,24 @@
 
       <!-- 通知类型标签 -->
       <div class="notification-item__meta">
-        <el-tag
-          :type="getTypeTagType(notification.type)"
-          size="small"
-          effect="light"
-        >
+        <el-tag :type="getTypeTagType(notification.type)" size="small" effect="light">
           {{ getTypeLabel(notification.type) }}
         </el-tag>
 
         <!-- 优先级标签 -->
-        <el-tag
-          v-if="isHighPriority"
-          type="danger"
-          size="small"
-          effect="light"
-        >
-          重要
-        </el-tag>
+        <el-tag v-if="isHighPriority" type="danger" size="small" effect="light"> 重要 </el-tag>
       </div>
     </div>
 
     <!-- 操作按钮 -->
     <div class="notification-item__actions">
-      <el-dropdown
-        trigger="click"
-        @command="handleAction"
-      >
+      <el-dropdown trigger="click" @command="handleAction">
         <el-button type="text" size="small">
           <el-icon><More /></el-icon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              v-if="notification.status === NotificationStatus.UNREAD"
-              command="mark-read"
-            >
+            <el-dropdown-item v-if="notification.status === NotificationStatus.UNREAD" command="mark-read">
               <el-icon><Check /></el-icon>
               标记已读
             </el-dropdown-item>
@@ -85,16 +68,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Check,
-  Delete,
-  More,
-  Bell,
-  Calendar,
-  CreditCard,
-  User,
-  Warning
-} from '@element-plus/icons-vue'
+import { Check, Delete, More, Bell, Calendar, CreditCard, User, Warning } from '@element-plus/icons-vue'
 import type { Notification } from '@/types/notification'
 import { NotificationStatus, NotificationType } from '@/types/notification'
 import { formatDate } from '@/utils/formatters'
@@ -111,9 +85,9 @@ const emit = defineEmits<{
 }>()
 
 // 计算属性
-const isHighPriority = computed(() => {
-  return props.notification.priority === 'high' || props.notification.priority === 'urgent'
-})
+const isHighPriority = computed(
+  () => props.notification.priority === 'high' || props.notification.priority === 'urgent',
+)
 
 const notificationIcon = computed(() => {
   switch (props.notification.type) {
@@ -174,7 +148,7 @@ const getTypeLabel = (type: NotificationType): string => {
     [NotificationType.MEMBERSHIP_BENEFITS_CHANGED]: '权益变更',
     [NotificationType.COURSE_NEW]: '新课程',
     [NotificationType.ACTIVITY_PROMOTION]: '活动通知',
-    [NotificationType.SYSTEM_MAINTENANCE]: '系统维护'
+    [NotificationType.SYSTEM_MAINTENANCE]: '系统维护',
   }
   return labels[type] || '系统通知'
 }

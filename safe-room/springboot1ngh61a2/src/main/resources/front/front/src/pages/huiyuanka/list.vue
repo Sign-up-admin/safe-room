@@ -4,9 +4,7 @@
       <div>
         <p class="section-eyebrow">BLACK & GOLD CLUB</p>
         <h1 id="hero-title">会员卡矩阵 · 权益一目了然</h1>
-        <p>
-          从入门体验到黑金尊享，会员卡提供不同的训练次数、私教折扣与预约优先级。挑选最适合你的训练旅程。
-        </p>
+        <p>从入门体验到黑金尊享，会员卡提供不同的训练次数、私教折扣与预约优先级。挑选最适合你的训练旅程。</p>
         <div class="hero-actions">
           <TechButton size="lg" @click="goPurchase(selectedCard?.id)">立即购买</TechButton>
           <TechButton size="lg" variant="outline" @click="scrollToSection('matrix')">查看卡种</TechButton>
@@ -19,7 +17,7 @@
       </div>
     </section>
 
-    <section id="matrix" class="card-matrix" v-loading="loading.cards" aria-labelledby="matrix-title" role="region">
+    <section id="matrix" v-loading="loading.cards" class="card-matrix" aria-labelledby="matrix-title" role="region">
       <h2 id="matrix-title" class="sr-only">会员卡选择</h2>
       <div
         ref="cardContainerRef"
@@ -43,24 +41,29 @@
         <button
           v-for="(card, index) in cards"
           :key="card.id"
-          :class="['indicator', { 'indicator--active': card.id === selectedCardId }]"
+          class="indicator"
+          :class="[{ 'indicator--active': card.id === selectedCardId }]"
+          :aria-label="`选择${card.huiyuankamingcheng}会员卡`"
+          :aria-selected="card.id === selectedCardId"
+          role="tab"
+          :tabindex="card.id === selectedCardId ? 0 : -1"
           @click="selectCard(card.id)"
           @keydown.left.prevent="navigateCards(-1)"
           @keydown.right.prevent="navigateCards(1)"
           @keydown.enter.prevent="selectCard(card.id)"
           @keydown.space.prevent="selectCard(card.id)"
-          :aria-label="`选择${card.huiyuankamingcheng}会员卡`"
-          :aria-selected="card.id === selectedCardId"
-          role="tab"
-          :tabindex="card.id === selectedCardId ? 0 : -1"
         ></button>
       </div>
 
       <el-empty v-if="!cards.length && !loading.cards" description="暂无会员卡" />
     </section>
 
-    <section class="membership-details" v-if="selectedCard" aria-labelledby="details-title" role="region">
-      <TechCard class="membership-detail-card" :title="selectedCard.huiyuankamingcheng" :subtitle="selectedCard.youxiaoqi">
+    <section v-if="selectedCard" class="membership-details" aria-labelledby="details-title" role="region">
+      <TechCard
+        class="membership-detail-card"
+        :title="selectedCard.huiyuankamingcheng"
+        :subtitle="selectedCard.youxiaoqi"
+      >
         <template #title>
           <h3 id="details-title">{{ selectedCard.huiyuankamingcheng }}</h3>
         </template>
@@ -127,7 +130,13 @@
       </TechCard>
     </section>
 
-    <TechCard class="membership-cta" variant="layered" :interactive="false" title="立即加入" subtitle="获取专属顾问服务">
+    <TechCard
+      class="membership-cta"
+      variant="layered"
+      :interactive="false"
+      title="立即加入"
+      subtitle="获取专属顾问服务"
+    >
       <template #title>
         <h3 id="cta-title">立即加入</h3>
       </template>
@@ -224,7 +233,13 @@ function scrollToSelectedCard() {
   }
 }
 
-function selectCard(cardId: number) {
+function selectCard(card: Huiyuanka | number) {
+  let cardId: number
+  if (typeof card === 'number') {
+    cardId = card
+  } else {
+    cardId = card.id!
+  }
   const index = cards.value.findIndex(c => c.id === cardId)
   if (index >= 0) {
     selectedIndex.value = index
@@ -250,14 +265,14 @@ const comparisonMetrics = computed(() => {
     key: 'price',
     label: '价格',
     desc: '含课程/权益价值',
-    values: toValueMap((card) => Math.min(100, Math.max(20, (Number(card.jiage) || 0) / 100))),
+    values: toValueMap(card => Math.min(100, Math.max(20, (Number(card.jiage) || 0) / 100))),
     format: (value: number) => formatCurrency((value / 100) * (selectedCard.value?.jiage || 1)),
   }
   const durationMetric = {
     key: 'duration',
     label: '有效期',
     desc: '越长越划算',
-    values: toValueMap((card) => {
+    values: toValueMap(card => {
       const months = parseInt(card.youxiaoqi || '12', 10)
       return Math.min(100, months * 8)
     }),
@@ -324,7 +339,10 @@ function toValueMap(getter: (card: Huiyuanka, index: number) => number) {
 
 function deriveBenefits(card: Huiyuanka) {
   const text = card.shiyongshuoming || card.huiyuankaxiangqing || ''
-  const segments = text.split(/[\n、。,，]/).map((item) => item.trim()).filter(Boolean)
+  const segments = text
+    .split(/[\n、。,，]/)
+    .map(item => item.trim())
+    .filter(Boolean)
   if (segments.length) return segments.slice(0, 6)
   return ['课程预约优先 72h', '私教单次 9 折', '智能体测 1 次/月', '专属客服顾问', '限定活动优先', '嘉宾权益 2 次']
 }
@@ -349,7 +367,6 @@ function scrollToSection(anchor: string) {
   const element = document.getElementById(anchor)
   element?.scrollIntoView({ behavior: 'smooth' })
 }
-
 </script>
 
 <style scoped lang="scss">

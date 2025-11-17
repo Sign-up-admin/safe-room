@@ -2,7 +2,7 @@
  * API Endpoints Constants - Frontend
  * 前台API端点常量定义
  * 根据 docs/API.md 接口文档定义
- * 
+ *
  * 前台路径约定：
  * - 列表：/{module}/list
  * - 详情：/{module}/detail/{id}
@@ -279,4 +279,3 @@ export function getEndpointString(path: string, ...args: any[]): string {
   }
   return endpoint
 }
-

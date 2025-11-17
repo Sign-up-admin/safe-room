@@ -17,11 +17,12 @@
       <TechButton size="sm" @click="$emit('refresh')">搜索</TechButton>
     </div>
 
-    <div class="coach-recommend__list" v-loading="loading">
+    <div v-loading="loading" class="coach-recommend__list">
       <article
         v-for="(coach, index) in coaches"
         :key="coach.id"
-        :class="['coach-card', { 'coach-card--active': coach.id === selectedCoach?.id }]"
+        class="coach-card"
+        :class="[{ 'coach-card--active': coach.id === selectedCoach?.id }]"
         :style="{ '--index': index }"
         @click="$emit('select', coach)"
         @mouseenter="handleCardHover($event)"
@@ -267,4 +268,3 @@ onMounted(() => {
   }
 }
 </style>
-

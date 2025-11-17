@@ -229,9 +229,7 @@ describe('useMembershipSelection', () => {
 
   it('should validate comparison limit', () => {
     // Helper function to check if can add to comparison
-    const canAddToComparison = (cardId: number) => {
-      return !store.comparedCardIds.includes(cardId) && store.comparedCardIds.length < 3
-    }
+    const canAddToComparison = (cardId: number) => !store.comparedCardIds.includes(cardId) && store.comparedCardIds.length < 3
 
     expect(canAddToComparison(1)).toBe(true)
 

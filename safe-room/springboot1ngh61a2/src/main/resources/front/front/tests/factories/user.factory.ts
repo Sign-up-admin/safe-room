@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import type { validateApiResponse } from '../../../../../../../../tests/shared/types/api-response.types'
 
 export interface User {
   id: number
@@ -110,4 +111,129 @@ export function createMockUserSession(overrides: Partial<{
     refreshToken: faker.string.alphanumeric(32),
     ...overrides
   }
+}
+
+// ========== 数据一致性检查函数 ==========
+
+/**
+ * 验证User对象是否符合接口规范
+ */
+export function validateUserData(user: any): user is User {
+  return (
+    user &&
+    typeof user === 'object' &&
+    typeof user.id === 'number' &&
+    typeof user.username === 'string' &&
+    typeof user.email === 'string' &&
+    typeof user.role === 'string' &&
+    typeof user.status === 'number' &&
+    typeof user.createTime === 'string' &&
+    user.username.length > 0 &&
+    user.email.includes('@')
+  )
+}
+
+/**
+ * 验证User数组数据一致性
+ */
+export function validateUserListConsistency(users: User[]): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!Array.isArray(users)) {
+    errors.push('Input is not an array')
+    return { isValid: false, errors, warnings }
+  }
+
+  const usernames = new Set<string>()
+  const emails = new Set<string>()
+
+  users.forEach((user, index) => {
+    if (!validateUserData(user)) {
+      errors.push(`User at index ${index} has invalid structure`)
+    }
+
+    // 检查用户名唯一性
+    if (usernames.has(user.username)) {
+      warnings.push(`Duplicate username ${user.username} found`)
+    }
+    usernames.add(user.username)
+
+    // 检查邮箱唯一性
+    if (emails.has(user.email)) {
+      warnings.push(`Duplicate email ${user.email} found`)
+    }
+    emails.add(user.email)
+
+    // 检查邮箱格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(user.email)) {
+      warnings.push(`User ${user.username} has invalid email format: ${user.email}`)
+    }
+
+    // 检查状态值合理性
+    if (user.status !== 0 && user.status !== 1) {
+      warnings.push(`User ${user.username} has invalid status: ${user.status}`)
+    }
+
+    // 检查角色合理性
+    const validRoles = ['user', 'admin', 'coach', 'member']
+    if (!validRoles.includes(user.role)) {
+      warnings.push(`User ${user.username} has invalid role: ${user.role}`)
+    }
+  })
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  }
+}
+
+/**
+ * 验证用户会话数据
+ */
+export function validateUserSession(session: any): boolean {
+  return (
+    session &&
+    typeof session === 'object' &&
+    validateUserData(session.user) &&
+    typeof session.token === 'string' &&
+    typeof session.expiresAt === 'string' &&
+    typeof session.refreshToken === 'string' &&
+    session.token.length > 0 &&
+    session.refreshToken.length > 0
+  )
+}
+
+/**
+ * 创建验证后的用户数据（带类型检查）
+ */
+export function createValidatedUser(overrides: Partial<User> = {}): User {
+  const user = createMockUser(overrides)
+
+  if (!validateUserData(user)) {
+    throw new Error('Generated user data does not match User interface')
+  }
+
+  return user
+}
+
+/**
+ * 创建验证后的用户列表
+ */
+export function createValidatedUsers(count: number, overrides: Partial<User> = {}): User[] {
+  const users = createMockUsers(count, overrides)
+  const validation = validateUserListConsistency(users)
+
+  if (!validation.isValid) {
+    console.warn('User list validation warnings:', validation.warnings)
+    throw new Error(`User list validation failed: ${validation.errors.join(', ')}`)
+  }
+
+  return users
 }

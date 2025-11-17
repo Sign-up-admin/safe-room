@@ -10,13 +10,9 @@ const loading = ref(false)
 const unreadCount = ref(0)
 
 // 计算属性
-const unreadMessages = computed(() =>
-  messages.value.filter(msg => msg.isread === 0)
-)
+const unreadMessages = computed(() => messages.value.filter(msg => msg.isread === 0))
 
-const reminderMessages = computed(() =>
-  messages.value.filter(msg => msg.type === 'reminder')
-)
+const reminderMessages = computed(() => messages.value.filter(msg => msg.type === 'reminder'))
 
 // 方法
 export function useMessageCenter() {
@@ -29,7 +25,7 @@ export function useMessageCenter() {
         limit: 50,
         order: 'desc',
         sort: 'addtime',
-        ...params
+        ...params,
       })
       messages.value = list || []
       updateUnreadCount()
@@ -46,8 +42,8 @@ export function useMessageCenter() {
       const response = await fetch('/messages/unreadCount', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       })
       const result = await response.json()
       unreadCount.value = result.count || 0
@@ -62,9 +58,9 @@ export function useMessageCenter() {
       await fetch('/messages/markRead', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(messageIds)
+        body: JSON.stringify(messageIds),
       })
 
       // 更新本地状态
@@ -91,9 +87,9 @@ export function useMessageCenter() {
       await fetch('/messages/sendReminder', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params)
+        body: JSON.stringify(params),
       })
     } catch (error) {
       console.error('发送提醒消息失败:', error)
@@ -108,10 +104,7 @@ export function useMessageCenter() {
 
   // 初始化
   const init = async () => {
-    await Promise.all([
-      loadMessages(),
-      loadUnreadCount()
-    ])
+    await Promise.all([loadMessages(), loadUnreadCount()])
   }
 
   return {
@@ -127,6 +120,6 @@ export function useMessageCenter() {
     loadUnreadCount,
     markAsRead,
     sendReminderMessage,
-    init
+    init,
   }
 }

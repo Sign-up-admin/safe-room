@@ -1,5 +1,5 @@
 <template>
-<el-card v-loading="loading">
+  <el-card v-loading="loading">
     <template #header>
       <div class="detail-header">
         <h2>{{ config.name }}详情</h2>
@@ -10,7 +10,13 @@
     <el-descriptions v-if="record" :column="2" border>
       <el-descriptions-item v-for="field in config.fields" :key="field.prop" :label="field.label">
         <template v-if="field.type === 'image'">
-          <el-image v-if="record[field.prop]" :src="record[field.prop]" :preview-src-list="[record[field.prop]]" fit="cover" class="detail-thumb" />
+          <el-image
+            v-if="record[field.prop]"
+            :src="record[field.prop]"
+            :preview-src-list="[record[field.prop]]"
+            fit="cover"
+            class="detail-thumb"
+          />
           <span v-else>--</span>
         </template>
         <template v-else-if="field.type === 'richtext'">
@@ -52,7 +58,7 @@ const { record, loading, fetchDetail } = useModuleDetail(props.moduleKey)
 
 watch(
   () => props.id,
-  (value) => {
+  value => {
     if (value !== undefined && value !== null) {
       fetchDetail(value)
     }
@@ -62,7 +68,7 @@ watch(
 
 watch(
   () => props.prefetched,
-  (value) => {
+  value => {
     if (value) {
       record.value = value as any
     }
@@ -75,7 +81,7 @@ function formatFieldValue(field: FieldConfig, value: any) {
     return '--'
   }
   if (field.options) {
-    const match = field.options.find((option) => option.value === value)
+    const match = field.options.find(option => option.value === value)
     if (match) return match.label
   }
   switch (field.type) {
@@ -162,5 +168,3 @@ function formatFieldValue(field: FieldConfig, value: any) {
   }
 }
 </style>
-
-

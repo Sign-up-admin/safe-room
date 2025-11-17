@@ -113,7 +113,7 @@ $color-info-bg: $color-secondary-blue-soft;
 }
 
 // Theme Variants
-[data-theme="light"] {
+[data-theme='light'] {
   --color-bg-deep: #f8f9fa;
   --color-bg-dark: #ffffff;
   --color-bg-card: rgba(255, 255, 255, 0.9);
@@ -135,7 +135,7 @@ $color-info-bg: $color-secondary-blue-soft;
   --color-primary-glow: rgba(25, 118, 210, 0.25);
 }
 
-[data-theme="blue"] {
+[data-theme='blue'] {
   --color-bg-deep: #0f1419;
   --color-bg-dark: #1a1d21;
   --color-bg-card: rgba(26, 29, 33, 0.8);

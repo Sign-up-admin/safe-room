@@ -3,7 +3,9 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.JianshenjiaolianEntity;
 import com.service.JianshenjiaolianService;
+import com.utils.TestDataCleanup;
 import com.utils.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,6 +19,13 @@ class JianshenjiaolianControllerTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private JianshenjiaolianService jianshenjiaolianService;
+
+    @AfterEach
+    void cleanupTestData() {
+        // 清理测试健身教练数据
+        TestDataCleanup.cleanupByPrefix(jianshenjiaolianService, "jiaolianmingcheng", "测试教练");
+        TestDataCleanup.cleanupByPrefix(jianshenjiaolianService, "jiaolianmingcheng", "delete");
+    }
 
     @Test
     void shouldReturnPagedCoaches() throws Exception {
@@ -50,6 +59,7 @@ class JianshenjiaolianControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         JianshenjiaolianEntity updated = jianshenjiaolianService.getById(existing.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getSijiaojiage()).isEqualTo(499D);
     }
 

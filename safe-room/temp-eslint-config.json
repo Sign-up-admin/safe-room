@@ -1,0 +1,12 @@
+{
+  "extends": ["@vue/eslint-config-typescript"],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "caughtErrorsIgnorePattern": "^_"
+    }],
+    "vue/no-unused-vars": "error",
+    "no-unused-vars": "off"
+  }
+}

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
-import Board from '../../../src/views/board.vue'
+import Board from '@/views/board.vue'
 
 describe('Board View', () => {
   let router: any

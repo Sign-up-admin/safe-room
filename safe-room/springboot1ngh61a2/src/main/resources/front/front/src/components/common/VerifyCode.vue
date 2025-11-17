@@ -1,15 +1,7 @@
 <template>
   <div class="verify-code-panel">
-    <div
-      class="verify-code"
-      :style="codeStyle"
-      @click="refreshCode"
-    >
-      <span
-        v-for="(char, index) in displayCode"
-        :key="index"
-        :style="getCharStyle(index)"
-      >
+    <div class="verify-code" :style="codeStyle" @click="refreshCode">
+      <span v-for="(char, index) in displayCode" :key="index" :style="getCharStyle(index)">
         {{ char }}
       </span>
     </div>
@@ -51,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
   height: '60px',
   fontSize: '30px',
   placeholder: '请输入验证码',
-  autoFocus: false
+  autoFocus: false,
 })
 
 // Emits
@@ -78,7 +70,7 @@ const codeStyle = computed(() => ({
   lineHeight: props.height,
   fontSize: props.fontSize,
   backgroundColor: bgColors[Math.floor(Math.random() * bgColors.length)],
-  color: textColors[Math.floor(Math.random() * textColors.length)]
+  color: textColors[Math.floor(Math.random() * textColors.length)],
 }))
 
 // Methods
@@ -135,7 +127,7 @@ function checkCode() {
 defineExpose({
   refreshCode,
   checkCode,
-  getCode: () => codeChars.value
+  getCode: () => codeChars.value,
 })
 
 // Lifecycle
@@ -145,9 +137,12 @@ onMounted(() => {
 })
 
 // Watch for prop changes
-watch(() => props.codeLength, () => {
-  generateCode()
-})
+watch(
+  () => props.codeLength,
+  () => {
+    generateCode()
+  },
+)
 </script>
 
 <style scoped>

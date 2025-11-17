@@ -1,6 +1,6 @@
 <template>
   <div class="mobile-form" :class="{ 'mobile-form--loading': loading }">
-    <div class="mobile-form__header" v-if="$slots.header">
+    <div v-if="$slots.header" class="mobile-form__header">
       <slot name="header" />
     </div>
 
@@ -8,13 +8,13 @@
       <slot />
     </div>
 
-    <div class="mobile-form__actions" v-if="$slots.actions">
+    <div v-if="$slots.actions" class="mobile-form__actions">
       <slot name="actions" />
     </div>
 
     <!-- 骨架屏 -->
     <div v-if="loading" class="mobile-form__skeleton">
-      <div class="skeleton-item" v-for="i in 4" :key="i">
+      <div v-for="i in 4" :key="i" class="skeleton-item">
         <div class="skeleton-label"></div>
         <div class="skeleton-input"></div>
       </div>
@@ -114,7 +114,12 @@ const handleTouchEnd = (e: TouchEvent) => {
 
 .skeleton-label {
   height: 14px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.1) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
   border-radius: 4px;
@@ -123,7 +128,12 @@ const handleTouchEnd = (e: TouchEvent) => {
 
 .skeleton-input {
   height: 48px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(255, 255, 255, 0.08) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
   border-radius: 12px;

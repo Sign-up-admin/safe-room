@@ -54,6 +54,7 @@ import { generateTitle } from '@/utils/i18n'
 import menu from '@/utils/menu'
 import { routes } from '@/router/routes/index'
 import { useTagsViewStore } from '@/stores/tagsView'
+import { useUserStore } from '@/stores/user'
 import storage from '@/utils/storage'
 import ScrollPane from './ScrollPane.vue'
 import type { RouteLocationNormalized } from 'vue-router'
@@ -62,6 +63,7 @@ import type { TagView } from '@/stores/tagsView'
 const route = useRoute()
 const router = useRouter()
 const tagsViewStore = useTagsViewStore()
+const userStore = useUserStore()
 
 const visible = ref(false)
 const top = ref(0)
@@ -96,7 +98,7 @@ onMounted(() => {
   if (menus && Array.isArray(menus)) {
     menuList.push(...menus)
   }
-  const role = storage.get('role') || ''
+  const role = userStore.userRole || ''
   for (let i = 0; i < menuList.length; i++) {
     if (menuList[i].roleName == role) {
       routesList.value = menuList[i].backMenu || []

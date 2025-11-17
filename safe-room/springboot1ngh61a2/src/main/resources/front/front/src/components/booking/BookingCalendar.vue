@@ -1,11 +1,16 @@
 <template>
-  <section class="booking-calendar" :class="{ 'booking-calendar--loading': loading }" v-loading="loading">
+  <section
+    v-loading="loading"
+    class="booking-calendar"
+    :class="{ 'booking-calendar--loading': loading }"
+    data-testid="booking-time-selection"
+  >
     <div class="booking-calendar__legend">
       <span><i class="legend-dot legend-dot--available" />可预约</span>
       <span><i class="legend-dot legend-dot--low" />名额紧张</span>
       <span><i class="legend-dot legend-dot--conflict" />时间冲突</span>
     </div>
-    <div class="booking-calendar__grid">
+    <div class="booking-calendar__grid" data-testid="booking-time-calendar">
       <article v-for="day in days" :key="day.iso" class="booking-calendar__card">
         <header>
           <p>{{ day.label }}</p>
@@ -21,11 +26,9 @@
           >
             <button
               type="button"
-              :class="[
-                'calendar-slot',
-                `calendar-slot--${slot.status}`,
-                { 'calendar-slot--selected': isActiveSlot(day, slot) },
-              ]"
+              class="calendar-slot"
+              :class="[`calendar-slot--${slot.status}`, { 'calendar-slot--selected': isActiveSlot(day, slot) }]"
+              :data-testid="`time-slot-${slot.time.replace(':', '-')}`"
               :disabled="slot.status === 'conflict' || slot.status === 'disabled'"
               @click="$emit('select', { day, slot })"
             >
@@ -33,9 +36,7 @@
                 <span>{{ slot.time }}</span>
                 <small>{{ slot.period }}</small>
               </div>
-              <span class="calendar-slot__meta">
-                {{ slot.remaining }} 名额
-              </span>
+              <span class="calendar-slot__meta"> {{ slot.remaining }} 名额 </span>
             </button>
           </el-tooltip>
         </div>
@@ -254,4 +255,3 @@ function resolveTooltip(day: CalendarDay, slot: CalendarSlot) {
   }
 }
 </style>
-

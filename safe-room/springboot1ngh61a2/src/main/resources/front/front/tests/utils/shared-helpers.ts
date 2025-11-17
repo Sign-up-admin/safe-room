@@ -9,7 +9,7 @@ export class WaitUtils {
   /**
    * 等待元素出现并可交互
    */
-  static async waitForInteractable(page: Page, selector: string, timeout: number = 10000): Promise<void> {
+  static async waitForInteractable(page: Page, selector: string, timeout = 10000): Promise<void> {
     await page.waitForSelector(selector, { state: 'visible', timeout })
     await page.waitForSelector(selector, { state: 'attached', timeout })
 
@@ -21,7 +21,7 @@ export class WaitUtils {
   /**
    * 等待页面完全加载
    */
-  static async waitForPageStable(page: Page, timeout: number = 30000): Promise<void> {
+  static async waitForPageStable(page: Page, timeout = 30000): Promise<void> {
     await page.waitForLoadState('networkidle', { timeout })
     await page.waitForLoadState('domcontentloaded', { timeout })
 
@@ -32,14 +32,14 @@ export class WaitUtils {
   /**
    * 等待文本出现
    */
-  static async waitForText(page: Page, text: string, timeout: number = 10000): Promise<void> {
+  static async waitForText(page: Page, text: string, timeout = 10000): Promise<void> {
     await page.waitForSelector(`text=${text}`, { timeout })
   }
 
   /**
    * 等待URL变化
    */
-  static async waitForUrlChange(page: Page, expectedUrl: string | RegExp, timeout: number = 10000): Promise<void> {
+  static async waitForUrlChange(page: Page, expectedUrl: string | RegExp, timeout = 10000): Promise<void> {
     await page.waitForURL(expectedUrl, { timeout })
   }
 }
@@ -159,9 +159,7 @@ export class PerformanceUtils {
       const lcp = performance.getEntriesByType('largest-contentful-paint')[0]
 
       const fidEntry = performance.getEntriesByType('first-input')[0] as any
-      const clsEntry = performance.getEntriesByType('layout-shift').reduce((sum, entry: any) => {
-        return sum + (entry.hadRecentInput ? 0 : entry.value)
-      }, 0)
+      const clsEntry = performance.getEntriesByType('layout-shift').reduce((sum, entry: any) => sum + (entry.hadRecentInput ? 0 : entry.value), 0)
 
       return {
         firstContentfulPaint: fcp ? fcp.startTime : 0,
@@ -256,7 +254,7 @@ export class NetworkUtils {
   /**
    * Mock网络错误
    */
-  static async mockNetworkError(page: Page, pattern: string | RegExp, statusCode: number = 500): Promise<void> {
+  static async mockNetworkError(page: Page, pattern: string | RegExp, statusCode = 500): Promise<void> {
     await page.route(pattern, async (route) => {
       await route.fulfill({
         status: statusCode,
@@ -323,7 +321,7 @@ export class TestDataUtils {
   /**
    * 生成随机日期时间
    */
-  static generateRandomDateTime(daysFromNow: number = 0): string {
+  static generateRandomDateTime(daysFromNow = 0): string {
     const date = new Date()
     date.setDate(date.getDate() + daysFromNow)
     date.setHours(9 + Math.floor(Math.random() * 10)) // 9 AM to 7 PM
@@ -1015,7 +1013,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   // Mock user messages APIs
   await page.route('**/xiaoxi/**', async (route: any) => {
     const method = route.request().method()
-    
+
     if (method === 'GET') {
       await route.fulfill({
         status: 200,
@@ -1032,6 +1030,312 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
             }
           ],
           total: 1
+        })
+      })
+      return
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 0,
+        msg: '操作成功'
+      })
+    })
+  })
+
+  // Mock equipment management APIs (器材管理)
+  await page.route('**/jianshenqicai/**', async (route: any) => {
+    const method = route.request().method()
+    const url = route.request().url()
+
+    // Handle GET requests for equipment list
+    if (method === 'GET' && url.includes('/list')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: [
+            {
+              id: 1,
+              qicaimingcheng: '跑步机',
+              qicaileixing: '有氧器材',
+              zhuangtai: '可用',
+              weizhi: '一楼有氧区',
+              jiage: '免费',
+              shuliang: '5',
+              tupian: '/uploads/treadmill.jpg'
+            },
+            {
+              id: 2,
+              qicaimingcheng: '哑铃组',
+              qicaileixing: '力量器材',
+              zhuangtai: '部分可用',
+              weizhi: '二楼力量区',
+              jiage: '免费',
+              shuliang: '12',
+              tupian: '/uploads/dumbbells.jpg'
+            },
+            {
+              id: 3,
+              qicaimingcheng: '瑜伽垫',
+              qicaileixing: '辅助器材',
+              zhuangtai: '可用',
+              weizhi: '瑜伽馆',
+              jiage: '免费',
+              shuliang: '20',
+              tupian: '/uploads/yoga-mat.jpg'
+            }
+          ],
+          total: 3
+        })
+      })
+      return
+    }
+
+    // Handle POST requests for equipment booking
+    if (method === 'POST') {
+      const postData = route.request().postDataJSON()
+
+      // Simulate booking conflict
+      if (postData?.shijian?.includes('09:00')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            code: 409,
+            msg: '该时间段器材已被预约'
+          })
+        })
+        return
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: {
+            id: Date.now(),
+            ...postData
+          },
+          msg: '器材预约成功'
+        })
+      })
+      return
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 0,
+        msg: '操作成功'
+      })
+    })
+  })
+
+  // Mock news APIs (新闻资讯)
+  await page.route('**/news/**', async (route: any) => {
+    const method = route.request().method()
+    const url = route.request().url()
+
+    // Handle GET requests for news list
+    if (method === 'GET' && url.includes('/list')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: [
+            {
+              id: 1,
+              title: '健身新趋势：HIIT训练大揭秘',
+              content: 'HIIT（高强度间歇训练）已成为现代健身的重要方式...',
+              author: '健身专家',
+              addtime: '2024-12-01 10:00:00',
+              clicknum: 156,
+              tupian: '/uploads/hiit-news.jpg',
+              thumbsupnum: 23,
+              crazilynum: 5
+            },
+            {
+              id: 2,
+              title: '冬季健身注意事项',
+              content: '冬季健身需要特别注意保暖和热身...',
+              author: '营养师',
+              addtime: '2024-12-02 14:00:00',
+              clicknum: 89,
+              tupian: '/uploads/winter-fitness.jpg',
+              thumbsupnum: 15,
+              crazilynum: 2
+            },
+            {
+              id: 3,
+              title: '瑜伽初学者指南',
+              content: '瑜伽不仅能塑造身材，更能带来心灵的宁静...',
+              author: '瑜伽教练',
+              addtime: '2024-12-03 16:00:00',
+              clicknum: 203,
+              tupian: '/uploads/yoga-guide.jpg',
+              thumbsupnum: 45,
+              crazilynum: 8
+            }
+          ],
+          total: 3
+        })
+      })
+      return
+    }
+
+    // Handle POST requests for likes/comments
+    if (method === 'POST') {
+      const postData = route.request().postDataJSON()
+
+      if (postData?.thumbsup) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            code: 0,
+            msg: '点赞成功'
+          })
+        })
+        return
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: {
+            id: Date.now(),
+            ...postData
+          },
+          msg: '评论成功'
+        })
+      })
+      return
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 0,
+        msg: '操作成功'
+      })
+    })
+  })
+
+  // Mock chat/communication APIs (聊天交流)
+  await page.route('**/liaotian/**', async (route: any) => {
+    const method = route.request().method()
+    const url = route.request().url()
+
+    // Handle GET requests for chat messages
+    if (method === 'GET' && url.includes('/list')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: [
+            {
+              id: 1,
+              sender: '教练张',
+              receiver: 'testuser',
+              content: '您好，欢迎来到健身房！',
+              sendtime: '2024-12-01 09:00:00',
+              isread: 1
+            },
+            {
+              id: 2,
+              sender: 'testuser',
+              receiver: '教练张',
+              content: '谢谢教练，我想了解一下健身计划',
+              sendtime: '2024-12-01 09:05:00',
+              isread: 0
+            },
+            {
+              id: 3,
+              sender: '教练张',
+              receiver: 'testuser',
+              content: '好的，我建议您从基础训练开始',
+              sendtime: '2024-12-01 09:10:00',
+              isread: 0
+            }
+          ],
+          total: 3
+        })
+      })
+      return
+    }
+
+    // Handle POST requests for sending messages
+    if (method === 'POST') {
+      const postData = route.request().postDataJSON()
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: {
+            id: Date.now(),
+            ...postData,
+            sendtime: new Date().toISOString().slice(0, 19).replace('T', ' ')
+          },
+          msg: '消息发送成功'
+        })
+      })
+      return
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 0,
+        msg: '操作成功'
+      })
+    })
+  })
+
+  // Alternative chat API endpoints
+  await page.route('**/chat/**', async (route: any) => {
+    const method = route.request().method()
+
+    if (method === 'GET') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          data: [
+            {
+              id: 1,
+              sender: '系统',
+              message: '欢迎使用在线客服系统',
+              timestamp: '2024-12-01 10:00:00'
+            }
+          ],
+          total: 1
+        })
+      })
+      return
+    }
+
+    if (method === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 0,
+          msg: '消息已发送'
         })
       })
       return

@@ -12,8 +12,8 @@ export const useScrollAnimation = (
   options: ScrollAnimationOptions = {},
 ) => {
   const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
+    entries => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           callback(entry)
           if (options.once) {
@@ -46,4 +46,3 @@ export const useScrollAnimation = (
     disconnect,
   }
 }
-

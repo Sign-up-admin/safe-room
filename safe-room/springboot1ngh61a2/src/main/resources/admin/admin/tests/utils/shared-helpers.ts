@@ -178,7 +178,7 @@ export class TestDataUtils {
   /**
    * 生成随机测试数据
    */
-  static generateRandomData(type: 'user' | 'coach' | 'course' | 'booking'): any {
+  static generateRandomData(type: 'user' | 'coach' | 'course' | 'booking' | 'equipment' | 'news' | 'chat' | 'membership'): any {
     const timestamp = Date.now()
     const randomNum = Math.floor(Math.random() * 1000)
 
@@ -209,6 +209,31 @@ export class TestDataUtils {
           kechengmingcheng: `测试课程${randomNum}`,
           yuyueshijian: new Date(timestamp + randomNum * 3600000).toISOString().slice(0, 16).replace('T', ' '),
           zhuangtai: ['已预约', '已确认', '已完成', '已取消'][randomNum % 4]
+        }
+      case 'equipment':
+        return {
+          qicaimingcheng: `测试器材${randomNum}`,
+          qicaileixing: ['力量器械', '有氧器械', '瑜伽辅助', '健身配件'][randomNum % 4],
+          shuliang: `${5 + (randomNum % 20)}`,
+          jiage: `${500 + (randomNum % 2000)}`
+        }
+      case 'news':
+        return {
+          title: `测试公告${randomNum}`,
+          introduction: `这是测试公告${randomNum}的简介内容`,
+          content: `这是测试公告${randomNum}的详细内容，包含了丰富的资讯和重要通知信息。`
+        }
+      case 'chat':
+        return {
+          content: `这是测试反馈内容${randomNum}，用户提出了使用建议或问题反馈`,
+          reply: `感谢您的反馈，我们会尽快处理您的问题。`
+        }
+      case 'membership':
+        return {
+          huiyuankamingcheng: `测试会员卡${randomNum}`,
+          jiage: `${500 + (randomNum % 2000)}`,
+          youxiaoqi: `${30 + (randomNum % 365)}天`,
+          fuwuneirong: `包含健身房所有课程无限次使用，私人教练指导等全方位服务`
         }
       default:
         return {}
@@ -346,6 +371,26 @@ export class ReportUtils {
   static clearTestResults(): void {
     this.testResults = []
   }
+}
+
+/**
+ * 创建测试数据
+ */
+export async function createTestData(page: Page, type: string, data: any): Promise<void> {
+  // 在实际测试中，这里会通过API创建测试数据
+  // 目前先用Mock的方式处理
+  logStep(`创建测试数据: ${type}`)
+  await page.waitForTimeout(100) // 模拟API调用
+}
+
+/**
+ * 清理测试数据
+ */
+export async function cleanupTestData(page: Page, type: string, identifier: string): Promise<void> {
+  // 在实际测试中，这里会通过API删除测试数据
+  // 目前先用Mock的方式处理
+  logStep(`清理测试数据: ${type} - ${identifier}`)
+  await page.waitForTimeout(100) // 模拟API调用
 }
 
 // 导出便捷函数

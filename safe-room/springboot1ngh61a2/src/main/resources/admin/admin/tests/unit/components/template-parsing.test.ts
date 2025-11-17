@@ -527,7 +527,7 @@ describe('Template Parsing Tests', () => {
       expect(wrapper.text()).toContain('Hidden message')
     })
 
-    it('should parse v-show directive', () => {
+    it('should parse v-show directive', async () => {
       const ShowTemplate = defineComponent({
         data() {
           return {

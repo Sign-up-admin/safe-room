@@ -15,15 +15,22 @@
           <el-form-item :label="field.label" :prop="field.prop">
             <component :is="getFieldComponent(field)" v-bind="getFieldProps(field)">
               <template v-if="field.type === 'select'" #default>
-                <el-option v-for="option in field.options || []" :key="option.value" :label="option.label" :value="option.value" />
+                <el-option
+                  v-for="option in field.options || []"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
               </template>
             </component>
           </el-form-item>
         </el-col>
       </el-row>
       <div class="form-actions">
-        <el-button type="primary" :loading="saving" @click="handleSubmit">提交</el-button>
-        <el-button @click="resetForm">重置</el-button>
+        <el-button type="primary" :loading="saving" data-testid="module-form-submit-button" @click="handleSubmit"
+          >提交</el-button
+        >
+        <el-button data-testid="module-form-reset-button" @click="resetForm">重置</el-button>
       </div>
     </el-form>
   </el-card>
@@ -52,14 +59,17 @@ const emit = defineEmits<{
 const mode = computed(() => props.mode || 'create')
 const config = moduleConfigs[props.moduleKey]
 
-const { formModel, saving, submit, resetForm: resetModuleForm, setFormData } = useModuleForm(
-  props.moduleKey as ModuleKey,
-  (props.initialData || {}) as any,
-)
+const {
+  formModel,
+  saving,
+  submit,
+  resetForm: resetModuleForm,
+  setFormData,
+} = useModuleForm(props.moduleKey as ModuleKey, (props.initialData || {}) as any)
 
 watch(
   () => props.initialData,
-  (val) => {
+  val => {
     if (val) {
       setFormData(val)
     }
@@ -71,7 +81,7 @@ const formRef = ref<FormInstance>()
 
 const formRules = computed<FormRules>(() => {
   const rules: FormRules = {}
-  config.fields.forEach((field) => {
+  config.fields.forEach(field => {
     if (field.required) {
       rules[field.prop] = [
         {
@@ -106,34 +116,35 @@ function getFieldComponent(field: (typeof config.fields)[number]) {
 }
 
 function getFieldProps(field: (typeof config.fields)[number]) {
-  const value = formModel[field.prop as keyof typeof formModel]
+  const prop = field.prop as string
+  const value = (formModel as any)[prop]
   if (field.type === 'textarea') {
     return {
       type: 'textarea',
       rows: 4,
       modelValue: value,
-      'onUpdate:modelValue': (val: any) => (formModel[field.prop as keyof typeof formModel] = val),
+      'onUpdate:modelValue': (val: any) => ((formModel as any)[prop] = val),
       placeholder: field.placeholder || `请输入${field.label}`,
     }
   }
   if (field.type === 'select') {
     return {
       modelValue: value,
-      'onUpdate:modelValue': (val: any) => (formModel[field.prop as keyof typeof formModel] = val),
+      'onUpdate:modelValue': (val: any) => ((formModel as any)[prop] = val),
       placeholder: field.placeholder || `请选择${field.label}`,
     }
   }
   if (field.type === 'number') {
     return {
       modelValue: value,
-      'onUpdate:modelValue': (val: any) => (formModel[field.prop as keyof typeof formModel] = val),
+      'onUpdate:modelValue': (val: any) => ((formModel as any)[prop] = val),
       controls: false,
     }
   }
   if (field.type === 'date' || field.type === 'datetime') {
     return {
       modelValue: value,
-      'onUpdate:modelValue': (val: any) => (formModel[field.prop as keyof typeof formModel] = val),
+      'onUpdate:modelValue': (val: any) => ((formModel as any)[prop] = val),
       type: field.type,
       clearable: true,
       'value-format': field.type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD HH:mm:ss',
@@ -145,19 +156,19 @@ function getFieldProps(field: (typeof config.fields)[number]) {
       fileUrls: value as string,
       action: 'file/upload',
       limit: 1,
-      onChange: (val: string) => (formModel[field.prop as keyof typeof formModel] = val),
+      onChange: (val: string) => ((formModel as any)[prop] = val),
     }
   }
   if (field.type === 'richtext') {
     return {
       value: value as string,
       action: 'file/upload',
-      'onUpdate:value': (val: string) => (formModel[field.prop as keyof typeof formModel] = val),
+      'onUpdate:value': (val: string) => ((formModel as any)[prop] = val),
     }
   }
   return {
     modelValue: value,
-    'onUpdate:modelValue': (val: any) => (formModel[field.prop as keyof typeof formModel] = val),
+    'onUpdate:modelValue': (val: any) => ((formModel as any)[prop] = val),
     placeholder: field.placeholder || `请输入${field.label}`,
     clearable: true,
   }
@@ -246,5 +257,3 @@ function resetForm() {
   }
 }
 </style>
-
-

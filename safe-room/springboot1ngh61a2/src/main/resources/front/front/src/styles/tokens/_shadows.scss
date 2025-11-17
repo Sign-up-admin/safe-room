@@ -5,10 +5,18 @@
 // Shadow Scale
 $shadow-none: none;
 $shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-sm:
+  0 1px 3px 0 rgba(0, 0, 0, 0.1),
+  0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  0 10px 10px -5px rgba(0, 0, 0, 0.04);
 $shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 $shadow-3xl: 0 35px 60px -12px rgba(0, 0, 0, 0.3);
 
@@ -51,7 +59,7 @@ $shadow-scale: (
   'glow-yellow-soft': $shadow-glow-yellow-soft,
   'glow-blue': $shadow-glow-blue,
   'glow-green': $shadow-glow-green,
-  'glow-red': $shadow-glow-red
+  'glow-red': $shadow-glow-red,
 );
 
 // CSS Custom Properties for Shadows
@@ -97,32 +105,74 @@ $shadow-scale: (
 @mixin shadow-colored($color, $size: md) {
   @if map-has-key($shadow-scale, $size) {
     $base-shadow: map-get($shadow-scale, $size);
-    box-shadow: #{$base-shadow}, 0 0 20px rgba($color, 0.2);
+    box-shadow:
+      #{$base-shadow},
+      0 0 20px rgba($color, 0.2);
   } @else {
     box-shadow: 0 0 20px rgba($color, 0.2);
   }
 }
 
 // Shadow Utility Classes
-.shadow-none { box-shadow: var(--shadow-none); }
-.shadow-xs { box-shadow: var(--shadow-xs); }
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow { box-shadow: var(--shadow-md); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-.shadow-xl { box-shadow: var(--shadow-xl); }
-.shadow-2xl { box-shadow: var(--shadow-2xl); }
-.shadow-3xl { box-shadow: var(--shadow-3xl); }
-.shadow-inner { box-shadow: var(--shadow-inner); }
+.shadow-none {
+  box-shadow: var(--shadow-none);
+}
+.shadow-xs {
+  box-shadow: var(--shadow-xs);
+}
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+.shadow {
+  box-shadow: var(--shadow-md);
+}
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+.shadow-2xl {
+  box-shadow: var(--shadow-2xl);
+}
+.shadow-3xl {
+  box-shadow: var(--shadow-3xl);
+}
+.shadow-inner {
+  box-shadow: var(--shadow-inner);
+}
 
-.shadow-card { box-shadow: var(--shadow-card); }
-.shadow-modal { box-shadow: var(--shadow-modal); }
-.shadow-tooltip { box-shadow: var(--shadow-tooltip); }
-.shadow-dropdown { box-shadow: var(--shadow-dropdown); }
-.shadow-button { box-shadow: var(--shadow-button); }
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+.shadow-modal {
+  box-shadow: var(--shadow-modal);
+}
+.shadow-tooltip {
+  box-shadow: var(--shadow-tooltip);
+}
+.shadow-dropdown {
+  box-shadow: var(--shadow-dropdown);
+}
+.shadow-button {
+  box-shadow: var(--shadow-button);
+}
 
-.shadow-glow-yellow { box-shadow: var(--shadow-glow-yellow); }
-.shadow-glow-yellow-soft { box-shadow: var(--shadow-glow-yellow-soft); }
-.shadow-glow-blue { box-shadow: var(--shadow-glow-blue); }
-.shadow-glow-green { box-shadow: var(--shadow-glow-green); }
-.shadow-glow-red { box-shadow: var(--shadow-glow-red); }
+.shadow-glow-yellow {
+  box-shadow: var(--shadow-glow-yellow);
+}
+.shadow-glow-yellow-soft {
+  box-shadow: var(--shadow-glow-yellow-soft);
+}
+.shadow-glow-blue {
+  box-shadow: var(--shadow-glow-blue);
+}
+.shadow-glow-green {
+  box-shadow: var(--shadow-glow-green);
+}
+.shadow-glow-red {
+  box-shadow: var(--shadow-glow-red);
+}

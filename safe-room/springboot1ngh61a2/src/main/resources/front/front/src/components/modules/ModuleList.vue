@@ -8,7 +8,12 @@
             <el-form-item :label="field.label">
               <component :is="getSearchComponent(field)" v-bind="getSearchComponentProps(field)">
                 <template v-if="field.type === 'select'" #default>
-                  <el-option v-for="option in field.options || []" :key="option.value" :label="option.label" :value="option.value" />
+                  <el-option
+                    v-for="option in field.options || []"
+                    :key="option.value"
+                    :label="option.label"
+                    :value="option.value"
+                  />
                 </template>
               </component>
             </el-form-item>
@@ -43,10 +48,22 @@
       >
         <el-table-column type="selection" width="50" />
         <el-table-column type="index" width="60" label="#" />
-        <el-table-column v-for="field in tableFields" :key="field.prop" :prop="field.prop" :label="field.label" min-width="140">
+        <el-table-column
+          v-for="field in tableFields"
+          :key="field.prop"
+          :prop="field.prop"
+          :label="field.label"
+          min-width="140"
+        >
           <template #default="{ row }">
             <div v-if="field.type === 'image'">
-              <el-image v-if="row[field.prop]" :src="row[field.prop]" :preview-src-list="[row[field.prop]]" fit="cover" class="thumb" />
+              <el-image
+                v-if="row[field.prop]"
+                :src="row[field.prop]"
+                :preview-src-list="[row[field.prop]]"
+                fit="cover"
+                class="thumb"
+              />
               <span v-else>--</span>
             </div>
             <span v-else>{{ formatFieldValue(field, row[field.prop]) }}</span>
@@ -100,18 +117,28 @@ const props = defineProps<{
 
 const emit = defineEmits<Emits>()
 
-const { config, loading, records, pagination, searchForm, fetchList, handleSearch, resetSearch, handlePageChange, handlePageSizeChange } =
-  useModuleList(props.moduleKey)
+const {
+  config,
+  loading,
+  records,
+  pagination,
+  searchForm,
+  fetchList,
+  handleSearch,
+  resetSearch,
+  handlePageChange,
+  handlePageSizeChange,
+} = useModuleList(props.moduleKey)
 
-const tableFields = computed(() => config.fields.filter((field) => field.showInTable))
-const searchFields = computed(() => config.fields.filter((field) => field.showInSearch))
+const tableFields = computed(() => config.fields.filter(field => field.showInTable))
+const searchFields = computed(() => config.fields.filter(field => field.showInSearch))
 
 function formatFieldValue(field: FieldConfig, value: any) {
   if (value === undefined || value === null || value === '') {
     return '--'
   }
   if (field.options) {
-    const match = field.options.find((option) => option.value === value)
+    const match = field.options.find(option => option.value === value)
     if (match) return match.label
   }
   switch (field.type) {
@@ -301,5 +328,3 @@ defineExpose({
   }
 }
 </style>
-
-

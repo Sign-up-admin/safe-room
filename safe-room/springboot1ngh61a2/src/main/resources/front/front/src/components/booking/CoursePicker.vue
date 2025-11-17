@@ -1,30 +1,35 @@
 <template>
-  <section class="course-picker">
+  <section class="course-picker" data-testid="booking-course-selection">
     <div class="course-picker__filters">
       <el-input
         v-model="keywordModel"
         placeholder="搜索课程 / 关键字"
         clearable
         :prefix-icon="Search"
+        data-testid="courses-search-input"
         @keyup.enter="$emit('refresh')"
       />
-      <el-select v-model="typeModel" placeholder="课程类型" clearable>
+      <el-select v-model="typeModel" placeholder="课程类型" clearable data-testid="courses-filter-select">
         <el-option v-for="type in courseTypes" :key="type" :label="type" :value="type" />
       </el-select>
       <TechButton size="sm" @click="$emit('refresh')">搜索</TechButton>
     </div>
-    <div class="course-picker__list" v-loading="loading">
+    <div v-loading="loading" class="course-picker__list" data-testid="courses-list-container">
       <article
         v-for="course in courses"
         :key="course.id"
-        :class="['course-picker__item', { 'course-picker__item--selected': course.id === selectedCourse?.id }]"
+        class="course-picker__item"
+        :class="[{ 'course-picker__item--selected': course.id === selectedCourse?.id }]"
+        :data-testid="`course-card-${course.id}`"
         @click="$emit('select', course)"
       >
         <img :src="resolveAssetUrl(course.tupian)" :alt="course.kechengmingcheng" loading="lazy" />
         <div>
           <p class="course-picker__eyebrow">{{ course.kechengleixing || '特色课程' }}</p>
-          <h3>{{ course.kechengmingcheng }}</h3>
-          <p class="course-picker__description">{{ course.kechengjianjie || '智能训练 · 动作实时纠错' }}</p>
+          <h3 :data-testid="`course-title-${course.id}`">{{ course.kechengmingcheng }}</h3>
+          <p class="course-picker__description" :data-testid="`course-description-${course.id}`">
+            {{ course.kechengjianjie || '智能训练 · 动作实时纠错' }}
+          </p>
         </div>
         <strong>{{ formatCurrency(course.kechengjiage || 0) }}</strong>
       </article>
@@ -173,4 +178,3 @@ function resolveAssetUrl(path?: string) {
   }
 }
 </style>
-

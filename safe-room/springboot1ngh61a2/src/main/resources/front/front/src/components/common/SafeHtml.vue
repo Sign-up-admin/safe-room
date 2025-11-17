@@ -1,13 +1,6 @@
 <template>
-  <div
-    v-if="html"
-    :class="className"
-    v-html="sanitizedHtml"
-  />
-  <div
-    v-else
-    :class="className"
-  >
+  <div v-if="html" :class="className" v-html="sanitizedHtml" />
+  <div v-else :class="className">
     <slot />
   </div>
 </template>
@@ -27,26 +20,25 @@ const props = withDefaults(defineProps<Props>(), {
   html: null,
   className: '',
   allowTags: undefined,
-  allowAttrs: undefined
+  allowAttrs: undefined,
 })
 
 const sanitizedHtml = computed(() => {
   if (!props.html) return ''
-  
+
   const options: {
     ALLOWED_TAGS?: string[]
     ALLOWED_ATTR?: string[]
   } = {}
-  
+
   if (props.allowTags) {
     options.ALLOWED_TAGS = props.allowTags
   }
-  
+
   if (props.allowAttrs) {
     options.ALLOWED_ATTR = props.allowAttrs
   }
-  
+
   return sanitizeHtml(props.html, options)
 })
 </script>
-

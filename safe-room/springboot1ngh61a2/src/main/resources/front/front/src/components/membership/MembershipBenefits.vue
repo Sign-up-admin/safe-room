@@ -11,7 +11,8 @@
         <button
           v-for="type in chartTypes"
           :key="type.key"
-          :class="['chart-type-btn', { 'chart-type-btn--active': activeChartType === type.key }]"
+          class="chart-type-btn"
+          :class="[{ 'chart-type-btn--active': activeChartType === type.key }]"
           @click="activeChartType = type.key"
         >
           {{ type.label }}
@@ -20,11 +21,7 @@
 
       <div class="card-selector">
         <select v-model="selectedCardId" class="card-select">
-          <option
-            v-for="card in cards"
-            :key="card.id"
-            :value="card.id"
-          >
+          <option v-for="card in cards" :key="card.id" :value="card.id">
             {{ card.huiyuankamingcheng }}
           </option>
         </select>
@@ -46,11 +43,7 @@
     <!-- 权益说明 -->
     <div class="benefits-explanation">
       <div class="explanation-grid">
-        <div
-          v-for="benefit in currentBenefitsData"
-          :key="benefit.key"
-          class="explanation-item"
-        >
+        <div v-for="benefit in currentBenefitsData" :key="benefit.key" class="explanation-item">
           <div class="benefit-icon">
             <div :class="`benefit-icon-${benefit.key}`"></div>
           </div>
@@ -275,7 +268,8 @@ function drawRadarChart() {
   const radius = Math.min(width, height) / 2
   const angleSlice = (Math.PI * 2) / data.length
 
-  const svg = d3.select(element)
+  const svg = d3
+    .select(element)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
@@ -287,7 +281,8 @@ function drawRadarChart() {
   for (let level = 0; level < levels; level++) {
     const levelFactor = radius * ((level + 1) / levels)
 
-    svg.selectAll(`.level-${level}`)
+    svg
+      .selectAll(`.level-${level}`)
       .data(data)
       .enter()
       .append('line')
@@ -300,13 +295,10 @@ function drawRadarChart() {
   }
 
   // 轴线
-  const axis = svg.selectAll('.axis')
-    .data(data)
-    .enter()
-    .append('g')
-    .attr('class', 'axis')
+  const axis = svg.selectAll('.axis').data(data).enter().append('g').attr('class', 'axis')
 
-  axis.append('line')
+  axis
+    .append('line')
     .attr('x1', 0)
     .attr('y1', 0)
     .attr('x2', (d, i) => radius * Math.cos(angleSlice * i - Math.PI / 2))
@@ -320,7 +312,8 @@ function drawRadarChart() {
     .radius(d => (d.score / 100) * radius)
     .angle((d, i) => i * angleSlice)
 
-  svg.append('path')
+  svg
+    .append('path')
     .datum(data)
     .attr('d', radarLine)
     .attr('fill', 'rgba(253, 216, 53, 0.2)')
@@ -328,7 +321,8 @@ function drawRadarChart() {
     .attr('stroke-width', 2)
 
   // 数据点
-  svg.selectAll('.radar-point')
+  svg
+    .selectAll('.radar-point')
     .data(data)
     .enter()
     .append('circle')
@@ -356,24 +350,25 @@ function drawBarChart() {
   const width = element.clientWidth - margin.left - margin.right
   const height = element.clientHeight - margin.top - margin.bottom
 
-  const svg = d3.select(element)
+  const svg = d3
+    .select(element)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`)
 
-  const x = d3.scaleBand()
+  const x = d3
+    .scaleBand()
     .range([0, width])
     .domain(data.map(d => d.key))
     .padding(0.2)
 
-  const y = d3.scaleLinear()
-    .range([height, 0])
-    .domain([0, 100])
+  const y = d3.scaleLinear().range([height, 0]).domain([0, 100])
 
   // X轴
-  svg.append('g')
+  svg
+    .append('g')
     .attr('transform', `translate(0,${height})`)
     .call(d3.axisBottom(x))
     .selectAll('text')
@@ -383,14 +378,16 @@ function drawBarChart() {
     .style('font-size', '12px')
 
   // Y轴
-  svg.append('g')
+  svg
+    .append('g')
     .call(d3.axisLeft(y))
     .selectAll('text')
     .style('fill', 'rgba(255, 255, 255, 0.7)')
     .style('font-size', '12px')
 
   // 柱子
-  svg.selectAll('.bar')
+  svg
+    .selectAll('.bar')
     .data(data)
     .enter()
     .append('rect')
@@ -421,7 +418,8 @@ function drawComparisonChart() {
   const height = element.clientHeight - margin.top - margin.bottom
   const radius = Math.min(width, height) / 2
 
-  const svg = d3.select(element)
+  const svg = d3
+    .select(element)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
@@ -436,7 +434,8 @@ function drawComparisonChart() {
     .innerRadius(radius * 0.3)
     .outerRadius(radius)
 
-  const color = d3.scaleOrdinal<string>()
+  const color = d3
+    .scaleOrdinal<string>()
     .domain(data.map(d => d.key))
     .range([
       'rgba(253, 216, 53, 0.8)',
@@ -448,20 +447,18 @@ function drawComparisonChart() {
     ])
 
   // 绘制扇形
-  const arcs = svg.selectAll('.arc')
-    .data(pieGenerator(data))
-    .enter()
-    .append('g')
-    .attr('class', 'arc')
+  const arcs = svg.selectAll('.arc').data(pieGenerator(data)).enter().append('g').attr('class', 'arc')
 
-  arcs.append('path')
+  arcs
+    .append('path')
     .attr('d', arcGenerator)
     .attr('fill', d => color(d.data.key))
     .attr('stroke', 'rgba(255, 255, 255, 0.2)')
     .attr('stroke-width', 1)
 
   // 添加标签
-  arcs.append('text')
+  arcs
+    .append('text')
     .attr('transform', d => `translate(${arcGenerator.centroid(d)})`)
     .attr('dy', '0.35em')
     .style('text-anchor', 'middle')
@@ -507,14 +504,17 @@ onUnmounted(() => {
 })
 
 // 监听selectedCardId变化
-watch(() => props.selectedCardId, (newId) => {
-  if (newId) {
-    selectedCardId.value = newId
-  }
-})
+watch(
+  () => props.selectedCardId,
+  newId => {
+    if (newId) {
+      selectedCardId.value = newId
+    }
+  },
+)
 
 // 监听selectedCardId变化发射事件
-watch(selectedCardId, (newId) => {
+watch(selectedCardId, newId => {
   emit('card-select', newId)
 })
 </script>

@@ -69,10 +69,15 @@ export const moduleConfigs: Record<ModuleKey, ModuleConfig> = {
       { prop: 'shoujihaoma', label: '手机号', type: 'text', showInTable: true },
       { prop: 'huiyuankahao', label: '会员卡号', type: 'text', showInTable: true, showInSearch: true },
       { prop: 'youxiaoqizhi', label: '有效期至', type: 'date', showInTable: true },
-      { prop: 'status', label: '状态', type: 'select', options: [
-        { label: '正常', value: 0 },
-        { label: '锁定', value: 1 },
-      ] },
+      {
+        prop: 'status',
+        label: '状态',
+        type: 'select',
+        options: [
+          { label: '正常', value: 0 },
+          { label: '锁定', value: 1 },
+        ],
+      },
     ],
   },
   jianshenjiaolian: {
@@ -121,9 +126,7 @@ export const moduleConfigs: Record<ModuleKey, ModuleConfig> = {
     name: '课程类型',
     api: '/kechengleixing',
     primaryKey: 'id',
-    fields: [
-      { prop: 'kechengleixing', label: '课程类型', required: true, showInTable: true },
-    ],
+    fields: [{ prop: 'kechengleixing', label: '课程类型', required: true, showInTable: true }],
   },
   jianshenkecheng: {
     key: 'jianshenkecheng',
@@ -279,9 +282,7 @@ export const moduleConfigs: Record<ModuleKey, ModuleConfig> = {
     name: '公告类型',
     api: '/newstype',
     primaryKey: 'id',
-    fields: [
-      { prop: 'typename', label: '类型名称', required: true, showInTable: true },
-    ],
+    fields: [{ prop: 'typename', label: '类型名称', required: true, showInTable: true }],
   },
   discussjianshenkecheng: {
     key: 'discussjianshenkecheng',
@@ -361,5 +362,3 @@ export const moduleConfigs: Record<ModuleKey, ModuleConfig> = {
 export function getModuleConfig(key: ModuleKey): ModuleConfig {
   return moduleConfigs[key]
 }
-
-

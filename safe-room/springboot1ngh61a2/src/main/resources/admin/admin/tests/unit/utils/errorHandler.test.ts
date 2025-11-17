@@ -13,10 +13,10 @@ import {
   getStoredErrors,
   clearStoredErrors,
   clearErrorDedupeCache,
-} from '../../../src/utils/errorHandler'
+} from '@/utils/errorHandler'
 
 // Mock http module
-vi.mock('../../../src/utils/http', () => ({
+vi.mock('@/utils/http', () => ({
   default: {
     post: vi.fn(() => Promise.resolve()),
   },

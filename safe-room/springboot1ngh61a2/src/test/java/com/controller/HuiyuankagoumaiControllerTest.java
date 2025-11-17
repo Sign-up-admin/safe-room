@@ -3,7 +3,9 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.HuiyuankagoumaiEntity;
 import com.service.HuiyuankagoumaiService;
+import com.utils.TestDataCleanup;
 import com.utils.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,6 +19,13 @@ class HuiyuankagoumaiControllerTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private HuiyuankagoumaiService huiyuankagoumaiService;
+
+    @AfterEach
+    void cleanupTestData() {
+        // 清理测试会员卡购买记录数据
+        TestDataCleanup.cleanupByPrefix(huiyuankagoumaiService, "huiyuankahao", "member");
+        TestDataCleanup.cleanupByPrefix(huiyuankagoumaiService, "huiyuankahao", "delete");
+    }
 
     @Test
     void shouldReturnPagedPurchases() throws Exception {

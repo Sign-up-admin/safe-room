@@ -353,13 +353,11 @@ describe('Register.vue', () => {
       vm.$refs.formRef = { validate: mockValidate }
 
       // Mock API 响应（延迟响应以测试提交状态）
-      mockAxios.onPost('/yonghu/register').reply(() => {
-        return new Promise(resolve => {
+      mockAxios.onPost('/yonghu/register').reply(() => new Promise(resolve => {
           setTimeout(() => {
             resolve([200, { code: 0, msg: '注册成功' }])
           }, 100)
-        })
-      })
+        }))
 
       // 开始注册
       const registerPromise = vm.handleRegister()

@@ -1,0 +1,308 @@
+name: Test Quality Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/**'
+      - '.github/workflows/test-quality-gate.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/**'
+
+env:
+  TEST_FAILURE_THRESHOLD: 0
+  LINE_COVERAGE_MIN: 65
+  BRANCH_COVERAGE_MIN: 45
+  CONTROLLER_COVERAGE_MIN: 30
+  SERVICE_COVERAGE_MIN: 60
+
+jobs:
+  quality-gate-check:
+    name: Quality Gate Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download test results
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: test-reports-${{ github.run_id }}
+        path: test-reports/
+
+    - name: Download coverage reports
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: coverage-reports-${{ github.run_id }}
+        path: coverage-reports/
+
+    - name: Comprehensive Quality Gate Analysis
+      run: |
+        echo "🔍 Running Comprehensive Quality Gate Analysis..."
+        echo "==================================================="
+
+        FAILED_CHECKS=0
+        WARNINGS=0
+
+        # 1. Check test execution results
+        echo ""
+        echo "1. 📊 Test Execution Analysis"
+        echo "-----------------------------"
+
+        if [ -d "test-reports" ]; then
+          # Parse Surefire XML reports
+          TOTAL_TESTS=0
+          FAILED_TESTS=0
+          ERROR_TESTS=0
+          SKIPPED_TESTS=0
+
+          for xml_file in test-reports/*.xml; do
+            if [ -f "$xml_file" ]; then
+              tests=$(grep -oP '(?<=tests=")[^"]*' "$xml_file" | head -1)
+              failures=$(grep -oP '(?<=failures=")[^"]*' "$xml_file" | head -1)
+              errors=$(grep -oP '(?<=errors=")[^"]*' "$xml_file" | head -1)
+              skipped=$(grep -oP '(?<=skipped=")[^"]*' "$xml_file" | head -1)
+
+              TOTAL_TESTS=$((TOTAL_TESTS + ${tests:-0}))
+              FAILED_TESTS=$((FAILED_TESTS + ${failures:-0}))
+              ERROR_TESTS=$((ERROR_TESTS + ${errors:-0}))
+              SKIPPED_TESTS=$((SKIPPED_TESTS + ${skipped:-0}))
+            fi
+          done
+
+          TOTAL_FAILURES=$((FAILED_TESTS + ERROR_TESTS))
+
+          echo "Total Tests: $TOTAL_TESTS"
+          echo "Failed Tests: $FAILED_TESTS"
+          echo "Error Tests: $ERROR_TESTS"
+          echo "Skipped Tests: $SKIPPED_TESTS"
+          echo "Total Failures: $TOTAL_FAILURES"
+
+          if [ $TOTAL_FAILURES -gt $TEST_FAILURE_THRESHOLD ]; then
+            echo "❌ Test failures ($TOTAL_FAILURES) exceed threshold ($TEST_FAILURE_THRESHOLD)"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ Test failures within acceptable threshold"
+          fi
+        else
+          echo "❌ Test reports not found"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        fi
+
+        # 2. Check coverage metrics
+        echo ""
+        echo "2. 📈 Coverage Analysis"
+        echo "-----------------------"
+
+        if [ -f "coverage-reports/jacoco.xml" ]; then
+          # Install xmlstarlet for better XML parsing
+          apt-get update && apt-get install -y xmlstarlet
+
+          # Extract coverage percentages
+          LINE_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='LINE']/@covered" coverage-reports/jacoco.xml | head -1)
+          LINE_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='LINE']/@total" coverage-reports/jacoco.xml | head -1)
+          LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($LINE_COVERAGE/$LINE_TOTAL)*100}")
+
+          BRANCH_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='BRANCH']/@covered" coverage-reports/jacoco.xml | head -1)
+          BRANCH_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='BRANCH']/@total" coverage-reports/jacoco.xml | head -1)
+          BRANCH_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($BRANCH_COVERAGE/$BRANCH_TOTAL)*100}")
+
+          # Package-level coverage
+          CONTROLLER_LINE_COVERAGE=$(xmlstarlet sel -t -v "//package[contains(@name,'controller')]/counter[@type='LINE']/@covered" coverage-reports/jacoco.xml | paste -sd+ | bc || echo "0")
+          CONTROLLER_LINE_TOTAL=$(xmlstarlet sel -t -v "//package[contains(@name,'controller')]/counter[@type='LINE']/@total" coverage-reports/jacoco.xml | paste -sd+ | bc || echo "1")
+          CONTROLLER_LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($CONTROLLER_LINE_COVERAGE/$CONTROLLER_LINE_TOTAL)*100}")
+
+          SERVICE_LINE_COVERAGE=$(xmlstarlet sel -t -v "//package[contains(@name,'service')]/counter[@type='LINE']/@covered" coverage-reports/jacoco.xml | paste -sd+ | bc || echo "0")
+          SERVICE_LINE_TOTAL=$(xmlstarlet sel -t -v "//package[contains(@name,'service')]/counter[@type='LINE']/@total" coverage-reports/jacoco.xml | paste -sd+ | bc || echo "1")
+          SERVICE_LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($SERVICE_LINE_COVERAGE/$SERVICE_LINE_TOTAL)*100}")
+
+          echo "Coverage Metrics:"
+          echo "  Line Coverage: ${LINE_PERCENTAGE}%"
+          echo "  Branch Coverage: ${BRANCH_PERCENTAGE}%"
+          echo "  Controller Coverage: ${CONTROLLER_LINE_PERCENTAGE}%"
+          echo "  Service Coverage: ${SERVICE_LINE_PERCENTAGE}%"
+
+          # Check coverage thresholds
+          if (( $(echo "$LINE_PERCENTAGE < $LINE_COVERAGE_MIN" | bc -l) )); then
+            echo "❌ Line coverage (${LINE_PERCENTAGE}%) below threshold ($LINE_COVERAGE_MIN%)"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ Line coverage meets threshold"
+          fi
+
+          if (( $(echo "$BRANCH_PERCENTAGE < $BRANCH_COVERAGE_MIN" | bc -l) )); then
+            echo "❌ Branch coverage (${BRANCH_PERCENTAGE}%) below threshold ($BRANCH_COVERAGE_MIN%)"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ Branch coverage meets threshold"
+          fi
+
+          if (( $(echo "$CONTROLLER_LINE_PERCENTAGE < $CONTROLLER_COVERAGE_MIN" | bc -l) )); then
+            echo "❌ Controller coverage (${CONTROLLER_LINE_PERCENTAGE}%) below threshold ($CONTROLLER_COVERAGE_MIN%)"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ Controller coverage meets threshold"
+          fi
+
+          if (( $(echo "$SERVICE_LINE_PERCENTAGE < $SERVICE_COVERAGE_MIN" | bc -l) )); then
+            echo "❌ Service coverage (${SERVICE_LINE_PERCENTAGE}%) below threshold ($SERVICE_COVERAGE_MIN%)"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ Service coverage meets threshold"
+          fi
+
+        else
+          echo "❌ Coverage reports not found"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        fi
+
+        # 3. Check code quality metrics
+        echo ""
+        echo "3. 🔍 Code Quality Checks"
+        echo "-------------------------"
+
+        # Check for compilation warnings/errors
+        if [ -f "test-reports/build.log" ]; then
+          WARNING_COUNT=$(grep -c "WARNING\|warning" test-reports/build.log || echo "0")
+          ERROR_COUNT=$(grep -c "ERROR\|error" test-reports/build.log || echo "0")
+
+          echo "Build Warnings: $WARNING_COUNT"
+          echo "Build Errors: $ERROR_COUNT"
+
+          if [ $ERROR_COUNT -gt 0 ]; then
+            echo "❌ Build errors detected"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          else
+            echo "✅ No build errors"
+          fi
+
+          if [ $WARNING_COUNT -gt 50 ]; then
+            echo "⚠️  High number of build warnings ($WARNING_COUNT)"
+            WARNINGS=$((WARNINGS + 1))
+          fi
+        fi
+
+        # 4. Performance checks
+        echo ""
+        echo "4. ⚡ Performance Checks"
+        echo "-----------------------"
+
+        # Check test execution time (from previous job)
+        if [ -f "coverage-reports/test-duration.txt" ]; then
+          TEST_DURATION=$(cat coverage-reports/test-duration.txt)
+          echo "Test Execution Time: ${TEST_DURATION}s"
+
+          if [ $TEST_DURATION -gt 1800 ]; then
+            echo "⚠️  Test execution time exceeds 30 minutes"
+            WARNINGS=$((WARNINGS + 1))
+          else
+            echo "✅ Test execution time within limits"
+          fi
+        fi
+
+        # 5. Generate quality gate summary
+        echo ""
+        echo "📋 Quality Gate Summary"
+        echo "======================="
+        echo "Failed Checks: $FAILED_CHECKS"
+        echo "Warnings: $WARNINGS"
+
+        if [ $FAILED_CHECKS -gt 0 ]; then
+          echo "❌ QUALITY GATE FAILED"
+          echo ""
+          echo "Blocking Reasons:"
+          echo "- Tests failed or coverage below threshold"
+          echo "- Build errors detected"
+          echo "- Required artifacts missing"
+          exit 1
+        else
+          echo "✅ QUALITY GATE PASSED"
+
+          if [ $WARNINGS -gt 0 ]; then
+            echo ""
+            echo "⚠️  Warnings detected - consider addressing:"
+            echo "- High build warning count"
+            echo "- Long test execution time"
+          fi
+        fi
+
+    - name: Generate Quality Gate Report
+      if: always()
+      run: |
+        echo "📄 Generating Quality Gate Report..."
+
+        REPORT_FILE="quality-gate-report-${{ github.run_id }}.md"
+
+        cat > $REPORT_FILE << EOF
+        # Quality Gate Report
+
+        **Repository**: ${{ github.repository }}
+        **Branch**: ${{ github.ref_name }}
+        **Commit**: ${{ github.sha }}
+        **Run ID**: ${{ github.run_id }}
+        **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+        ## Status
+        $([ $FAILED_CHECKS -gt 0 ] && echo "❌ **FAILED**" || echo "✅ **PASSED**")
+
+        ## Summary
+        - Failed Checks: $FAILED_CHECKS
+        - Warnings: $WARNINGS
+        - Build: $([ -f "test-reports/build.log" ] && echo "Available" || echo "Not Available")
+        - Tests: $([ -d "test-reports" ] && echo "Available" || echo "Not Available")
+        - Coverage: $([ -f "coverage-reports/jacoco.xml" ] && echo "Available" || echo "Not Available")
+
+        ## Details
+        $(if [ -f "coverage-reports/jacoco.xml" ]; then
+          echo "### Coverage Metrics"
+          echo "- Line Coverage: ${LINE_PERCENTAGE}%"
+          echo "- Branch Coverage: ${BRANCH_PERCENTAGE}%"
+          echo "- Controller Coverage: ${CONTROLLER_LINE_PERCENTAGE}%"
+          echo "- Service Coverage: ${SERVICE_LINE_PERCENTAGE}%"
+        fi)
+
+        ---
+        *Generated by GitHub Actions Quality Gate*
+        EOF
+
+        echo "Quality gate report generated: $REPORT_FILE"
+
+    - name: Upload Quality Gate Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: quality-gate-report-${{ github.run_id }}
+        path: quality-gate-report-${{ github.run_id }}.md
+        retention-days: 30
+
+    - name: Comment Quality Gate Status on PR
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const status = ${{ steps.quality-gate.outputs.failed }} > 0 ? 'FAILED' : 'PASSED';
+          const statusEmoji = ${{ steps.quality-gate.outputs.failed }} > 0 ? '❌' : '✅';
+
+          const comment = `${statusEmoji} **Quality Gate ${status}**
+
+          **Failed Checks**: ${{ steps.quality-gate.outputs.failed }}
+          **Warnings**: ${{ steps.quality-gate.outputs.warnings }}
+
+          $( ${{ steps.quality-gate.outputs.failed }} > 0 ? '⚠️ **Build blocked due to quality gate failure**' : '✅ **All quality checks passed**' )
+
+          ---
+          *Report generated by automated quality gate*
+          `;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

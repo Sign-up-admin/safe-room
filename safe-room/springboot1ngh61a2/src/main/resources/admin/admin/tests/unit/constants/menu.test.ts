@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { MENU_CONFIG, getMenuList } from '../../../src/constants/menu'
+import { MENU_CONFIG, getMenuList } from '@/constants/menu'
 
 describe('菜单常量', () => {
   describe('MENU_CONFIG', () => {

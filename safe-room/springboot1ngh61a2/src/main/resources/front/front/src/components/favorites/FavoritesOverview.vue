@@ -6,7 +6,11 @@
         <div class="stat-card">
           <div class="stat-icon">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke="currentColor" stroke-width="2"/>
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
             </svg>
           </div>
           <div class="stat-content">
@@ -18,7 +22,7 @@
         <div class="stat-card">
           <div class="stat-icon">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" />
             </svg>
           </div>
           <div class="stat-content">
@@ -30,7 +34,7 @@
         <div class="stat-card">
           <div class="stat-icon">
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2"/>
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" stroke-width="2" />
             </svg>
           </div>
           <div class="stat-content">
@@ -45,7 +49,7 @@
         <h4>收藏类型分布</h4>
         <div class="chart-container">
           <svg width="200" height="200" viewBox="0 0 200 200" class="donut-chart">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"/>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20" />
             <circle
               v-for="(segment, index) in chartSegments"
               :key="index"
@@ -61,11 +65,7 @@
             />
           </svg>
           <div class="chart-legend">
-            <div
-              v-for="segment in chartSegments"
-              :key="segment.label"
-              class="legend-item"
-            >
+            <div v-for="segment in chartSegments" :key="segment.label" class="legend-item">
               <div class="legend-color" :style="{ backgroundColor: segment.color }"></div>
               <span class="legend-label">{{ segment.label }}</span>
               <span class="legend-value">{{ segment.value }}</span>
@@ -112,7 +112,7 @@ const chartSegments = computed(() => {
       value: category.count,
       color: colors[index % colors.length],
       dashArray,
-      dashOffset: -currentOffset
+      dashOffset: -currentOffset,
     }
 
     currentOffset += dashArray

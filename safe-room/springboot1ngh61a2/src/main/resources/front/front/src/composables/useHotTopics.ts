@@ -18,11 +18,11 @@ export type TimeRange = '24h' | '7d' | '30d' | 'all'
 
 // 热门度计算权重
 const WEIGHTS = {
-  replyCount: 2.0,    // 回复数量权重
-  likeCount: 1.5,     // 点赞数量权重
-  viewCount: 0.5,     // 浏览数量权重
-  timeDecay: 0.8,     // 时间衰减系数
-  tagBonus: 0.3       // 标签匹配奖励
+  replyCount: 2.0, // 回复数量权重
+  likeCount: 1.5, // 点赞数量权重
+  viewCount: 0.5, // 浏览数量权重
+  timeDecay: 0.8, // 时间衰减系数
+  tagBonus: 0.3, // 标签匹配奖励
 }
 
 export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
@@ -42,12 +42,15 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     })
 
     // 计算每个话题的热度
-    const topicMap = new Map<string, {
-      discussions: Discussjianshenkecheng[]
-      totalHeat: number
-      lastActivity: Date
-      tags: Set<string>
-    }>()
+    const topicMap = new Map<
+      string,
+      {
+        discussions: Discussjianshenkecheng[]
+        totalHeat: number
+        lastActivity: Date
+        tags: Set<string>
+      }
+    >()
 
     filteredDiscussions.forEach(discussion => {
       const tags = discussion.tags || []
@@ -60,7 +63,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
             discussions: [],
             totalHeat: 0,
             lastActivity: discussionTime,
-            tags: new Set()
+            tags: new Set(),
           })
         }
 
@@ -81,7 +84,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
       postCount: data.discussions.length,
       trend: calculateTrend(tagName, data.totalHeat),
       lastActivity: data.lastActivity.toISOString(),
-      tags: Array.from(data.tags)
+      tags: Array.from(data.tags),
     }))
 
     // 按热度排序
@@ -97,7 +100,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     return hotTopics.value
       .map(topic => ({
         ...topic,
-        relevanceScore: calculateRelevanceScore(topic, userInterests.value)
+        relevanceScore: calculateRelevanceScore(topic, userInterests.value),
       }))
       .sort((a, b) => b.relevanceScore - a.relevanceScore)
       .slice(0, 5)
@@ -127,9 +130,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     userInterests.value = interests
   }
 
-  const getTopicDetails = (topicId: number) => {
-    return hotTopics.value.find(topic => topic.id === topicId)
-  }
+  const getTopicDetails = (topicId: number) => hotTopics.value.find(topic => topic.id === topicId)
 
   // 辅助函数
   function getTimeThreshold(range: TimeRange, now: Date): Date {
@@ -137,7 +138,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
       '24h': 24 * 60 * 60 * 1000,
       '7d': 7 * 24 * 60 * 60 * 1000,
       '30d': 30 * 24 * 60 * 60 * 1000,
-      'all': Infinity
+      all: Infinity,
     }
 
     return new Date(now.getTime() - thresholds[range])
@@ -149,9 +150,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     const viewCount = discussion.viewCount || 0
 
     // 基础热度计算
-    let heat = replyCount * WEIGHTS.replyCount +
-               likeCount * WEIGHTS.likeCount +
-               viewCount * WEIGHTS.viewCount
+    let heat = replyCount * WEIGHTS.replyCount + likeCount * WEIGHTS.likeCount + viewCount * WEIGHTS.viewCount
 
     // 时间衰减
     const discussionTime = new Date(discussion.addtime || '')
@@ -173,7 +172,7 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     let hash = 0
     for (let i = 0; i < tagName.length; i++) {
       const char = tagName.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
+      hash = (hash << 5) - hash + char
       hash = hash & hash // 转换为32位整数
     }
     return Math.abs(hash)
@@ -220,6 +219,6 @@ export function useHotTopics(discussions: Ref<Discussjianshenkecheng[]>) {
     // 方法
     setTimeRange,
     setUserInterests,
-    getTopicDetails
+    getTopicDetails,
   }
 }

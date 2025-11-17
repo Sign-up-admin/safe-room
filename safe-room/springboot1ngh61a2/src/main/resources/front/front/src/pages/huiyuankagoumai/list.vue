@@ -1,5 +1,5 @@
 <template>
-  <div class="purchase-page" v-loading="loading.cards">
+  <div v-loading="loading.cards" class="purchase-page">
     <section class="purchase-hero">
       <div>
         <p class="section-eyebrow">MEMBERSHIP PURCHASE</p>
@@ -30,7 +30,7 @@
 
     <section v-show="currentStep === 2" class="purchase-section">
       <TechCard title="填写购卡信息" subtitle="我们将同步到个人中心">
-        <el-form :model="form" :rules="rules" ref="formRef" label-position="top" class="purchase-form">
+        <ElForm ref="formRef" :model="form" :rules="rules" label-position="top" class="purchase-form">
           <div class="form-grid">
             <el-form-item label="姓名" prop="name">
               <el-input v-model="form.name" placeholder="请输入姓名" />
@@ -45,7 +45,7 @@
               <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="可填写特殊需求" />
             </el-form-item>
           </div>
-        </el-form>
+        </ElForm>
         <div class="section-actions">
           <TechButton size="sm" variant="ghost" @click="goToStep(1)">上一步</TechButton>
           <TechButton size="sm" :disabled="!canProceedInfo" @click="goToStep(3)">下一步</TechButton>
@@ -86,8 +86,18 @@
             <div class="security-notice">
               <div class="security-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z" stroke="currentColor" stroke-width="2"/>
-                  <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path
+                    d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M9 12l2 2 4-4"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </div>
               <div>
@@ -99,24 +109,22 @@
             <div class="agreements">
               <el-checkbox v-model="agreements.privacy" class="agreement-checkbox">
                 <span>我已阅读并同意</span>
-                <a href="#" @click.prevent class="agreement-link">《隐私政策》</a>
+                <a href="#" class="agreement-link" @click.prevent>《隐私政策》</a>
               </el-checkbox>
 
               <el-checkbox v-model="agreements.membership" class="agreement-checkbox">
                 <span>我已阅读并同意</span>
-                <a href="#" @click.prevent class="agreement-link">《会员服务协议》</a>
+                <a href="#" class="agreement-link" @click.prevent>《会员服务协议》</a>
               </el-checkbox>
 
               <el-checkbox v-model="agreements.refund" class="agreement-checkbox">
                 <span>我已了解</span>
-                <a href="#" @click.prevent class="agreement-link">《退款政策》</a>
+                <a href="#" class="agreement-link" @click.prevent>《退款政策》</a>
               </el-checkbox>
             </div>
 
             <div class="agreement-actions">
-              <small class="agreement-hint">
-                提交订单即表示您已同意以上条款，如有疑问请咨询客服
-              </small>
+              <small class="agreement-hint"> 提交订单即表示您已同意以上条款，如有疑问请咨询客服 </small>
             </div>
           </div>
         </TechCard>
@@ -128,7 +136,7 @@
               :key="method.id"
               :method="method"
               :active="method.id === selectedMethod"
-              @select="(id) => (selectedMethod = id)"
+              @select="id => (selectedMethod = id)"
             />
           </div>
           <div class="section-actions">
@@ -157,8 +165,14 @@
           <div class="success-content">
             <div class="success-icon">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="rgba(253, 216, 53, 0.1)"/>
-                <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="rgba(253, 216, 53, 0.1)" />
+                <path
+                  d="M8 12l2 2 4-4"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
             <p class="success-message">订单已创建，可前往支付页完成付款或在个人中心查看详情。</p>
@@ -177,22 +191,28 @@
 
           <div class="success-actions">
             <TechButton size="sm" variant="ghost" @click="continuePurchase">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
-                <path d="M4 12h16m-8-8v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px">
+                <path d="M4 12h16m-8-8v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
               继续选购
             </TechButton>
             <TechButton size="sm" variant="outline" @click="goCenter">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px">
+                <path
+                  d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" />
               </svg>
               个人中心
             </TechButton>
             <TechButton size="sm" @click="goPay">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px;">
-                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
-                <line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" stroke-width="2"/>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 6px">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2" />
+                <line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" stroke-width="2" />
               </svg>
               前往支付
             </TechButton>
@@ -338,7 +358,7 @@ async function loadCards() {
 function hydrateSelection() {
   const { cardId } = route.query
   if (cardId) {
-    const index = cards.value.findIndex((card) => String(card.id) === String(cardId))
+    const index = cards.value.findIndex(card => String(card.id) === String(cardId))
     if (index >= 0) {
       selectedIndex.value = index
       return
@@ -350,7 +370,10 @@ function hydrateSelection() {
 function deriveBenefits(card: Huiyuanka | undefined) {
   if (!card) return ['预约提前 72h', '私教 9 折', '专属客服', '限定活动']
   const text = card.shiyongshuoming || card.huiyuankaxiangqing || ''
-  const segments = text.split(/[\n、。,，]/).map((item) => item.trim()).filter(Boolean)
+  const segments = text
+    .split(/[\n、。,，]/)
+    .map(item => item.trim())
+    .filter(Boolean)
   if (segments.length) return segments.slice(0, 4)
   return ['预约提前 72h', '私教 9 折', '专属客服', '限定活动']
 }
@@ -654,10 +677,7 @@ async function fetchOrderByCode(code: string) {
   }
   100% {
     opacity: 0;
-    transform: scale(2) rotate(360deg) translate(
-      calc(var(--x, 0) * 100px),
-      calc(var(--y, 0) * 100px)
-    );
+    transform: scale(2) rotate(360deg) translate(calc(var(--x, 0) * 100px), calc(var(--y, 0) * 100px));
   }
 }
 
@@ -778,9 +798,15 @@ async function fetchOrderByCode(code: string) {
   .tech-button {
     animation: action-button-appear 0.4s ease-out both;
 
-    &:nth-child(1) { animation-delay: 0.8s; }
-    &:nth-child(2) { animation-delay: 0.9s; }
-    &:nth-child(3) { animation-delay: 1.0s; }
+    &:nth-child(1) {
+      animation-delay: 0.8s;
+    }
+    &:nth-child(2) {
+      animation-delay: 0.9s;
+    }
+    &:nth-child(3) {
+      animation-delay: 1s;
+    }
   }
 }
 

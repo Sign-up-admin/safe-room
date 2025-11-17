@@ -72,7 +72,7 @@ export const useHoverGlow = (globalOptions: HoverGlowOptions = {}) => {
   }
 
   onBeforeUnmount(() => {
-    disposers.forEach((dispose) => dispose())
+    disposers.forEach(dispose => dispose())
     disposers.clear()
   })
 
@@ -81,5 +81,3 @@ export const useHoverGlow = (globalOptions: HoverGlowOptions = {}) => {
     detach,
   }
 }
-
-

@@ -6,5 +6,3 @@ export { default as Equipment3DViewer } from './Equipment3DViewer.vue'
 export { default as MobileForm } from './MobileForm.vue'
 export { default as RecommendationCard } from './RecommendationCard.vue'
 export type { TechStepperStep } from './TechStepper.vue'
-
-

@@ -43,4 +43,3 @@ export const useBookingStore = defineStore('booking', {
     },
   },
 })
-

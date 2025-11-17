@@ -30,4 +30,3 @@ export interface StoreupItem {
   remark?: string
   addtime?: string
 }
-

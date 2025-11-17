@@ -40,4 +40,3 @@ declare module 'vue' {
     $http: AxiosInstance
   }
 }
-

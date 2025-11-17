@@ -1,12 +1,15 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { createRouter, createMemoryHistory } from 'vue-router'
-import { createPinia } from 'pinia'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { mount, VueWrapper } from '@vue/test-utils'
+import { createRouter, createMemoryHistory, Router } from 'vue-router'
+import { createPinia, Pinia } from 'pinia'
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
 import App from '@/App.vue'
 
 describe('App', () => {
-  let router: any
-  let pinia: any
+  let router: Router
+  let pinia: Pinia
+  let wrapper: VueWrapper
 
   beforeEach(() => {
     pinia = createPinia()
@@ -20,11 +23,132 @@ describe('App', () => {
     })
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+    }
+    vi.clearAllMocks()
+  })
+
+  describe('Lifecycle Hooks', () => {
+    it('should mount successfully and render router-view', async () => {
+      wrapper = mount(App, {
+        global: {
+          plugins: [router, pinia, ElementPlus]
+        }
+      })
+
+      expect(wrapper.exists()).toBe(true)
+      expect(wrapper.vm).toBeDefined()
+
+      // Verify router-view is present
+      const routerView = wrapper.find('router-view')
+      expect(routerView.exists()).toBe(true)
+
+      // Wait for any async operations
+      await wrapper.vm.$nextTick()
+    })
+
+    it('should handle component mounting and DOM attachment', () => {
+      wrapper = mount(App, {
+        global: {
+          plugins: [router, pinia, ElementPlus]
+        },
+        attachTo: document.body
+      })
+
+      // Verify component is attached to DOM
+      expect(wrapper.element.parentElement).toBe(document.body)
+      expect(wrapper.element.tagName.toLowerCase()).toBe('div')
+      expect(wrapper.element.classList.contains('app-container')).toBe(true)
+    })
+
+    it('should handle component unmounting correctly', async () => {
+      wrapper = mount(App, {
+        global: {
+          plugins: [router, pinia, ElementPlus]
+        }
+      })
+
+      // Unmount component
+      wrapper.unmount()
+
+      // Verify component is unmounted
+      expect(wrapper.element.parentElement).toBeNull()
+    })
+
+    it('should respond to route changes during lifecycle', async () => {
+      wrapper = mount(App, {
+        global: {
+          plugins: [router, pinia, ElementPlus]
+        }
+      })
+
+      // Navigate to home route
+      await router.push('/')
+      await wrapper.vm.$nextTick()
+
+      // Verify router-view is still present and component remains mounted
+      expect(wrapper.find('router-view').exists()).toBe(true)
+      expect(wrapper.vm).toBeDefined()
+
+      // Navigate to login route
+      await router.push('/login')
+      await wrapper.vm.$nextTick()
+
+      // Verify component state is maintained
+      expect(wrapper.find('router-view').exists()).toBe(true)
+      expect(wrapper.vm).toBeDefined()
+    })
+
+    it('should maintain component state across route transitions', async () => {
+      wrapper = mount(App, {
+        global: {
+          plugins: [router, pinia, ElementPlus]
+        }
+      })
+
+      const initialElement = wrapper.element
+
+      // Navigate between routes
+      await router.push('/')
+      await wrapper.vm.$nextTick()
+
+      await router.push('/login')
+      await wrapper.vm.$nextTick()
+
+      // Verify the same DOM element is maintained
+      expect(wrapper.element).toBe(initialElement)
+      expect(wrapper.element.classList.contains('app-container')).toBe(true)
+    })
+
+    it('should handle async operations during mounting', async () => {
+      const mountPromise = new Promise(resolve => {
+        wrapper = mount(App, {
+          global: {
+            plugins: [router, pinia, ElementPlus]
+          }
+        })
+
+        // Simulate async operation
+        setTimeout(() => {
+          resolve(void 0)
+        }, 10)
+      })
+
+      await mountPromise
+
+      // Verify component is still functional after async operation
+      expect(wrapper.exists()).toBe(true)
+      expect(wrapper.find('router-view').exists()).toBe(true)
+    })
+  })
+
   describe('Component Rendering', () => {
     it('should render the app container', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -33,9 +157,9 @@ describe('App', () => {
     })
 
     it('should have correct CSS classes', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -44,9 +168,9 @@ describe('App', () => {
     })
 
     it('should contain router-view', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -59,9 +183,9 @@ describe('App', () => {
     it('should render router-view content', async () => {
       await router.push('/')
 
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -73,9 +197,9 @@ describe('App', () => {
     })
 
     it('should handle route changes', async () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -95,9 +219,9 @@ describe('App', () => {
 
   describe('App Structure', () => {
     it('should have proper HTML structure', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -107,9 +231,9 @@ describe('App', () => {
     })
 
     it('should render as expected', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 
@@ -120,9 +244,9 @@ describe('App', () => {
 
   describe('Styling', () => {
     it('should apply base styles', () => {
-      const wrapper = mount(App, {
+      wrapper = mount(App, {
         global: {
-          plugins: [router, pinia]
+          plugins: [router, pinia, ElementPlus]
         }
       })
 

@@ -45,6 +45,52 @@ class GlobalExceptionHandlerTest {
         assertThat(response.get("code")).isEqualTo(500);
         assertThat(response.get("msg")).isEqualTo("An unexpected error occurred: something unexpected");
     }
+
+    @Test
+    void handleNullPointerExceptionShouldReturn500Code() {
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        R response = handler.handleException(new NullPointerException("null reference"), mockResponse);
+
+        assertThat(response.get("code")).isEqualTo(500);
+        assertThat(response.get("msg")).isEqualTo("An unexpected error occurred: null reference");
+    }
+
+    @Test
+    void handleNumberFormatExceptionShouldReturn500Code() {
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        R response = handler.handleException(new NumberFormatException("invalid number"), mockResponse);
+
+        assertThat(response.get("code")).isEqualTo(500);
+        assertThat(response.get("msg")).isEqualTo("An unexpected error occurred: invalid number");
+    }
+
+    @Test
+    void handleExceptionWithNullMessageShouldHandleGracefully() {
+        MockHttpServletResponse mockResponse = new MockHttpServletResponse();
+        RuntimeException exception = new RuntimeException((String) null);
+        R response = handler.handleException(exception, mockResponse);
+
+        assertThat(response.get("code")).isEqualTo(500);
+        assertThat(response.get("msg")).isEqualTo("An unexpected error occurred");
+    }
+
+    @Test
+    void handleSQLExceptionWithNullCauseShouldHandleGracefully() {
+        SQLException sqlException = new SQLException("database error", (String) null, 0, null);
+        R response = handler.handleSQLException(sqlException);
+
+        assertThat(response.get("code")).isEqualTo(500);
+        assertThat(response.get("msg")).asString().contains("database error");
+    }
+
+    @Test
+    void handleEIExceptionWithNullMessageShouldHandleGracefully() {
+        EIException eiException = new EIException(null, 404);
+        R response = handler.handleEIException(eiException);
+
+        assertThat(response.get("code")).isEqualTo(404);
+        assertThat(response.get("msg")).isNull();
+    }
 }
 
 

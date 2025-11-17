@@ -5,7 +5,7 @@
         <component :is="getIcon()" size="16" />
         <span>{{ getTypeLabel() }}</span>
       </div>
-      <div class="recommendation-score" v-if="showScore">
+      <div v-if="showScore" class="recommendation-score">
         <span class="score-label">匹配度</span>
         <div class="score-bar">
           <div class="score-fill" :style="{ width: `${score}%` }"></div>
@@ -16,72 +16,107 @@
 
     <div class="recommendation-content">
       <h4 class="recommendation-title">
-        <component :is="interactive ? 'button' : 'span'" @click="handleClick" :class="{ 'title-link': interactive }">
+        <component :is="interactive ? 'button' : 'span'" :class="{ 'title-link': interactive }" @click="handleClick">
           {{ item.title || item.name }}
         </component>
       </h4>
 
-      <p class="recommendation-description" v-if="item.description">
+      <p v-if="item.description" class="recommendation-description">
         {{ item.description }}
       </p>
 
-      <div class="recommendation-meta" v-if="item.meta">
+      <div v-if="item.meta" class="recommendation-meta">
         <span v-for="(meta, index) in item.meta" :key="index" class="meta-item">
           {{ meta.label }}: {{ meta.value }}
         </span>
       </div>
 
-      <div class="recommendation-tags" v-if="item.tags && item.tags.length">
-        <span v-for="tag in item.tags.slice(0, 3)" :key="tag" class="tag">
-          #{{ tag }}
-        </span>
+      <div v-if="item.tags && item.tags.length" class="recommendation-tags">
+        <span v-for="tag in item.tags.slice(0, 3)" :key="tag" class="tag"> #{{ tag }} </span>
       </div>
     </div>
 
-    <div class="recommendation-actions" v-if="interactive">
+    <div v-if="interactive" class="recommendation-actions">
       <button
         class="action-btn like-btn"
         :class="{ 'like-btn--liked': item.isLiked }"
-        @click="handleLike"
         :aria-label="`点赞 ${item.title || item.name}`"
+        @click="handleLike"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         {{ item.likes || 0 }}
       </button>
 
-      <button
-        class="action-btn share-btn"
-        @click="handleShare"
-        :aria-label="`分享 ${item.title || item.name}`"
-      >
+      <button class="action-btn share-btn" :aria-label="`分享 ${item.title || item.name}`" @click="handleShare">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <polyline points="16,6 12,2 8,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <polyline
+            points="16,6 12,2 8,6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <line
+            x1="12"
+            y1="2"
+            x2="12"
+            y2="15"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         分享
       </button>
 
-      <button
-        class="action-btn dismiss-btn"
-        @click="handleDismiss"
-        :aria-label="`不再推荐 ${item.title || item.name}`"
-      >
+      <button class="action-btn dismiss-btn" :aria-label="`不再推荐 ${item.title || item.name}`" @click="handleDismiss">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line
+            x1="18"
+            y1="6"
+            x2="6"
+            y2="18"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <line
+            x1="6"
+            y1="6"
+            x2="18"
+            y2="18"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
 
     <!-- 推荐理由 -->
-    <div class="recommendation-reason" v-if="reason">
+    <div v-if="reason" class="recommendation-reason">
       <small class="reason-text">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-          <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+          <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
         {{ reason }}
       </small>
@@ -93,6 +128,18 @@
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
+const props = withDefaults(defineProps<Props>(), {
+  type: 'discussion',
+  showScore: true,
+  interactive: true,
+})
+// Emits
+const emit = defineEmits<{
+  click: [item: RecommendationItem]
+  like: [item: RecommendationItem]
+  share: [item: RecommendationItem]
+  dismiss: [item: RecommendationItem]
+}>()
 // 图标组件
 const Star = 'Star'
 const TrendingUp = 'TrendingUp'
@@ -121,20 +168,6 @@ interface Props {
   showScore?: boolean
   interactive?: boolean
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  type: 'discussion',
-  showScore: true,
-  interactive: true
-})
-
-// Emits
-const emit = defineEmits<{
-  click: [item: RecommendationItem]
-  like: [item: RecommendationItem]
-  share: [item: RecommendationItem]
-  dismiss: [item: RecommendationItem]
-}>()
 
 // 计算属性
 const score = computed(() => props.score || props.item.score || 0)
@@ -185,7 +218,7 @@ const handleShare = () => {
     navigator.share({
       title: props.item.title || props.item.name,
       text: props.item.description,
-      url: url
+      url: url,
     })
   } else {
     navigator.clipboard.writeText(url).then(() => {

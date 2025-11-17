@@ -2,20 +2,18 @@
   <div class="home">
     <main class="home__main">
       <HeroSection @book="handleBook" @view-courses="() => handleNav({ routeName: 'courses' })" />
-      <CoachNetwork :nodes="coachNodes" :links="coachLinks" @navigate="handleCoachNavigate" v-loading="loading.coaches" />
+      <CoachNetwork
+        v-loading="loading.coaches"
+        :nodes="coachNodes"
+        :links="coachLinks"
+        @navigate="handleCoachNavigate"
+      />
       <ServiceCards @navigate="handleServiceNavigate" />
 
-      <section class="home__section home__section--combined" v-loading="loading.courses">
+      <section v-loading="loading.courses" class="home__section home__section--combined">
         <!-- 背景视频 -->
-        <video
-          class="combined-bg-video"
-          :src="videoBgSrc"
-          autoplay
-          muted
-          loop
-          playsinline
-        />
-        
+        <video class="combined-bg-video" :src="videoBgSrc" autoplay muted loop playsinline />
+
         <!-- 内容层 -->
         <div class="combined-content">
           <!-- 热门课程部分 -->
@@ -49,7 +47,7 @@
         </div>
       </section>
 
-      <section class="home__section home__section--news" v-loading="loading.news">
+      <section v-loading="loading.news" class="home__section home__section--news">
         <div class="section-header">
           <div>
             <p class="section-eyebrow">LATEST UPDATES</p>
@@ -131,11 +129,7 @@ const loading = reactive({
 onMounted(async () => {
   try {
     // Load data in parallel but handle errors gracefully
-    const promises = [
-      loadHotCourses(),
-      loadNews(),
-      loadCoaches()
-    ]
+    const promises = [loadHotCourses(), loadNews(), loadCoaches()]
 
     // Use Promise.allSettled to prevent one failure from blocking others
     const results = await Promise.allSettled(promises)
@@ -246,9 +240,7 @@ async function loadCoaches() {
 function mapCoachToNode(coach: Jianshenjiaolian, index: number): CoachNodeView {
   const id = String(coach.id ?? coach.jiaoliangonghao ?? index)
   const strengthTags = ['力量与体能', '燃脂塑形', '功能康复', '青少年体适能']
-  const role =
-    coach.gerenjianjie?.slice(0, 24) ||
-    `${strengthTags[index % strengthTags.length]} · 认证私教`
+  const role = coach.gerenjianjie?.slice(0, 24) || `${strengthTags[index % strengthTags.length]} · 认证私教`
 
   return {
     id,
@@ -374,20 +366,17 @@ const videoBgSrc = `${normalizedBase}/file/video/qicai.mp4`
     font-size: 32px;
     color: #f7fbea;
   }
-  
 }
 
 .section-eyebrow {
   color: #fdd835;
   letter-spacing: 0.4em;
   margin: 0;
-  
 }
 
 .section-description {
   color: #9aa0b3;
   font-size: 0.95rem;
-  
 }
 
 .carousel-item {

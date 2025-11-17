@@ -5,22 +5,21 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * Metrics Interceptor for collecting API performance metrics
  * Records response times and request counts for all API endpoints
  */
-@Component
 public class MetricsInterceptor implements HandlerInterceptor {
 
-    @Autowired
-    private MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
+    private final MetricsConfig metricsConfig;
 
-    @Autowired
-    private MetricsConfig metricsConfig;
+    public MetricsInterceptor(MeterRegistry meterRegistry, MetricsConfig metricsConfig) {
+        this.meterRegistry = meterRegistry;
+        this.metricsConfig = metricsConfig;
+    }
 
     private final ThreadLocal<Long> startTime = new ThreadLocal<>();
 

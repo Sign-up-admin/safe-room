@@ -3,7 +3,9 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.HuiyuanxufeiEntity;
 import com.service.HuiyuanxufeiService;
+import com.utils.TestDataCleanup;
 import com.utils.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,6 +19,13 @@ class HuiyuanxufeiControllerTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private HuiyuanxufeiService huiyuanxufeiService;
+
+    @AfterEach
+    void cleanupTestData() {
+        // 清理测试会员续费记录数据
+        TestDataCleanup.cleanupByPrefix(huiyuanxufeiService, "huiyuankahao", "test-renewal");
+        TestDataCleanup.cleanupByPrefix(huiyuanxufeiService, "huiyuankahao", "delete");
+    }
 
     @Test
     void shouldReturnPagedRenewals() throws Exception {

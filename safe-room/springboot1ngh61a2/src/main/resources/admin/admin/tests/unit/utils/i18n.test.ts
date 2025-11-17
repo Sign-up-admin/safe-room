@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateTitle } from '../../../src/utils/i18n'
+import { generateTitle } from '@/utils/i18n'
 
 describe('i18n工具', () => {
   describe('generateTitle', () => {

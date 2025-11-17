@@ -43,9 +43,9 @@ export function cleanupMockAdapter() {
  * 创建标准API响应
  */
 export function createApiResponse<T = any>(
-  code: number = 0,
+  code = 0,
   data?: T,
-  msg: string = 'success'
+  msg = 'success'
 ) {
   return {
     code,
@@ -60,8 +60,8 @@ export function createApiResponse<T = any>(
 export function createPaginatedResponse<T = any>(
   list: T[],
   total: number,
-  page: number = 1,
-  size: number = 10
+  page = 1,
+  size = 10
 ) {
   return createApiResponse(0, {
     list,
@@ -87,8 +87,7 @@ export const mockUserData = {
     ...overrides
   }),
 
-  createUserList: (count: number = 5) => {
-    return Array.from({ length: count }, (_, i) =>
+  createUserList: (count = 5) => Array.from({ length: count }, (_, i) =>
       mockUserData.createUser({
         id: i + 1,
         username: `user${i + 1}`,
@@ -96,7 +95,6 @@ export const mockUserData = {
         phone: `13800138${String(i + 1).padStart(3, '0')}`
       })
     )
-  }
 }
 
 /**
@@ -116,7 +114,7 @@ export const mockCourseData = {
     ...overrides
   }),
 
-  createCourseList: (count: number = 5) => {
+  createCourseList: (count = 5) => {
     const categories = ['健身', '瑜伽', '舞蹈', '力量训练']
     const difficulties = ['初级', '中级', '高级']
 
@@ -149,8 +147,7 @@ export const mockReservationData = {
     ...overrides
   }),
 
-  createReservationList: (count: number = 5) => {
-    return Array.from({ length: count }, (_, i) =>
+  createReservationList: (count = 5) => Array.from({ length: count }, (_, i) =>
       mockReservationData.createReservation({
         id: i + 1,
         userId: i + 1,
@@ -158,7 +155,6 @@ export const mockReservationData = {
         status: i % 2 === 0 ? 'confirmed' : 'pending'
       })
     )
-  }
 }
 
 /**
@@ -178,7 +174,7 @@ export const mockOrderData = {
     ...overrides
   }),
 
-  createOrderList: (count: number = 5) => {
+  createOrderList: (count = 5) => {
     const statuses = ['paid', 'pending', 'cancelled', 'refunded']
 
     return Array.from({ length: count }, (_, i) =>
@@ -211,7 +207,7 @@ export const mockCoachData = {
     ...overrides
   }),
 
-  createCoachList: (count: number = 5) => {
+  createCoachList: (count = 5) => {
     const specialties = ['健身训练', '瑜伽教学', '舞蹈指导', '力量训练', '游泳教学']
 
     return Array.from({ length: count }, (_, i) =>
@@ -241,7 +237,7 @@ export const mockMembershipCardData = {
     ...overrides
   }),
 
-  createCardList: (count: number = 3) => {
+  createCardList: (count = 3) => {
     const cardTypes = [
       { name: '铜卡会员', price: 499, duration: 90 },
       { name: '银卡会员', price: 999, duration: 180 },
@@ -272,7 +268,7 @@ export const mockNewsData = {
     ...overrides
   }),
 
-  createNewsList: (count: number = 5) => {
+  createNewsList: (count = 5) => {
     const titles = [
       '健身新趋势：HIIT训练大受欢迎',
       '营养搭配指南：运动后如何补充能量',
@@ -307,7 +303,7 @@ export const mockCommentData = {
     ...overrides
   }),
 
-  createCommentList: (count: number = 5) => {
+  createCommentList: (count = 5) => {
     const comments = [
       '课程内容很丰富，教练很有耐心！',
       '练习效果很好，坚持练习感觉身体变化很大',
@@ -560,37 +556,27 @@ export const errorResponses = {
  * 测试数据验证器
  */
 export const dataValidators = {
-  isValidUser: (user: any) => {
-    return user &&
+  isValidUser: (user: any) => user &&
            typeof user.id === 'number' &&
            typeof user.username === 'string' &&
-           typeof user.email === 'string'
-  },
+           typeof user.email === 'string',
 
-  isValidCourse: (course: any) => {
-    return course &&
+  isValidCourse: (course: any) => course &&
            typeof course.id === 'number' &&
            typeof course.name === 'string' &&
-           typeof course.price === 'number'
-  },
+           typeof course.price === 'number',
 
-  isValidReservation: (reservation: any) => {
-    return reservation &&
+  isValidReservation: (reservation: any) => reservation &&
            typeof reservation.id === 'number' &&
            typeof reservation.userId === 'number' &&
-           typeof reservation.courseId === 'number'
-  },
+           typeof reservation.courseId === 'number',
 
-  isValidApiResponse: (response: any) => {
-    return response &&
+  isValidApiResponse: (response: any) => response &&
            typeof response.code === 'number' &&
-           typeof response.msg === 'string'
-  },
+           typeof response.msg === 'string',
 
-  isValidPaginatedResponse: (response: any) => {
-    return dataValidators.isValidApiResponse(response) &&
+  isValidPaginatedResponse: (response: any) => dataValidators.isValidApiResponse(response) &&
            response.data &&
            Array.isArray(response.data.list) &&
            typeof response.data.total === 'number'
-  }
 }

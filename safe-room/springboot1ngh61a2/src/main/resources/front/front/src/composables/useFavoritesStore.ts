@@ -27,12 +27,12 @@ export function useFavoritesStore() {
   const pagination = reactive({
     page: 1,
     limit: 12,
-    total: 0
+    total: 0,
   })
 
   const filters = reactive<FavoritesFilters>({
     category: 'all',
-    keyword: ''
+    keyword: '',
   })
 
   const selectionState = reactive<Record<number, boolean>>({})
@@ -42,11 +42,11 @@ export function useFavoritesStore() {
   const selectedIds = computed(() =>
     Object.entries(selectionState)
       .filter(([, checked]) => checked)
-      .map(([id]) => Number(id))
+      .map(([id]) => Number(id)),
   )
 
-  const filteredFavorites = computed(() => {
-    return favorites.value.filter(item => {
+  const filteredFavorites = computed(() =>
+    favorites.value.filter(item => {
       const matchCategory = filters.category === 'all' || item.tablename === filters.category
       const keyword = filters.keyword.trim().toLowerCase()
       const matchKeyword =
@@ -55,8 +55,8 @@ export function useFavoritesStore() {
         item.remark?.toLowerCase().includes(keyword) ||
         translateTableName(item.tablename).includes(filters.keyword)
       return matchCategory && matchKeyword
-    })
-  })
+    }),
+  )
 
   const categories = computed(() => {
     const map: Record<string, number> = {}
@@ -94,13 +94,13 @@ export function useFavoritesStore() {
     const categoryData = Object.entries(categoryMap).map(([name, count], index) => ({
       name: translateTableName(name),
       count,
-      color: colors[index % colors.length]
+      color: colors[index % colors.length],
     }))
 
     return {
       totalCount: favorites.value.length,
       recentCount,
-      categories: categoryData
+      categories: categoryData,
     }
   })
 
@@ -111,7 +111,7 @@ export function useFavoritesStore() {
       const params = {
         page: pagination.page,
         limit: pagination.limit,
-        userid: localStorage.getItem('userid')
+        userid: localStorage.getItem('userid'),
       }
 
       const response = await storeupService.list(params)
@@ -156,7 +156,7 @@ export function useFavoritesStore() {
         tablename,
         name,
         picture,
-        userid: Number(localStorage.getItem('userid'))
+        userid: Number(localStorage.getItem('userid')),
       }
 
       const response = await storeupService.save(data)
@@ -212,7 +212,7 @@ export function useFavoritesStore() {
       jianshenjiaolian: '教练',
       jianshenqicai: '器材',
       news: '新闻',
-      discussjianshenkecheng: '讨论'
+      discussjianshenkecheng: '讨论',
     }
     return map[tablename || ''] || '其他'
   }
@@ -222,12 +222,14 @@ export function useFavoritesStore() {
     const selectedItems = favorites.value.filter(item => selectedIds.value.includes(item.id!))
     const csvContent = [
       ['名称', '类型', '收藏时间', '来源ID'].join(','),
-      ...selectedItems.map(item => [
-        `"${item.name || ''}"`,
-        `"${translateTableName(item.tablename)}"`,
-        `"${formatDate(item.addtime)}"`,
-        `"${item.refid || ''}"`
-      ].join(','))
+      ...selectedItems.map(item =>
+        [
+          `"${item.name || ''}"`,
+          `"${translateTableName(item.tablename)}"`,
+          `"${formatDate(item.addtime)}"`,
+          `"${item.refid || ''}"`,
+        ].join(','),
+      ),
     ].join('\n')
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -244,16 +246,14 @@ export function useFavoritesStore() {
   // 批量分享
   async function shareFavorites() {
     const selectedItems = favorites.value.filter(item => selectedIds.value.includes(item.id!))
-    const shareText = selectedItems.map(item =>
-      `${item.name} - ${translateTableName(item.tablename)}`
-    ).join('\n')
+    const shareText = selectedItems.map(item => `${item.name} - ${translateTableName(item.tablename)}`).join('\n')
 
     try {
       if (navigator.share) {
         await navigator.share({
           title: '我的收藏列表',
           text: shareText,
-          url: window.location.href
+          url: window.location.href,
         })
       } else {
         // 复制到剪贴板

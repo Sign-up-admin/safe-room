@@ -8,6 +8,146 @@ param(
     [string]$TestPattern = "*"
 )
 
+# PowerShell兼容性检查（增强版）
+function Test-PowerShellCompatibility {
+    $psVersion = $PSVersionTable.PSVersion
+    $minVersion = [version]"5.1"
+
+    if ($psVersion -lt $minVersion) {
+        Write-Host "错误: 此脚本需要 PowerShell $minVersion 或更高版本。当前版本: $psVersion" -ForegroundColor Red
+        exit 1
+    }
+
+    # 检查是否使用了不支持的语法
+    $isPSCore = $PSVersionTable.PSVersion.Major -ge 6
+    if (-not $isPSCore) {
+        Write-Host "警告: 使用 Windows PowerShell $psVersion，某些功能可能受限" -ForegroundColor Yellow
+        Write-Host "建议升级到 PowerShell Core 7+ 以获得更好的跨平台支持" -ForegroundColor Yellow
+    }
+
+    Write-Host "PowerShell版本: $psVersion ($($PSVersionTable.PSEdition))" -ForegroundColor Cyan
+}
+
+# 跨平台命令执行函数 - 增强PowerShell兼容性
+function Invoke-CrossPlatformCommand {
+    param(
+        [string]$Command,
+        [string]$WorkingDirectory = $null,
+        [switch]$UseShellExecute
+    )
+
+    try {
+        # PowerShell兼容性检查
+        $isPSCore = $PSVersionTable.PSVersion.Major -ge 6
+        $isWindows = if ($PSVersionTable.PSVersion.Major -ge 6) {
+            $IsWindows
+        } else {
+            $true  # 假设Windows PowerShell在Windows上运行
+        }
+
+        if ($UseShellExecute -or ($isWindows -and -not $isPSCore)) {
+            # Windows PowerShell 或明确要求使用shell执行
+            $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $startInfo.FileName = if ($isWindows) { "cmd.exe" } else { "/bin/bash" }
+            $startInfo.Arguments = if ($isWindows) { "/c `"$Command`"" } else { "-c `"$Command`"" }
+            $startInfo.UseShellExecute = $false
+            $startInfo.RedirectStandardOutput = $true
+            $startInfo.RedirectStandardError = $true
+            $startInfo.CreateNoWindow = $true
+        } else {
+            # PowerShell Core 或跨平台场景
+            # 解析命令和参数，避免&&解析问题
+            $commandParts = $Command -split '(?<!\\)&&'  # 负向预查，避免转义的&&
+            if ($commandParts.Length -gt 1) {
+                # 多命令链，递归执行
+                $results = @()
+                foreach ($cmd in $commandParts) {
+                    $cmd = $cmd.Trim()
+                    if ($cmd) {
+                        $result = Invoke-CrossPlatformCommand -Command $cmd.Trim() -WorkingDirectory $WorkingDirectory
+                        $results += $result
+                        # 检查退出码，如果失败则停止执行
+                        if ($LASTEXITCODE -ne 0) {
+                            $global:LASTEXITCODE = $LASTEXITCODE
+                            return ($results -join "`n")
+                        }
+                    }
+                }
+                return ($results -join "`n")
+            }
+
+            # 单命令执行
+            $commandParts = $Command -split ' '
+            $executable = $commandParts[0]
+            $arguments = if ($commandParts.Length -gt 1) { $commandParts[1..($commandParts.Length-1)] -join ' ' } else { '' }
+
+            $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+            $startInfo.FileName = $executable
+            $startInfo.Arguments = $arguments
+            $startInfo.UseShellExecute = $false
+            $startInfo.RedirectStandardOutput = $true
+            $startInfo.RedirectStandardError = $true
+            $startInfo.CreateNoWindow = $true
+        }
+
+        if ($WorkingDirectory) {
+            Push-Location $WorkingDirectory
+        }
+
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $startInfo
+
+        # 捕获输出
+        $outputBuilder = New-Object System.Text.StringBuilder
+        $errorBuilder = New-Object System.Text.StringBuilder
+
+        $process.OutputDataReceived += {
+            param($sender, $e)
+            if ($e.Data) {
+                $outputBuilder.AppendLine($e.Data)
+            }
+        }
+
+        $process.ErrorDataReceived += {
+            param($sender, $e)
+            if ($e.Data) {
+                $errorBuilder.AppendLine($e.Data)
+            }
+        }
+
+        $process.Start()
+        $process.BeginOutputReadLine()
+        $process.BeginErrorReadLine()
+        $process.WaitForExit()
+
+        $output = $outputBuilder.ToString()
+        $errorOutput = $errorBuilder.ToString()
+
+        # 设置全局退出码
+        $global:LASTEXITCODE = $process.ExitCode
+
+        # 返回组合输出
+        if ($errorOutput) {
+            return $output + "`n" + $errorOutput
+        } else {
+            return $output
+        }
+    }
+    catch {
+        Write-Host "命令执行失败: $_" -ForegroundColor Red
+        $global:LASTEXITCODE = 1
+        return $_.Exception.Message
+    }
+    finally {
+        if ($WorkingDirectory) {
+            Pop-Location
+        }
+    }
+}
+
+# 执行兼容性检查
+Test-PowerShellCompatibility
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "    前端接口测试完整运行脚本" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -83,30 +223,53 @@ if (-not $SkipTests) {
 
     # Front应用测试
     Write-Host "运行Front应用测试..." -ForegroundColor Cyan
-    Push-Location "springboot1ngh61a2/src/main/resources/front/front"
+    $frontPath = "springboot1ngh61a2/src/main/resources/front/front"
 
     try {
-        npm run test:unit -- --run "tests/unit/**/*.test.ts"
-        Write-Host "Front应用测试完成！" -ForegroundColor Green
+        # 使用PowerShell兼容的方式执行命令
+        Push-Location $frontPath
+        try {
+            $command = "npm run test:unit -- --run `"tests/unit/**/*.test.ts`""
+            Write-Host "执行命令: $command" -ForegroundColor Gray
+            $output = Invoke-CrossPlatformCommand -Command $command -WorkingDirectory $frontPath
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Front应用测试完成！" -ForegroundColor Green
+            } else {
+                Write-Host "Front应用测试失败！" -ForegroundColor Red
+                Write-Host "输出: $output" -ForegroundColor Red
+            }
+        } finally {
+            Pop-Location
+        }
     } catch {
         Write-Host "Front应用测试失败：$($_.Exception.Message)" -ForegroundColor Red
     }
 
-    Pop-Location
     Write-Host ""
 
     # Admin应用测试
     Write-Host "运行Admin应用测试..." -ForegroundColor Cyan
-    Push-Location "springboot1ngh61a2/src/main/resources/admin/admin"
+    $adminPath = "springboot1ngh61a2/src/main/resources/admin/admin"
 
     try {
-        npm run test:unit -- --run "tests/unit/**/*.test.ts"
-        Write-Host "Admin应用测试完成！" -ForegroundColor Green
+        # 使用PowerShell兼容的方式执行命令
+        Push-Location $adminPath
+        try {
+            $command = "npm run test:unit -- --run `"tests/unit/**/*.test.ts`""
+            Write-Host "执行命令: $command" -ForegroundColor Gray
+            $output = Invoke-CrossPlatformCommand -Command $command -WorkingDirectory $adminPath
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "Admin应用测试完成！" -ForegroundColor Green
+            } else {
+                Write-Host "Admin应用测试失败！" -ForegroundColor Red
+                Write-Host "输出: $output" -ForegroundColor Red
+            }
+        } finally {
+            Pop-Location
+        }
     } catch {
         Write-Host "Admin应用测试失败：$($_.Exception.Message)" -ForegroundColor Red
     }
-
-    Pop-Location
 } else {
     Write-Host "跳过测试运行步骤。" -ForegroundColor Yellow
 }
@@ -125,5 +288,5 @@ Write-Host "- 更新了测试数据和数据库结构"
 Write-Host "- 完善了API测试覆盖率"
 Write-Host ""
 Write-Host "如需重新运行特定测试，请使用以下命令：" -ForegroundColor Cyan
-Write-Host "cd springboot1ngh61a2/src/main/resources/front/front && npm run test:unit -- --run tests/unit/api/pages.test.ts"
-Write-Host "cd springboot1ngh61a2/src/main/resources/admin/admin && npm run test:unit -- --run tests/unit/api/pages.test.ts"
+Write-Host "Set-Location 'springboot1ngh61a2/src/main/resources/front/front'; npm run test:unit -- --run tests/unit/api/pages.test.ts"
+Write-Host "Set-Location 'springboot1ngh61a2/src/main/resources/admin/admin'; npm run test:unit -- --run tests/unit/api/pages.test.ts"

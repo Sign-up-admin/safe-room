@@ -69,7 +69,7 @@ export function useBookingConflict(userAccount?: string) {
     ]
 
     stack.forEach(({ list, type }) => {
-      list.forEach((item) => {
+      list.forEach(item => {
         const slot = extractSlot(item.yuyueshijian)
         if (!slot) return
         const key = slotKeyByParts(slot.date, slot.time)
@@ -131,12 +131,12 @@ export function useBookingConflict(userAccount?: string) {
     const usage = usageAt(isoDate, time)
     if (!usage) return []
     const details: string[] = []
-    usage.courseItems.forEach((item) => {
+    usage.courseItems.forEach(item => {
       const courseName = item.kechengmingcheng ?? '未知课程'
       const coachName = item.jiaolianxingming ? `（${item.jiaolianxingming}）` : ''
       details.push(`课程预约：${courseName}${coachName}`)
     })
-    usage.coachItems.forEach((item) => {
+    usage.coachItems.forEach(item => {
       const coachName = item.jiaolianxingming ?? '未知教练'
       const price = item.sijiaojiage ? ` ¥${item.sijiaojiage}` : ''
       details.push(`私教预约：${coachName}${price}`)
@@ -174,7 +174,10 @@ export function useBookingConflict(userAccount?: string) {
   }
 
   // 获取智能时间建议
-  function getTimeSuggestions(isoDate: string, preferredTime?: string): Array<{
+  function getTimeSuggestions(
+    isoDate: string,
+    preferredTime?: string,
+  ): Array<{
     time: string
     period: string
     score: number
@@ -231,14 +234,12 @@ export function useBookingConflict(userAccount?: string) {
         time: slot.time,
         period: slot.period,
         score,
-        reason
+        reason,
       }
     })
 
     // 按分数排序，返回前3个建议
-    return suggestions
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
+    return suggestions.sort((a, b) => b.score - a.score).slice(0, 3)
   }
 
   // 获取最佳可用时间
@@ -263,4 +264,3 @@ export function useBookingConflict(userAccount?: string) {
     getBestAvailableTime,
   }
 }
-

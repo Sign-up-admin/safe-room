@@ -402,3 +402,287 @@ export class AdminMembershipDetailPage extends BasePage {
     await this.submitForm()
   }
 }
+
+/**
+ * 器材管理列表页面
+ */
+export class AdminEquipmentListPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/index/jianshenqicai`)
+    await this.waitForPageLoad()
+  }
+
+  async clickAddEquipment(): Promise<void> {
+    await this.clickButton('添加')
+  }
+
+  async searchEquipment(name: string): Promise<void> {
+    await this.search(name)
+  }
+
+  async editEquipment(index = 0): Promise<void> {
+    const editButtons = this.page.locator('button:has-text("编辑"), .edit-btn')
+    if (await editButtons.count() > index) {
+      await editButtons.nth(index).click()
+    }
+  }
+
+  async deleteEquipment(index = 0): Promise<void> {
+    await this.deleteRow(index)
+  }
+
+  async toggleEquipmentStatus(index = 0): Promise<void> {
+    const statusButtons = this.page.locator('button:has-text("上架"), button:has-text("下架")')
+    if (await statusButtons.count() > index) {
+      await statusButtons.nth(index).click()
+    }
+  }
+}
+
+/**
+ * 器材管理详情/编辑页面
+ */
+export class AdminEquipmentDetailPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async fillEquipmentForm(equipmentData: {
+    qicaimingcheng?: string
+    qicaileixing?: string
+    shuliang?: string
+    jiage?: string
+    jieshao?: string
+  }): Promise<void> {
+    if (equipmentData.qicaimingcheng) {
+      await this.fillInput('input[name="qicaimingcheng"]', equipmentData.qicaimingcheng)
+    }
+    if (equipmentData.qicaileixing) {
+      await this.fillInput('input[name="qicaileixing"]', equipmentData.qicaileixing)
+    }
+    if (equipmentData.shuliang) {
+      await this.fillInput('input[name="shuliang"]', equipmentData.shuliang)
+    }
+    if (equipmentData.jiage) {
+      await this.fillInput('input[name="jiage"]', equipmentData.jiage)
+    }
+    if (equipmentData.jieshao) {
+      await this.fillInput('textarea[name="jieshao"]', equipmentData.jieshao)
+    }
+  }
+
+  async saveEquipment(): Promise<void> {
+    await this.submitForm()
+  }
+}
+
+/**
+ * 公告管理列表页面
+ */
+export class AdminNewsListPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/index/news`)
+    await this.waitForPageLoad()
+  }
+
+  async clickAddNews(): Promise<void> {
+    await this.clickButton('添加')
+  }
+
+  async searchNews(title: string): Promise<void> {
+    await this.search(title)
+  }
+
+  async editNews(index = 0): Promise<void> {
+    const editButtons = this.page.locator('button:has-text("编辑"), .edit-btn')
+    if (await editButtons.count() > index) {
+      await editButtons.nth(index).click()
+    }
+  }
+
+  async deleteNews(index = 0): Promise<void> {
+    await this.deleteRow(index)
+  }
+
+  async publishNews(index = 0): Promise<void> {
+    const publishButtons = this.page.locator('button:has-text("发布"), button:has-text("上架")')
+    if (await publishButtons.count() > index) {
+      await publishButtons.nth(index).click()
+    }
+  }
+}
+
+/**
+ * 公告管理详情/编辑页面
+ */
+export class AdminNewsDetailPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async fillNewsForm(newsData: {
+    title?: string
+    introduction?: string
+    picture?: string
+    content?: string
+  }): Promise<void> {
+    if (newsData.title) {
+      await this.fillInput('input[name="title"]', newsData.title)
+    }
+    if (newsData.introduction) {
+      await this.fillInput('input[name="introduction"]', newsData.introduction)
+    }
+    if (newsData.picture) {
+      await this.fillInput('input[name="picture"]', newsData.picture)
+    }
+    if (newsData.content) {
+      await this.fillInput('textarea[name="content"]', newsData.content)
+    }
+  }
+
+  async saveNews(): Promise<void> {
+    await this.submitForm()
+  }
+}
+
+/**
+ * 反馈管理列表页面
+ */
+export class AdminChatListPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/index/chat`)
+    await this.waitForPageLoad()
+  }
+
+  async searchChat(keyword: string): Promise<void> {
+    await this.search(keyword)
+  }
+
+  async viewChatDetail(index = 0): Promise<void> {
+    const viewButtons = this.page.locator('button:has-text("查看"), button:has-text("详情")')
+    if (await viewButtons.count() > index) {
+      await viewButtons.nth(index).click()
+    }
+  }
+
+  async replyToChat(index = 0): Promise<void> {
+    const replyButtons = this.page.locator('button:has-text("回复"), button:has-text("处理")')
+    if (await replyButtons.count() > index) {
+      await replyButtons.nth(index).click()
+    }
+  }
+
+  async markAsRead(index = 0): Promise<void> {
+    const markButtons = this.page.locator('button:has-text("已读"), button:has-text("标记已读")')
+    if (await markButtons.count() > index) {
+      await markButtons.nth(index).click()
+    }
+  }
+}
+
+/**
+ * 反馈管理详情页面
+ */
+export class AdminChatDetailPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async fillReply(replyContent: string): Promise<void> {
+    await this.fillInput('textarea[name="reply"]', replyContent)
+  }
+
+  async submitReply(): Promise<void> {
+    await this.clickButton('提交回复')
+  }
+}
+
+/**
+ * 系统配置管理页面
+ */
+export class AdminSystemConfigPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/index/config`)
+    await this.waitForPageLoad()
+  }
+
+  async updateCarouselSettings(settings: { title?: string, image?: string, link?: string }): Promise<void> {
+    if (settings.title) {
+      await this.fillInput('input[name="title"]', settings.title)
+    }
+    if (settings.image) {
+      await this.fillInput('input[name="image"]', settings.image)
+    }
+    if (settings.link) {
+      await this.fillInput('input[name="link"]', settings.link)
+    }
+    await this.clickButton('保存')
+  }
+
+  async updateBasicSettings(settings: { siteName?: string, contact?: string, address?: string }): Promise<void> {
+    if (settings.siteName) {
+      await this.fillInput('input[name="siteName"]', settings.siteName)
+    }
+    if (settings.contact) {
+      await this.fillInput('input[name="contact"]', settings.contact)
+    }
+    if (settings.address) {
+      await this.fillInput('input[name="address"]', settings.address)
+    }
+    await this.clickButton('保存')
+  }
+}
+
+/**
+ * 报表分析页面
+ */
+export class AdminReportsPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/index/reports`)
+    await this.waitForPageLoad()
+  }
+
+  async selectDateRange(startDate: string, endDate: string): Promise<void> {
+    await this.fillInput('input[name="startDate"]', startDate)
+    await this.fillInput('input[name="endDate"]', endDate)
+  }
+
+  async generateReport(): Promise<void> {
+    await this.clickButton('生成报表')
+  }
+
+  async exportReport(): Promise<void> {
+    await this.clickButton('导出')
+  }
+
+  async getChartData(): Promise<any> {
+    // 获取图表数据的方法
+    return await this.page.evaluate(() => {
+      const charts = document.querySelectorAll('.chart, .echarts, canvas')
+      return {
+        chartCount: charts.length,
+        hasData: charts.length > 0
+      }
+    })
+  }
+}

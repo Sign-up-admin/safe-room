@@ -18,7 +18,17 @@ interface ErrorInfo {
   timestamp: string
   userAgent: string
   url: string
-  type: 'vue' | 'promise' | 'error' | 'resource' | 'console-error' | 'console-warn' | 'console-log' | 'console-info' | 'console-debug' | 'console-trace'
+  type:
+    | 'vue'
+    | 'promise'
+    | 'error'
+    | 'resource'
+    | 'console-error'
+    | 'console-warn'
+    | 'console-log'
+    | 'console-info'
+    | 'console-debug'
+    | 'console-trace'
   level?: 'error' | 'warn' | 'info' | 'debug'
   args?: any[]
   componentName?: string
@@ -85,13 +95,13 @@ function shouldDedupeError(errorInfo: ErrorInfo): boolean {
   const key = getErrorDedupeKey(errorInfo)
   const now = Date.now()
   const lastTime = errorDedupeCache.get(key)
-  
+
   if (lastTime && now - lastTime < DEDUPE_TIME) {
     return true // 5秒内相同错误，去重
   }
-  
+
   errorDedupeCache.set(key, now)
-  
+
   // 清理过期缓存（保留最近100条）
   if (errorDedupeCache.size > 100) {
     const entries = Array.from(errorDedupeCache.entries())
@@ -99,7 +109,7 @@ function shouldDedupeError(errorInfo: ErrorInfo): boolean {
     errorDedupeCache.clear()
     entries.slice(0, 100).forEach(([k, v]) => errorDedupeCache.set(k, v))
   }
-  
+
   return false
 }
 
@@ -167,11 +177,9 @@ function flushErrorQueue() {
   }
 
   const errorsToSend = errorQueue.splice(0, QUEUE_BATCH_SIZE)
-  
+
   // 批量发送
-  Promise.all(
-    errorsToSend.map(error => sendErrorToServer(error))
-  ).catch(() => {
+  Promise.all(errorsToSend.map(error => sendErrorToServer(error))).catch(() => {
     // 发送失败，将错误重新加入队列（但限制队列大小）
     if (errorQueue.length < 100) {
       errorQueue.unshift(...errorsToSend)
@@ -199,11 +207,17 @@ function handleError(errorInfo: ErrorInfo) {
   // 在控制台输出错误信息（开发环境）
   if (import.meta.env.DEV) {
     const level = errorInfo.level || 'error'
-    const consoleMethod = level === 'error' ? console.error : 
-                          level === 'warn' ? console.warn : 
-                          level === 'info' ? console.info : 
-                          level === 'debug' ? console.debug : console.log
-    
+    const consoleMethod =
+      level === 'error'
+        ? console.error
+        : level === 'warn'
+          ? console.warn
+          : level === 'info'
+            ? console.info
+            : level === 'debug'
+              ? console.debug
+              : console.log
+
     console.group(`🚨 ${errorInfo.type.toUpperCase()} 错误捕获`)
     consoleMethod('错误信息:', errorInfo.message)
     if (errorInfo.stack) {
@@ -231,7 +245,7 @@ function handleError(errorInfo: ErrorInfo) {
 
   // 添加到发送队列
   errorQueue.push(errorInfo)
-  
+
   // 如果队列达到批量大小，立即发送
   if (errorQueue.length >= QUEUE_BATCH_SIZE) {
     flushErrorQueue()
@@ -247,23 +261,16 @@ function handleError(errorInfo: ErrorInfo) {
 /**
  * Vue 错误处理器
  */
-export function vueErrorHandler(
-  err: unknown,
-  instance: any,
-  info: string
-) {
+export function vueErrorHandler(err: unknown, instance: any, info: string) {
   const errorInfo = formatError(err, 'vue')
   errorInfo.message = `Vue 组件错误 [${info}]: ${errorInfo.message}`
-  
+
   if (instance) {
     // Vue 3 兼容性：尝试获取组件名称
-    const componentName = instance.$options?.name || 
-                         instance.type?.name || 
-                         instance.type?.__name || 
-                         'Unknown'
+    const componentName = instance.$options?.name || instance.type?.name || instance.type?.__name || 'Unknown'
     errorInfo.message += ` | 组件: ${componentName}`
   }
-  
+
   handleError(errorInfo)
 }
 
@@ -272,10 +279,10 @@ export function vueErrorHandler(
  */
 export function unhandledRejectionHandler(event: PromiseRejectionEvent) {
   event.preventDefault() // 阻止默认的控制台错误输出
-  
+
   const errorInfo = formatError(event.reason, 'promise')
   errorInfo.message = `未处理的 Promise 拒绝: ${errorInfo.message}`
-  
+
   handleError(errorInfo)
 }
 
@@ -287,7 +294,7 @@ export function globalErrorHandler(
   source?: string,
   lineno?: number,
   colno?: number,
-  error?: Error
+  error?: Error,
 ) {
   let errorInfo: ErrorInfo
 
@@ -315,7 +322,7 @@ export function globalErrorHandler(
  */
 export function resourceErrorHandler(event: ErrorEvent) {
   const target = event.target as HTMLElement
-  
+
   if (target && (target.tagName === 'IMG' || target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
     const errorInfo: ErrorInfo = {
       message: `资源加载失败: ${target.tagName} - ${(target as HTMLImageElement).src || (target as HTMLLinkElement).href || 'unknown'}`,
@@ -325,7 +332,7 @@ export function resourceErrorHandler(event: ErrorEvent) {
       url: window.location.href,
       type: 'resource',
     }
-    
+
     handleError(errorInfo)
   }
 }
@@ -353,4 +360,3 @@ export function getStoredErrors(): ErrorInfo[] {
 export function clearStoredErrors() {
   localStorage.removeItem('frontend_errors')
 }
-

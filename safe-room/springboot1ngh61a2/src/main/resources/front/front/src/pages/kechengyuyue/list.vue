@@ -64,13 +64,13 @@
       <TechCard title="确认信息" subtitle="填写联系人与备注">
         <BookingSummary
           ref="summaryRef"
-          :course-name="selectedCourse?.kechengmingcheng"
-          :slot-label="summarySlot"
-          :amount="selectedCourse?.kechengjiage"
           v-model:contact="contact"
           v-model:phone="phone"
           v-model:remark="remark"
           v-model:agreement="agreement"
+          :course-name="selectedCourse?.kechengmingcheng"
+          :slot-label="summarySlot"
+          :amount="selectedCourse?.kechengjiage"
         >
           <template #actions>
             <TechButton size="sm" variant="ghost" @click="goToStep(2)">上一步</TechButton>
@@ -183,7 +183,7 @@ const loading = reactive({
 
 const selectedSlot = computed<SelectedSlot | null>({
   get: () => (slotDraft.value?.iso ? (slotDraft.value as SelectedSlot) : null),
-  set: (value) => bookingStore.setSlot(value ?? undefined),
+  set: value => bookingStore.setSlot(value ?? undefined),
 })
 
 const selectedSlotKey = computed(() =>
@@ -216,31 +216,27 @@ onMounted(() => {
 
 watch(
   () => bookingStore.selectedCourseId,
-  (id) => {
+  id => {
     if (!id) return
-    const target = courses.value.find((item) => item.id === id)
+    const target = courses.value.find(item => item.id === id)
     if (target) {
       selectedCourse.value = target
     }
   },
 )
 
-watch(
-  [() => route.query.courseId, () => route.query.focus, courses],
-  () => hydrateSelection(),
-  { immediate: true },
-)
+watch([() => route.query.courseId, () => route.query.focus, courses], () => hydrateSelection(), { immediate: true })
 
 function hydrateSelection() {
   if (!courses.value.length) return
   const { courseId, focus } = route.query
   let target = selectedCourse.value
   if (courseId) {
-    target = courses.value.find((item) => String(item.id) === String(courseId))
+    target = courses.value.find(item => String(item.id) === String(courseId))
   } else if (focus) {
-    target = courses.value.find((item) => item.kechengmingcheng?.includes(String(focus)))
+    target = courses.value.find(item => item.kechengmingcheng?.includes(String(focus)))
   } else if (bookingStore.selectedCourseId) {
-    target = courses.value.find((item) => item.id === bookingStore.selectedCourseId)
+    target = courses.value.find(item => item.id === bookingStore.selectedCourseId)
   }
   if (!target && courses.value.length) {
     target = courses.value[0]
@@ -254,7 +250,7 @@ function hydrateSelection() {
 async function loadCourseTypes() {
   try {
     const { list } = await typeService.list({ page: 1, limit: 50 })
-    courseTypes.value = list.map((item) => item.kechengleixing).filter(Boolean) as string[]
+    courseTypes.value = list.map(item => item.kechengleixing).filter(Boolean) as string[]
   } catch (error) {
     console.error(error)
   }
@@ -320,10 +316,12 @@ function buildSchedule(course?: Jianshenkecheng) {
     else period = '凌晨'
 
     // 使用课程的实际时间替换默认时段
-    courseTimeSlots = [{
-      time: timeString,
-      period
-    }]
+    courseTimeSlots = [
+      {
+        time: timeString,
+        period,
+      },
+    ]
   }
 
   return Array.from({ length: DAY_WINDOW }).map((_, index) => {
@@ -337,10 +335,16 @@ function buildSchedule(course?: Jianshenkecheng) {
       weekday: weekdayFormatter.format(day),
       iso,
       date,
-      slots: courseTimeSlots.map((template) => {
+      slots: courseTimeSlots.map(template => {
         const remaining = bookingConflict.resolveRemaining(iso, template.time)
         const conflict = bookingConflict.hasConflict(iso, template.time)
-        const status = conflict ? 'conflict' : remaining <= 0 ? 'disabled' : remaining <= 3 ? 'low' : 'available'
+        const status: 'available' | 'low' | 'conflict' | 'disabled' = conflict
+          ? 'conflict'
+          : remaining <= 0
+            ? 'disabled'
+            : remaining <= 3
+              ? 'low'
+              : 'available'
         return {
           time: template.time,
           period: template.period,
@@ -404,7 +408,6 @@ async function submitBooking() {
       yuyueshijian: slotExpression,
       yonghuxingming: contact.value,
       shoujihaoma: phone.value,
-      beizhu: remark.value,
     }
 
     await bookingService.create(payload)

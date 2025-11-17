@@ -11,9 +11,20 @@ on:
     paths:
       - 'springboot1ngh61a2/**'
 
+env:
+  TEST_FAILURE_THRESHOLD: 0  # No test failures allowed
+  LINE_COVERAGE_MIN: 65
+  BRANCH_COVERAGE_MIN: 45
+  INSTRUCTION_COVERAGE_MIN: 65
+  METHOD_COVERAGE_MIN: 75
+  CLASS_COVERAGE_MIN: 90
+  CONTROLLER_COVERAGE_MIN: 30
+  SERVICE_COVERAGE_MIN: 60
+
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     services:
       postgres:
@@ -32,6 +43,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
@@ -54,86 +67,314 @@ jobs:
         PGPASSWORD=test123 psql -h localhost -U postgres -d springboot1ngh61a2 -f src/main/resources/schema-postgresql.sql
 
     - name: Run tests with coverage
+      id: run-tests
       run: |
         cd springboot1ngh61a2
-        mvn clean test jacoco:report -Dspring.profiles.active=test
+        echo "Starting test execution at $(date)"
+        START_TIME=$(date +%s)
 
-    - name: Upload coverage reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: |
-          springboot1ngh61a2/target/site/jacoco/
-          springboot1ngh61a2/target/surefire-reports/
+        # Run tests with coverage and capture exit code
+        mvn clean test jacoco:report -Dspring.profiles.active=test -Dmaven.test.failure.ignore=false
+        TEST_EXIT_CODE=$?
 
-    - name: Coverage Check
+        END_TIME=$(date +%s)
+        TEST_DURATION=$((END_TIME - START_TIME))
+
+        echo "Test execution completed in ${TEST_DURATION} seconds"
+        echo "test_duration=${TEST_DURATION}" >> $GITHUB_OUTPUT
+        echo "test_exit_code=${TEST_EXIT_CODE}" >> $GITHUB_OUTPUT
+
+        # Exit with the test result
+        exit $TEST_EXIT_CODE
+
+    - name: Check test results
+      if: always()
+      id: test-results
       run: |
         cd springboot1ngh61a2
-        # Extract coverage percentages from JaCoCo report
-        if [ -f target/site/jacoco/jacoco.xml ]; then
-          # Parse XML and extract coverage values
-          LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-          BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-          INSTRUCTION_COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-          METHOD_COVERAGE=$(grep -oP '(?<=<counter type="METHOD" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-          CLASS_COVERAGE=$(grep -oP '(?<=<counter type="CLASS" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
 
-          echo "Line Coverage: $LINE_COVERAGE%"
-          echo "Branch Coverage: $BRANCH_COVERAGE%"
-          echo "Instruction Coverage: $INSTRUCTION_COVERAGE%"
-          echo "Method Coverage: $METHOD_COVERAGE%"
-          echo "Class Coverage: $CLASS_COVERAGE%"
-
-          # Check against thresholds (updated to match pom.xml configuration)
-          if (( $(echo "$LINE_COVERAGE < 65" | bc -l) )); then
-            echo "❌ Line coverage $LINE_COVERAGE% is below threshold 65%"
-            exit 1
-          fi
-
-          if (( $(echo "$BRANCH_COVERAGE < 45" | bc -l) )); then
-            echo "❌ Branch coverage $BRANCH_COVERAGE% is below threshold 45%"
-            exit 1
-          fi
-
-          if (( $(echo "$INSTRUCTION_COVERAGE < 65" | bc -l) )); then
-            echo "❌ Instruction coverage $INSTRUCTION_COVERAGE% is below threshold 65%"
-            exit 1
-          fi
-
-          if (( $(echo "$METHOD_COVERAGE < 75" | bc -l) )); then
-            echo "❌ Method coverage $METHOD_COVERAGE% is below threshold 75%"
-            exit 1
-          fi
-
-          if (( $(echo "$CLASS_COVERAGE < 90" | bc -l) )); then
-            echo "❌ Class coverage $CLASS_COVERAGE% is below threshold 90%"
-            exit 1
-          fi
-
-          echo "✅ All coverage thresholds passed!"
-        else
-          echo "❌ JaCoCo report not found"
+        # Check if surefire reports exist
+        if [ ! -d "target/surefire-reports" ]; then
+          echo "❌ Test reports not found"
+          echo "tests_passed=false" >> $GITHUB_OUTPUT
+          echo "test_failure_count=unknown" >> $GITHUB_OUTPUT
           exit 1
         fi
 
-    - name: Generate coverage badge
+        # Parse test results from XML files
+        TOTAL_TESTS=0
+        FAILED_TESTS=0
+        ERROR_TESTS=0
+        SKIPPED_TESTS=0
+
+        for xml_file in target/surefire-reports/*.xml; do
+          if [ -f "$xml_file" ]; then
+            # Extract test counts from XML
+            tests=$(grep -oP '(?<=tests=")[^"]*' "$xml_file" | head -1)
+            failures=$(grep -oP '(?<=failures=")[^"]*' "$xml_file" | head -1)
+            errors=$(grep -oP '(?<=errors=")[^"]*' "$xml_file" | head -1)
+            skipped=$(grep -oP '(?<=skipped=")[^"]*' "$xml_file" | head -1)
+
+            TOTAL_TESTS=$((TOTAL_TESTS + ${tests:-0}))
+            FAILED_TESTS=$((FAILED_TESTS + ${failures:-0}))
+            ERROR_TESTS=$((ERROR_TESTS + ${errors:-0}))
+            SKIPPED_TESTS=$((SKIPPED_TESTS + ${skipped:-0}))
+          fi
+        done
+
+        TOTAL_FAILURES=$((FAILED_TESTS + ERROR_TESTS))
+
+        echo "Total Tests: $TOTAL_TESTS"
+        echo "Failed Tests: $FAILED_TESTS"
+        echo "Error Tests: $ERROR_TESTS"
+        echo "Skipped Tests: $SKIPPED_TESTS"
+        echo "Total Failures: $TOTAL_FAILURES"
+
+        # Check test failure threshold
+        if [ $TOTAL_FAILURES -gt $TEST_FAILURE_THRESHOLD ]; then
+          echo "❌ Test failures ($TOTAL_FAILURES) exceed threshold ($TEST_FAILURE_THRESHOLD)"
+          echo "tests_passed=false" >> $GITHUB_OUTPUT
+          echo "test_failure_count=${TOTAL_FAILURES}" >> $GITHUB_OUTPUT
+          exit 1
+        else
+          echo "✅ Test failures within acceptable threshold"
+          echo "tests_passed=true" >> $GITHUB_OUTPUT
+          echo "test_failure_count=${TOTAL_FAILURES}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Upload test reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports-${{ github.run_id }}
+        path: |
+          springboot1ngh61a2/target/surefire-reports/
+          springboot1ngh61a2/target/failsafe-reports/
+        retention-days: 30
+
+    - name: Enhanced Coverage Analysis
+      id: coverage-analysis
+      run: |
+        cd springboot1ngh61a2
+
+        # Check if JaCoCo report exists
+        if [ ! -f "target/site/jacoco/jacoco.xml" ]; then
+          echo "❌ JaCoCo report not found"
+          echo "coverage_available=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+        echo "coverage_available=true" >> $GITHUB_OUTPUT
+
+        # Enhanced coverage parsing using XML tools
+        apt-get update && apt-get install -y xmlstarlet
+
+        # Extract coverage percentages with better precision
+        LINE_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='LINE']/@covered" target/site/jacoco/jacoco.xml | head -1)
+        LINE_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='LINE']/@total" target/site/jacoco/jacoco.xml | head -1)
+        LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($LINE_COVERAGE/$LINE_TOTAL)*100}")
+
+        BRANCH_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='BRANCH']/@covered" target/site/jacoco/jacoco.xml | head -1)
+        BRANCH_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='BRANCH']/@total" target/site/jacoco/jacoco.xml | head -1)
+        BRANCH_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($BRANCH_COVERAGE/$BRANCH_TOTAL)*100}")
+
+        INSTRUCTION_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='INSTRUCTION']/@covered" target/site/jacoco/jacoco.xml | head -1)
+        INSTRUCTION_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='INSTRUCTION']/@total" target/site/jacoco/jacoco.xml | head -1)
+        INSTRUCTION_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($INSTRUCTION_COVERAGE/$INSTRUCTION_TOTAL)*100}")
+
+        METHOD_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='METHOD']/@covered" target/site/jacoco/jacoco.xml | head -1)
+        METHOD_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='METHOD']/@total" target/site/jacoco/jacoco.xml | head -1)
+        METHOD_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($METHOD_COVERAGE/$METHOD_TOTAL)*100}")
+
+        CLASS_COVERAGE=$(xmlstarlet sel -t -v "//report/counter[@type='CLASS']/@covered" target/site/jacoco/jacoco.xml | head -1)
+        CLASS_TOTAL=$(xmlstarlet sel -t -v "//report/counter[@type='CLASS']/@total" target/site/jacoco/jacoco.xml | head -1)
+        CLASS_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($CLASS_COVERAGE/$CLASS_TOTAL)*100}")
+
+        # Extract package-level coverage for specific packages
+        CONTROLLER_LINE_COVERAGE=$(xmlstarlet sel -t -v "//package[contains(@name,'controller')]/counter[@type='LINE']/@covered" target/site/jacoco/jacoco.xml | paste -sd+ | bc || echo "0")
+        CONTROLLER_LINE_TOTAL=$(xmlstarlet sel -t -v "//package[contains(@name,'controller')]/counter[@type='LINE']/@total" target/site/jacoco/jacoco.xml | paste -sd+ | bc || echo "1")
+        CONTROLLER_LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($CONTROLLER_LINE_COVERAGE/$CONTROLLER_LINE_TOTAL)*100}")
+
+        SERVICE_LINE_COVERAGE=$(xmlstarlet sel -t -v "//package[contains(@name,'service')]/counter[@type='LINE']/@covered" target/site/jacoco/jacoco.xml | paste -sd+ | bc || echo "0")
+        SERVICE_LINE_TOTAL=$(xmlstarlet sel -t -v "//package[contains(@name,'service')]/counter[@type='LINE']/@total" target/site/jacoco/jacoco.xml | paste -sd+ | bc || echo "1")
+        SERVICE_LINE_PERCENTAGE=$(awk "BEGIN {printf \"%.2f\", ($SERVICE_LINE_COVERAGE/$SERVICE_LINE_TOTAL)*100}")
+
+        # Output coverage metrics
+        echo "Coverage Analysis Results:"
+        echo "========================="
+        echo "Line Coverage: ${LINE_PERCENTAGE}% (${LINE_COVERAGE}/${LINE_TOTAL})"
+        echo "Branch Coverage: ${BRANCH_PERCENTAGE}% (${BRANCH_COVERAGE}/${BRANCH_TOTAL})"
+        echo "Instruction Coverage: ${INSTRUCTION_PERCENTAGE}% (${INSTRUCTION_COVERAGE}/${INSTRUCTION_TOTAL})"
+        echo "Method Coverage: ${METHOD_PERCENTAGE}% (${METHOD_COVERAGE}/${METHOD_TOTAL})"
+        echo "Class Coverage: ${CLASS_PERCENTAGE}% (${CLASS_COVERAGE}/${CLASS_TOTAL})"
+        echo "Controller Coverage: ${CONTROLLER_LINE_PERCENTAGE}%"
+        echo "Service Coverage: ${SERVICE_LINE_PERCENTAGE}%"
+
+        # Set output variables
+        echo "line_coverage=${LINE_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "branch_coverage=${BRANCH_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "instruction_coverage=${INSTRUCTION_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "method_coverage=${METHOD_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "class_coverage=${CLASS_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "controller_coverage=${CONTROLLER_LINE_PERCENTAGE}" >> $GITHUB_OUTPUT
+        echo "service_coverage=${SERVICE_LINE_PERCENTAGE}" >> $GITHUB_OUTPUT
+
+    - name: Quality Gate Check
+      run: |
+        cd springboot1ngh61a2
+
+        echo "🔍 Running Quality Gate Checks..."
+        echo "================================="
+
+        # Check coverage thresholds
+        FAILED_CHECKS=0
+
+        # Global coverage checks
+        if (( $(echo "${{ steps.coverage-analysis.outputs.line_coverage }} < $LINE_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Line coverage (${{ steps.coverage-analysis.outputs.line_coverage }}%) below threshold ($LINE_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Line coverage: ${{ steps.coverage-analysis.outputs.line_coverage }}%"
+        fi
+
+        if (( $(echo "${{ steps.coverage-analysis.outputs.branch_coverage }} < $BRANCH_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Branch coverage (${{ steps.coverage-analysis.outputs.branch_coverage }}%) below threshold ($BRANCH_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Branch coverage: ${{ steps.coverage-analysis.outputs.branch_coverage }}%"
+        fi
+
+        if (( $(echo "${{ steps.coverage-analysis.outputs.instruction_coverage }} < $INSTRUCTION_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Instruction coverage (${{ steps.coverage-analysis.outputs.instruction_coverage }}%) below threshold ($INSTRUCTION_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Instruction coverage: ${{ steps.coverage-analysis.outputs.instruction_coverage }}%"
+        fi
+
+        if (( $(echo "${{ steps.coverage-analysis.outputs.method_coverage }} < $METHOD_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Method coverage (${{ steps.coverage-analysis.outputs.method_coverage }}%) below threshold ($METHOD_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Method coverage: ${{ steps.coverage-analysis.outputs.method_coverage }}%"
+        fi
+
+        if (( $(echo "${{ steps.coverage-analysis.outputs.class_coverage }} < $CLASS_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Class coverage (${{ steps.coverage-analysis.outputs.class_coverage }}%) below threshold ($CLASS_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Class coverage: ${{ steps.coverage-analysis.outputs.class_coverage }}%"
+        fi
+
+        # Package-level coverage checks
+        if (( $(echo "${{ steps.coverage-analysis.outputs.controller_coverage }} < $CONTROLLER_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Controller coverage (${{ steps.coverage-analysis.outputs.controller_coverage }}%) below threshold ($CONTROLLER_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Controller coverage: ${{ steps.coverage-analysis.outputs.controller_coverage }}%"
+        fi
+
+        if (( $(echo "${{ steps.coverage-analysis.outputs.service_coverage }} < $SERVICE_COVERAGE_MIN" | bc -l) )); then
+          echo "❌ Service coverage (${{ steps.coverage-analysis.outputs.service_coverage }}%) below threshold ($SERVICE_COVERAGE_MIN%)"
+          FAILED_CHECKS=$((FAILED_CHECKS + 1))
+        else
+          echo "✅ Service coverage: ${{ steps.coverage-analysis.outputs.service_coverage }}%"
+        fi
+
+        # Test execution time check
+        if [ ${{ steps.run-tests.outputs.test_duration }} -gt 1800 ]; then
+          echo "⚠️  Test execution time (${{ steps.run-tests.outputs.test_duration }}s) exceeds 30 minutes"
+        else
+          echo "✅ Test execution time: ${{ steps.run-tests.outputs.test_duration }}s"
+        fi
+
+        echo ""
+        echo "Quality Gate Summary:"
+        echo "====================="
+        echo "Failed checks: $FAILED_CHECKS"
+
+        if [ $FAILED_CHECKS -gt 0 ]; then
+          echo "❌ Quality gate FAILED - $FAILED_CHECKS checks failed"
+          exit 1
+        else
+          echo "✅ Quality gate PASSED - All checks successful"
+        fi
+
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports-${{ github.run_id }}
+        path: |
+          springboot1ngh61a2/target/site/jacoco/
+        retention-days: 30
+
+    - name: Generate enhanced coverage badges
       if: success()
       run: |
         cd springboot1ngh61a2
-        # Create coverage badge using shields.io format
-        LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-        BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
 
-        echo "Creating coverage badges..."
-        echo "https://img.shields.io/badge/Line_Coverage-$LINE_COVERAGE%25-green" > coverage-line-badge.txt
-        echo "https://img.shields.io/badge/Branch_Coverage-$BRANCH_COVERAGE%25-blue" > coverage-branch-badge.txt
+        echo "Creating enhanced coverage badges..."
+        echo "https://img.shields.io/badge/Line_Coverage-${{ steps.coverage-analysis.outputs.line_coverage }}%25-green" > coverage-line-badge.txt
+        echo "https://img.shields.io/badge/Branch_Coverage-${{ steps.coverage-analysis.outputs.branch_coverage }}%25-blue" > coverage-branch-badge.txt
+        echo "https://img.shields.io/badge/Instruction_Coverage-${{ steps.coverage-analysis.outputs.instruction_coverage }}%25-orange" > coverage-instruction-badge.txt
+        echo "https://img.shields.io/badge/Method_Coverage-${{ steps.coverage-analysis.outputs.method_coverage }}%25-purple" > coverage-method-badge.txt
+        echo "https://img.shields.io/badge/Class_Coverage-${{ steps.coverage-analysis.outputs.class_coverage }}%25-red" > coverage-class-badge.txt
+        echo "https://img.shields.io/badge/Controller_Coverage-${{ steps.coverage-analysis.outputs.controller_coverage }}%25-yellow" > coverage-controller-badge.txt
+        echo "https://img.shields.io/badge/Service_Coverage-${{ steps.coverage-analysis.outputs.service_coverage }}%25-cyan" > coverage-service-badge.txt
 
-    - name: Upload coverage badge
+    - name: Upload coverage badges
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: coverage-badge
+        name: coverage-badges-${{ github.run_id }}
         path: springboot1ngh61a2/coverage-*-badge.txt
+        retention-days: 30
+
+    - name: Store coverage history
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+
+        # Create coverage history directory
+        mkdir -p coverage-history
+
+        # Create comprehensive coverage data file
+        CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
+
+        cat > coverage-history/coverage_${CURRENT_DATE}.json << EOF
+        {
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "${{ github.sha }}",
+          "branch": "${{ github.ref_name }}",
+          "pr_number": "${{ github.event.number }}",
+          "build_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+          "test_duration_seconds": ${{ steps.run-tests.outputs.test_duration }},
+          "test_failures": ${{ steps.test-results.outputs.test_failure_count }},
+          "coverage": {
+            "line_percentage": ${{ steps.coverage-analysis.outputs.line_coverage }},
+            "branch_percentage": ${{ steps.coverage-analysis.outputs.branch_coverage }},
+            "instruction_percentage": ${{ steps.coverage-analysis.outputs.instruction_coverage }},
+            "method_percentage": ${{ steps.coverage-analysis.outputs.method_coverage }},
+            "class_percentage": ${{ steps.coverage-analysis.outputs.class_coverage }},
+            "controller_percentage": ${{ steps.coverage-analysis.outputs.controller_coverage }},
+            "service_percentage": ${{ steps.coverage-analysis.outputs.service_coverage }}
+          },
+          "quality_gate_passed": ${{ steps.quality-gate.outputs.passed }}
+        }
+        EOF
+
+        echo "Coverage history saved: coverage_${CURRENT_DATE}.json"
+
+        # Clean up old history files (keep last 50)
+        ls -t coverage-history/coverage_*.json | tail -n +51 | xargs -r rm
+
+    - name: Upload coverage history
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-history-${{ github.run_id }}
+        path: springboot1ngh61a2/coverage-history/
+        retention-days: 90
 
     - name: SonarQube Scan
       if: env.SONAR_TOKEN != ''
@@ -144,44 +385,151 @@ jobs:
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-    - name: Coverage Trend Analysis
-      run: |
-        cd springboot1ngh61a2
-        # Store current coverage metrics for trend analysis
-        mkdir -p coverage-history
-        CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
-
-        # Extract coverage data
-        if [ -f target/site/jacoco/jacoco.xml ]; then
-          LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-          BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
-
-          # Create coverage data file
-          cat > coverage-history/coverage_${CURRENT_DATE}.json << EOF
-          {
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "commit": "${{ github.sha }}",
-            "branch": "${{ github.ref_name }}",
-            "line_coverage": ${LINE_COVERAGE:-0},
-            "branch_coverage": ${BRANCH_COVERAGE:-0},
-            "build_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          }
-          EOF
-
-          echo "Coverage data saved: coverage_${CURRENT_DATE}.json"
-        fi
-
-    - name: Upload coverage history
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-history
-        path: springboot1ngh61a2/coverage-history/
-
-    - name: Comment PR with coverage
-      if: github.event_name == 'pull_request'
+    - name: Comment PR with coverage summary
+      if: github.event_name == 'pull_request' && success()
       uses: dorny/test-reporter@v1
       with:
-        name: Backend Coverage Report
+        name: Backend Test & Coverage Report
         path: springboot1ngh61a2/target/surefire-reports/*.xml
         reporter: java-junit
         fail-on-error: false
+
+    - name: Generate HTML Test Report
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating HTML test report..."
+        node ../scripts/generate-html-test-report.js \
+          --input target/surefire-reports \
+          --output ../test-report.html \
+          --title "Backend Test Report - Build ${{ github.run_id }}" \
+          --history ../springboot1ngh61a2/coverage-history
+
+    - name: Generate Coverage Report
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating HTML coverage report..."
+        node ../scripts/generate-coverage-report.js \
+          --input target/site/jacoco/jacoco.xml \
+          --output ../coverage-report.html \
+          --title "Code Coverage Report - Build ${{ github.run_id }}" \
+          --history ../springboot1ngh61a2/coverage-history
+
+    - name: Collect Health Metrics
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+        echo "Collecting test health metrics..."
+        node ../scripts/collect-test-health-metrics.js \
+          --test-reports target/surefire-reports \
+          --coverage-reports target/site/jacoco \
+          --output ../test-health-metrics.json \
+          --history ../springboot1ngh61a2/coverage-history \
+          --include-trends
+
+    - name: Generate Health Dashboard
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating test health dashboard..."
+        node ../scripts/generate-test-health-dashboard.js \
+          --metrics ../test-health-metrics.json \
+          --output ../test-health-dashboard.html \
+          --title "Test Health Dashboard - Build ${{ github.run_id }}"
+
+    - name: Generate Coverage Trend Analysis
+      if: always()
+      run: |
+        cd springboot1ngh61a2
+        echo "Generating coverage trend analysis..."
+        node ../scripts/generate-coverage-trend-report.js \
+          --input ../springboot1ngh61a2/coverage-history \
+          --output ../coverage-trend-analysis.md \
+          --forecast \
+          --recommendations
+
+    - name: Upload HTML Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-reports-${{ github.run_id }}
+        path: |
+          test-report.html
+          coverage-report.html
+          test-health-dashboard.html
+          coverage-trend-analysis.md
+        retention-days: 30
+
+    - name: Upload Metrics Data
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: metrics-data-${{ github.run_id }}
+        path: |
+          test-health-metrics.json
+        retention-days: 90
+
+    - name: Comment PR with Enhanced Report
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          // Read metrics data if available
+          let metricsData = null;
+          try {
+            const metricsPath = path.join(process.cwd(), 'test-health-metrics.json');
+            if (fs.existsSync(metricsPath)) {
+              metricsData = JSON.parse(fs.readFileSync(metricsPath, 'utf8'));
+            }
+          } catch (e) {
+            console.log('Could not read metrics data:', e.message);
+          }
+
+          const coverage = {
+            line: ${{ steps.coverage-analysis.outputs.line_coverage }},
+            branch: ${{ steps.coverage-analysis.outputs.branch_coverage }},
+            controller: ${{ steps.coverage-analysis.outputs.controller_coverage }},
+            service: ${{ steps.coverage-analysis.outputs.service_coverage }}
+          };
+
+          const testDuration = ${{ steps.run-tests.outputs.test_duration }};
+          const testFailures = ${{ steps.test-results.outputs.test_failure_count }};
+          const healthScore = metricsData ? metricsData.overallHealthScore : 'N/A';
+
+          const comment = `## 🧪 Backend Test & Quality Report
+
+          ### 📊 Coverage Metrics
+          - **Line Coverage**: ${coverage.line}% ${coverage.line >= 65 ? '✅' : '❌'}
+          - **Branch Coverage**: ${coverage.branch}% ${coverage.branch >= 45 ? '✅' : '❌'}
+          - **Controller Coverage**: ${coverage.controller}% ${coverage.controller >= 30 ? '✅' : '❌'}
+          - **Service Coverage**: ${coverage.service}% ${coverage.service >= 60 ? '✅' : '❌'}
+
+          ### 🩺 Test Health
+          - **Health Score**: ${healthScore}/100 ${healthScore >= 80 ? '🟢' : healthScore >= 60 ? '🟡' : '🔴'}
+          - **Test Success Rate**: ${metricsData ? metricsData.testExecution.successRate + '%' : 'N/A'}
+          - **Test Duration**: ${Math.floor(testDuration / 60)}m ${testDuration % 60}s
+          - **Test Failures**: ${testFailures}
+
+          ### 📈 Quality Gate
+          ${testFailures == 0 && coverage.line >= 65 && coverage.branch >= 45 ? '✅ **PASSED**' : '❌ **FAILED**'}
+
+          ### 📋 Reports
+          - [📊 Test Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+          - [📈 Coverage Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+          - [🩺 Health Dashboard](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+          - [📉 Trend Analysis](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)
+
+          ---
+          *Generated by Enhanced CI/CD Pipeline*
+          `;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });

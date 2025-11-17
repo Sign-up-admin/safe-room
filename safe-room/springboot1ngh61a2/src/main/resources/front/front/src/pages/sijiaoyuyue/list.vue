@@ -47,11 +47,11 @@
     >
       <TechCard title="设定目标 & 套餐" subtitle="训练目标可多选">
         <GoalSelector
+          v-model:selected-goals="selectedGoals"
           :goals="goalOptions"
-          v-model:selectedGoals="selectedGoals"
           :package-options="packageOptions"
           :selected-package="selectedPackage"
-          :price-calculator="(pkg) => priceBreakdown.value.finalPrice"
+          :price-calculator="pkg => priceBreakdown.finalPrice"
         >
           <template #actions>
             <div class="booking-actions">
@@ -169,9 +169,10 @@
           <label
             v-for="method in paymentMethods"
             :key="method.value"
-            :class="['payment-option', { 'payment-option--active': paymentMethod === method.value }]"
+            class="payment-option"
+            :class="[{ 'payment-option--active': paymentMethod === method.value }]"
           >
-            <input type="radio" :value="method.value" v-model="paymentMethod" />
+            <input v-model="paymentMethod" type="radio" :value="method.value" />
             <div>
               <p>{{ method.label }}</p>
               <span>{{ method.desc }}</span>
@@ -181,13 +182,13 @@
 
         <BookingSummary
           ref="summaryRef"
-          :course-name="selectedCoach?.jiaolianxingming"
-          :slot-label="summarySlot"
-          :amount="totalPrice"
           v-model:contact="contact"
           v-model:phone="phone"
           v-model:remark="remark"
           v-model:agreement="agreement"
+          :course-name="selectedCoach?.jiaolianxingming"
+          :slot-label="summarySlot"
+          :amount="totalPrice"
         >
           <template #actions>
             <TechButton size="sm" variant="ghost" @click="goToStep(3)">上一步</TechButton>
@@ -225,12 +226,7 @@ import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { TechButton, TechCard, Stepper } from '@/components/common'
-import {
-  BookingSummary,
-  CoachRecommend,
-  GoalSelector,
-  SchedulePlanner,
-} from '@/components/booking'
+import { BookingSummary, CoachRecommend, GoalSelector, SchedulePlanner } from '@/components/booking'
 import { getModuleService } from '@/services/crud'
 import type { Jianshenjiaolian, Sijiaoyuyue } from '@/types/modules'
 import { formatCurrency, formatDate } from '@/utils/formatters'
@@ -246,19 +242,19 @@ const steps = [
     label: '选择教练',
     description: '匹配擅长领域',
     validation: () => !!selectedCoach.value,
-    errorMessage: '请先选择一位教练'
+    errorMessage: '请先选择一位教练',
   },
   {
     label: '设定目标',
     description: '选择训练套餐',
     validation: () => !!selectedPackage.value,
-    errorMessage: '请选择训练套餐'
+    errorMessage: '请选择训练套餐',
   },
   {
     label: '选择时间',
     description: '排期 & 冲突检测',
     validation: () => !!selectedSlot.value,
-    errorMessage: '请选择预约时间'
+    errorMessage: '请选择预约时间',
   },
   {
     label: '确认支付',
@@ -267,7 +263,7 @@ const steps = [
       const valid = agreement.value && contact.value && phone.value
       return valid
     },
-    errorMessage: '请完善预约信息并同意服务条款'
+    errorMessage: '请完善预约信息并同意服务条款',
   },
 ]
 
@@ -341,7 +337,7 @@ watch([selectedCoach, selectedPackage, selectedGoals], () => {
   updateContext({
     coach: selectedCoach.value,
     package: selectedPackage.value,
-    goals: selectedGoals.value
+    goals: selectedGoals.value,
   })
 })
 
@@ -350,9 +346,7 @@ const totalPrice = computed(() => priceBreakdown.value.finalPrice)
 const summarySlot = computed(() =>
   selectedSlot.value ? `${selectedSlot.value.label} ${selectedSlot.value.time}` : '未选择',
 )
-const goalSummary = computed(() =>
-  selectedGoals.value.length ? selectedGoals.value.join(' / ') : '综合提升',
-)
+const goalSummary = computed(() => (selectedGoals.value.length ? selectedGoals.value.join(' / ') : '综合提升'))
 const selectedSlotKey = computed(() =>
   selectedSlot.value ? `${selectedSlot.value.iso}-${selectedSlot.value.time}` : undefined,
 )
@@ -373,7 +367,7 @@ const completionProgress = computed(() => {
     !!selectedCoach.value, // 步骤1
     !!selectedPackage.value, // 步骤2
     !!selectedSlot.value, // 步骤3
-    agreement.value && !!contact.value && !!phone.value // 步骤4
+    agreement.value && !!contact.value && !!phone.value, // 步骤4
   ]
   const completedSteps = steps.filter(Boolean).length
   return Math.round((completedSteps / steps.length) * 100)
@@ -394,7 +388,7 @@ watch(coaches, () => hydrateCoachSelection())
 function hydrateCoachSelection() {
   const coachId = route.query.coachId
   if (coachId && coaches.value.length) {
-    const target = coaches.value.find((coach) => String(coach.id) === String(coachId))
+    const target = coaches.value.find(coach => String(coach.id) === String(coachId))
     if (target) {
       selectedCoach.value = target
       currentStep.value = 2
@@ -431,10 +425,10 @@ async function loadCoaches() {
           yonghuzhanghao: userAccount,
         })
         userHistory = (historyResp.list ?? [])
-          .map((item) => {
+          .map(item => {
             // 从教练工号或姓名匹配教练ID
             const matched = allCoaches.find(
-              (c) => c.jiaoliangonghao === item.jiaoliangonghao || c.jiaolianxingming === item.jiaolianxingming,
+              c => c.jiaoliangonghao === item.jiaoliangonghao || c.jiaolianxingming === item.jiaolianxingming,
             )
             return matched?.id
           })
@@ -453,8 +447,8 @@ async function loadCoaches() {
       currentGoals: selectedGoals.value,
       userPreferences: {
         preferredGoals: goalOptions.slice(0, 2), // 假设前两个是用户偏好
-        budgetRange: [300, 800] // 默认预算范围
-      }
+        budgetRange: [300, 800], // 默认预算范围
+      },
     })
 
     coaches.value = coachesWithReasons.value.slice(0, 8) // 只显示前8个
@@ -526,25 +520,13 @@ function buildSchedule() {
         const restDay = (index + slotIdx + (selectedCoach.value?.id ?? 1)) % 7 === 0
         const conflict = bookingConflict.hasConflict(iso, slot.time)
         const remaining = bookingConflict.resolveRemaining(iso, slot.time, 6)
-        const status = restDay
-          ? 'disabled'
-          : conflict
-            ? 'conflict'
-            : remaining <= 1
-              ? 'low'
-              : 'available'
+        const status = restDay ? 'disabled' : conflict ? 'conflict' : remaining <= 1 ? 'low' : 'available'
         return {
           time: slot.time,
           period: slot.period,
           status,
           statusLabel:
-            status === 'disabled'
-              ? '休息'
-              : status === 'conflict'
-                ? '冲突'
-                : remaining <= 1
-                  ? '名额紧张'
-                  : '可预约',
+            status === 'disabled' ? '休息' : status === 'conflict' ? '冲突' : remaining <= 1 ? '名额紧张' : '可预约',
           remaining,
           conflictReasons: conflict ? bookingConflict.conflictDetails(iso, slot.time) : undefined,
         }
@@ -665,7 +647,6 @@ function goPay() {
 function goCoachList() {
   router.push('/index/jianshenjiaolian')
 }
-
 </script>
 
 <style scoped lang="scss">

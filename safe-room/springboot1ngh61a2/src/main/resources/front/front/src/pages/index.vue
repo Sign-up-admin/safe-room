@@ -15,7 +15,8 @@
         <button
           v-for="item in navItems"
           :key="item.url"
-          :class="['layout__nav-item', { 'layout__nav-item--active': isActive(item.url) }]"
+          class="layout__nav-item"
+          :class="[{ 'layout__nav-item--active': isActive(item.url) }]"
           @click="go(item.url)"
         >
           <span>{{ item.name }}</span>
@@ -24,7 +25,8 @@
       </nav>
       <div class="layout__actions">
         <button
-          :class="['layout__nav-item', { 'layout__nav-item--active': isActive('/index/storeup') }]"
+          class="layout__nav-item"
+          :class="[{ 'layout__nav-item--active': isActive('/index/storeup') }]"
           @click="go('/index/storeup')"
         >
           <span>我的收藏</span>
@@ -73,12 +75,12 @@ const isLoggedIn = computed(() => !!localStorage.getItem('frontToken'))
 function go(url: string) {
   // 确保路径格式正确
   const targetPath = url.startsWith('/') ? url : `/${url}`
-  
+
   // 如果已经在目标路径，不重复跳转
   if (route.path === targetPath) return
-  
+
   // 执行路由跳转
-  router.push(targetPath).catch((err) => {
+  router.push(targetPath).catch(err => {
     // 忽略重复导航错误
     if (err.name !== 'NavigationDuplicated') {
       console.error('路由跳转失败:', err, '目标路径:', targetPath, '当前路径:', route.path)
@@ -121,7 +123,8 @@ function isActive(url: string) {
 .layout__backdrop {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(253, 216, 53, 0.12), transparent 35%),
+  background:
+    radial-gradient(circle at 20% 20%, rgba(253, 216, 53, 0.12), transparent 35%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.18), transparent 45%),
     radial-gradient(circle at 50% 80%, rgba(253, 216, 53, 0.1), transparent 40%),
     linear-gradient(120deg, rgba(12, 12, 12, 0.9), rgba(2, 2, 2, 0.95));
@@ -244,7 +247,6 @@ function isActive(url: string) {
   align-items: center;
 }
 
-
 .layout__cta {
   min-width: 180px;
 }
@@ -332,4 +334,3 @@ function isActive(url: string) {
   }
 }
 </style>
-

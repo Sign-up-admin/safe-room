@@ -7,12 +7,12 @@ export interface ListResult<T> {
   total: number
 }
 
-class CrudService<TRecord extends Record<string, any>> {
+class CrudService<TRecord = Record<string, unknown>> {
   constructor(private readonly basePath: string) {}
 
   async list(params: Partial<PageParams> = {}): Promise<ListResult<TRecord>> {
     const response = await http.get<ApiResponse<PageResult<TRecord>>>(`${this.basePath}/list`, {
-      params: params || ({} as any),
+      params,
     })
     return response.data.data || { list: [], total: 0 }
   }
@@ -38,12 +38,12 @@ class CrudService<TRecord extends Record<string, any>> {
   }
 
   // Alias methods for compatibility
-  async delete(id: number | string): Promise<ApiResponse> {
+  delete(id: number | string): Promise<ApiResponse> {
     return this.remove([id])
   }
 
-  async save(payload: Partial<TRecord>): Promise<ApiResponse> {
-    if (payload.id) {
+  save(payload: Partial<TRecord>): Promise<ApiResponse> {
+    if ((payload as any).id != null) {
       return this.update(payload)
     } else {
       return this.create(payload)
@@ -59,7 +59,7 @@ class CrudService<TRecord extends Record<string, any>> {
 
   async autoSort(params: Partial<PageParams> = {}): Promise<TRecord[]> {
     const response = await http.get<ApiResponse<PageResult<TRecord>>>(`${this.basePath}/autoSort`, {
-      params: params || ({} as any),
+      params,
     })
     // 后端返回的是 PageUtils 对象，包含 list 和 total
     const pageData = response.data.data
@@ -72,7 +72,7 @@ class CrudService<TRecord extends Record<string, any>> {
 
   async autoSortCollaborative(params: Partial<PageParams> = {}): Promise<TRecord[]> {
     const response = await http.get<ApiResponse<PageResult<TRecord>>>(`${this.basePath}/autoSort2`, {
-      params: params || ({} as any),
+      params,
     })
     // 后端返回的是 PageUtils 对象，包含 list 和 total
     const pageData = response.data.data
@@ -90,20 +90,19 @@ class CrudService<TRecord extends Record<string, any>> {
     return response.data
   }
 
-  async fetchStats<T = any>(endpoint: string, params: Record<string, any> = {}): Promise<T> {
+  async fetchStats<T = unknown>(endpoint: string, params: Record<string, string | number> = {}): Promise<T> {
     const response = await http.get<ApiResponse<T>>(`${this.basePath}/${endpoint}`, {
-      params: params || ({} as any),
+      params,
     })
     return response.data.data!
   }
 }
 
-const serviceCache: Partial<Record<ModuleKey, CrudService<any>>> = {}
+const serviceCache = new Map<ModuleKey, CrudService>()
 
 export function getModuleService<K extends ModuleKey>(key: K): CrudService<ModuleEntityMap[K]> {
-  if (!serviceCache[key]) {
-    serviceCache[key] = new CrudService<ModuleEntityMap[K]>(`/${key}`)
+  if (!serviceCache.has(key)) {
+    serviceCache.set(key, new CrudService<ModuleEntityMap[K]>(`/${key}`) as unknown as CrudService)
   }
-  return serviceCache[key]!
+  return serviceCache.get(key)! as unknown as CrudService<ModuleEntityMap[K]>
 }
-

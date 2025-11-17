@@ -14,16 +14,13 @@ import NotificationCenter from '../components/NotificationCenter.vue'
 
 // Lazy load other components with error handling
 // 使用函数包装动态导入，添加错误处理
-const createLazyComponent = (importFn: () => Promise<any>) => {
-  return () => {
-    return importFn().catch((error) => {
-      console.error('Failed to load component:', error)
-      // 静默处理错误，避免阻塞路由导航
-      // 在实际导航时会再次尝试加载
-      return Promise.reject(error)
-    })
-  }
-}
+const createLazyComponent = (importFn: () => Promise<any>) => () =>
+  importFn().catch(error => {
+    console.error('Failed to load component:', error)
+    // 静默处理错误，避免阻塞路由导航
+    // 在实际导航时会再次尝试加载
+    return Promise.reject(error)
+  })
 
 // Lazy load other components
 const yonghuList = createLazyComponent(() => import('../pages/yonghu/list.vue'))
@@ -63,7 +60,7 @@ const jianshenqicaiList = createLazyComponent(() => import('../pages/jianshenqic
 const jianshenqicaiDetail = createLazyComponent(() => import('../pages/jianshenqicai/EquipmentDetail.vue'))
 const jianshenqicaiAdd = createLazyComponent(() => import('../pages/jianshenqicai/add.vue'))
 const newstypeList = createLazyComponent(() => import('../pages/newstype/list.vue'))
-const newstypeDetail = createLazyComponent(() => import('../pages/newstype/detail.vue'))
+const newstypeDetail = createLazyComponent(() => import('../pages/newstype/NewstypeDetail.vue'))
 const newstypeAdd = createLazyComponent(() => import('../pages/newstype/add.vue'))
 const discussjianshenkechengList = createLazyComponent(() => import('../pages/discussjianshenkecheng/list.vue'))
 const discussjianshenkechengDetail = createLazyComponent(() => import('../pages/discussjianshenkecheng/detail.vue'))
@@ -99,7 +96,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'notifications',
         component: NotificationCenter,
-        meta: { title: '消息中心' }
+        meta: { title: '消息中心' },
       },
       {
         path: 'pay',
@@ -392,33 +389,33 @@ router.beforeEach((to, from, next) => {
     // API文档（所有子路由）
     '/index/api',
   ]
-  
+
   // 检查是否是公开路由
-  const isPublicRoute = publicRoutes.some(route => {
-    // 精确匹配或路径以公开路由开头
-    return to.path === route || to.path.startsWith(route + '/')
-  })
-  
+  const isPublicRoute = publicRoutes.some(
+    route =>
+      // 精确匹配或路径以公开路由开头
+      to.path === route || to.path.startsWith(route + '/'),
+  )
+
   if (isPublicRoute) {
     next()
     return
   }
-  
+
   // 需要登录的路由
   const token = localStorage.getItem('frontToken')
-  
+
   if (!token) {
     // 未登录，重定向到登录页
     next({
       path: '/login',
-      query: { redirect: to.fullPath } // 保存原始路径，登录后可以跳转回来
+      query: { redirect: to.fullPath }, // 保存原始路径，登录后可以跳转回来
     })
     return
   }
-  
+
   // Token存在，允许访问
   next()
 })
 
 export default router
-

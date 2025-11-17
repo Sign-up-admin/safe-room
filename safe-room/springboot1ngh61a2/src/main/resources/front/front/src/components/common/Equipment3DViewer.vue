@@ -1,24 +1,24 @@
 <template>
-  <div class="equipment-3d-viewer" ref="containerRef">
+  <div ref="containerRef" class="equipment-3d-viewer">
     <div class="viewer-background"></div>
     <div class="viewer-controls">
       <TechButton size="sm" variant="outline" @click="resetCamera">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-          <path d="M21 3v5h-5"/>
-          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-          <path d="M8 16H3v5"/>
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M8 16H3v5" />
         </svg>
         重置视角
       </TechButton>
       <TechButton size="sm" variant="outline" @click="toggleAutoRotate">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3"/>
+          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3" />
         </svg>
         {{ isAutoRotating ? '停止旋转' : '自动旋转' }}
       </TechButton>
     </div>
-    <div class="viewer-canvas" ref="canvasRef"></div>
+    <div ref="canvasRef" class="viewer-canvas"></div>
     <div class="viewer-info">
       <div class="equipment-specs">
         <h4>{{ equipment.qicaimingcheng }}</h4>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import * as THREE from 'three'
-import { TechButton } from '@/components/common'
+import TechButton from './TechButton.vue'
 import type { Jianshenqicai } from '@/types/modules'
 
 interface Props {
@@ -65,7 +65,7 @@ let camera: THREE.PerspectiveCamera
 let renderer: THREE.WebGLRenderer
 let model: THREE.Group
 let animationId: number
-let isAutoRotating = ref(false)
+const isAutoRotating = ref(false)
 let controlsCleanup: (() => void) | null = null
 
 onMounted(() => {
@@ -88,9 +88,13 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
 
-watch(() => props.equipment, () => {
-  updateModel()
-}, { deep: true })
+watch(
+  () => props.equipment,
+  () => {
+    updateModel()
+  },
+  { deep: true },
+)
 
 function init3DViewer() {
   if (!containerRef.value || !canvasRef.value) return
@@ -108,14 +112,14 @@ function init3DViewer() {
     50, // 减小视野角度，使模型看起来更大
     width / height,
     0.1,
-    1000
+    1000,
   )
 
   // 创建渲染器（启用alpha通道以支持透明背景）
-  renderer = new THREE.WebGLRenderer({ 
-    antialias: true, 
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
     alpha: true,
-    preserveDrawingBuffer: false
+    preserveDrawingBuffer: false,
   })
   renderer.setSize(width, height)
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -164,11 +168,11 @@ function createModel() {
   if (model) {
     scene.remove(model)
     // 清理旧模型的资源
-    model.traverse((child) => {
+    model.traverse(child => {
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose()
         if (Array.isArray(child.material)) {
-          child.material.forEach((mat) => mat.dispose())
+          child.material.forEach(mat => mat.dispose())
         } else {
           child.material.dispose()
         }
@@ -188,33 +192,33 @@ function createModel() {
 
   // 创建正方体几何体
   const geometry = new THREE.BoxGeometry(3, 3, 3)
-  
+
   // 创建材质（金色，金属感）
   const material = new THREE.MeshStandardMaterial({
     color: 0xfdd835, // 金色
     metalness: 0.8,
-    roughness: 0.2
+    roughness: 0.2,
   })
-  
+
   // 创建正方体网格
   const cube = new THREE.Mesh(geometry, material)
   cube.castShadow = true
   cube.receiveShadow = true
-  
+
   // 添加边缘高光效果
   const edges = new THREE.EdgesGeometry(geometry)
   const edgeMaterial = new THREE.LineBasicMaterial({
     color: 0xfdd835,
     linewidth: 1,
     transparent: true,
-    opacity: 0.8
+    opacity: 0.8,
   })
   const edgeLines = new THREE.LineSegments(edges, edgeMaterial)
-  
+
   model.add(cube)
   model.add(edgeLines)
   scene.add(model)
-  
+
   // 确保模型在原点
   model.position.set(0, 0, 0)
 }
@@ -238,7 +242,7 @@ function addControls() {
 
     const deltaMove = {
       x: event.clientX - previousMousePosition.x,
-      y: event.clientY - previousMousePosition.y
+      y: event.clientY - previousMousePosition.y,
     }
 
     // 使用球坐标旋转，更自然的交互
@@ -270,7 +274,7 @@ function addControls() {
     const distance = camera.position.length()
     const newDistance = distance + event.deltaY * 0.01
     const clampedDistance = Math.max(3, Math.min(15, newDistance))
-    
+
     camera.position.normalize().multiplyScalar(clampedDistance)
     camera.lookAt(0, 0, 0)
   }
@@ -312,14 +316,14 @@ function fitCameraToModel() {
 
     // 计算合适的相机距离
     const maxDim = Math.max(size.x, size.y, size.z)
-    
+
     console.log('相机适配信息:', {
       center,
       size,
       maxDim,
-      modelPosition: model.position
+      modelPosition: model.position,
     })
-    
+
     // 如果模型为空或尺寸为0，使用默认距离
     let distance = 8
     if (maxDim > 0) {

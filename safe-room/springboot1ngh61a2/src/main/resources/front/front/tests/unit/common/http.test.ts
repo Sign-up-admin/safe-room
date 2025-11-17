@@ -9,15 +9,13 @@ const mockCurrentRoute = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('@/router', () => {
-  return {
+vi.mock('@/router', () => ({
     default: {
       push: mockPush,
       replace: mockReplace,
       currentRoute: mockCurrentRoute,
     },
-  }
-})
+  }))
 
 import router from '@/router'
 import http from '@/common/http'
@@ -346,12 +344,12 @@ describe('http client', () => {
         cancelTokenSource = new AbortController()
       }
 
-      mock.onGet('/cancellable').reply(() => {
+      mock.onGet('/cancellable').reply(() => 
         // 模拟延迟响应
-        return new Promise((resolve) => {
+         new Promise((resolve) => {
           setTimeout(() => resolve([200, { code: 0, data: {} }]), 100)
         })
-      })
+      )
 
       const requestPromise = http.get('/cancellable', {
         signal: cancelTokenSource?.signal || cancelTokenSource?.token,

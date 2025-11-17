@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.ResourceUtils;
+import org.junit.jupiter.api.AfterEach;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class FileControllerTest extends AbstractControllerIntegrationTest {
+
+    @AfterEach
+    void cleanupTestFiles() {
+        // 清理可能遗漏的测试文件
+        // 注意：主要的文件清理在每个测试方法中进行，此处作为兜底清理
+        try {
+            // 清理upload目录下的测试文件
+            File uploadDir = getUploadDirectory();
+            if (uploadDir.exists() && uploadDir.isDirectory()) {
+                File[] files = uploadDir.listFiles((dir, name) ->
+                    name.startsWith("hello.txt") ||
+                    name.startsWith("download.txt") ||
+                    name.startsWith("cover.png") ||
+                    name.startsWith("large.png") ||
+                    name.startsWith("empty.txt") ||
+                    name.startsWith("malware.exe"));
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.exists() && !file.delete()) {
+                            file.deleteOnExit();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // 忽略清理过程中的异常
+        }
+    }
 
     @Test
     void shouldUploadFileAndReturnName() throws Exception {
@@ -163,6 +192,14 @@ class FileControllerTest extends AbstractControllerIntegrationTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, "png", baos);
         return new MockMultipartFile("file", filename, "image/png", baos.toByteArray());
+    }
+
+    private File getUploadDirectory() throws Exception {
+        File path = new File(ResourceUtils.getURL("classpath:static").getPath());
+        if (!path.exists()) {
+            path = new File("");
+        }
+        return new File(path.getAbsolutePath(), "/upload/");
     }
 }
 

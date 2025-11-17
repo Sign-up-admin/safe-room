@@ -1,20 +1,11 @@
 <template>
-  <el-drawer
-    v-model="visible"
-    title="通知设置"
-    size="400px"
-    :close-on-click-modal="false"
-  >
+  <el-drawer v-model="visible" title="通知设置" size="400px" :close-on-click-modal="false">
     <div class="notification-settings">
       <!-- 通知类型开关 -->
       <div class="notification-settings__section">
         <h3 class="notification-settings__section-title">通知类型</h3>
         <div class="notification-settings__switches">
-          <div
-            v-for="type in notificationTypes"
-            :key="type.key"
-            class="notification-settings__switch-item"
-          >
+          <div v-for="type in notificationTypes" :key="type.key" class="notification-settings__switch-item">
             <div class="notification-settings__switch-info">
               <span class="notification-settings__switch-label">{{ type.label }}</span>
               <span class="notification-settings__switch-desc">{{ type.description }}</span>
@@ -33,22 +24,14 @@
       <div class="notification-settings__section">
         <h3 class="notification-settings__section-title">通知渠道</h3>
         <div class="notification-settings__channels">
-          <el-checkbox
-            v-model="localPreferences.smsEnabled"
-            :disabled="loading"
-            @change="handleChannelChange"
-          >
+          <el-checkbox v-model="localPreferences.smsEnabled" :disabled="loading" @change="handleChannelChange">
             <div class="notification-settings__channel-info">
               <span class="notification-settings__channel-label">短信通知</span>
               <span class="notification-settings__channel-desc">通过短信接收重要通知</span>
             </div>
           </el-checkbox>
 
-          <el-checkbox
-            v-model="pushEnabled"
-            :disabled="loading"
-            @change="handlePushChannelChange"
-          >
+          <el-checkbox v-model="pushEnabled" :disabled="loading" @change="handlePushChannelChange">
             <div class="notification-settings__channel-info">
               <span class="notification-settings__channel-label">推送通知</span>
               <span class="notification-settings__channel-desc">通过App推送接收通知</span>
@@ -61,11 +44,7 @@
       <div class="notification-settings__section">
         <h3 class="notification-settings__section-title">邮件通知</h3>
         <div class="notification-settings__email">
-          <el-radio-group
-            v-model="localPreferences.emailFrequency"
-            :disabled="loading"
-            @change="handleChannelChange"
-          >
+          <el-radio-group v-model="localPreferences.emailFrequency" :disabled="loading" @change="handleChannelChange">
             <el-radio label="immediate">立即发送</el-radio>
             <el-radio label="daily">每日汇总</el-radio>
             <el-radio label="weekly">每周汇总</el-radio>
@@ -111,20 +90,8 @@
 
       <!-- 操作按钮 -->
       <div class="notification-settings__actions">
-        <el-button
-          type="default"
-          :disabled="loading"
-          @click="handleReset"
-        >
-          重置
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="handleSave"
-        >
-          保存设置
-        </el-button>
+        <el-button type="default" :disabled="loading" @click="handleReset"> 重置 </el-button>
+        <el-button type="primary" :loading="loading" @click="handleSave"> 保存设置 </el-button>
       </div>
     </div>
   </el-drawer>
@@ -142,7 +109,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  loading: false
+  loading: false,
 })
 
 const emit = defineEmits<{
@@ -158,11 +125,11 @@ const localPreferences = ref<NotificationPreferences>({
   quietHours: {
     enabled: false,
     startTime: '22:00',
-    endTime: '08:00'
+    endTime: '08:00',
   },
   emailFrequency: 'immediate',
   smsEnabled: true,
-  pushEnabled: true
+  pushEnabled: true,
 })
 
 const quietStartTime = ref('')
@@ -171,7 +138,7 @@ const quietEndTime = ref('')
 // 计算属性
 const visible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: value => emit('update:modelValue', value),
 })
 
 const pushEnabled = computed({
@@ -179,7 +146,7 @@ const pushEnabled = computed({
   set: (value: boolean) => {
     localPreferences.value.pushEnabled = value
     handleChannelChange()
-  }
+  },
 })
 
 // 通知类型配置
@@ -187,45 +154,49 @@ const notificationTypes = [
   {
     key: NotificationType.APPOINTMENT_SUCCESS,
     label: '预约成功通知',
-    description: '课程/私教预约成功后立即通知'
+    description: '课程/私教预约成功后立即通知',
   },
   {
     key: NotificationType.APPOINTMENT_REMINDER,
     label: '预约提醒',
-    description: '预约前1小时自动提醒'
+    description: '预约前1小时自动提醒',
   },
   {
     key: NotificationType.PAYMENT_SUCCESS,
     label: '支付成功通知',
-    description: '支付完成确认'
+    description: '支付完成确认',
   },
   {
     key: NotificationType.MEMBERSHIP_EXPIRY_REMINDER,
     label: '会员到期提醒',
-    description: '会员卡到期前7天、3天、1天提醒'
+    description: '会员卡到期前7天、3天、1天提醒',
   },
   {
     key: NotificationType.COURSE_NEW,
     label: '新课程发布',
-    description: '新课程上架通知'
+    description: '新课程上架通知',
   },
   {
     key: NotificationType.ACTIVITY_PROMOTION,
     label: '活动通知',
-    description: '优惠活动和赛事信息'
-  }
+    description: '优惠活动和赛事信息',
+  },
 ]
 
 // 监听props变化，同步到本地状态
-watch(() => props.preferences, (newPreferences) => {
-  if (newPreferences) {
-    localPreferences.value = { ...newPreferences }
+watch(
+  () => props.preferences,
+  newPreferences => {
+    if (newPreferences) {
+      localPreferences.value = { ...newPreferences }
 
-    // 同步时间选择器
-    quietStartTime.value = newPreferences.quietHours.startTime
-    quietEndTime.value = newPreferences.quietHours.endTime
-  }
-}, { immediate: true })
+      // 同步时间选择器
+      quietStartTime.value = newPreferences.quietHours.startTime
+      quietEndTime.value = newPreferences.quietHours.endTime
+    }
+  },
+  { immediate: true },
+)
 
 // 事件处理
 const handleTypeChange = () => {
@@ -279,7 +250,7 @@ const updateChannelsFromTypes = () => {
   const importantTypes = [
     NotificationType.APPOINTMENT_SUCCESS,
     NotificationType.PAYMENT_SUCCESS,
-    NotificationType.MEMBERSHIP_EXPIRY_REMINDER
+    NotificationType.MEMBERSHIP_EXPIRY_REMINDER,
   ]
 
   const hasImportantTypes = importantTypes.some(type => enabledTypes.includes(type))

@@ -17,7 +17,7 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
     autoConnect = true,
     reconnectInterval = 5000,
     maxReconnectAttempts = 5,
-    heartbeatInterval = 30000
+    heartbeatInterval = 30000,
   } = options
 
   // 响应式状态
@@ -38,9 +38,7 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
     return 'disconnected'
   })
 
-  const canReconnect = computed(() => {
-    return reconnectAttempts.value < maxReconnectAttempts
-  })
+  const canReconnect = computed(() => reconnectAttempts.value < maxReconnectAttempts)
 
   // WebSocket事件处理
   const handleOpen = (event: Event) => {
@@ -71,7 +69,8 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
     notificationStore.setWsConnected(false)
 
     // 自动重连
-    if (canReconnect.value && event.code !== 1000) { // 1000是正常关闭
+    if (canReconnect.value && event.code !== 1000) {
+      // 1000是正常关闭
       scheduleReconnect()
     }
   }
@@ -144,7 +143,7 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
         url,
         token: getAuthToken(),
         reconnectInterval,
-        maxReconnectAttempts
+        maxReconnectAttempts,
       })
 
       // 绑定事件处理器
@@ -152,7 +151,6 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
       ws.value.addEventListener('close', handleClose)
       ws.value.addEventListener('error', handleError)
       ws.value.addEventListener('message', handleMessage)
-
     } catch (error) {
       console.error('创建WebSocket连接失败:', error)
       isConnecting.value = false
@@ -215,28 +213,31 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
 
   const sendHeartbeat = () => {
     if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-      ws.value.send(JSON.stringify({
-        type: 'heartbeat',
-        timestamp: Date.now(),
-        connectionId: connectionId.value
-      }))
+      ws.value.send(
+        JSON.stringify({
+          type: 'heartbeat',
+          timestamp: Date.now(),
+          connectionId: connectionId.value,
+        }),
+      )
     }
   }
 
   // 认证和消息发送
-  const getAuthToken = (): string => {
+  const getAuthToken = (): string =>
     // 从localStorage或其他地方获取token
-    return localStorage.getItem('token') || ''
-  }
+    localStorage.getItem('token') || ''
 
   const sendAuth = () => {
     if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-      ws.value.send(JSON.stringify({
-        type: 'auth',
-        token: getAuthToken(),
-        userAgent: navigator.userAgent,
-        timestamp: Date.now()
-      }))
+      ws.value.send(
+        JSON.stringify({
+          type: 'auth',
+          token: getAuthToken(),
+          userAgent: navigator.userAgent,
+          timestamp: Date.now(),
+        }),
+      )
     }
   }
 
@@ -275,6 +276,6 @@ export function useNotificationWebSocket(options: UseNotificationWebSocketOption
     sendMessage,
 
     // WebSocket实例（谨慎使用）
-    ws: readonly(ws)
+    ws: readonly(ws),
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="course-detail" v-if="course">
+  <div v-if="course" class="course-detail">
     <section class="course-hero" :style="heroBackground">
       <video
         v-if="course.kechengshipin"
@@ -75,11 +75,7 @@
           </p>
         </TechCard>
 
-        <TechCard
-          ref="scheduleCard"
-          title="预约流程 & 档期"
-          subtitle="三步完成 · 实时查看余位"
-        >
+        <TechCard ref="scheduleCard" title="预约流程 & 档期" subtitle="三步完成 · 实时查看余位">
           <Stepper :steps="bookingSteps" :current="selectedStep" />
           <div class="schedule-grid">
             <article v-for="day in schedule" :key="day.label" class="schedule-card">
@@ -91,8 +87,8 @@
                 <button
                   v-for="slot in day.slots"
                   :key="slot.time"
+                  class="schedule-slot"
                   :class="[
-                    'schedule-slot',
                     `schedule-slot--${slot.status}`,
                     { 'schedule-slot--selected': isSelectedSlot(day.label, slot.time) },
                   ]"
@@ -130,7 +126,7 @@
             </div>
             <TechButton variant="text" @click="goCourseList">全部课程</TechButton>
           </div>
-          <div class="course-detail__related-grid" v-loading="loading.related">
+          <div v-loading="loading.related" class="course-detail__related-grid">
             <CourseCard
               v-for="item in relatedCourses"
               :key="item.id"
@@ -167,7 +163,12 @@
           </ul>
         </TechCard>
 
-        <TechCard title="系统热推" subtitle="按热度实时推荐" :interactive="false" v-loading="smartRecommendations.loadingAuto">
+        <TechCard
+          v-loading="smartRecommendations.loadingAuto"
+          title="系统热推"
+          subtitle="按热度实时推荐"
+          :interactive="false"
+        >
           <ul class="recommend-list">
             <li v-for="item in smartRecommendations.auto" :key="item.id">
               <div>
@@ -177,14 +178,17 @@
               <TechButton size="sm" variant="text" @click="goCourseDetail(item)">查看</TechButton>
             </li>
           </ul>
-          <el-empty v-if="!smartRecommendations.auto.length && !smartRecommendations.loadingAuto" description="暂无数据" />
+          <el-empty
+            v-if="!smartRecommendations.auto.length && !smartRecommendations.loadingAuto"
+            description="暂无数据"
+          />
         </TechCard>
 
         <TechCard
+          v-loading="smartRecommendations.loadingCollaborative"
           title="猜你想练"
           subtitle="基于收藏行为"
           :interactive="false"
-          v-loading="smartRecommendations.loadingCollaborative"
         >
           <ul class="recommend-list">
             <li v-for="item in smartRecommendations.collaborative" :key="`smart-${item.id}`">
@@ -260,12 +264,7 @@ const testimonials = [
   },
 ]
 
-const highlights = [
-  'AI 负重监测 + 实时心率',
-  '教练 1v1 动作纠正',
-  '智能预约 · 冲突提醒',
-  '课程完成度可视化',
-]
+const highlights = ['AI 负重监测 + 实时心率', '教练 1v1 动作纠正', '智能预约 · 冲突提醒', '课程完成度可视化']
 
 const bookingSteps = [
   { label: '选择课程', description: '根据训练目标筛选' },
@@ -275,13 +274,11 @@ const bookingSteps = [
 
 const heroStats = computed(() => ({
   rating: (4.8 + ((course.value?.id ?? 0) % 10) * 0.02).toFixed(2),
-  sessions: Math.max(6, (course.value?.clicknum ?? 0) % 8 + 6),
+  sessions: Math.max(6, ((course.value?.clicknum ?? 0) % 8) + 6),
   heat: (course.value?.clicknum ?? 0) + 280,
 }))
 
-const formattedPrice = computed(() =>
-  course.value?.kechengjiage ? formatCurrency(course.value.kechengjiage) : '¥298',
-)
+const formattedPrice = computed(() => (course.value?.kechengjiage ? formatCurrency(course.value.kechengjiage) : '¥298'))
 
 const formattedDate = computed(() =>
   course.value?.shangkeshijian ? formatDate(course.value.shangkeshijian) : '随到随练',
@@ -369,7 +366,7 @@ async function loadRelatedCourses(detail: Jianshenkecheng) {
       order: 'desc',
       kechengleixing: detail.kechengleixing,
     })
-    relatedCourses.value = (list ?? []).filter((item) => item.id !== detail.id)
+    relatedCourses.value = (list ?? []).filter(item => item.id !== detail.id)
   } catch (error) {
     console.error(error)
   } finally {

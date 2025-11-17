@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { rateLimiter } from '../../../src/utils/rateLimiter'
+import { rateLimiter } from '@/utils/rateLimiter'
 
 describe('速率限制工具', () => {
   beforeEach(() => {

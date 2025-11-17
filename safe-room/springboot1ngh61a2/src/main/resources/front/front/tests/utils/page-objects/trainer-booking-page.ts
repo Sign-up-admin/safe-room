@@ -45,7 +45,7 @@ export class TrainerBookingPage {
     logTestStep('私教预约页面加载完成')
   }
 
-  async selectTrainer(index: number = 0): Promise<void> {
+  async selectTrainer(index = 0): Promise<void> {
     // Try multiple selectors for trainer cards
     const trainerSelectors = [
       '.trainer-card',
@@ -147,7 +147,7 @@ export class TrainerBookingPage {
     return 0
   }
 
-  async getTrainerPrice(index: number = 0): Promise<string> {
+  async getTrainerPrice(index = 0): Promise<string> {
     const trainerSelectors = [
       '.trainer-card',
       '.coach-card',

@@ -5,4 +5,3 @@ export { default as ServiceCards } from './ServiceCards.vue'
 export { default as Testimonials } from './Testimonials.vue'
 export { default as FloatingServiceButton } from './FloatingServiceButton.vue'
 export { default as TechFooter } from './Footer.vue'
-

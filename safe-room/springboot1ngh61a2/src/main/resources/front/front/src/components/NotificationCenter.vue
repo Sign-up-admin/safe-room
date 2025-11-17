@@ -4,20 +4,13 @@
     <div class="notification-center__header">
       <div class="notification-center__title-section">
         <h2 class="notification-center__title">消息中心</h2>
-        <div v-if="unreadCount > 0" class="notification-center__unread-badge">
-          {{ unreadCount }} 条未读
-        </div>
+        <div v-if="unreadCount > 0" class="notification-center__unread-badge">{{ unreadCount }} 条未读</div>
       </div>
 
       <div class="notification-center__actions">
         <!-- 筛选器 -->
         <div class="notification-center__filters">
-          <el-select
-            v-model="currentFilter"
-            placeholder="筛选通知"
-            size="small"
-            @change="handleFilterChange"
-          >
+          <el-select v-model="currentFilter" placeholder="筛选通知" size="small" @change="handleFilterChange">
             <el-option label="全部" value="all" />
             <el-option label="未读" value="unread" />
             <el-option label="已读" value="read" />
@@ -29,21 +22,17 @@
 
         <!-- 操作按钮 -->
         <div class="notification-center__buttons">
-        <el-button
-          v-if="unreadCount > 0"
-          type="primary"
-          size="small"
-          :loading="loading.actions['markAllRead']"
-          @click="handleMarkAllRead"
-        >
-          全部已读
-        </el-button>
-
           <el-button
-            type="default"
+            v-if="unreadCount > 0"
+            type="primary"
             size="small"
-            @click="showSettings = true"
+            :loading="loading.actions['markAllRead']"
+            @click="handleMarkAllRead"
           >
+            全部已读
+          </el-button>
+
+          <el-button type="default" size="small" @click="showSettings = true">
             <el-icon><Setting /></el-icon>
             设置
           </el-button>
@@ -55,18 +44,13 @@
     <div class="notification-center__content">
       <!-- 加载状态 -->
       <div v-if="loading.list" class="notification-center__loading">
-        <el-skeleton
-          v-for="i in 5"
-          :key="i"
-          animated
-          :loading="true"
-        >
+        <el-skeleton v-for="i in 5" :key="i" animated :loading="true">
           <template #template>
             <div class="notification-skeleton">
-              <el-skeleton-item variant="circle" style="width: 40px; height: 40px;" />
-              <div style="flex: 1;">
-                <el-skeleton-item variant="text" style="width: 200px;" />
-                <el-skeleton-item variant="text" style="width: 150px; margin-top: 8px;" />
+              <el-skeleton-item variant="circle" style="width: 40px; height: 40px" />
+              <div style="flex: 1">
+                <el-skeleton-item variant="text" style="width: 200px" />
+                <el-skeleton-item variant="text" style="width: 150px; margin-top: 8px" />
               </div>
             </div>
           </template>
@@ -85,14 +69,7 @@
 
         <!-- 加载更多 -->
         <div v-if="pagination.hasMore && !loading.list" class="notification-center__load-more">
-          <el-button
-            type="default"
-            size="small"
-            :loading="loading.list"
-            @click="handleLoadMore"
-          >
-            加载更多
-          </el-button>
+          <el-button type="default" size="small" :loading="loading.list" @click="handleLoadMore"> 加载更多 </el-button>
         </div>
       </div>
 
@@ -105,12 +82,7 @@
         <p class="notification-center__empty-desc">
           {{ currentFilter === 'all' ? '您还没有收到任何通知' : '该筛选条件下没有通知' }}
         </p>
-        <el-button
-          v-if="currentFilter !== 'all'"
-          type="primary"
-          size="small"
-          @click="currentFilter = 'all'"
-        >
+        <el-button v-if="currentFilter !== 'all'" type="primary" size="small" @click="currentFilter = 'all'">
           查看全部通知
         </el-button>
       </div>
@@ -143,13 +115,7 @@ const showSettings = ref(false)
 const currentFilter = ref<'all' | 'unread' | 'read' | 'appointment' | 'payment' | 'membership'>('all')
 
 // 计算属性
-const {
-  notifications,
-  unreadCount,
-  loading,
-  pagination,
-  preferences
-} = notificationStore
+const { notifications, unreadCount, loading, pagination, preferences } = notificationStore
 
 // 筛选后的通知列表
 const filteredNotifications = computed(() => {
@@ -163,9 +129,7 @@ const filteredNotifications = computed(() => {
       filtered = filtered.filter(n => n.status === NotificationStatus.READ)
       break
     case 'appointment':
-      filtered = filtered.filter(n =>
-        n.type.includes('appointment') || n.type.includes('booking')
-      )
+      filtered = filtered.filter(n => n.type.includes('appointment') || n.type.includes('booking'))
       break
     case 'payment':
       filtered = filtered.filter(n => n.type.includes('payment'))
@@ -179,9 +143,7 @@ const filteredNotifications = computed(() => {
   }
 
   // 按时间倒序排序
-  return filtered.sort((a, b) =>
-    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+  return filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 })
 
 // 事件处理
@@ -228,7 +190,7 @@ const handleMarkAllRead = async () => {
 const handleLoadMore = async () => {
   try {
     await notificationStore.loadNotifications({
-      page: pagination.current + 1
+      page: pagination.current + 1,
     })
   } catch (error) {
     ElMessage.error('加载失败')
@@ -251,7 +213,7 @@ onMounted(async () => {
     await Promise.all([
       notificationStore.loadNotifications({ refresh: true }),
       notificationStore.loadPreferences(),
-      notificationStore.loadStats()
+      notificationStore.loadStats(),
     ])
   } catch (error) {
     console.error('初始化通知中心失败:', error)

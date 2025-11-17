@@ -14,10 +14,7 @@ export interface KeyboardNavigationOptions {
   onActivate?: (index: number) => void
 }
 
-export function useKeyboardNavigation(
-  itemsRef: Ref<HTMLElement[]>,
-  options: KeyboardNavigationOptions = {}
-) {
+export function useKeyboardNavigation(itemsRef: Ref<HTMLElement[]>, options: KeyboardNavigationOptions = {}) {
   const {
     loop = true,
     vertical = true,
@@ -25,7 +22,7 @@ export function useKeyboardNavigation(
     activateOnFocus = false,
     preventDefault = true,
     onNavigate,
-    onActivate
+    onActivate,
   } = options
 
   const currentIndex = ref(0)
@@ -163,7 +160,7 @@ export function useKeyboardNavigation(
     navigateLast,
     activate,
     deactivate,
-    setCurrentIndex
+    setCurrentIndex,
   }
 }
 
@@ -175,29 +172,22 @@ export function useCalendarKeyboardNavigation(calendarRef: Ref<HTMLElement | nul
   const selectedDate = ref<Date | null>(null)
   const focusedDate = ref<Date | null>(null)
 
-  const {
-    currentIndex,
-    focusItem,
-    navigateNext,
-    navigatePrevious,
-    navigateFirst,
-    navigateLast,
-    activate
-  } = useKeyboardNavigation(ref([]), {
-    loop: false,
-    vertical: true,
-    horizontal: true,
-    onNavigate: (direction, index) => {
-      // 更新聚焦日期
-      updateFocusedDate(direction)
-    },
-    onActivate: (index) => {
-      // 选择日期
-      if (focusedDate.value) {
-        selectedDate.value = focusedDate.value
-      }
-    }
-  })
+  const { currentIndex, focusItem, navigateNext, navigatePrevious, navigateFirst, navigateLast, activate } =
+    useKeyboardNavigation(ref([]), {
+      loop: false,
+      vertical: true,
+      horizontal: true,
+      onNavigate: (direction, index) => {
+        // 更新聚焦日期
+        updateFocusedDate(direction)
+      },
+      onActivate: index => {
+        // 选择日期
+        if (focusedDate.value) {
+          selectedDate.value = focusedDate.value
+        }
+      },
+    })
 
   const updateFocusedDate = (direction: NavigationDirection) => {
     if (!focusedDate.value) {
@@ -247,7 +237,7 @@ export function useCalendarKeyboardNavigation(calendarRef: Ref<HTMLElement | nul
     focusedDate,
     focusDate,
     selectDate,
-    activate
+    activate,
   }
 }
 
@@ -262,32 +252,25 @@ export interface TableNavigationOptions extends KeyboardNavigationOptions {
   onCellActivate?: (row: number, col: number) => void
 }
 
-export function useTableKeyboardNavigation(
-  tableRef: Ref<HTMLElement | null>,
-  options: TableNavigationOptions
-) {
+export function useTableKeyboardNavigation(tableRef: Ref<HTMLElement | null>, options: TableNavigationOptions) {
   const { rows, cols, onCellNavigate, onCellActivate, ...navOptions } = options
 
   const currentRow = ref(0)
   const currentCol = ref(0)
 
-  const {
-    focusItem,
-    navigateNext,
-    navigatePrevious,
-    navigateFirst,
-    navigateLast,
-    activate
-  } = useKeyboardNavigation(ref([]), {
-    ...navOptions,
-    loop: false,
-    onNavigate: (direction) => {
-      navigateCell(direction)
+  const { focusItem, navigateNext, navigatePrevious, navigateFirst, navigateLast, activate } = useKeyboardNavigation(
+    ref([]),
+    {
+      ...navOptions,
+      loop: false,
+      onNavigate: direction => {
+        navigateCell(direction)
+      },
+      onActivate: () => {
+        onCellActivate?.(currentRow.value, currentCol.value)
+      },
     },
-    onActivate: () => {
-      onCellActivate?.(currentRow.value, currentCol.value)
-    }
-  })
+  )
 
   const navigateCell = (direction: NavigationDirection) => {
     let newRow = currentRow.value
@@ -346,7 +329,7 @@ export function useTableKeyboardNavigation(
     focusCell,
     setCurrentCell,
     navigateCell,
-    activate
+    activate,
   }
 }
 
@@ -354,31 +337,24 @@ export function useTableKeyboardNavigation(
 // 步骤条键盘导航
 // =================================
 
-export function useStepperKeyboardNavigation(
-  stepperRef: Ref<HTMLElement | null>,
-  totalSteps: number
-) {
+export function useStepperKeyboardNavigation(stepperRef: Ref<HTMLElement | null>, totalSteps: number) {
   const currentStep = ref(0)
 
-  const {
-    focusItem,
-    navigateNext,
-    navigatePrevious,
-    navigateFirst,
-    navigateLast,
-    activate
-  } = useKeyboardNavigation(ref([]), {
-    loop: false,
-    vertical: false,
-    horizontal: true,
-    onNavigate: (direction, index) => {
-      currentStep.value = index
+  const { focusItem, navigateNext, navigatePrevious, navigateFirst, navigateLast, activate } = useKeyboardNavigation(
+    ref([]),
+    {
+      loop: false,
+      vertical: false,
+      horizontal: true,
+      onNavigate: (direction, index) => {
+        currentStep.value = index
+      },
+      onActivate: index => {
+        // 可以触发步骤切换逻辑
+        console.log(`Activated step ${index + 1}`)
+      },
     },
-    onActivate: (index) => {
-      // 可以触发步骤切换逻辑
-      console.log(`Activated step ${index + 1}`)
-    }
-  })
+  )
 
   const goToStep = (stepIndex: number) => {
     if (stepIndex >= 0 && stepIndex < totalSteps) {
@@ -404,7 +380,7 @@ export function useStepperKeyboardNavigation(
     goToStep,
     nextStep,
     previousStep,
-    activate
+    activate,
   }
 }
 
@@ -447,6 +423,6 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[]) {
 
   return {
     // 返回快捷键列表，用于显示帮助信息
-    shortcuts
+    shortcuts,
   }
 }

@@ -3,19 +3,12 @@
     <section class="coaches-hero">
       <p class="section-eyebrow">COACH MATRIX</p>
       <h1>明星教练矩阵 · 技能图谱实时联动</h1>
-      <p>
-        以力导向网络可视化教练关系，结合技能、资历、评分与价格等多维信息，找到最适合你的明星私教。
-      </p>
+      <p>以力导向网络可视化教练关系，结合技能、资历、评分与价格等多维信息，找到最适合你的明星私教。</p>
     </section>
 
     <TechCard as="section" class="coaches-filters" :interactive="false" variant="layered">
       <div class="filters__grid">
-        <el-input
-          v-model="filters.keyword"
-          placeholder="搜索教练姓名 / 擅长"
-          clearable
-          :prefix-icon="Search"
-        />
+        <el-input v-model="filters.keyword" placeholder="搜索教练姓名 / 擅长" clearable :prefix-icon="Search" />
         <el-select v-model="filters.skill" placeholder="擅长领域" clearable>
           <el-option v-for="skill in skillOptions" :key="skill" :label="skill" :value="skill" />
         </el-select>
@@ -24,13 +17,7 @@
         </el-select>
         <div class="filters__slider">
           <label>私教价格</label>
-          <el-slider
-            v-model="filters.price"
-            :min="100"
-            :max="800"
-            range
-            :step="50"
-          />
+          <el-slider v-model="filters.price" :min="100" :max="800" range :step="50" />
         </div>
       </div>
       <div class="filters__actions">
@@ -58,14 +45,10 @@
     </div>
 
     <section class="coaches-network">
-      <div class="coaches-network__graph" v-loading="loading.graph">
-        <CoachNetwork
-          :nodes="graphNodes"
-          :links="graphLinks"
-          @navigate="handleGraphNavigate"
-        />
+      <div v-loading="loading.graph" class="coaches-network__graph">
+        <CoachNetwork :nodes="graphNodes" :links="graphLinks" @navigate="handleGraphNavigate" />
       </div>
-      <TechCard class="coaches-network__panel" v-if="activeCoach">
+      <TechCard v-if="activeCoach" class="coaches-network__panel">
         <p class="section-eyebrow">ACTIVE COACH</p>
         <h3>{{ activeCoach.name }}</h3>
         <p class="panel__role">{{ activeCoach.role }}</p>
@@ -93,7 +76,7 @@
       </TechCard>
     </section>
 
-    <section class="coaches-list" v-loading="loading.list">
+    <section v-loading="loading.list" class="coaches-list">
       <article v-for="coach in displayCoaches" :key="coach.id" class="coach-card">
         <div class="coach-card__head">
           <img :src="coach.avatar" :alt="coach.name" />
@@ -148,11 +131,22 @@ import type { CoachView } from '@/types/views'
 import type { CoachLink } from '@/utils/forceGraph'
 import { formatCurrency } from '@/utils/formatters'
 
+interface CoachMeta {
+  id: string
+  name: string
+  role?: string
+  clients?: string
+  awards?: string
+  rating?: string
+  featured?: boolean
+  avatar?: string
+}
+
 const coachService = getModuleService('jianshenjiaolian')
 const router = useRouter()
 
 const coaches = ref<CoachView[]>([])
-const graphNodes = ref<CoachView[]>([])
+const graphNodes = ref<CoachMeta[]>([])
 const graphLinks = ref<CoachLink[]>([])
 const activeCoach = ref<CoachView | null>(null)
 
@@ -178,7 +172,7 @@ const skillOptions = ['增肌力量', '燃脂 HIIT', '功能康复', '青少年�
 const ratingOptions = [4.5, 4.7, 4.9]
 
 const displayCoaches = computed(() =>
-  coaches.value.filter((coach) => {
+  coaches.value.filter(coach => {
     if (filters.skill && !coach.skills.includes(filters.skill)) return false
     if (Number(coach.rating) < filters.rating) return false
     if (coach.price < filters.price[0] || coach.price > filters.price[1]) return false
@@ -233,9 +227,7 @@ function mapCoach(item: Jianshenjiaolian): CoachView {
     name: item.jiaolianxingming || item.jiaoliangonghao || '明星教练',
     avatar: resolveAssetUrl(item.zhaopian),
     role: item.gerenjianjie?.slice(0, 24) || '全栈训练专家',
-    description:
-      item.gerenjianjie ||
-      '专注体态矫正与高效增肌，结合 AI 体能数据制定训练处方。',
+    description: item.gerenjianjie || '专注体态矫正与高效增肌，结合 AI 体能数据制定训练处方。',
     years: Number(item.nianling) || 6,
     price: item.sijiaojiage || 499,
     rating,
@@ -260,7 +252,7 @@ function buildNetwork(list: CoachView[]) {
   const nodes = list.slice(0, 8).map((coach, index) => ({
     ...coach,
     featured: index === 0,
-    clients: `${coach.clients}+`,
+    clients: coach.clients.toString(),
     awards: `${5 + (index % 4)}`,
   }))
   graphNodes.value = nodes
@@ -296,9 +288,13 @@ function handlePageChange(page: number) {
   loadCoaches()
 }
 
-function handleGraphNavigate(node: CoachView) {
-  activeCoach.value = node
-  goCoachDetail(node.id)
+function handleGraphNavigate(node: CoachMeta) {
+  // 从coaches数组中找到对应的完整教练信息
+  const coach = coaches.value.find(c => c.id === node.id)
+  if (coach) {
+    activeCoach.value = coach
+    goCoachDetail(node.id)
+  }
 }
 
 function goCoachDetail(id: string) {

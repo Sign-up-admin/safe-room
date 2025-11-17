@@ -4,7 +4,7 @@
 ;(function($, window, document,undefined) {
 
 	//定义Code的构造函数
-    var Code = function(ele, opt) {
+    const Code = function(ele, opt) {
         this.$element = ele,
         this.defaults = {
         	type : 1,
@@ -22,15 +22,15 @@
         this.options = $.extend({}, this.defaults, opt)
     };
 
-    var _code_chars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-    var _code_color1 = ['#fffff0', '#f0ffff', '#f0fff0', '#fff0f0'];
-    var _code_color2 = ['#FF0033', '#006699', '#993366', '#FF9900', '#66CC66', '#FF33CC'];
+    const _code_chars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    const _code_color1 = ['#fffff0', '#f0ffff', '#f0fff0', '#fff0f0'];
+    const _code_color2 = ['#FF0033', '#006699', '#993366', '#FF9900', '#66CC66', '#FF33CC'];
 
     //定义Code的方法
     Code.prototype = {
     	init : function() {
 
-			var _this = this;
+			const _this = this;
 
 			this.loadDom();
 			this.setCode();
@@ -42,12 +42,12 @@
 			};
 
 			//点击验证码
-			this.$element.find('.verify-code, .verify-change-code').on('click', function() {
+			this.$element.find('.verify-code, .verify-change-code').on('click', () => {
 				_this.setCode();
 			});
 
 			//确定的点击事件
-			this.htmlDoms.code_btn.on('click', function() {
+			this.htmlDoms.code_btn.on('click', () => {
 				_this.checkCode();
 			})
 
@@ -55,7 +55,7 @@
 
     	//加载页面
     	loadDom : function() {
-    		var panelHtml = '<div class="cerify-code-panel"><div class="verify-code"></div><div class="verify-code-area"><div class="verify-input-area"><input type="text" class="varify-input-code" /></div><div class="verify-change-area"><a class="verify-change-code">换一张</a></div></div></div>';
+    		const panelHtml = '<div class="cerify-code-panel"><div class="verify-code"></div><div class="verify-code-area"><div class="verify-input-area"><input type="text" class="varify-input-code" /></div><div class="verify-change-area"><a class="verify-change-code">换一张</a></div></div></div>';
         	this.$element.append(panelHtml);
 
         	this.htmlDoms = {
@@ -73,19 +73,19 @@
     	//设置验证码
     	setCode : function() {
 
-    		var color1Num = Math.floor(Math.random() * 3);
-    		var color2Num = Math.floor(Math.random() * 5);
+    		const color1Num = Math.floor(Math.random() * 3);
+    		const color2Num = Math.floor(Math.random() * 5);
 
     		this.htmlDoms.code.css({'background-color': _code_color1[color1Num], 'color': _code_color2[color2Num]});
     		this.htmlDoms.code_input.val('');
 
-    		var code = '';
+    		let code = '';
     		this.code_chose = '';
 
     		if(this.options.type == 1) {		//普通验证码
-				for(var i = 0; i < this.options.codeLength; i++) {
-					var charNum = Math.floor(Math.random() * 52);
-					var tmpStyle = (charNum%2 ==0)? "font-style:italic;margin-right: 10px;":"font-weight:bolder;";
+				for(let i = 0; i < this.options.codeLength; i++) {
+					const charNum = Math.floor(Math.random() * 52);
+					let tmpStyle = (charNum%2 ==0)? "font-style:italic;margin-right: 10px;":"font-weight:bolder;";
 					tmpStyle += (Math.floor(Math.random() * 2) == 1)? "font-weight:bolder;":"";
 
 					this.code_chose += _code_chars[charNum];
@@ -93,8 +93,8 @@
 				}
     		}else {		//算法验证码
 
-    			var num1 = Math.floor(Math.random() * this.options.figure);
-    			var num2 = Math.floor(Math.random() * this.options.figure);
+    			let num1 = Math.floor(Math.random() * this.options.figure);
+    			let num2 = Math.floor(Math.random() * this.options.figure);
 
     			if(this.options.arith == 0) {
     				var tmparith = Math.floor(Math.random() * 3);
@@ -107,7 +107,7 @@
     					break;
     				case 2 :
     					if(parseInt(num1) < parseInt(num2)) {
-    						var tmpnum = num1;
+    						const tmpnum = num1;
     						num1 = num2;
     						num2 = tmpnum;
     					}
@@ -145,7 +145,7 @@
 
 
     //定义Slide的构造函数
-    var Slide = function(ele, opt) {
+    const Slide = function(ele, opt) {
         this.$element = ele,
         this.defaults = {
 
@@ -178,7 +178,7 @@
     Slide.prototype = {
 
         init: function() {
-        	var _this = this;
+        	const _this = this;
 
         	//加载页面
         	this.loadDom();
@@ -189,32 +189,32 @@
 			};
 
         	//按下
-        	this.htmlDoms.move_block.on('touchstart', function(e) {
+        	this.htmlDoms.move_block.on('touchstart', (e) => {
         		_this.start(e);
         	});
 
-        	this.htmlDoms.move_block.on('mousedown', function(e) {
+        	this.htmlDoms.move_block.on('mousedown', (e) => {
         		_this.start(e);
         	});
 
         	//拖动
-            window.addEventListener("touchmove", function(e) {
+            window.addEventListener("touchmove", (e) => {
             	_this.move(e);
             });
-            window.addEventListener("mousemove", function(e) {
+            window.addEventListener("mousemove", (e) => {
             	_this.move(e);
             });
 
             //鼠标松开
-            window.addEventListener("touchend", function() {
+            window.addEventListener("touchend", () => {
             	_this.end();
             });
-            window.addEventListener("mouseup", function() {
+            window.addEventListener("mouseup", () => {
             	_this.end();
             });
 
             //刷新
-            _this.$element.find('.verify-refresh').on('click', function() {
+            _this.$element.find('.verify-refresh').on('click', () => {
             	_this.refresh();
             });
         },
@@ -223,8 +223,8 @@
         loadDom : function() {
         	this.img_rand = Math.floor(Math.random() * this.options.imgName.length);			//随机的背景图片
 
-        	var panelHtml = '';
-        	var tmpHtml = '';
+        	let panelHtml = '';
+        	let tmpHtml = '';
 
         	if(this.options.type != 1) {		//图片滑动
         		panelHtml += '<div class="verify-img-panel"><div  class="verify-refresh"><span class="icon iconfont icon-shuaxin"></span></div><div style="position: relative;z-index: 2;border: 1px solid #fff;background: #fff;" class="verify-gap"></div></div>';
@@ -279,8 +279,8 @@
 	            }else {     //兼容PC端
 	                var x = e.touches[0].pageX;
 	            }
-	            var bar_area_left = Slide.prototype.getLeft(this.htmlDoms.bar_area[0]);
-	            var move_block_left = x - bar_area_left; //小方块相对于父元素的left值
+	            const bar_area_left = Slide.prototype.getLeft(this.htmlDoms.bar_area[0]);
+	            let move_block_left = x - bar_area_left; //小方块相对于父元素的left值
 
 
 	            if(this.options.type != 1) {		//图片滑动
@@ -315,14 +315,14 @@
         //鼠标松开
         end: function() {
 
-        	var _this = this;
+        	const _this = this;
 
         	//判断是否重合
         	if(this.status) {
 
         		if(this.options.type != 1) {		//图片滑动
 
-        			var vOffset = parseInt(this.options.vOffset);
+        			const vOffset = parseInt(this.options.vOffset);
 		            if(parseInt(this.htmlDoms.gap.css('left')) >= (parseInt(this.htmlDoms.move_block.css('left')) - vOffset) && parseInt(this.htmlDoms.gap.css('left')) <= (parseInt(this.htmlDoms.move_block.css('left')) + vOffset)) {
 		            	this.htmlDoms.move_block.css('background-color', '#5cb85c');
                   this.htmlDoms.left_bar.addClass('verify-left-bar-success');
@@ -341,7 +341,7 @@
 		            	this.htmlDoms.icon.removeClass('icon-jinru');
 		            	this.htmlDoms.icon.addClass('icon-guanbi1');
 
-		            	setTimeout(function () {
+		            	setTimeout(() => {
 					    	_this.htmlDoms.move_block.animate({'left':'0px'}, 'fast');
 					    	_this.htmlDoms.left_bar.animate({'width': '40px'}, 'fast');
                 _this.htmlDoms.left_bar.removeClass('verify-left-bar-active');
@@ -383,7 +383,7 @@
 		            	this.htmlDoms.icon.removeClass('icon-jinru');
 		            	this.htmlDoms.icon.addClass('icon-guanbi1');
 
-		            	setTimeout(function () {
+		            	setTimeout(() => {
 					    	_this.htmlDoms.move_block.animate({'left':'0px'}, 'fast');
 					    	_this.htmlDoms.left_bar.animate({'width': '40px'}, 'fast');
                 _this.htmlDoms.left_bar.removeClass('verify-left-bar-active');
@@ -409,9 +409,9 @@
 
 
         resetSize : function(obj) {
-        	var img_width,img_height,bar_width,bar_height;	//图片的宽度、高度，移动条的宽度、高度
-        	var parentWidth = obj.$element.parent().width() || $(window).width();
-        	var parentHeight = obj.$element.parent().height() || $(window).height();
+        	let img_width,img_height,bar_width,bar_height;	//图片的宽度、高度，移动条的宽度、高度
+        	const parentWidth = obj.$element.parent().width() || $(window).width();
+        	const parentHeight = obj.$element.parent().height() || $(window).height();
 
        		if(obj.options.imgSize.width.indexOf('%')!= -1){
         		img_width = parseInt(obj.options.imgSize.width)/100 * parentWidth + 'px';
@@ -442,10 +442,10 @@
 
         //随机出生点位
         randSet: function() {
-        	var rand1 = Math.floor(Math.random()*9+1);
-        	var rand2 = Math.floor(Math.random()*9+1);
-        	var top = rand1 * parseInt(this.setSize.img_height)/15 + parseInt(this.setSize.img_height) * 0.1;
-        	var left = rand2 * parseInt(this.setSize.img_width)/15 + parseInt(this.setSize.img_width) * 0.1;
+        	const rand1 = Math.floor(Math.random()*9+1);
+        	const rand2 = Math.floor(Math.random()*9+1);
+        	const top = rand1 * parseInt(this.setSize.img_height)/15 + parseInt(this.setSize.img_height) * 0.1;
+        	const left = rand2 * parseInt(this.setSize.img_width)/15 + parseInt(this.setSize.img_width) * 0.1;
 
         	this.$element.find('.verify-img-panel').css('margin-bottom', this.options.vSpace + 'px');
         	this.$element.find('.verify-gap').css({'top': top, 'left': left});
@@ -462,7 +462,7 @@
 
         //获取left值
         getLeft: function(node) {
-			var left = $(node).offset().left;
+			const left = $(node).offset().left;
 //          var nowPos = node.offsetParent;
 //
 //          while(nowPos != null) {　　
@@ -475,7 +475,7 @@
 
 
     //定义Points的构造函数
-    var Points = function(ele, opt) {
+    const Points = function(ele, opt) {
         this.$element = ele,
         this.defaults = {
         	defaultNum : 4,	//默认的文字数量
@@ -501,7 +501,7 @@
     Points.prototype = {
     	init : function() {
 
-			var _this = this;
+			const _this = this;
 
 			//加载页面
         	_this.loadDom();
@@ -521,8 +521,8 @@
 				if(_this.num == _this.options.checkNum) {
 
 					_this.num = _this.createPoint(_this.getMousePos(this, e));
-					setTimeout(function () {
-						var flag = _this.comparePos(_this.fontPos, _this.checkPosArr);
+					setTimeout(() => {
+						const flag = _this.comparePos(_this.fontPos, _this.checkPosArr);
 
 						if(flag == false) {	//验证失败
 
@@ -530,7 +530,7 @@
 							_this.$element.find('.verify-bar-area').css({'color': '#d9534f', 'border-color': '#d9534f'});
 						    _this.$element.find('.verify-msg').text('验证失败');
 
-							setTimeout(function () {
+							setTimeout(() => {
 								_this.$element.find('.verify-bar-area').css({'color': '#000','border-color': '#ddd'});
 						    	_this.refresh();
 						    }, 400);
@@ -553,7 +553,7 @@
         	});
 
         	 //刷新
-            _this.$element.find('.verify-refresh').on('click', function() {
+            _this.$element.find('.verify-refresh').on('click', () => {
             	_this.refresh();
             });
 
@@ -569,8 +569,8 @@
     		this.num = 1;	//点击的记数
     		this.img_rand = Math.floor(Math.random() * this.options.imgName.length);			//随机的背景图片
 
-        	var panelHtml = '';
-        	var tmpHtml = '';
+        	let panelHtml = '';
+        	const tmpHtml = '';
 
         	this.setSize = Slide.prototype.resetSize(this);	//重新设置宽度高度
 
@@ -593,23 +593,23 @@
     	//绘制合成的图片
     	drawImg : function(obj, img) {
     		//准备canvas环境
-	       	var canvas = this.$element.find('canvas')[0];
+	       	const canvas = this.$element.find('canvas')[0];
 	      	//var canvas=document.getElementById("myCanvas");
-	       	var ctx=canvas.getContext("2d");
+	       	const ctx=canvas.getContext("2d");
 
 	       	// 绘制图片
 	       	ctx.drawImage(img,0,0, parseInt(this.setSize.img_width), parseInt(this.setSize.img_height));
 
 	       	// 绘制水印
-	       	var fontSizeArr = ['italic small-caps bold 20px microsoft yahei', 'small-caps normal 25px arial', '34px microsoft yahei'];
-	       	var fontStr = '天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰余成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字乃服衣裳推位让国有虞陶唐吊民伐罪周发殷汤坐朝问道垂拱平章爱育黎首臣伏戎羌遐迩体率宾归王';	//不重复的汉字
+	       	const fontSizeArr = ['italic small-caps bold 20px microsoft yahei', 'small-caps normal 25px arial', '34px microsoft yahei'];
+	       	const fontStr = '天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏闰余成岁律吕调阳云腾致雨露结为霜金生丽水玉出昆冈剑号巨阙珠称夜光果珍李柰菜重芥姜海咸河淡鳞潜羽翔龙师火帝鸟官人皇始制文字乃服衣裳推位让国有虞陶唐吊民伐罪周发殷汤坐朝问道垂拱平章爱育黎首臣伏戎羌遐迩体率宾归王';	//不重复的汉字
 
 
-	       	var fontChars = [];
+	       	const fontChars = [];
 
-	       	var avg = Math.floor(parseInt(this.setSize.img_width)/(parseInt(this.options.defaultNum)+1));
-	       	var tmp_index = '';
-	       	var color2Num = Math.floor(Math.random() * 5);
+	       	const avg = Math.floor(parseInt(this.setSize.img_width)/(parseInt(this.options.defaultNum)+1));
+	       	let tmp_index = '';
+	       	const color2Num = Math.floor(Math.random() * 5);
 
 	       	for(var i = 1; i <= this.options.defaultNum; i++) {
 
@@ -634,7 +634,7 @@
 	       		this.shuffle(this.fontPos).pop();
 	       	}
 
-	       	var msgStr = '';
+	       	let msgStr = '';
 	       	for(var i = 0; i < this.fontPos.length; i++) {
 	       		msgStr += this.fontPos[i].char + ',';
 	       	}
@@ -646,11 +646,11 @@
 
     	//获取坐标
     	getMousePos :function(obj, event) {
-            var e = event || window.event;
-            var scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
-            var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
-            var x = e.clientX - ($(obj).offset().left - $(window).scrollLeft());
-    		var y = e.clientY - ($(obj).offset().top - $(window).scrollTop());
+            const e = event || window.event;
+            const scrollX = document.documentElement.scrollLeft || document.body.scrollLeft;
+            const scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+            const x = e.clientX - ($(obj).offset().left - $(window).scrollLeft());
+    		const y = e.clientY - ($(obj).offset().top - $(window).scrollTop());
 
             return {'x': x, 'y': y};
      	},
@@ -658,7 +658,7 @@
      	//递归去重
      	getChars : function(fontStr, fontChars) {
 
-     		var tmp_rand = parseInt(Math.floor(Math.random() * fontStr.length));
+     		let tmp_rand = parseInt(Math.floor(Math.random() * fontStr.length));
      		if(tmp_rand > 0) {
      			tmp_rand = tmp_rand - 1;
      		}
@@ -673,7 +673,7 @@
 
 		//洗牌数组
        	shuffle : function(arr) {
-			var m = arr.length, i;
+			let m = arr.length, i;
 			while (m) {
 				i = (Math.random() * m--) >>> 0;
 				[arr[m], arr[i]] = [arr[i], arr[m]]
@@ -690,8 +690,8 @@
        	//比对坐标点
        	comparePos : function (fontPos, checkPosArr) {
 
-       		var flag = true;
-       		for(var i = 0; i < fontPos.length; i++) {
+       		let flag = true;
+       		for(let i = 0; i < fontPos.length; i++) {
        			if(!(parseInt(checkPosArr[i].x) + 40 > fontPos[i].x && parseInt(checkPosArr[i].x) - 40 < fontPos[i].x && parseInt(checkPosArr[i].y) + 40 > fontPos[i].y && parseInt(checkPosArr[i].y) - 40 < fontPos[i].y)) {
        				flag = false;
        				break;
@@ -703,14 +703,14 @@
 
        	//刷新
         refresh: function() {
-        	var _this = this;
+        	const _this = this;
         	this.$element.find('.point-area').remove();
         	this.fontPos = [];
         	this.checkPosArr = [];
         	this.num = 1;
 
         	this.img_rand = Math.floor(Math.random() * this.options.imgName.length);			//随机的背景图片
-        	var img = new Image();
+        	const img = new Image();
 		    img.src = this.options.imgName[this.img_rand];
 
 
@@ -725,19 +725,19 @@
 
     //在插件中使用codeVerify对象
     $.fn.codeVerify = function(options, callbacks) {
-        var code = new Code(this, options);
+        const code = new Code(this, options);
         code.init();
     };
 
     //在插件中使用slideVerify对象
     $.fn.slideVerify = function(options, callbacks) {
-        var slide = new Slide(this, options);
+        const slide = new Slide(this, options);
         slide.init();
     };
 
     //在插件中使用clickVerify对象
     $.fn.pointsVerify = function(options, callbacks) {
-        var points = new Points(this, options);
+        const points = new Points(this, options);
         points.init();
     };
 

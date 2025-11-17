@@ -3,14 +3,7 @@
     <div class="payment-result__icon">
       <div v-if="status === 'processing'" class="processing-spinner">
         <svg class="spinner" viewBox="0 0 50 50">
-          <circle
-            class="path"
-            cx="25"
-            cy="25"
-            r="20"
-            fill="none"
-            stroke-width="4"
-          />
+          <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="4" />
         </svg>
       </div>
       <div v-else-if="status === 'success'" class="success-icon">
@@ -45,9 +38,7 @@
           <div class="status-dot"></div>
           <span>正在查询支付状态...</span>
         </div>
-        <div v-if="pollingCount > 0" class="polling-info">
-          已查询 {{ pollingCount }} 次 • 每2秒自动刷新
-        </div>
+        <div v-if="pollingCount > 0" class="polling-info">已查询 {{ pollingCount }} 次 • 每2秒自动刷新</div>
       </div>
       <div v-if="status === 'processing' && countdown > 0" class="payment-result__countdown">
         <svg class="countdown-circle" viewBox="0 0 36 36">
@@ -339,7 +330,8 @@ small {
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -433,4 +425,3 @@ small {
   line-height: 1.5;
 }
 </style>
-

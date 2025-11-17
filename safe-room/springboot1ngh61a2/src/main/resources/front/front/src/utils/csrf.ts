@@ -21,16 +21,16 @@ export function generateCsrfToken(): string {
  */
 export function getOrCreateCsrfToken(): string {
   const storageKey = 'csrf_token'
-  
+
   // 尝试从sessionStorage获取
   let token = sessionStorage.getItem(storageKey)
-  
+
   if (!token) {
     // 生成新Token并存储
     token = generateCsrfToken()
     sessionStorage.setItem(storageKey, token)
   }
-  
+
   return token
 }
 
@@ -64,7 +64,7 @@ export function clearCsrfToken(): void {
  */
 export function validateCsrfToken(token: string | null | undefined): boolean {
   if (!token) return false
-  
+
   const storedToken = getCsrfToken()
   return storedToken !== null && storedToken === token
 }
@@ -73,4 +73,3 @@ export function validateCsrfToken(token: string | null | undefined): boolean {
  * CSRF Token请求头名称
  */
 export const CSRF_TOKEN_HEADER = 'X-CSRF-Token'
-

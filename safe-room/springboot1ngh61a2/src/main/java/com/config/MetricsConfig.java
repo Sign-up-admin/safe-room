@@ -10,8 +10,10 @@ import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,8 +33,9 @@ public class MetricsConfig {
         return registry -> registry.config().commonTags("application", "fitness-gym");
     }
 
-    @Autowired
-    public void bindMetrics(MeterRegistry registry) {
+    @EventListener(ApplicationReadyEvent.class)
+    public void bindMetrics(ApplicationReadyEvent event) {
+        MeterRegistry registry = event.getApplicationContext().getBean(MeterRegistry.class);
         // JVM Metrics
         new JvmMemoryMetrics().bindTo(registry);
         new JvmGcMetrics().bindTo(registry);

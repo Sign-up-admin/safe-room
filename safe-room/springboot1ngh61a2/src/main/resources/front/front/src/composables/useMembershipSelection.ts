@@ -30,17 +30,11 @@ export const useMembershipSelection = defineStore('membershipSelection', () => {
   const error = ref<string | null>(null)
 
   // 计算属性
-  const selectedCard = computed(() => {
-    return cards.value.find(card => card.id === selectedCardId.value) || null
-  })
+  const selectedCard = computed(() => cards.value.find(card => card.id === selectedCardId.value) || null)
 
-  const hoveredCard = computed(() => {
-    return cards.value.find(card => card.id === hoveredCardId.value) || null
-  })
+  const hoveredCard = computed(() => cards.value.find(card => card.id === hoveredCardId.value) || null)
 
-  const comparedCards = computed(() => {
-    return cards.value.filter(card => comparedCardIds.value.includes(card.id!))
-  })
+  const comparedCards = computed(() => cards.value.filter(card => comparedCardIds.value.includes(card.id!)))
 
   const comparisonData = computed<MembershipComparisonData>(() => {
     const data: MembershipComparisonData = {
@@ -71,56 +65,55 @@ export const useMembershipSelection = defineStore('membershipSelection', () => {
 
       // 预约优先级（基于卡种等级）
       const priorityLevels: Record<string, number> = {
-        '尊享': 100,
-        '黑金': 100,
-        '高级': 75,
-        '提升': 75,
-        '标准': 50,
-        '体验': 25,
+        尊享: 100,
+        黑金: 100,
+        高级: 75,
+        提升: 75,
+        标准: 50,
+        体验: 25,
       }
       const cardName = card.huiyuankamingcheng?.toLowerCase() || ''
-      data.priority[card.id] = priorityLevels[
-        Object.keys(priorityLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'
-      ] || 50
+      data.priority[card.id] =
+        priorityLevels[Object.keys(priorityLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'] ||
+        50
 
       // 私教折扣（折扣力度，9.5折=95，8.5折=85）
       const discountLevels: Record<string, number> = {
-        '尊享': 95,
-        '黑金': 95,
-        '高级': 90,
-        '提升': 90,
-        '标准': 85,
-        '体验': 80,
+        尊享: 95,
+        黑金: 95,
+        高级: 90,
+        提升: 90,
+        标准: 85,
+        体验: 80,
       }
-      data.trainerDiscount[card.id] = discountLevels[
-        Object.keys(discountLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'
-      ] || 85
+      data.trainerDiscount[card.id] =
+        discountLevels[Object.keys(discountLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'] ||
+        85
 
       // 设施权限（设施数量）
       const facilityLevels: Record<string, number> = {
-        '尊享': 100,
-        '黑金': 100,
-        '高级': 80,
-        '提升': 80,
-        '标准': 60,
-        '体验': 40,
+        尊享: 100,
+        黑金: 100,
+        高级: 80,
+        提升: 80,
+        标准: 60,
+        体验: 40,
       }
-      data.facilityAccess[card.id] = facilityLevels[
-        Object.keys(facilityLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'
-      ] || 60
+      data.facilityAccess[card.id] =
+        facilityLevels[Object.keys(facilityLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'] ||
+        60
 
       // 嘉宾权益（活动次数）
       const guestLevels: Record<string, number> = {
-        '尊享': 100,
-        '黑金': 100,
-        '高级': 70,
-        '提升': 70,
-        '标准': 40,
-        '体验': 20,
+        尊享: 100,
+        黑金: 100,
+        高级: 70,
+        提升: 70,
+        标准: 40,
+        体验: 20,
       }
-      data.guestBenefits[card.id] = guestLevels[
-        Object.keys(guestLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'
-      ] || 40
+      data.guestBenefits[card.id] =
+        guestLevels[Object.keys(guestLevels).find(level => cardName.includes(level.toLowerCase())) || '标准'] || 40
     })
 
     return data
@@ -144,14 +137,13 @@ export const useMembershipSelection = defineStore('membershipSelection', () => {
       const guestScore = comparisonData.value.guestBenefits[card.id] || 0
 
       // 加权平均分
-      const totalScore = (
+      const totalScore =
         priceScore * 0.25 +
         durationScore * 0.15 +
         priorityScore * 0.2 +
         trainerScore * 0.15 +
         facilityScore * 0.15 +
         guestScore * 0.1
-      )
 
       if (totalScore > bestScore) {
         bestScore = totalScore
@@ -206,14 +198,14 @@ export const useMembershipSelection = defineStore('membershipSelection', () => {
   }
 
   // 监听选中卡片变化，自动添加到对比列表
-  watch(selectedCardId, (newId) => {
+  watch(selectedCardId, newId => {
     if (newId && !comparedCardIds.value.includes(newId)) {
       addToComparison(newId)
     }
   })
 
   // 初始化推荐卡片
-  watch(recommendedCard, (newRecommended) => {
+  watch(recommendedCard, newRecommended => {
     if (newRecommended && !selectedCardId.value && cards.value.length > 0) {
       selectedCardId.value = newRecommended.id || null
     }

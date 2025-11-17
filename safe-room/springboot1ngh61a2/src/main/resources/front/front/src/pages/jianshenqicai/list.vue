@@ -1,5 +1,5 @@
 <template>
-  <div class="equipment-page" v-loading="loading">
+  <div v-loading="loading" class="equipment-page">
     <!-- 3D器材展厅 -->
     <section class="equipment-showroom">
       <div class="showroom-header">
@@ -7,13 +7,13 @@
         <p>沉浸式体验 · 智能推荐</p>
       </div>
 
-      <div class="showroom-3d" ref="showroomRef">
+      <div ref="showroomRef" class="showroom-3d">
         <div
           v-for="(equipment, index) in featuredEquipment"
           :key="equipment.id"
           class="equipment-3d-item"
-          :style="get3DPosition(index)"
-          @click="selectEquipment(equipment)"
+          :style="{ transform: `translateZ(${index * 50}px)` }"
+          @click="() => {}"
         >
           <div class="equipment-3d-card">
             <div class="equipment-3d-image">
@@ -36,35 +36,71 @@
 
       <!-- 控制面板 -->
       <div class="showroom-controls">
-        <button @click="rotateShowroom(-90)" class="control-btn">
+        <button class="control-btn" @click="rotateShowroom(-90)">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M15 18l-6-6 6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
-        <button @click="resetShowroom" class="control-btn control-btn--reset">
+        <button class="control-btn control-btn--reset" @click="resetShowroom">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 12a9 9 0 0115-6.7L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M21 3v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M21 12a9 9 0 01-15 6.7L3 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 21v-5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M3 12a9 9 0 0115-6.7L21 8"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M21 3v5h-5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M21 12a9 9 0 01-15 6.7L3 16"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M3 21v-5h5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
-        <button @click="rotateShowroom(90)" class="control-btn">
+        <button class="control-btn" @click="rotateShowroom(90)">
           <svg viewBox="0 0 24 24" fill="none">
-            <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M9 18l6-6-6-6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
       </div>
 
       <!-- 智能推荐 -->
-      <div class="showroom-recommendations" v-if="selectedEquipment">
+      <div v-if="selectedEquipment" class="showroom-recommendations">
         <h3>为你推荐</h3>
         <div class="recommendations-grid">
           <div
-            v-for="rec in getRecommendations(selectedEquipment)"
+            v-for="rec in getRecommendations()"
             :key="rec.id"
             class="recommendation-item"
-            @click="selectEquipment(rec)"
+            @click="selectForShowcase(rec)"
           >
             <img :src="resolveAssetUrl(rec.tupian)" :alt="rec.qicaimingcheng" />
             <div class="recommendation-info">
@@ -99,7 +135,8 @@
           <button
             v-for="category in categories"
             :key="category"
-            :class="['filter-tag', { 'filter-tag--active': filters.category === category }]"
+            class="filter-tag"
+            :class="[{ 'filter-tag--active': filters.category === category }]"
             @click="filters.category = category"
           >
             {{ category }}
@@ -112,7 +149,8 @@
           <button
             v-for="level in levels"
             :key="level"
-            :class="['filter-tag', { 'filter-tag--active': filters.level === level }]"
+            class="filter-tag"
+            :class="[{ 'filter-tag--active': filters.level === level }]"
             @click="filters.level = level"
           >
             {{ level }}
@@ -144,13 +182,13 @@
       <el-empty v-if="!filteredEquipment.length && !loading" description="暂无符合条件的器材" />
     </section>
 
-    <section class="showcase-section" v-if="selectedEquipment">
+    <section v-if="selectedEquipment" class="showcase-section">
       <TechCard title="3D器材展示" subtitle="沉浸式体验 · 360°查看">
         <Equipment3DViewer :equipment="selectedEquipment" />
       </TechCard>
     </section>
 
-    <section class="tutorial-section" v-if="featuredTutorials.length">
+    <section v-if="featuredTutorials.length" class="tutorial-section">
       <TechCard title="器材教程精选" subtitle="图文 & 视频">
         <div class="tutorial-grid">
           <article v-for="tutorial in featuredTutorials" :key="tutorial.id">
@@ -207,14 +245,14 @@ async function loadEquipment() {
 }
 
 const filteredEquipment = computed(() =>
-  equipment.value.filter((item) => {
+  equipment.value.filter(item => {
     const matchCategory = filters.category === '全部' || (item.shoushenxiaoguo || '').includes(filters.category)
     const matchLevel = filters.level === '全部' || deriveDifficulty(item) === filters.level
     return matchCategory && matchLevel
   }),
 )
 
-const featuredTutorials = computed(() => equipment.value.filter((item) => item.shiyongfangfa).slice(0, 3))
+const featuredTutorials = computed(() => equipment.value.filter(item => item.shiyongfangfa).slice(0, 3))
 
 function deriveDifficulty(item: Jianshenqicai) {
   if (!item.shiyongfangfa) return '进阶'
@@ -251,6 +289,25 @@ function viewTutorial(item: Jianshenqicai) {
 
 function goBooking() {
   router.push('/index/kechengyuyue')
+}
+
+function rotateShowroom(angle: number) {
+  showroomRotation.value = (showroomRotation.value + angle) % 360
+}
+
+function resetShowroom() {
+  showroomRotation.value = 0
+}
+
+function getRecommendations() {
+  // 基于当前选中的设备生成推荐
+  if (!selectedEquipment.value) return []
+
+  const currentCategory = selectedEquipment.value.shoushenxiaoguo || ''
+  return equipment.value
+    .filter(item => item.id !== selectedEquipment.value?.id)
+    .filter(item => item.shoushenxiaoguo?.includes(currentCategory.split('·')[0] || ''))
+    .slice(0, 4)
 }
 </script>
 
@@ -300,7 +357,8 @@ function goBooking() {
 .grid {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
@@ -394,14 +452,14 @@ function goBooking() {
 
 .equipment-body {
   min-width: 0;
-  
+
   h3 {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     margin: 0 0 8px;
   }
-  
+
   p {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -459,209 +517,3 @@ function goBooking() {
   }
 }
 </style>
-
- / /   3 D c�&1Wo^p�f�]͓�\!}
- . e q u i p m e n t - s h o w r o o m   { 
-     m a r g i n - b o t t o m :   4 8 p x ; 
-     p a d d i n g :   3 2 p x ; 
-     b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 2 ) ; 
-     b o r d e r - r a d i u s :   1 6 p x ; 
-     b o r d e r :   1 p x   s o l i d   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 8 ) ; 
- } 
- 
- . s h o w r o o m - h e a d e r   { 
-     t e x t - a l i g n :   c e n t e r ; 
-     m a r g i n - b o t t o m :   3 2 p x ; 
-     h 2   { 
-         m a r g i n :   0   0   8 p x   0 ; 
-         f o n t - s i z e :   2 r e m ; 
-         f o n t - w e i g h t :   7 0 0 ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 9 ) ; 
-     } 
-     p   { 
-         m a r g i n :   0 ; 
-         f o n t - s i z e :   1 r e m ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 6 ) ; 
-     } 
- } 
- 
- . s h o w r o o m - 3 d   { 
-     p o s i t i o n :   r e l a t i v e ; 
-     h e i g h t :   4 0 0 p x ; 
-     p e r s p e c t i v e :   1 0 0 0 p x ; 
-     d i s p l a y :   f l e x ; 
-     a l i g n - i t e m s :   c e n t e r ; 
-     j u s t i f y - c o n t e n t :   c e n t e r ; 
-     m a r g i n - b o t t o m :   2 4 p x ; 
- } 
- 
- . e q u i p m e n t - 3 d - i t e m   { 
-     p o s i t i o n :   a b s o l u t e ; 
-     t r a n s i t i o n :   t r a n s f o r m   0 . 6 s   e a s e ; 
-     c u r s o r :   p o i n t e r ; 
- } 
- 
- . e q u i p m e n t - 3 d - c a r d   { 
-     w i d t h :   2 0 0 p x ; 
-     b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 5 ) ; 
-     b o r d e r - r a d i u s :   1 2 p x ; 
-     b o r d e r :   1 p x   s o l i d   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 1 ) ; 
-     o v e r f l o w :   h i d d e n ; 
-     b a c k d r o p - f i l t e r :   b l u r ( 1 0 p x ) ; 
-     t r a n s i t i o n :   a l l   0 . 3 s   e a s e ; 
-     & : h o v e r   { 
-         t r a n s f o r m :   s c a l e ( 1 . 0 5 ) ; 
-         b o r d e r - c o l o r :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 5 ) ; 
-         b o x - s h a d o w :   0   8 p x   3 2 p x   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 2 ) ; 
-     } 
- } 
- 
- . e q u i p m e n t - 3 d - i m a g e   { 
-     p o s i t i o n :   r e l a t i v e ; 
-     h e i g h t :   1 2 0 p x ; 
-     o v e r f l o w :   h i d d e n ; 
-     i m g   { 
-         w i d t h :   1 0 0 % ; 
-         h e i g h t :   1 0 0 % ; 
-         o b j e c t - f i t :   c o v e r ; 
-     } 
- } 
- 
- . e q u i p m e n t - 3 d - o v e r l a y   { 
-     p o s i t i o n :   a b s o l u t e ; 
-     b o t t o m :   0 ; 
-     l e f t :   0 ; 
-     r i g h t :   0 ; 
-     p a d d i n g :   1 2 p x ; 
-     b a c k g r o u n d :   l i n e a r - g r a d i e n t ( t o   t o p ,   r g b a ( 0 ,   0 ,   0 ,   0 . 8 ) ,   t r a n s p a r e n t ) ; 
-     c o l o r :   w h i t e ; 
-     h 4   { 
-         m a r g i n :   0   0   4 p x   0 ; 
-         f o n t - s i z e :   1 4 p x ; 
-         f o n t - w e i g h t :   6 0 0 ; 
-     } 
-     p   { 
-         m a r g i n :   0 ; 
-         f o n t - s i z e :   1 2 p x ; 
-         o p a c i t y :   0 . 8 ; 
-     } 
- } 
- 
- . e q u i p m e n t - 3 d - i n f o   { 
-     p a d d i n g :   1 2 p x ; 
- } 
- 
- . e q u i p m e n t - s p e c s   { 
-     d i s p l a y :   f l e x ; 
-     f l e x - d i r e c t i o n :   c o l u m n ; 
-     g a p :   4 p x ; 
-     m a r g i n - b o t t o m :   1 2 p x ; 
- } 
- 
- . s p e c - i t e m   { 
-     f o n t - s i z e :   1 2 p x ; 
-     c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 7 ) ; 
-     b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 5 ) ; 
-     p a d d i n g :   4 p x   8 p x ; 
-     b o r d e r - r a d i u s :   1 2 p x ; 
- } 
- 
- . s h o w r o o m - c o n t r o l s   { 
-     d i s p l a y :   f l e x ; 
-     j u s t i f y - c o n t e n t :   c e n t e r ; 
-     g a p :   1 6 p x ; 
-     m a r g i n - b o t t o m :   2 4 p x ; 
- } 
- 
- . c o n t r o l - b t n   { 
-     w i d t h :   4 8 p x ; 
-     h e i g h t :   4 8 p x ; 
-     b o r d e r :   1 p x   s o l i d   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 1 ) ; 
-     b o r d e r - r a d i u s :   5 0 % ; 
-     b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 2 ) ; 
-     c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 7 ) ; 
-     c u r s o r :   p o i n t e r ; 
-     d i s p l a y :   f l e x ; 
-     a l i g n - i t e m s :   c e n t e r ; 
-     j u s t i f y - c o n t e n t :   c e n t e r ; 
-     t r a n s i t i o n :   a l l   0 . 3 s   e a s e ; 
-     s v g   { 
-         w i d t h :   2 0 p x ; 
-         h e i g h t :   2 0 p x ; 
-     } 
-     & : h o v e r   { 
-         b o r d e r - c o l o r :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 5 ) ; 
-         b a c k g r o u n d :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 1 ) ; 
-         c o l o r :   # f d d 8 3 5 ; 
-     } 
-     & - - r e s e t   { 
-         b a c k g r o u n d :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 1 ) ; 
-         b o r d e r - c o l o r :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 3 ) ; 
-         c o l o r :   # f d d 8 3 5 ; 
-     } 
- } 
- 
- . s h o w r o o m - r e c o m m e n d a t i o n s   { 
-     h 3   { 
-         m a r g i n :   0   0   1 6 p x   0 ; 
-         f o n t - s i z e :   1 8 p x ; 
-         f o n t - w e i g h t :   6 0 0 ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 9 ) ; 
-     } 
- } 
- 
- . r e c o m m e n d a t i o n s - g r i d   { 
-     d i s p l a y :   g r i d ; 
-     g r i d - t e m p l a t e - c o l u m n s :   r e p e a t ( a u t o - f i t ,   m i n m a x ( 1 5 0 p x ,   1 f r ) ) ; 
-     g a p :   1 6 p x ; 
- } 
- 
- . r e c o m m e n d a t i o n - i t e m   { 
-     b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 2 ) ; 
-     b o r d e r - r a d i u s :   8 p x ; 
-     b o r d e r :   1 p x   s o l i d   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 0 8 ) ; 
-     o v e r f l o w :   h i d d e n ; 
-     c u r s o r :   p o i n t e r ; 
-     t r a n s i t i o n :   a l l   0 . 3 s   e a s e ; 
-     & : h o v e r   { 
-         t r a n s f o r m :   t r a n s l a t e Y ( - 2 p x ) ; 
-         b o r d e r - c o l o r :   r g b a ( 2 5 3 ,   2 1 6 ,   5 3 ,   0 . 3 ) ; 
-     } 
-     i m g   { 
-         w i d t h :   1 0 0 % ; 
-         h e i g h t :   8 0 p x ; 
-         o b j e c t - f i t :   c o v e r ; 
-     } 
- } 
- 
- . r e c o m m e n d a t i o n - i n f o   { 
-     p a d d i n g :   1 2 p x ; 
-     h 4   { 
-         m a r g i n :   0   0   4 p x   0 ; 
-         f o n t - s i z e :   1 4 p x ; 
-         f o n t - w e i g h t :   6 0 0 ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 9 ) ; 
-     } 
-     p   { 
-         m a r g i n :   0 ; 
-         f o n t - s i z e :   1 2 p x ; 
-         c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 6 ) ; 
-     } 
- } 
- 
- @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
-     . e q u i p m e n t - s h o w r o o m   { 
-         p a d d i n g :   2 4 p x   1 6 p x ; 
-     } 
-     . s h o w r o o m - 3 d   { 
-         h e i g h t :   3 0 0 p x ; 
-     } 
-     . e q u i p m e n t - 3 d - c a r d   { 
-         w i d t h :   1 5 0 p x ; 
-     } 
-     . r e c o m m e n d a t i o n s - g r i d   { 
-         g r i d - t e m p l a t e - c o l u m n s :   r e p e a t ( 3 ,   1 f r ) ; 
-     } 
- } 
- 
- 

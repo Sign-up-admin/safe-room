@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-page" v-loading="loading">
+  <div v-loading="loading" class="chat-page">
     <header class="chat-header">
       <div>
         <p class="section-eyebrow">FEEDBACK LOOP</p>
@@ -16,7 +16,7 @@
           <span>{{ formatDateTime(item.addtime) }}</span>
         </header>
         <p>{{ item.ask || '正在等待处理...' }}</p>
-        <div class="chat-reply" v-if="item.reply">
+        <div v-if="item.reply" class="chat-reply">
           <small>客服回复 · {{ formatDateTime(item.replytime) }}</small>
           <p>{{ item.reply }}</p>
         </div>
@@ -153,4 +153,3 @@ function goCreate() {
   }
 }
 </style>
-

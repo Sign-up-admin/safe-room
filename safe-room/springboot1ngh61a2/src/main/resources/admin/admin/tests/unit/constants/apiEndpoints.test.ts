@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { API_ENDPOINTS, getEndpoint, getEndpointString } from '../../../src/constants/apiEndpoints'
+import { API_ENDPOINTS, getEndpoint, getEndpointString } from '@/constants/apiEndpoints'
 
 describe('API端点常量', () => {
   describe('API_ENDPOINTS', () => {

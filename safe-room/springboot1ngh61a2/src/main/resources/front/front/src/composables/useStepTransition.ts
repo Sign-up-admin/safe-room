@@ -40,7 +40,7 @@ export function useStepTransition(options: StepTransitionOptions = {}) {
 
       if (fromEl && toEl) {
         // 移除之前的发光效果
-        stepElements.forEach((el) => {
+        stepElements.forEach(el => {
           gsap.set(el, {
             boxShadow: 'none',
             scale: 1,
@@ -133,4 +133,3 @@ export function useStepTransition(options: StepTransitionOptions = {}) {
     timeline,
   }
 }
-

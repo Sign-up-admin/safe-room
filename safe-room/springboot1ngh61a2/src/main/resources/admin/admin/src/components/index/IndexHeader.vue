@@ -31,18 +31,20 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import type { User, FitnessCoach } from '@/types/api'
 import { useTagsViewStore } from '@/stores/tagsView'
+import { useUserStore } from '@/stores/user'
 import http from '@/utils/http'
 import storage from '@/utils/storage'
 import base from '@/utils/base'
 
 const router = useRouter()
 const tagsViewStore = useTagsViewStore()
+const userStore = useUserStore()
 
 const user = ref<User | FitnessCoach | null>(null)
 const projectName = computed(() => base.getProjectName())
 const baseUrl = computed(() => base.get().url)
 const adminName = computed(() => storage.get('adminName') || '')
-const role = computed(() => storage.get('role') || '')
+const role = computed(() => userStore.userRole || '')
 
 const avatar = computed(() => storage.get('headportrait') || '')
 

@@ -70,7 +70,7 @@ export class CourseListPage {
     }
   }
 
-  async clickCourseCard(index: number = 0): Promise<void> {
+  async clickCourseCard(index = 0): Promise<void> {
     // Try multiple selectors for course cards
     const cardSelectors = [
       '.course-card',

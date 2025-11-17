@@ -32,7 +32,7 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { ElMessage } from 'element-plus'
 import type { UploadProps } from 'element-plus'
-import storage from '@/utils/storage'
+import { useUserStore } from '@/stores/user'
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
@@ -72,9 +72,10 @@ const uploadRef = ref()
 const quillEditorRef = ref()
 const content = ref(props.modelValue)
 const quillUpdateImg = ref(false)
+const userStore = useUserStore()
 
 const header = computed(() => ({
-  Token: storage.get('Token'),
+  Token: userStore.token,
 }))
 
 const getActionUrl = computed(() => {
@@ -90,9 +91,14 @@ const editorOption = {
       container: toolbarOptions,
       handlers: {
         image: function () {
-          const uploadInput = document.querySelector('.avatar-uploader input') as HTMLInputElement
-          if (uploadInput) {
-            uploadInput.click()
+          // Use the upload component ref instead of document.querySelector
+          if (uploadRef.value) {
+            const uploadComponent = uploadRef.value as any
+            // Access the internal input element through the upload component
+            const inputEl = uploadComponent.$el?.querySelector('input[type="file"]')
+            if (inputEl) {
+              inputEl.click()
+            }
           }
         },
       },

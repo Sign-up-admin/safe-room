@@ -29,7 +29,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./tests/setup/vitest.setup.ts'],
+    setupFiles: ['./tests/setup/vitest.setup.ts', './tests/setup/performance.setup.ts'],
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     exclude: [
       '**/node_modules/**',
@@ -42,6 +42,28 @@ export default defineConfig({
       '../../../**/target/classes/**',
       '../**/target/classes/**'
     ],
+    // 性能优化配置
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+        minThreads: 1,
+        maxThreads: 4, // 根据CPU核心数调整
+        useAtomics: true,
+        isolate: true
+      }
+    },
+    maxConcurrency: 3, // 降低并发限制，避免资源竞争
+    fileParallelism: true,
+    // 优化超时配置
+    testTimeout: 15000, // 稍微增加以适应复杂测试
+    hookTimeout: 10000,
+    teardownTimeout: 5000,
+    isolate: true,
+
+    // 添加智能重试机制
+    retry: 2, // 失败测试重试2次
+    retryDelay: 1000, // 重试间隔1秒
     deps: {
       inline: [/@vue/],
     }
@@ -63,10 +85,10 @@ export default defineConfig({
       '**/*.test.{ts,js}',
     ],
     thresholds: {
-      lines: 30,
-      functions: 30,
-      branches: 25,
-      statements: 30
+      lines: 85,
+      functions: 85,
+      branches: 80,
+      statements: 85
     },
     all: false,
     skipFull: false,

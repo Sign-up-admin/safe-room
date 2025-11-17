@@ -3,7 +3,8 @@
     <li
       v-for="(step, index) in steps"
       :key="step.label"
-      :class="['payment-stepper__item', `payment-stepper__item--${statusFor(index)}`]"
+      class="payment-stepper__item"
+      :class="[`payment-stepper__item--${statusFor(index)}`]"
     >
       <span class="payment-stepper__index">{{ index + 1 }}</span>
       <div>
@@ -93,7 +94,9 @@ function statusFor(index: number) {
   &--current {
     border-color: #fdd835;
     background: linear-gradient(135deg, rgba(253, 216, 53, 0.2), rgba(0, 0, 0, 0.8));
-    box-shadow: 0 0 30px rgba(253, 216, 53, 0.5), 0 0 60px rgba(253, 216, 53, 0.2);
+    box-shadow:
+      0 0 30px rgba(253, 216, 53, 0.5),
+      0 0 60px rgba(253, 216, 53, 0.2);
     animation: glow 2s ease-in-out infinite alternate;
   }
 
@@ -143,11 +146,14 @@ function statusFor(index: number) {
 
 @keyframes glow {
   from {
-    box-shadow: 0 0 30px rgba(253, 216, 53, 0.5), 0 0 60px rgba(253, 216, 53, 0.2);
+    box-shadow:
+      0 0 30px rgba(253, 216, 53, 0.5),
+      0 0 60px rgba(253, 216, 53, 0.2);
   }
   to {
-    box-shadow: 0 0 40px rgba(253, 216, 53, 0.7), 0 0 80px rgba(253, 216, 53, 0.3);
+    box-shadow:
+      0 0 40px rgba(253, 216, 53, 0.7),
+      0 0 80px rgba(253, 216, 53, 0.3);
   }
 }
 </style>
-

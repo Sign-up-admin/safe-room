@@ -329,6 +329,7 @@ public class JianshenkechengController {
 
         PageUtils page = jianshenkechengService.queryPage(params, ew);
         // 创建一个新的可修改的列表，避免 UnsupportedOperationException
+        @SuppressWarnings("unchecked")
         List<JianshenkechengEntity> pageList = new ArrayList<>((List<JianshenkechengEntity>)page.getList());
         if(pageList.size()<limit) {
             int toAddNum = limit-pageList.size();

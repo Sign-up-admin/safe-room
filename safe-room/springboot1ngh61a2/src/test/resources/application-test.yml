@@ -1,28 +1,69 @@
 # Test configuration for unit tests
 spring:
   datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
-    password: ""
+    password:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 30000
   sql:
     init:
       mode: always
       schema-locations: classpath:schema-h2.sql
-      data-locations: classpath:data-h2.sql
+      data-locations: classpath:test-data.sql
+      continue-on-error: false
+      separator: ;
+  h2:
+    console:
+      enabled: false  # 测试环境禁用控制台
+  jpa:
+    hibernate:
+      ddl-auto: none  # 使用SQL脚本初始化，不使用Hibernate DDL
+    show-sql: false  # 测试环境不显示SQL
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
 
 # Disable MinIO for tests
 minio:
   enabled: false
 
+# Disable metrics and actuator for tests
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ""
+    enabled-by-default: false
+  metrics:
+    enabled: false
+  endpoint:
+    health:
+      enabled: false
+    info:
+      enabled: false
+
+# Disable application metrics for tests
+metrics:
+  fitness-gym:
+    enabled: false
+
 # Test logging
 logging:
   level:
     root: WARN
-    com.controller: DEBUG
-    com.service: DEBUG
-    org.testcontainers: INFO
-    org.testcontainers.containers: DEBUG
+    com.jlwl: INFO  # 项目包日志级别
+    com.controller: INFO
+    com.service: INFO
+    org.springframework: WARN
+    org.springframework.test: INFO
+    org.testcontainers: WARN
+    org.h2: WARN
+    com.zaxxer.hikari: WARN
 
 # Test-specific configurations
 test:
@@ -35,12 +76,7 @@ test:
     member-username: user01
     member-password: 123456
   containers:
-    enabled: true  # Enable Testcontainers for integration tests
-    postgres:
-      image: postgres:13
-      database: testdb
-      username: test
-      password: test123
+    enabled: false  # Disable Testcontainers, use H2 for unit tests
   data:
     cleanup-enabled: true  # Enable automatic test data cleanup
     cleanup-prefixes: ["test-", "auto-", "temp-"]  # Prefixes for test data identification

@@ -473,12 +473,12 @@
 }
 
 // 深色主题优化
-[data-theme="dark"] {
+[data-theme='dark'] {
   // 深色主题已经是默认，无需额外覆盖
 }
 
 // 浅色主题
-[data-theme="light"] {
+[data-theme='light'] {
   --el-bg-color: var(--color-bg-dark);
   --el-bg-color-page: var(--color-bg-deep);
   --el-text-color-primary: var(--color-text-primary);
@@ -488,7 +488,7 @@
 }
 
 // 蓝色主题
-[data-theme="blue"] {
+[data-theme='blue'] {
   --el-color-primary: var(--color-primary);
   --el-bg-color: var(--color-bg-dark);
   --el-text-color-primary: var(--color-text-primary);

@@ -1,0 +1,43 @@
+{
+  "testFailureThreshold": 0,
+  "coverageThresholds": {
+    "line": 65,
+    "branch": 45,
+    "instruction": 65,
+    "method": 75,
+    "class": 90,
+    "controller": 30,
+    "service": 60
+  },
+  "maxTestDuration": 1800,
+  "qualityChecks": {
+    "enableBuildErrorCheck": true,
+    "maxBuildWarnings": 50,
+    "enablePerformanceCheck": true,
+    "enableSecurityScan": true
+  },
+  "reporting": {
+    "generateHtmlReports": true,
+    "generateTrendAnalysis": true,
+    "storeHistory": true,
+    "maxHistoryEntries": 50
+  },
+  "notifications": {
+    "onFailure": true,
+    "onWarning": false,
+    "slackWebhook": null,
+    "emailRecipients": []
+  },
+  "customRules": {
+    "packageExclusions": [
+      "**/config/**",
+      "**/entity/**",
+      "**/*Exception.class",
+      "**/*Application.class"
+    ],
+    "requiredTestAnnotations": [
+      "@Test",
+      "@SpringBootTest"
+    ]
+  }
+}

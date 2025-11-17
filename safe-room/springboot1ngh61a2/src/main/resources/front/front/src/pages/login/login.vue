@@ -14,7 +14,7 @@
 
       <section class="login-form">
         <div class="form-header">
-          <h2>会员登录</h2>
+          <h2 data-testid="login-page-title">会员登录</h2>
           <p>输入账号密码，开启高效训练体验</p>
         </div>
 
@@ -24,34 +24,48 @@
           type="error"
           show-icon
           class="mb-16"
+          data-testid="login-error-message"
           @close="errorMessage = ''"
         />
 
-        <el-form ref="formRef" :model="loginForm" :rules="rules" label-position="top" @keyup.enter="handleLogin">
+        <el-form
+          ref="formRef"
+          :model="loginForm"
+          :rules="rules"
+          label-position="top"
+          data-testid="login-form"
+          @keyup.enter="handleLogin"
+        >
           <el-form-item prop="username">
             <template #label>
-              <span class="form-label"><span class="required-asterisk">*</span>账号<span class="required-asterisk">*</span></span>
+              <span class="form-label"
+                ><span class="required-asterisk">*</span>账号<span class="required-asterisk">*</span></span
+              >
             </template>
             <el-input
               v-model="loginForm.username"
               placeholder="请输入会员账号"
               autocomplete="username"
               clearable
+              data-testid="login-username-input"
             />
           </el-form-item>
           <el-form-item prop="password">
             <template #label>
-              <span class="form-label"><span class="required-asterisk">*</span>密码<span class="required-asterisk">*</span></span>
+              <span class="form-label"
+                ><span class="required-asterisk">*</span>密码<span class="required-asterisk">*</span></span
+              >
             </template>
             <el-input
               v-model="loginForm.password"
               placeholder="请输入密码"
               show-password
               autocomplete="current-password"
+              data-testid="login-password-input"
             />
           </el-form-item>
           <el-form-item v-if="roleOptions.length > 1" label="登录身份" prop="tableName">
-            <el-radio-group v-model="loginForm.tableName">
+            <el-radio-group v-model="loginForm.tableName" data-testid="login-role-radio-group">
               <el-radio v-for="role in roleOptions" :key="role.value" :value="role.value">
                 {{ role.label }}
               </el-radio>
@@ -59,11 +73,16 @@
           </el-form-item>
 
           <div class="form-actions">
-            <el-checkbox v-model="rememberMe">记住账号</el-checkbox>
-            <el-link type="primary" @click="goToRegister">没有账号？立即注册</el-link>
+            <el-checkbox v-model="rememberMe" data-testid="login-remember-checkbox">记住账号</el-checkbox>
+            <el-link type="primary" data-testid="login-register-link" @click="goToRegister">没有账号？立即注册</el-link>
           </div>
 
-          <button class="yellow-button submit-btn" :disabled="submitting" @click="handleLogin">
+          <button
+            class="yellow-button submit-btn"
+            :disabled="submitting"
+            data-testid="login-submit-button"
+            @click="handleLogin"
+          >
             {{ submitting ? '登录中...' : '登录' }}
           </button>
         </el-form>
@@ -94,8 +113,8 @@ const errorMessage = ref('')
 const roleOptions = computed(() =>
   menu
     .list()
-    .filter((role) => role.hasFrontLogin === '是')
-    .map((role) => ({ label: role.roleName, value: role.tableName })),
+    .filter(role => role.hasFrontLogin === '是')
+    .map(role => ({ label: role.roleName, value: role.tableName })),
 )
 
 const loginForm = reactive({
@@ -122,7 +141,7 @@ onMounted(() => {
     loginForm.username = remembered
   }
   const savedRole = localStorage.getItem('UserTableName')
-  if (savedRole && roleOptions.value.some((role) => role.value === savedRole)) {
+  if (savedRole && roleOptions.value.some(role => role.value === savedRole)) {
     loginForm.tableName = savedRole
   }
 })
@@ -194,7 +213,8 @@ function goToRegister() {
   align-items: center;
   justify-content: center;
   padding: 48px 18px;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.2), transparent 45%),
+  background:
+    radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.2), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.15), transparent 40%), #020202;
 }
 
@@ -313,7 +333,7 @@ function goToRegister() {
   // 密码输入框图标颜色 - 灰色
   :deep(.el-input__password) {
     color: #9ea1a6;
-    
+
     &:hover {
       color: var(--color-yellow);
     }
@@ -322,7 +342,7 @@ function goToRegister() {
   // 清除按钮颜色
   :deep(.el-input__clear) {
     color: #9ea1a6;
-    
+
     &:hover {
       color: var(--color-yellow);
     }
@@ -489,4 +509,3 @@ function goToRegister() {
   }
 }
 </style>
-

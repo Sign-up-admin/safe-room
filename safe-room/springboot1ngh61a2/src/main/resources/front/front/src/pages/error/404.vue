@@ -5,4 +5,3 @@
 <script setup lang="ts">
 import ErrorPage from './ErrorPage.vue'
 </script>
-

@@ -8,13 +8,13 @@ INSERT INTO config (id, name, config_value, url) VALUES
 
 -- 管理员账户
 INSERT INTO users (id, username, password, password_hash, failed_login_attempts, lock_until, image, role, status, addtime) VALUES
-  (1, 'admin', 'admin', NULL, 0, NULL, 'upload/image1.jpg', '管理员', 0, CURRENT_TIMESTAMP),
-  (2, 'manager', '123456', NULL, 0, NULL, 'upload/image2.jpg', '管理员', 0, CURRENT_TIMESTAMP),
-  (3, 'operator', '123456', NULL, 0, NULL, 'upload/image3.jpg', '管理员', 0, CURRENT_TIMESTAMP);
+  (1, 'admin', 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lbdxp7O.7C0XJ8Eo', 0, NULL, 'upload/image1.jpg', '管理员', 0, CURRENT_TIMESTAMP),
+  (2, 'manager', '123456', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lbdxp7O.7C0XJ8Eo', 0, NULL, 'upload/image2.jpg', '管理员', 0, CURRENT_TIMESTAMP),
+  (3, 'operator', '123456', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lbdxp7O.7C0XJ8Eo', 0, NULL, 'upload/image3.jpg', '管理员', 0, CURRENT_TIMESTAMP);
 
 -- 用户账户
 INSERT INTO yonghu (id, addtime, yonghuzhanghao, mima, password_hash, failed_login_attempts, lock_until, yonghuxingming, touxiang, xingbie, shengao, tizhong, shoujihaoma, huiyuankahao, huiyuankamingcheng, youxiaoqizhi, status) VALUES
-  (1, CURRENT_TIMESTAMP, 'user01', '123456', NULL, 0, NULL, '李四', 'upload/yonghu1.jpg', '男', '175cm', '70kg', '13900000001', 'HY0001', '年卡', DATE '2025-12-31', 0),
+  (1, CURRENT_TIMESTAMP, 'user01', '123456', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lbdxp7O.7C0XJ8Eo', 0, NULL, '李四', 'upload/yonghu1.jpg', '男', '175cm', '70kg', '13900000001', 'HY0001', '年卡', DATE '2025-12-31', 0),
   (2, CURRENT_TIMESTAMP, 'user02', '123456', NULL, 0, NULL, '王芳', 'upload/yonghu2.jpg', '女', '162cm', '55kg', '13900000002', 'HY0002', '年卡', DATE '2025-12-31', 0),
   (3, CURRENT_TIMESTAMP, 'user03', '123456', NULL, 0, NULL, '张伟', 'upload/yonghu3.jpg', '男', '180cm', '78kg', '13900000003', 'HY0003', '季卡', DATE '2025-11-30', 0),
   (4, CURRENT_TIMESTAMP, 'user04', '123456', NULL, 0, NULL, '陈静', 'upload/yonghu4.jpg', '女', '168cm', '60kg', '13900000004', 'HY0004', 'VIP年卡', DATE '2025-12-31', 0),
@@ -38,7 +38,7 @@ INSERT INTO kechengleixing (id, addtime, kechengleixing, clicktime, clicknum, di
 
 -- 健身教练
 INSERT INTO jianshenjiaolian (id, addtime, jiaoliangonghao, mima, password_hash, failed_login_attempts, lock_until, jiaolianxingming, zhaopian, xingbie, nianling, shengao, tizhong, lianxidianhua, sijiaojiage, gerenjianjie, clicktime, clicknum, discussnum, storeupnum) VALUES
-  (1, CURRENT_TIMESTAMP, 'coach001', '123456', NULL, 0, NULL, '张三', 'upload/jiaolian1.jpg', '男', '30', '180cm', '75kg', '13800000001', 199.0, '多年健身经验，擅长力量及有氧训练，国家一级健身教练', NULL, 0, 0, 0),
+  (1, CURRENT_TIMESTAMP, 'coach001', '123456', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lbdxp7O.7C0XJ8Eo', 0, NULL, '张三', 'upload/jiaolian1.jpg', '男', '30', '180cm', '75kg', '13800000001', 199.0, '多年健身经验，擅长力量及有氧训练，国家一级健身教练', NULL, 0, 0, 0),
   (2, CURRENT_TIMESTAMP, 'coach002', '123456', NULL, 0, NULL, '李娜', 'upload/jiaolian2.jpg', '女', '28', '165cm', '55kg', '13800000002', 299.0, '专业瑜伽教练，拥有国际瑜伽认证，擅长哈他瑜伽和流瑜伽', NULL, 0, 0, 0),
   (3, CURRENT_TIMESTAMP, 'coach003', '123456', NULL, 0, NULL, '王强', 'upload/jiaolian3.jpg', '男', '32', '185cm', '85kg', '13800000003', 249.0, '资深拳击教练，前职业拳击手，擅长拳击技巧和体能训练', NULL, 0, 0, 0),
   (4, CURRENT_TIMESTAMP, 'coach004', '123456', NULL, 0, NULL, '赵敏', 'upload/jiaolian4.jpg', '女', '26', '170cm', '58kg', '13800000004', 179.0, '普拉提专业教练，拥有普拉提国际认证，擅长核心力量训练', NULL, 0, 0, 0),

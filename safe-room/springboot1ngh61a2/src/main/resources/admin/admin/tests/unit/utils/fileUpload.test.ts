@@ -11,7 +11,7 @@ import {
   isDocumentFile,
   isVideoFile,
   type FileUploadConfig,
-} from '../../../src/utils/fileUpload'
+} from '@/utils/fileUpload'
 import { ElMessage } from 'element-plus'
 
 // Mock Element Plus

@@ -1,0 +1,1942 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { createPinia } from 'pinia'
+import ChatList from '@/views/modules/chat/list.vue'
+import http from '@/utils/http'
+import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
+
+// Mock the child components
+vi.mock('@/components/modules/chat/ChatFilter.vue', () => ({
+  default: {
+    name: 'ChatFilter',
+    template: '<div>ChatFilter Mock</div>',
+    props: ['modelValue'],
+    emits: ['update:modelValue', 'search', 'reset']
+  }
+}))
+
+vi.mock('@/components/modules/chat/ChatDetailDialog.vue', () => ({
+  default: {
+    name: 'ChatDetailDialog',
+    template: '<div>ChatDetailDialog Mock</div>',
+    props: ['visible', 'record', 'permissions'],
+    emits: ['update:visible', 'reply']
+  }
+}))
+
+vi.mock('@/components/modules/chat/ChatReplyForm.vue', () => ({
+  default: {
+    name: 'ChatReplyForm',
+    template: '<div>ChatReplyForm Mock</div>',
+    props: ['visible', 'record', 'submitting'],
+    emits: ['update:visible', 'submit']
+  }
+}))
+
+// Mock Element Plus components using unified helpers
+const elMocks = createElementPlusMocks()
+vi.mock('element-plus', () => elMocks)
+
+vi.mock('@/utils/http', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn()
+  }
+}))
+
+vi.mock('@/utils/storage', () => ({
+  default: {
+    get: vi.fn(),
+    set: vi.fn()
+  }
+}))
+
+vi.mock('@/utils/base', () => ({
+  default: {
+    get: vi.fn(() => ({ url: 'http://localhost:8080' }))
+  }
+}))
+
+// Mock HTTP for testing
+const mockHttp = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn()
+}
+
+describe('ChatList', () => {
+  let router: any
+  let pinia: any
+
+  beforeEach(() => {
+    pinia = createPinia()
+    router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { name: 'chat', path: '/chat', component: ChatList }
+      ]
+    })
+    vi.clearAllMocks()
+  })
+
+  describe('Component Rendering', () => {
+    it('should render the chat list component', () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      expect(wrapper.exists()).toBe(true)
+    })
+  })
+
+  describe('Chat Management', () => {
+    it('should load chat data on mount', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockData = {
+        list: [
+          {
+            id: 1,
+            ask: 'How to use the product?',
+            reply: 'Please check our documentation.',
+            isreply: 1,
+            addtime: '2024-01-01 10:00:00',
+            userid: 1,
+            yonghuEntity: { yonghuming: 'User1', shouji: '13800138000' }
+          },
+          {
+            id: 2,
+            ask: 'When will the feature be available?',
+            reply: null,
+            isreply: 0,
+            addtime: '2024-01-02 14:30:00',
+            userid: 2,
+            yonghuEntity: { yonghuming: 'User2', shouji: '13900139000' }
+          }
+        ],
+        total: 2
+      }
+
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: mockData
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Verify HTTP call with correct endpoint and parameters
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+
+      // Verify data loading is triggered on mount
+      expect(mockHttp.get).toHaveBeenCalledTimes(1)
+    })
+
+    it('should render loaded chat data correctly', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockData = {
+        list: [
+          {
+            id: 1,
+            ask: 'Test question',
+            reply: 'Test answer',
+            isreply: 1,
+            addtime: '2024-01-01 10:00:00',
+            userid: 1,
+            yonghuEntity: { yonghuming: 'TestUser', shouji: '13800138000' }
+          }
+        ],
+        total: 1
+      }
+
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: mockData
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Verify table component is rendered
+      const table = wrapper.findComponent({ name: 'ElTable' })
+      expect(table.exists()).toBe(true)
+
+      // Verify pagination component is rendered
+      const pagination = wrapper.findComponent({ name: 'ElPagination' })
+      expect(pagination.exists()).toBe(true)
+    })
+
+    it('should handle loading errors gracefully', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      mockHttp.get.mockRejectedValue(new Error('Network error'))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Should handle error without crashing
+      expect(wrapper.exists()).toBe(true)
+
+      // Should show error result component
+      const errorResult = wrapper.findComponent({ name: 'ElResult' })
+      expect(errorResult.exists()).toBe(true)
+    })
+
+    it('should pass filter parameters to API calls', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Get the component instance
+      const vm = wrapper.vm as any
+
+      // Simulate applying filters
+      vm.filterForm.isreply = 0
+      vm.filterForm.ask = 'test question'
+      vm.handleSearch()
+
+      // Verify API was called with filter parameters
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc',
+          isreply: 0,
+          ask: 'test question'
+        })
+      }))
+    })
+
+    it('should handle pagination changes', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Get the component instance
+      const vm = wrapper.vm as any
+
+      // Simulate page change
+      vm.handlePageChange(2)
+
+      // Verify API was called with new page parameter
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 2,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+    })
+
+    it('should handle page size changes', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Get the component instance
+      const vm = wrapper.vm as any
+
+      // Simulate page size change
+      vm.handleSizeChange(20)
+
+      // Verify API was called with new limit parameter and reset page to 1
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 20,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+    })
+  })
+
+  describe('Form Validation', () => {
+    it('should validate reply content is required', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0
+      }
+      vm.openReplyForm(testRow)
+
+      // Try to submit with empty reply
+      vm.replyForm.reply = ''
+      vm.submitReply()
+
+      // Should not proceed with API call due to validation
+      expect(mockHttp.post).not.toHaveBeenCalled()
+    })
+
+    it('should allow valid reply submission', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set valid reply content
+      vm.replyForm.reply = 'This is a valid reply'
+
+      // Mock form validation as passed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true) // Validation passed
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Should call API with correct data
+      expect(mockHttp.post).toHaveBeenCalledWith('/chat/update', {
+        id: 1,
+        userid: 1,
+        reply: 'This is a valid reply',
+        isreply: 1
+      })
+
+      // Should show success message
+      expect(mockElMessage.success).toHaveBeenCalledWith('回复成功')
+
+      // Should close form
+      expect(vm.replyVisible).toBe(false)
+    })
+
+    it('should handle reply submission failure', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      mockHttp.post.mockRejectedValue(new Error('Submission failed'))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'This is a reply'
+
+      // Mock form validation as passed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true) // Validation passed
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Should show error message
+      expect(mockElMessage.error).toHaveBeenCalledWith('回复失败')
+
+      // Should not close form
+      expect(vm.replyVisible).toBe(true)
+    })
+
+    it('should initialize reply form correctly', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test opening reply form for new reply
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: null,
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      expect(vm.replyForm.id).toBe(1)
+      expect(vm.replyForm.ask).toBe('Test question')
+      expect(vm.replyForm.reply).toBe('')
+      expect(vm.replyForm.isreply).toBe(0)
+      expect(vm.isEditingReply).toBe(false)
+      expect(vm.replyVisible).toBe(true)
+    })
+
+    it('should initialize reply form for editing', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test opening reply form for editing existing reply
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: 'Existing reply',
+        isreply: 1,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      expect(vm.replyForm.id).toBe(1)
+      expect(vm.replyForm.ask).toBe('Test question')
+      expect(vm.replyForm.reply).toBe('Existing reply')
+      expect(vm.replyForm.isreply).toBe(1)
+      expect(vm.isEditingReply).toBe(true)
+      expect(vm.replyVisible).toBe(true)
+    })
+
+    it('should close reply form and reset data', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form first
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: 'Test reply',
+        isreply: 1,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      expect(vm.replyVisible).toBe(true)
+      expect(vm.replyForm.reply).toBe('Test reply')
+
+      // Close form
+      vm.closeReplyForm()
+
+      expect(vm.replyVisible).toBe(false)
+      expect(vm.replyForm.id).toBe(null)
+      expect(vm.replyForm.ask).toBe('')
+      expect(vm.replyForm.reply).toBe('')
+      expect(vm.replyForm.isreply).toBe(0)
+    })
+
+    it('should have correct validation rules', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Check that reply rules are defined correctly
+      expect(vm.replyRules).toBeDefined()
+      expect(vm.replyRules.reply).toBeDefined()
+      expect(vm.replyRules.reply).toEqual([
+        { required: true, message: '请输入回复内容', trigger: 'blur' }
+      ])
+    })
+  })
+
+  describe('CRUD Operations', () => {
+    it('should view chat details', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockData = {
+        id: 1,
+        ask: 'Test question',
+        reply: 'Test answer',
+        isreply: 1,
+        addtime: '2024-01-01 10:00:00',
+        userid: 1,
+        yonghuEntity: { yonghuming: 'TestUser', shouji: '13800138000' }
+      }
+
+      mockHttp.get.mockResolvedValue({ data: { code: 0, data: mockData } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test viewing details
+      const testRow = { id: 1 }
+      vm.viewRow(testRow)
+
+      // Should call API to get details
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/info/1')
+
+      // Should open detail dialog
+      expect(vm.detailVisible).toBe(true)
+      expect(vm.detailRecord).toEqual(mockData)
+    })
+
+    it('should handle view details error', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockRejectedValue(new Error('API Error'))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test viewing details with error
+      const testRow = { id: 1, ask: 'Test question' }
+      vm.viewRow(testRow)
+
+      // Should open detail dialog with fallback data
+      expect(vm.detailVisible).toBe(true)
+      expect(vm.detailRecord).toEqual(testRow)
+    })
+
+    it('should delete chat messages', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+      const mockElMessageBox = vi.mocked(ElMessageBox)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+      mockElMessageBox.confirm.mockResolvedValue()
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test deleting a message
+      const testRow = { id: 1, ask: 'Test question' }
+      await vm.removeRow(testRow)
+
+      // Should show confirmation dialog
+      expect(mockElMessageBox.confirm).toHaveBeenCalledWith(
+        '确定要删除该留言吗？',
+        '提示',
+        expect.any(Object)
+      )
+
+      // Should call delete API
+      expect(mockHttp.post).toHaveBeenCalledWith('/chat/delete', { ids: 1 })
+
+      // Should show success message
+      expect(mockElMessage.success).toHaveBeenCalledWith('删除成功')
+
+      // Should refresh list
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.any(Object))
+    })
+
+    it('should handle delete cancellation', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessageBox = vi.mocked(ElMessageBox)
+
+      mockElMessageBox.confirm.mockRejectedValue('cancel')
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test cancelling delete
+      const testRow = { id: 1, ask: 'Test question' }
+      await vm.removeRow(testRow)
+
+      // Should not call delete API
+      expect(mockHttp.post).not.toHaveBeenCalled()
+
+      // Should not show success message
+      expect(mockHttp.get).toHaveBeenCalledTimes(1) // Only initial load
+    })
+
+    it('should handle delete error', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+      const mockElMessageBox = vi.mocked(ElMessageBox)
+
+      mockHttp.post.mockRejectedValue(new Error('Delete failed'))
+      mockElMessageBox.confirm.mockResolvedValue()
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test delete error
+      const testRow = { id: 1, ask: 'Test question' }
+      await vm.removeRow(testRow)
+
+      // Should show error message
+      expect(mockElMessage.error).toHaveBeenCalledWith('删除失败')
+
+      // Should not refresh list
+      expect(mockHttp.get).toHaveBeenCalledTimes(1) // Only initial load
+    })
+
+    it('should refresh chat list', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Clear mock call history
+      mockHttp.get.mockClear()
+
+      // Test manual refresh
+      vm.fetchList()
+
+      // Should call API again
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+    })
+
+    it('should handle reply form opening for new reply', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test opening reply form for unanswered message
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: null,
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      expect(vm.replyVisible).toBe(true)
+      expect(vm.isEditingReply).toBe(false)
+      expect(vm.replyForm.id).toBe(1)
+      expect(vm.replyForm.ask).toBe('Test question')
+      expect(vm.replyForm.reply).toBe('')
+      expect(vm.replyForm.isreply).toBe(0)
+    })
+
+    it('should handle reply form opening for editing reply', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test opening reply form for editing existing reply
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: 'Existing reply',
+        isreply: 1,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      expect(vm.replyVisible).toBe(true)
+      expect(vm.isEditingReply).toBe(true)
+      expect(vm.replyForm.id).toBe(1)
+      expect(vm.replyForm.ask).toBe('Test question')
+      expect(vm.replyForm.reply).toBe('Existing reply')
+      expect(vm.replyForm.isreply).toBe(1)
+    })
+
+    it('should prevent opening reply form without row', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Test opening reply form with null row
+      vm.openReplyForm(null)
+
+      expect(vm.replyVisible).toBe(false)
+    })
+
+    it('should close detail dialog', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open detail dialog first
+      vm.detailVisible = true
+      vm.detailRecord = { id: 1, ask: 'Test' }
+
+      // Close dialog
+      vm.detailVisible = false
+
+      expect(vm.detailVisible).toBe(false)
+    })
+
+    it('should handle permissions for operations', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Check permissions object
+      expect(vm.permissions).toBeDefined()
+      expect(vm.permissions).toHaveProperty('create')
+      expect(vm.permissions).toHaveProperty('update')
+      expect(vm.permissions).toHaveProperty('remove')
+      expect(vm.permissions).toHaveProperty('view')
+    })
+  })
+
+  describe('Filter and Pagination', () => {
+    it('should apply reply status filter', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set reply status filter to show only replied messages
+      vm.filterForm.isreply = 1
+      vm.handleSearch()
+
+      // Verify API call includes isreply parameter
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc',
+          isreply: 1
+        })
+      }))
+    })
+
+    it('should apply reply status filter for unreplied messages', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set reply status filter to show only unreplied messages
+      vm.filterForm.isreply = 0
+      vm.handleSearch()
+
+      // Verify API call includes isreply parameter
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          isreply: 0
+        })
+      }))
+    })
+
+    it('should apply message content keyword filter', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set message content filter
+      vm.filterForm.ask = 'problem with login'
+      vm.handleSearch()
+
+      // Verify API call includes ask parameter
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          ask: 'problem with login'
+        })
+      }))
+    })
+
+    it('should reset filters', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set filters
+      vm.filterForm.isreply = 0
+      vm.filterForm.ask = 'test question'
+
+      // Reset filters
+      vm.handleReset()
+
+      // Verify filters are cleared
+      expect(vm.filterForm.isreply).toBe(null)
+      expect(vm.filterForm.ask).toBe('')
+    })
+
+    it('should handle null reply status filter', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set reply status to null (show all)
+      vm.filterForm.isreply = null
+      vm.handleSearch()
+
+      // Verify API call does not include isreply parameter when null
+      const lastCall = mockHttp.get.mock.lastCall
+      const params = lastCall[1].params
+      expect(params.isreply).toBeUndefined()
+    })
+
+    it('should handle empty message content filter', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set empty message content filter
+      vm.filterForm.ask = ''
+      vm.handleSearch()
+
+      // Verify API call does not include ask parameter when empty
+      const lastCall = mockHttp.get.mock.lastCall
+      const params = lastCall[1].params
+      expect(params.ask).toBeUndefined()
+    })
+
+    it('should apply multiple filters simultaneously', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set multiple filters
+      vm.filterForm.isreply = 1
+      vm.filterForm.ask = 'urgent issue'
+      vm.handleSearch()
+
+      // Verify all filters are applied
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc',
+          isreply: 1,
+          ask: 'urgent issue'
+        })
+      }))
+    })
+
+    it('should reset page to 1 when applying filters', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Change to page 3 first
+      vm.pagination.page = 3
+
+      // Apply filter
+      vm.filterForm.ask = 'test'
+      vm.handleSearch()
+
+      // Verify page was reset to 1
+      expect(vm.pagination.page).toBe(1)
+    })
+
+    it('should reset page to 1 when resetting filters', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Change to page 5
+      vm.pagination.page = 5
+
+      // Reset filters
+      vm.handleReset()
+
+      // Verify page was reset to 1
+      expect(vm.pagination.page).toBe(1)
+    })
+
+    it('should handle page size changes correctly', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Change page size to 50
+      vm.handleSizeChange(50)
+
+      // Verify page size and page reset
+      expect(vm.pagination.limit).toBe(50)
+      expect(vm.pagination.page).toBe(1)
+
+      // Verify API call with new parameters
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 1,
+          limit: 50,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+    })
+
+    it('should handle page navigation', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Navigate to page 3
+      vm.handlePageChange(3)
+
+      // Verify page changed
+      expect(vm.pagination.page).toBe(3)
+
+      // Verify API call with correct page
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 3,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc'
+        })
+      }))
+    })
+
+    it('should maintain other parameters during pagination', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.get.mockResolvedValue({
+        data: {
+          code: 0,
+          data: { list: [], total: 0 }
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set filters first
+      vm.filterForm.isreply = 0
+      vm.filterForm.ask = 'bug report'
+      vm.handleSearch()
+
+      // Clear calls to focus on pagination
+      mockHttp.get.mockClear()
+
+      // Change page
+      vm.handlePageChange(2)
+
+      // Verify filters are maintained during pagination
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.objectContaining({
+        params: expect.objectContaining({
+          page: 2,
+          limit: 10,
+          sort: 'addtime',
+          order: 'desc',
+          isreply: 0,
+          ask: 'bug report'
+        })
+      }))
+    })
+
+    it('should display filter form elements', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Verify filter form is rendered
+      const filterForm = wrapper.findComponent({ name: 'ElForm' })
+      expect(filterForm.exists()).toBe(true)
+
+      // Verify reply status select
+      const statusSelect = wrapper.findComponent({ name: 'ElSelect' })
+      expect(statusSelect.exists()).toBe(true)
+
+      // Verify message input
+      const messageInput = wrapper.findComponent({ name: 'ElInput' })
+      expect(messageInput.exists()).toBe(true)
+
+      // Verify search and reset buttons
+      const buttons = wrapper.findAllComponents({ name: 'ElButton' })
+      expect(buttons.length).toBeGreaterThanOrEqual(2) // At least search and reset buttons
+    })
+
+    it('should display pagination controls', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      // Verify pagination component is rendered
+      const pagination = wrapper.findComponent({ name: 'ElPagination' })
+      expect(pagination.exists()).toBe(true)
+
+      // Verify pagination props
+      expect(pagination.props('background')).toBe(true)
+      expect(pagination.props('layout')).toBe('total, sizes, prev, pager, next')
+    })
+  })
+
+  describe('Submit Logic', () => {
+    it('should handle successful reply submission', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      // Mock successful API response
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'This is a helpful reply'
+
+      // Mock form validation as passed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify API call
+      expect(mockHttp.post).toHaveBeenCalledWith('/chat/update', {
+        id: 1,
+        userid: 1,
+        reply: 'This is a helpful reply',
+        isreply: 1
+      })
+
+      // Verify success message
+      expect(mockElMessage.success).toHaveBeenCalledWith('回复成功')
+
+      // Verify form is closed
+      expect(vm.replyVisible).toBe(false)
+
+      // Verify list is refreshed
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.any(Object))
+    })
+
+    it('should handle reply submission with form validation failure', async () => {
+      const mockHttp = vi.mocked(http)
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set empty reply (should fail validation)
+      vm.replyForm.reply = ''
+
+      // Mock form validation as failed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(false)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify API was not called due to validation failure
+      expect(mockHttp.post).not.toHaveBeenCalled()
+
+      // Verify form remains open
+      expect(vm.replyVisible).toBe(true)
+    })
+
+    it('should handle reply submission API error', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      // Mock API error
+      mockHttp.post.mockRejectedValue(new Error('Submission failed'))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation as passed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify error message
+      expect(mockElMessage.error).toHaveBeenCalledWith('回复失败')
+
+      // Verify form remains open
+      expect(vm.replyVisible).toBe(true)
+
+      // Verify list was not refreshed
+      expect(mockHttp.get).toHaveBeenCalledTimes(1) // Only initial load
+    })
+
+    it('should handle reply submission with API error response', async () => {
+      const mockHttp = vi.mocked(http)
+      const mockElMessage = vi.mocked(ElMessage)
+
+      // Mock API error response
+      mockHttp.post.mockResolvedValue({
+        data: {
+          code: 1,
+          msg: 'Invalid reply content'
+        }
+      })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Invalid content'
+
+      // Mock form validation as passed
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify error message from API
+      expect(mockElMessage.error).toHaveBeenCalledWith('Invalid reply content')
+
+      // Verify form remains open
+      expect(vm.replyVisible).toBe(true)
+    })
+
+    it('should update reply status to replied after successful submission', async () => {
+      const mockHttp = vi.mocked(http)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form for unanswered message
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Verify initial state
+      expect(vm.replyForm.isreply).toBe(0)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify API was called with isreply set to 1
+      expect(mockHttp.post).toHaveBeenCalledWith('/chat/update', {
+        id: 1,
+        userid: 1,
+        reply: 'Test reply',
+        isreply: 1
+      })
+    })
+
+    it('should handle reply submission without form reference', async () => {
+      const mockHttp = vi.mocked(http)
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Set replyFormRef to null
+      vm.replyFormRef = null
+
+      // Try to submit reply
+      await vm.submitReply()
+
+      // Verify no API call was made
+      expect(mockHttp.post).not.toHaveBeenCalled()
+    })
+
+    it('should maintain submitting state during reply submission', async () => {
+      const mockHttp = vi.mocked(http)
+
+      // Mock delayed API response
+      mockHttp.post.mockImplementation(() => new Promise(resolve => {
+        setTimeout(() => resolve({ data: { code: 0 } }), 100)
+      }))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Start submission
+      const submitPromise = vm.submitReply()
+
+      // Verify submitting state is set
+      expect(vm.submitting).toBe(true)
+
+      // Wait for completion
+      await submitPromise
+
+      // Verify submitting state is reset
+      expect(vm.submitting).toBe(false)
+    })
+
+    it('should reset submitting state after submission failure', async () => {
+      const mockHttp = vi.mocked(http)
+
+      mockHttp.post.mockRejectedValue(new Error('Submission failed'))
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify submitting state is reset
+      expect(vm.submitting).toBe(false)
+    })
+
+    it('should refresh list after successful submission', async () => {
+      const mockHttp = vi.mocked(http)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Clear initial call
+      mockHttp.get.mockClear()
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify list was refreshed (fetchList was called)
+      expect(mockHttp.get).toHaveBeenCalledWith('/chat/page', expect.any(Object))
+    })
+
+    it('should close form after successful submission', async () => {
+      const mockHttp = vi.mocked(http)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      vm.replyVisible = true
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit reply
+      await vm.submitReply()
+
+      // Verify form is closed
+      expect(vm.replyVisible).toBe(false)
+    })
+
+    it('should handle multiple rapid submissions', async () => {
+      const mockHttp = vi.mocked(http)
+
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      const vm = wrapper.vm as any
+
+      // Open reply form
+      const testRow = {
+        id: 1,
+        ask: 'Test question',
+        reply: '',
+        isreply: 0,
+        userid: 1
+      }
+      vm.openReplyForm(testRow)
+
+      // Set reply content
+      vm.replyForm.reply = 'Test reply'
+
+      // Mock form validation
+      const mockValidate = vi.fn().mockImplementation((callback) => {
+        callback(true)
+      })
+      vm.replyFormRef = { validate: mockValidate }
+
+      // Submit multiple times rapidly
+      const submitPromises = [
+        vm.submitReply(),
+        vm.submitReply(),
+        vm.submitReply()
+      ]
+
+      await Promise.all(submitPromises)
+
+      // Verify API was called multiple times
+      expect(mockHttp.post).toHaveBeenCalledTimes(3)
+
+      // All should succeed
+      expect(vm.replyVisible).toBe(false)
+    })
+
+    it('should handle submit event from ChatReplyForm', async () => {
+      const mockHttp = vi.mocked(http)
+      mockHttp.post.mockResolvedValue({ data: { code: 0 } })
+
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const submitData = { id: 1, userid: 123, reply: 'Test reply' }
+      const form = wrapper.findComponent({ name: 'ChatReplyForm' })
+      await form.vm.$emit('submit', submitData)
+
+      // Verify HTTP call was made with correct data
+      expect(mockHttp.post).toHaveBeenCalledWith(
+        expect.stringContaining('update'),
+        expect.objectContaining({
+          id: 1,
+          userid: 123,
+          reply: 'Test reply',
+          isreply: 1
+        })
+      )
+
+      // Verify success message and form closure
+      expect(wrapper.vm.replyVisible).toBe(false)
+      expect(wrapper.vm.replyRecord).toBe(null)
+    })
+  }
+
+  describe('Component Integration', () => {
+    it('should render ChatFilter component', () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const filter = wrapper.findComponent({ name: 'ChatFilter' })
+      expect(filter.exists()).toBe(true)
+    })
+
+    it('should render ChatDetailDialog component', () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const dialog = wrapper.findComponent({ name: 'ChatDetailDialog' })
+      expect(dialog.exists()).toBe(true)
+    })
+
+    it('should render ChatReplyForm component', () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const form = wrapper.findComponent({ name: 'ChatReplyForm' })
+      expect(form.exists()).toBe(true)
+    })
+
+    it('should pass filterForm to ChatFilter component', () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const filter = wrapper.findComponent({ name: 'ChatFilter' })
+      expect(filter.props('modelValue')).toEqual({ isreply: null, ask: '' })
+    })
+
+    it('should handle search event from ChatFilter', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const filter = wrapper.findComponent({ name: 'ChatFilter' })
+      await filter.vm.$emit('search')
+
+      // Verify that search resets page and fetches list
+      expect(wrapper.vm.pagination.page).toBe(1)
+    })
+
+    it('should handle reset event from ChatFilter', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      // Set some filter values
+      wrapper.vm.filterForm.isreply = 1
+      wrapper.vm.filterForm.ask = 'test'
+
+      const filter = wrapper.findComponent({ name: 'ChatFilter' })
+      await filter.vm.$emit('reset')
+
+      // Verify filters are reset
+      expect(wrapper.vm.filterForm.isreply).toBe(null)
+      expect(wrapper.vm.filterForm.ask).toBe('')
+      expect(wrapper.vm.pagination.page).toBe(1)
+    })
+
+    it('should handle reply event from ChatDetailDialog', async () => {
+      const wrapper = mountComponent(ChatList, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const mockRecord = { id: 1, isreply: 0 }
+      const dialog = wrapper.findComponent({ name: 'ChatDetailDialog' })
+      await dialog.vm.$emit('reply', mockRecord)
+
+      // Verify reply form is opened with correct record
+      expect(wrapper.vm.replyVisible).toBe(true)
+      expect(wrapper.vm.replyRecord).toEqual(mockRecord)
+    })
+  })
+})

@@ -22,4 +22,3 @@ export interface MenuRole {
   roleName: string
   tableName: string
 }
-

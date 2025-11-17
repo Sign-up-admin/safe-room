@@ -12,7 +12,8 @@
         <section>
           <h2>1. 概述</h2>
           <p>
-            本文档提供了智能健身房管理系统对外 API 接口的详细说明，包括接口地址、请求参数、响应格式等信息。开发者可以使用这些 API 集成到自己的应用中。
+            本文档提供了智能健身房管理系统对外 API
+            接口的详细说明，包括接口地址、请求参数、响应格式等信息。开发者可以使用这些 API 集成到自己的应用中。
           </p>
         </section>
 
@@ -33,13 +34,15 @@
           <h3>2.3 响应格式</h3>
           <p>所有接口统一返回 JSON 格式：</p>
           <div class="code-block">
-            <pre>{
+            <pre>
+{
   "code": 0,
   "msg": "success",
   "data": {
     // 具体数据
   }
-}</pre>
+}</pre
+            >
           </div>
         </section>
 
@@ -48,14 +51,17 @@
           <h3>3.1 Token 认证</h3>
           <p>除登录、注册等公开接口外，其他接口需要在请求头中携带 Token：</p>
           <div class="code-block">
-            <pre>Headers:
-  Token: &lt;your-token&gt;</pre>
+            <pre>
+Headers:
+  Token: &lt;your-token&gt;</pre
+            >
           </div>
 
           <h3>3.2 获取 Token</h3>
           <p>通过登录接口获取 Token：</p>
           <div class="code-block">
-            <pre>POST /users/login
+            <pre>
+POST /users/login
 Content-Type: application/x-www-form-urlencoded
 
 username=admin&password=admin
@@ -66,7 +72,8 @@ Response:
   "msg": "登录成功",
   "token": "a1b2c3d4e5f6",
   "role": "users"
-}</pre>
+}</pre
+            >
           </div>
         </section>
 
@@ -109,18 +116,21 @@ Response:
           <h3>5.1 分页查询</h3>
           <p>大多数列表接口支持分页查询：</p>
           <div class="code-block">
-            <pre>GET /{module}/list?page=1&limit=10&sort=addtime&order=desc
+            <pre>
+GET /{module}/list?page=1&limit=10&sort=addtime&order=desc
 
 Query Parameters:
   page: 页码（从1开始，默认1）
   limit: 每页条数（默认10）
   sort: 排序字段
-  order: 排序方式（asc/desc）</pre>
+  order: 排序方式（asc/desc）</pre
+            >
           </div>
 
           <h3>5.2 响应格式（分页）</h3>
           <div class="code-block">
-            <pre>{
+            <pre>
+{
   "code": 0,
   "msg": "success",
   "data": {
@@ -129,7 +139,8 @@ Query Parameters:
     "page": 1,
     "limit": 10
   }
-}</pre>
+}</pre
+            >
           </div>
         </section>
 
@@ -267,14 +278,17 @@ Query Parameters:
           <h2>7. 请求示例</h2>
           <h3>7.1 获取课程列表</h3>
           <div class="code-block">
-            <pre>curl -X GET \
+            <pre>
+curl -X GET \
   "http://localhost:8080/springboot1ngh61a2/jianshenkecheng/list?page=1&limit=10" \
-  -H "Token: your-token-here"</pre>
+  -H "Token: your-token-here"</pre
+            >
           </div>
 
           <h3>7.2 预约课程</h3>
           <div class="code-block">
-            <pre>curl -X POST \
+            <pre>
+curl -X POST \
   "http://localhost:8080/springboot1ngh61a2/kechengyuyue/add" \
   -H "Content-Type: application/json" \
   -H "Token: your-token-here" \
@@ -282,7 +296,8 @@ Query Parameters:
     "kechengid": 1,
     "yuyueshijian": "2025-11-20 10:00:00",
     "beizhu": "预约备注"
-  }'</pre>
+  }'</pre
+            >
           </div>
         </section>
 
@@ -522,4 +537,3 @@ function goBack() {
   }
 }
 </style>
-

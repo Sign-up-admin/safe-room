@@ -3,8 +3,10 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.HuiyuankaEntity;
 import com.service.HuiyuankaService;
+import com.utils.TestDataCleanup;
 import com.utils.TestUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +21,15 @@ class HuiyuankaControllerTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private HuiyuankaService huiyuankaService;
+
+    @AfterEach
+    void cleanupTestData() {
+        // 清理测试会员卡数据
+        TestDataCleanup.cleanupByPrefix(huiyuankaService, "huiyuankamingcheng", "测试");
+        TestDataCleanup.cleanupByPrefix(huiyuankaService, "huiyuankamingcheng", "更新");
+        TestDataCleanup.cleanupByPrefix(huiyuankaService, "huiyuankamingcheng", "删除");
+        TestDataCleanup.cleanupByPrefix(huiyuankaService, "huiyuankamingcheng", "精准过滤");
+    }
 
     @Test
     void shouldReturnPagedMembershipCards() throws Exception {
@@ -76,6 +87,7 @@ class HuiyuankaControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         HuiyuankaEntity updated = huiyuankaService.getById(existing.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getJiage()).isEqualTo(2599);
     }
 

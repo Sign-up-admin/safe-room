@@ -35,4 +35,3 @@ export const useParticleSystem = (options: UseParticleSystemOptions) => {
     destroy,
   }
 }
-

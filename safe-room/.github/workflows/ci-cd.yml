@@ -233,12 +233,109 @@ jobs:
           name: dependency-check-report
           path: reports/
 
+  # 测试质量门禁
+  test-quality-gate:
+    name: Test Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [backend-test, frontend-test]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install xml2js
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: backend-test-results
+          path: backend-test-results/
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: coverage-reports-${{ github.run_id }}
+          path: coverage-reports/
+
+      - name: Run Enhanced Quality Gate
+        run: |
+          echo "🔍 Running Enhanced Test Quality Gate Checks..."
+          echo "==============================================="
+
+          FAILED_CHECKS=0
+          WARNINGS=0
+
+          # Run the quality gate script
+          ./scripts/test-quality-gate.sh
+
+          QUALITY_GATE_EXIT_CODE=$?
+
+          if [ $QUALITY_GATE_EXIT_CODE -eq 0 ]; then
+            echo "✅ Quality gate script passed"
+          else
+            echo "❌ Quality gate script failed"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          fi
+
+          # Additional CI/CD specific checks
+          echo ""
+          echo "Additional CI/CD Checks:"
+          echo "========================"
+
+          # Check if all required jobs passed
+          if [ "${{ needs.backend-test.result }}" != "success" ]; then
+            echo "❌ Backend test job failed"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          fi
+
+          if [ "${{ needs.frontend-test.result }}" != "success" ]; then
+            echo "❌ Frontend test job failed"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          fi
+
+          # Check if required artifacts exist
+          if [ ! -d "backend-test-results" ]; then
+            echo "❌ Backend test results artifact not found"
+            FAILED_CHECKS=$((FAILED_CHECKS + 1))
+          fi
+
+          if [ ! -f "coverage-reports/jacoco.xml" ]; then
+            echo "⚠️  Coverage report not found - this may indicate test issues"
+            WARNINGS=$((WARNINGS + 1))
+          fi
+
+          echo ""
+          echo "Quality Gate Summary:"
+          echo "====================="
+          echo "Failed checks: $FAILED_CHECKS"
+          echo "Warnings: $WARNINGS"
+
+          if [ $FAILED_CHECKS -gt 0 ]; then
+            echo "❌ Quality gate FAILED - Build blocked"
+            echo "quality_gate_passed=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ Quality gate PASSED - Proceeding with build"
+            echo "quality_gate_passed=true" >> $GITHUB_OUTPUT
+          fi
+
   # 构建Docker镜像
   build:
     name: Build Docker Image
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [backend-test, frontend-test, security-scan]
+    needs: [test-quality-gate, security-scan]
     permissions:
       contents: read
       packages: write

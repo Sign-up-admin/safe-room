@@ -8,16 +8,16 @@ $font-family-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospac
 $font-family-display: 'Montserrat', 'Poppins', 'Segoe UI', sans-serif;
 
 // Font Sizes (using rem for scalability)
-$font-size-xs: 0.75rem;   // 12px
-$font-size-sm: 0.875rem;  // 14px
-$font-size-base: 1rem;    // 16px
-$font-size-lg: 1.125rem;  // 18px
-$font-size-xl: 1.25rem;   // 20px
-$font-size-2xl: 1.5rem;   // 24px
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
 $font-size-3xl: 1.875rem; // 30px
-$font-size-4xl: 2.25rem;  // 36px
-$font-size-5xl: 3rem;     // 48px
-$font-size-6xl: 3.75rem;  // 60px
+$font-size-4xl: 2.25rem; // 36px
+$font-size-5xl: 3rem; // 48px
+$font-size-6xl: 3.75rem; // 60px
 
 // Font Weights
 $font-weight-thin: 100;
@@ -56,85 +56,85 @@ $typography-scale: (
     weight: $font-weight-bold,
     line-height: $line-height-tight,
     letter-spacing: $letter-spacing-tight,
-    margin-bottom: 1rem
+    margin-bottom: 1rem,
   ),
   'h2': (
     size: $font-size-3xl,
     weight: $font-weight-bold,
     line-height: $line-height-tight,
     letter-spacing: $letter-spacing-tight,
-    margin-bottom: 0.875rem
+    margin-bottom: 0.875rem,
   ),
   'h3': (
     size: $font-size-2xl,
     weight: $font-weight-semibold,
     line-height: $line-height-snug,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 0.75rem
+    margin-bottom: 0.75rem,
   ),
   'h4': (
     size: $font-size-xl,
     weight: $font-weight-semibold,
     line-height: $line-height-snug,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 0.625rem
+    margin-bottom: 0.625rem,
   ),
   'h5': (
     size: $font-size-lg,
     weight: $font-weight-medium,
     line-height: $line-height-normal,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 0.5rem
+    margin-bottom: 0.5rem,
   ),
   'h6': (
     size: $font-size-base,
     weight: $font-weight-medium,
     line-height: $line-height-normal,
     letter-spacing: $letter-spacing-wide,
-    margin-bottom: 0.5rem
+    margin-bottom: 0.5rem,
   ),
   'body-large': (
     size: $font-size-lg,
     weight: $font-weight-normal,
     line-height: $line-height-relaxed,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 1rem
+    margin-bottom: 1rem,
   ),
   'body': (
     size: $font-size-base,
     weight: $font-weight-normal,
     line-height: $line-height-relaxed,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 1rem
+    margin-bottom: 1rem,
   ),
   'body-small': (
     size: $font-size-sm,
     weight: $font-weight-normal,
     line-height: $line-height-relaxed,
     letter-spacing: $letter-spacing-normal,
-    margin-bottom: 0.75rem
+    margin-bottom: 0.75rem,
   ),
   'caption': (
     size: $font-size-xs,
     weight: $font-weight-normal,
     line-height: $line-height-normal,
     letter-spacing: $letter-spacing-wide,
-    margin-bottom: 0.5rem
+    margin-bottom: 0.5rem,
   ),
   'button': (
     size: $font-size-sm,
     weight: $font-weight-medium,
     line-height: $line-height-tight,
     letter-spacing: $letter-spacing-wider,
-    margin-bottom: 0
+    margin-bottom: 0,
   ),
   'label': (
     size: $font-size-sm,
     weight: $font-weight-medium,
     line-height: $line-height-tight,
     letter-spacing: $letter-spacing-wide,
-    margin-bottom: 0.25rem
-  )
+    margin-bottom: 0.25rem,
+  ),
 );
 
 // CSS Custom Properties for Typography
@@ -204,32 +204,76 @@ $typography-scale: (
 }
 
 // Text Utility Classes
-.text-primary { color: var(--color-text-primary); }
-.text-secondary { color: var(--color-text-secondary); }
-.text-tertiary { color: var(--color-text-tertiary); }
-.text-muted { color: var(--color-text-muted); }
-.text-inverse { color: var(--color-text-inverse); }
-.text-brand { color: var(--color-brand); }
-.text-success { color: var(--color-success); }
-.text-warning { color: var(--color-warning); }
-.text-error { color: var(--color-error); }
-.text-info { color: var(--color-info); }
+.text-primary {
+  color: var(--color-text-primary);
+}
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+.text-tertiary {
+  color: var(--color-text-tertiary);
+}
+.text-muted {
+  color: var(--color-text-muted);
+}
+.text-inverse {
+  color: var(--color-text-inverse);
+}
+.text-brand {
+  color: var(--color-brand);
+}
+.text-success {
+  color: var(--color-success);
+}
+.text-warning {
+  color: var(--color-warning);
+}
+.text-error {
+  color: var(--color-error);
+}
+.text-info {
+  color: var(--color-info);
+}
 
 // Font Weight Utility Classes
-.font-thin { font-weight: $font-weight-thin; }
-.font-light { font-weight: $font-weight-light; }
-.font-normal { font-weight: $font-weight-normal; }
-.font-medium { font-weight: $font-weight-medium; }
-.font-semibold { font-weight: $font-weight-semibold; }
-.font-bold { font-weight: $font-weight-bold; }
-.font-extrabold { font-weight: $font-weight-extrabold; }
-.font-black { font-weight: $font-weight-black; }
+.font-thin {
+  font-weight: $font-weight-thin;
+}
+.font-light {
+  font-weight: $font-weight-light;
+}
+.font-normal {
+  font-weight: $font-weight-normal;
+}
+.font-medium {
+  font-weight: $font-weight-medium;
+}
+.font-semibold {
+  font-weight: $font-weight-semibold;
+}
+.font-bold {
+  font-weight: $font-weight-bold;
+}
+.font-extrabold {
+  font-weight: $font-weight-extrabold;
+}
+.font-black {
+  font-weight: $font-weight-black;
+}
 
 // Text Transform Utility Classes
-.text-uppercase { text-transform: $text-transform-uppercase; }
-.text-lowercase { text-transform: $text-transform-lowercase; }
-.text-capitalize { text-transform: $text-transform-capitalize; }
-.text-none { text-transform: $text-transform-none; }
+.text-uppercase {
+  text-transform: $text-transform-uppercase;
+}
+.text-lowercase {
+  text-transform: $text-transform-lowercase;
+}
+.text-capitalize {
+  text-transform: $text-transform-capitalize;
+}
+.text-none {
+  text-transform: $text-transform-none;
+}
 
 // Responsive Typography
 @media (max-width: 768px) {

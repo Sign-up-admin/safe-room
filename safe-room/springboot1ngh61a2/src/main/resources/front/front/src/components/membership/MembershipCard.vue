@@ -1,7 +1,8 @@
 <template>
   <article
+    class="membership-card"
+    data-testid="membership-card"
     :class="[
-      'membership-card',
       {
         'membership-card--active': active,
         'membership-card--featured': featured,
@@ -15,21 +16,24 @@
     @keydown.space.prevent="handleClick"
   >
     <!-- 流动发光边框效果 -->
-    <div class="membership-card__glow" v-if="active || featured"></div>
+    <div v-if="active || featured" class="membership-card__glow"></div>
 
     <!-- 卡片主体 -->
     <div class="membership-card__inner">
       <!-- 卡片头部 -->
-      <header class="membership-card__header">
-        <div class="membership-card__title-section">
-          <h3 class="membership-card__title">{{ card.huiyuankamingcheng }}</h3>
-          <span class="membership-card__duration">{{ card.youxiaoqi || '12 个月' }}</span>
+      <header class="membership-card__header" data-testid="membership-card-header">
+        <div class="membership-card__title-section" data-testid="membership-card-title-section">
+          <h3 class="membership-card__title" data-testid="membership-card-title">{{ card.huiyuankamingcheng }}</h3>
+          <span class="membership-card__duration" data-testid="membership-card-duration">{{ card.youxiaoqi || '12 个月' }}</span>
         </div>
 
         <!-- 特色标签 -->
         <div v-if="featured" class="membership-card__badge">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" fill="currentColor"/>
+            <path
+              d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"
+              fill="currentColor"
+            />
           </svg>
           推荐
         </div>
@@ -42,52 +46,37 @@
 
       <!-- 权益标签 -->
       <div class="membership-card__benefits">
-        <div
-          v-for="benefit in displayBenefits"
-          :key="benefit.text"
-          class="benefit-tag"
-          :class="benefit.type"
-        >
-          <div :class="['benefit-icon', benefit.iconClass]"></div>
+        <div v-for="benefit in displayBenefits" :key="benefit.text" class="benefit-tag" :class="benefit.type">
+          <div class="benefit-icon" :class="[benefit.iconClass]"></div>
           <span>{{ benefit.text }}</span>
         </div>
       </div>
 
       <!-- 价格区域 -->
-      <div class="membership-card__price">
-        <div class="price-main">
-          <strong class="price-amount">{{ formatCurrency(card.jiage || 0) }}</strong>
-          <small class="price-unit">/ {{ card.youxiaoqi || '12 个月' }}</small>
+      <div class="membership-card__price" data-testid="membership-card-price">
+        <div class="price-main" data-testid="membership-card-price-main">
+          <strong class="price-amount" data-testid="membership-card-price-amount">{{ formatCurrency(card.jiage || 0) }}</strong>
+          <small class="price-unit" data-testid="membership-card-price-unit">/ {{ card.youxiaoqi || '12 个月' }}</small>
         </div>
-        <small class="price-benefits-count">含 {{ displayBenefits.length }} 项权益</small>
+        <small class="price-benefits-count" data-testid="membership-card-benefits-count">含 {{ displayBenefits.length }} 项权益</small>
       </div>
 
       <!-- 卡片图片 -->
       <div class="membership-card__image">
-        <img
-          :src="resolveAssetUrl(card.tupian)"
-          :alt="`${card.huiyuankamingcheng}卡片图片`"
-          loading="lazy"
-        />
+        <img :src="resolveAssetUrl(card.tupian)" :alt="`${card.huiyuankamingcheng}卡片图片`" loading="lazy" />
         <!-- 装饰性渐变遮罩 -->
         <div class="image-overlay"></div>
       </div>
 
       <!-- 悬停时的额外信息 -->
-      <div class="membership-card__hover-info" v-if="showHoverInfo">
+      <div v-if="showHoverInfo" class="membership-card__hover-info">
         <div class="hover-benefits">
-          <div
-            v-for="benefit in displayBenefits.slice(0, 3)"
-            :key="benefit.text"
-            class="hover-benefit-item"
-          >
-            <div :class="['hover-benefit-icon', benefit.iconClass]"></div>
+          <div v-for="benefit in displayBenefits.slice(0, 3)" :key="benefit.text" class="hover-benefit-item">
+            <div class="hover-benefit-icon" :class="[benefit.iconClass]"></div>
             <span>{{ benefit.text }}</span>
           </div>
         </div>
-        <TechButton size="sm" variant="outline" class="hover-cta">
-          查看详情
-        </TechButton>
+        <TechButton size="sm" variant="outline" class="hover-cta" data-testid="membership-card-view-details-button"> 查看详情 </TechButton>
       </div>
     </div>
 
@@ -163,18 +152,14 @@ function getBenefitIcon(benefit: string, index: number): string {
 // 从卡片数据中提取权益
 function deriveBenefits(card: Huiyuanka): string[] {
   const text = card.shiyongshuoming || card.huiyuankaxiangqing || ''
-  const segments = text.split(/[\n、。,，]/).map(item => item.trim()).filter(Boolean)
+  const segments = text
+    .split(/[\n、。,，]/)
+    .map(item => item.trim())
+    .filter(Boolean)
   if (segments.length) return segments.slice(0, 6)
 
   // 默认权益
-  return [
-    '课程预约优先 72h',
-    '私教单次 9 折',
-    '智能体测 1 次/月',
-    '专属客服顾问',
-    '限定活动优先',
-    '嘉宾权益 2 次',
-  ]
+  return ['课程预约优先 72h', '私教单次 9 折', '智能体测 1 次/月', '专属客服顾问', '限定活动优先', '嘉宾权益 2 次']
 }
 
 function resolveAssetUrl(path?: string): string {
@@ -223,7 +208,9 @@ function handleClick() {
     border-radius: 24px;
     padding: 1px;
     background: linear-gradient(135deg, rgba(253, 216, 53, 0.2), rgba(253, 216, 53, 0.1), transparent);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0;
@@ -249,7 +236,9 @@ function handleClick() {
 
   &--active {
     border-color: rgba(253, 216, 53, 0.8);
-    box-shadow: $shadow-glow, 0 8px 32px rgba(253, 216, 53, 0.3);
+    box-shadow:
+      $shadow-glow,
+      0 8px 32px rgba(253, 216, 53, 0.3);
     background: linear-gradient(135deg, rgba(253, 216, 53, 0.1), rgba(0, 0, 0, 0.8));
 
     &::after {
@@ -271,7 +260,8 @@ function handleClick() {
   position: absolute;
   inset: -2px;
   border-radius: 26px;
-  background: linear-gradient(45deg,
+  background: linear-gradient(
+    45deg,
     transparent,
     rgba(253, 216, 53, 0.3),
     transparent,
@@ -284,9 +274,15 @@ function handleClick() {
 }
 
 @keyframes glow-flow {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 .membership-card__inner {
@@ -472,12 +468,7 @@ function handleClick() {
   .image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0.1) 0%,
-      transparent 50%,
-      rgba(253, 216, 53, 0.05) 100%
-    );
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, transparent 50%, rgba(253, 216, 53, 0.05) 100%);
   }
 }
 

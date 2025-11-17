@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import pinia from '../../../src/stores/index'
+import pinia from '@/stores/index'
 
 describe('Stores index', () => {
   it('应该导出Pinia实例', () => {

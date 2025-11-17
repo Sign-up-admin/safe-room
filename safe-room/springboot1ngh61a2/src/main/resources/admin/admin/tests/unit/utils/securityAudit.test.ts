@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, vi } from 'vitest'
-import { securityAuditor, SecurityEventType } from '../../../src/utils/securityAudit'
+import { securityAuditor, SecurityEventType } from '@/utils/securityAudit'
 
 describe('安全审计工具', () => {
   beforeAll(() => {

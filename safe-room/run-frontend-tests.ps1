@@ -1,3 +1,4 @@
+# run-frontend-tests.ps1
 # 前端自动化测试脚本
 # 用于运行前端项目的所有测试（单元测试和E2E测试）
 
@@ -5,22 +6,38 @@ param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("unit", "e2e", "coverage", "all")]
     [string]$Type = "all",
-    
+
     [Parameter(Mandatory=$false)]
     [ValidateSet("front", "admin", "both")]
     [string]$App = "both",
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$Watch,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$UI,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$Debug
 )
 
 $ErrorActionPreference = "Stop"
+
+# 导入统一的环境检查函数库
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$envLibPath = Join-Path $scriptRoot "scripts\common\Test-Environment.ps1"
+if (Test-Path $envLibPath) {
+    . $envLibPath
+} else {
+    Write-Error "错误: 找不到环境检查函数库: $envLibPath"
+    exit 1
+}
+
+# 兼容性检查 - 确保使用PowerShell 5.1+兼容的语法
+if ($PSVersionTable.PSVersion.Major -lt 5) {
+    Write-Error "此脚本需要 PowerShell 5.1 或更高版本。当前版本: $($PSVersionTable.PSVersion)"
+    exit 1
+}
 
 # 颜色输出函数
 function Write-ColorOutput($ForegroundColor) {
@@ -97,19 +114,18 @@ function Run-Test {
         }
         
         Write-Info "执行命令: $command`n"
-        
-        # 检查是否安装了依赖
-        if (-not (Test-Path "node_modules")) {
-            Write-Warning "未找到 node_modules，正在安装依赖..."
-            npm install
-            if ($LASTEXITCODE -ne 0) {
-                Write-Error "依赖安装失败"
-                return $false
-            }
+
+        # 使用统一的环境检查和依赖安装
+        if (-not (Install-Dependencies -ProjectPath $Path -ProjectName "$AppName 项目")) {
+            Write-Error "依赖安装失败"
+            return $false
         }
         
         # 运行测试
-        Invoke-Expression $command
+        $output = Invoke-CrossPlatformCommand -Command $command -WorkingDirectory $Path
+        if ($LASTEXITCODE -ne 0) {
+            throw "Test execution failed: $output"
+        }
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "`n✓ $AppName - $TestType 测试通过"
@@ -140,6 +156,27 @@ if ($Watch) { Write-Info "模式: Watch" }
 if ($UI) { Write-Info "模式: UI" }
 if ($Debug) { Write-Info "模式: Debug" }
 Write-Info "=========================================`n"
+
+# 环境检查
+Write-TestLog "正在检查测试环境..." "INFO"
+
+# 确定要检查的项目路径
+$projectPathsToCheck = @()
+switch ($App) {
+    "front" { $projectPathsToCheck = @($FrontPath) }
+    "admin" { $projectPathsToCheck = @($AdminPath) }
+    "both" { $projectPathsToCheck = @($FrontPath, $AdminPath) }
+}
+
+# 检查环境
+$envCheckPassed = Test-TestEnvironment -RequiredCommands @("node", "npm", "npx") -ProjectPaths $projectPathsToCheck -InstallDependencies
+
+if (-not $envCheckPassed) {
+    Write-TestLog "环境检查失败，请解决上述问题后重试" "ERROR"
+    exit 1
+}
+
+Write-TestLog "环境检查通过" "SUCCESS"
 
 # 确定要运行的测试类型
 $testTypes = @()

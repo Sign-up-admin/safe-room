@@ -5,6 +5,7 @@
 import { ref, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useApi } from './useApi'
+import { errorHandler } from '@/utils/errorHandler'
 import type { PageResult, PageParams, ListQueryParams } from '@/types/api'
 
 export interface UseTableOptions<T extends Record<string, unknown> = Record<string, unknown>> {
@@ -86,10 +87,19 @@ export function useTable<T extends Record<string, unknown> = Record<string, unkn
         total.value = 0
       }
     } catch (error: any) {
-      listError.value = error.message || '获取列表失败'
+      // 使用统一错误处理器处理错误
+      listError.value = errorHandler.extractErrorMessage(error)
       records.value = []
       total.value = 0
-      console.error('获取列表失败:', error)
+
+      errorHandler.handleApiError(error, {
+        showToast: false, // 列表错误显示在页面上，不使用toast
+        redirect: false,   // 列表错误通常不需要跳转
+        logToConsole: true,
+        context: 'Table List Fetch'
+      }).catch(() => {
+        // 错误处理器返回rejected promise，这里不需要额外处理
+      })
     } finally {
       loading.value = false
     }
@@ -172,7 +182,15 @@ export function useTable<T extends Record<string, unknown> = Record<string, unkn
       }
     } catch (error: any) {
       if (error !== 'cancel') {
-        ElMessage.error(error.message || '删除失败')
+        // 使用统一错误处理器处理错误
+        errorHandler.handleApiError(error, {
+          showToast: true,
+          redirect: false, // 删除错误通常不需要跳转
+          logToConsole: true,
+          context: 'Table Remove Row'
+        }).catch(() => {
+          // 错误处理器返回rejected promise，这里不需要额外处理
+        })
       }
     }
   }
@@ -214,7 +232,15 @@ export function useTable<T extends Record<string, unknown> = Record<string, unkn
       }
     } catch (error: any) {
       if (error !== 'cancel') {
-        ElMessage.error(error.message || '批量删除失败')
+        // 使用统一错误处理器处理错误
+        errorHandler.handleApiError(error, {
+          showToast: true,
+          redirect: false, // 删除错误通常不需要跳转
+          logToConsole: true,
+          context: 'Table Batch Remove'
+        }).catch(() => {
+          // 错误处理器返回rejected promise，这里不需要额外处理
+        })
       }
     }
   }

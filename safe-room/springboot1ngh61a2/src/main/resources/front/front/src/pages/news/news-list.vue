@@ -5,7 +5,7 @@
         <p class="section-eyebrow">LATEST STORIES</p>
         <h1>沉浸式资讯墙</h1>
         <p>了解课程上新、会员活动与训练干货，滚动阅读进度实时追踪。</p>
-        <div class="reading-stats" v-if="readingStats.totalRead > 0">
+        <div v-if="readingStats.totalRead > 0" class="reading-stats">
           <div class="stat-item">
             <span class="stat-value">{{ readingStats.totalRead }}</span>
             <span class="stat-label">篇已阅览</span>
@@ -32,11 +32,11 @@
         <TechButton size="sm" variant="outline" @click="handleSearch">搜索</TechButton>
         <TechButton size="sm" variant="outline" @click="toggleReadingMode">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10,9 9,9 8,9"/>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14,2 14,8 20,8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10,9 9,9 8,9" />
           </svg>
           {{ isReadingMode ? '退出沉浸' : '沉浸阅读' }}
         </TechButton>
@@ -48,7 +48,8 @@
         <button
           v-for="option in categoryOptions"
           :key="option.value"
-          :class="['filter-tab', { 'filter-tab--active': filters.typename === option.value }]"
+          class="filter-tab"
+          :class="[{ 'filter-tab--active': filters.typename === option.value }]"
           @click="changeCategory(option.value)"
         >
           {{ option.label }}
@@ -58,7 +59,8 @@
         <button
           v-for="option in sortOptions"
           :key="option.value"
-          :class="['filter-tab', { 'filter-tab--active': filters.sort === option.value }]"
+          class="filter-tab"
+          :class="[{ 'filter-tab--active': filters.sort === option.value }]"
           @click="changeSort(option.value)"
         >
           {{ option.label }}
@@ -75,12 +77,7 @@
           </svg>
         </div>
       </div>
-      <TechCard
-        v-for="(item, index) in newsList"
-        :key="item.id"
-        class="news-card"
-        :interactive="false"
-      >
+      <TechCard v-for="(item, index) in newsList" :key="item.id" class="news-card" :interactive="false">
         <div class="card-media" @click="goDetail(item.id)">
           <img :src="resolveAssetUrl(item.picture)" :alt="item.title" />
           <span class="card-tag">{{ item.typename || '公告' }}</span>
@@ -98,17 +95,13 @@
         </div>
         <div class="card-actions">
           <TechButton size="sm" variant="text" @click="goDetail(item.id)">阅读更多</TechButton>
-          <TechButton
-            size="sm"
-            variant="outline"
-            @click="share(item)"
-          >分享</TechButton>
+          <TechButton size="sm" variant="outline" @click="share(item)">分享</TechButton>
         </div>
       </TechCard>
       <el-empty v-if="!newsList.length && !loading" description="暂无资讯" />
     </section>
 
-    <section class="timeline" v-if="timelineGroups.length">
+    <section v-if="timelineGroups.length" class="timeline">
       <h3>阅读时间线</h3>
       <ul>
         <li v-for="group in timelineGroups" :key="group.month">
@@ -192,7 +185,7 @@ async function loadCategories() {
     const response = await http.get<ApiResponse<PageResult<{ typename: string }>>>('/newstype/list', {
       params: { page: 1, limit: 100, sort: 'id', order: 'asc' },
     })
-    const mapped = response.data.data?.list?.map((item) => ({ label: item.typename, value: item.typename })) ?? []
+    const mapped = response.data.data?.list?.map(item => ({ label: item.typename, value: item.typename })) ?? []
     categoryOptions.value = [{ label: '全部', value: '全部' }, ...mapped]
   } catch (error) {
     console.warn('加载公告类型失败', error)
@@ -287,7 +280,7 @@ function readingProgress(index: number) {
 
 const timelineGroups = computed(() => {
   const groups: Record<string, NewsItem[]> = {}
-  newsList.value.forEach((item) => {
+  newsList.value.forEach(item => {
     const month = item.addtime ? item.addtime.slice(0, 7) : '未知'
     if (!groups[month]) groups[month] = []
     groups[month].push(item)
@@ -375,7 +368,8 @@ function toggleReadingMode() {
 
 .news-page {
   min-height: 100vh;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
+  background:
+    radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.18), transparent 45%),
     radial-gradient(circle at 80% 0%, rgba(253, 216, 53, 0.12), transparent 45%), #020202;
   padding: 48px 24px 64px;
   display: flex;
@@ -699,4 +693,3 @@ function toggleReadingMode() {
   color: #fdd835 !important;
 }
 </style>
-

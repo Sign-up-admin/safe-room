@@ -1,0 +1,87 @@
+{
+  "timestamp": "2025-11-17T06:33:01.503Z",
+  "collection": {
+    "testReports": {
+      "found": false,
+      "count": 0
+    },
+    "coverageReports": {
+      "found": false,
+      "count": 0
+    },
+    "historyData": {
+      "found": false,
+      "count": 0
+    }
+  },
+  "testExecution": {
+    "totalTests": 0,
+    "passedTests": 0,
+    "failedTests": 0,
+    "errorTests": 0,
+    "skippedTests": 0,
+    "executionTime": 0,
+    "successRate": 0,
+    "averageTestTime": 0,
+    "flakyTests": 0
+  },
+  "coverage": {
+    "lineCoverage": 0,
+    "branchCoverage": 0,
+    "instructionCoverage": 0,
+    "methodCoverage": 0,
+    "classCoverage": 0,
+    "controllerCoverage": 0,
+    "serviceCoverage": 0,
+    "newCoverage": 0,
+    "coverageGaps": []
+  },
+  "quality": {
+    "buildErrors": 0,
+    "buildWarnings": 0,
+    "testReliability": 100,
+    "codeQualityScore": 20,
+    "securityIssues": 0
+  },
+  "performance": {
+    "testExecutionTime": 0,
+    "memoryUsage": 0,
+    "parallelExecution": false,
+    "performanceRegressions": 0
+  },
+  "trends": {
+    "coverageTrend": "stable",
+    "testTimeTrend": "stable",
+    "failureRateTrend": "stable",
+    "qualityTrend": "stable"
+  },
+  "alerts": [
+    {
+      "level": "critical",
+      "message": "Line coverage (0%) is below 65% threshold",
+      "metric": "lineCoverage"
+    },
+    {
+      "level": "high",
+      "message": "Controller coverage (0%) is below 30% threshold",
+      "metric": "controllerCoverage"
+    },
+    {
+      "level": "high",
+      "message": "Service coverage (0%) is below 60% threshold",
+      "metric": "serviceCoverage"
+    },
+    {
+      "level": "high",
+      "message": "Test success rate (0%) is below 95%",
+      "metric": "testSuccessRate"
+    }
+  ],
+  "recommendations": [
+    "Add more unit tests to achieve minimum line coverage of 65%",
+    "Add integration tests for controller endpoints",
+    "Improve service layer testing with better mocking and edge case coverage",
+    "Fix failing tests and address test flakiness"
+  ],
+  "overallHealthScore": 0
+}

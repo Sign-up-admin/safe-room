@@ -178,18 +178,19 @@ describe('jQuery Initialization Tests', () => {
           return
         }
 
-      const script = scripts[loadIndex]
-      loadScript(
-        script,
-        () => {
-          loadIndex++
-          loadNext()
-        },
-        () => {
-          loadIndex++
-          loadNext()
-        }
-      )
+        const script = scripts[loadIndex]
+        loadScript(
+          script,
+          () => {
+            loadIndex++
+            loadNext()
+          },
+          () => {
+            loadIndex++
+            loadNext()
+          }
+        )
+      })
     }
 
     await loadNext()

@@ -53,8 +53,12 @@ public class PageUtils implements Serializable {
 	 * Pagination for empty data
 	 */
 	public PageUtils(Map<String, Object> params) {
- 		Page page =new Query(params).getPage();
-		new PageUtils(page);
+ 		Page<?> page = new Query<>(params).getPage();
+		this.list = page.getRecords();
+		this.total = page.getTotal();
+		this.pageSize = (int)page.getSize();
+		this.currPage = (int)page.getCurrent();
+		this.totalPage = page.getPages();
 	}
 
 	 

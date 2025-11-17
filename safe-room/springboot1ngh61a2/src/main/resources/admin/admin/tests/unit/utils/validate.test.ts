@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { isEmail, isMobile, isPhone, isURL, isNumber, isIntNumer, checkIdCard } from '../../../src/utils/validate'
-import { containsSqlInjection } from '../../../src/utils/validator'
+import { isEmail, isMobile, isPhone, isURL, isNumber, isIntNumer, checkIdCard } from '@/utils/validate'
+import { containsSqlInjection } from '@/utils/validator'
 
 describe('验证工具', () => {
   describe('isEmail', () => {

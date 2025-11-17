@@ -1,32 +1,30 @@
 <template>
   <div class="error-page">
     <div class="error-page__container">
-      <div class="error-page__card" ref="cardRef">
+      <div ref="cardRef" class="error-page__card">
         <!-- 错误码展示 -->
-        <div class="error-page__code" ref="codeRef" :aria-label="`错误码 ${errorCode}`">
+        <div ref="codeRef" class="error-page__code" :aria-label="`错误码 ${errorCode}`">
           {{ errorCode }}
         </div>
 
         <!-- 错误标题 -->
-        <h1 class="error-page__title" ref="titleRef" role="alert">
+        <h1 ref="titleRef" class="error-page__title" role="alert">
           {{ errorInfo.title }}
         </h1>
 
         <!-- 错误描述 -->
-        <p class="error-page__description" ref="descriptionRef">
+        <p ref="descriptionRef" class="error-page__description">
           {{ errorInfo.description }}
         </p>
 
         <!-- 自动跳转倒计时 -->
         <div v-if="showCountdown" class="error-page__countdown">
           <span>{{ countdown }} 秒后自动跳转到{{ redirectTarget }} </span>
-          <button class="error-page__cancel-btn" @click="cancelAutoRedirect">
-            取消
-          </button>
+          <button class="error-page__cancel-btn" @click="cancelAutoRedirect">取消</button>
         </div>
 
         <!-- 操作按钮组 -->
-        <div class="error-page__actions" ref="actionsRef">
+        <div ref="actionsRef" class="error-page__actions">
           <button
             v-if="showLoginButton"
             class="error-page__btn error-page__btn--primary"
@@ -100,11 +98,18 @@ const titleRef = ref<HTMLElement>()
 const descriptionRef = ref<HTMLElement>()
 const actionsRef = ref<HTMLElement>()
 
-const errorCode = computed(() => {
-  return props.code || (route.params.code as string) || '404'
-})
+const errorCode = computed(() => props.code || (route.params.code as string) || '404')
 
-const errorConfig = {
+interface ErrorConfigItem {
+  title: string
+  description: string
+  primaryButton: string
+  autoRedirect: boolean
+  redirectDelay?: number
+  redirectTarget?: string
+}
+
+const errorConfig: Record<string, ErrorConfigItem> = {
   '401': {
     title: '身份验证失败',
     description: '您的登录已过期，请重新登录以继续访问',
@@ -133,7 +138,7 @@ const errorConfig = {
     primaryButton: '重新加载',
     autoRedirect: false,
   },
-  'network': {
+  network: {
     title: '网络连接失败',
     description: '无法连接到服务器，请检查网络设置',
     primaryButton: '重试连接',
@@ -141,9 +146,7 @@ const errorConfig = {
   },
 }
 
-const errorInfo = computed(() => {
-  return errorConfig[errorCode.value as keyof typeof errorConfig] || errorConfig['404']
-})
+const errorInfo = computed(() => errorConfig[errorCode.value as keyof typeof errorConfig] || errorConfig['404'])
 
 const showCountdown = ref(false)
 const countdown = ref(0)
@@ -235,7 +238,7 @@ const initAnimations = () => {
           duration: 0.5,
           ease: 'power3.out',
         },
-        '-=0.4'
+        '-=0.4',
       )
     }
 
@@ -248,7 +251,7 @@ const initAnimations = () => {
           duration: 0.4,
           ease: 'power3.out',
         },
-        '-=0.3'
+        '-=0.3',
       )
     }
 
@@ -272,7 +275,7 @@ const initAnimations = () => {
           duration: 0.5,
           ease: 'power3.out',
         },
-        '-=0.2'
+        '-=0.2',
       )
     }
   } else {
@@ -521,4 +524,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

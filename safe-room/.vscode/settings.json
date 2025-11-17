@@ -1,24 +1,25 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "eslint.enable": true,
-    "eslint.validate": [
-        "javascript",
-        "javascriptreact",
-        "vue"
-    ],
-    "eslint.workingDirectories": [
-        "springboot1ngh61a2/src/main/resources/front/front",
-        "springboot1ngh61a2/src/main/resources/admin/admin"
-    ],
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-    "eslint.format.enable": true,
-    "[vue]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    }
+    "java.compile.nullAnalysis.mode":  "automatic",
+    "java.configuration.updateBuildConfiguration":  "interactive",
+    "eslint.enable":  true,
+    "eslint.validate":  [
+                            "javascript",
+                            "javascriptreact",
+                            "vue"
+                        ],
+    "eslint.workingDirectories":  [
+                                      "springboot1ngh61a2/src/main/resources/front/front",
+                                      "springboot1ngh61a2/src/main/resources/admin/admin"
+                                  ],
+    "editor.codeActionsOnSave":  {
+                                     "source.fixAll.eslint":  "explicit"
+                                 },
+    "eslint.format.enable":  true,
+    "[vue]":  {
+                  "editor.defaultFormatter":  "dbaeumer.vscode-eslint"
+              },
+    "[javascript]":  {
+                         "editor.defaultFormatter":  "dbaeumer.vscode-eslint"
+                     },
+    "git.path":  "C:\\Users\\李\\AppData\\Local\\GitHubDesktop\\app-3.5.4\\resources\\app\\git\\cmd\\git.exe"
 }

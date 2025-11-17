@@ -20,17 +20,10 @@
         </div>
 
         <div class="mobile-benefits-list">
-          <div
-            v-for="metric in comparisonMetrics"
-            :key="metric.key"
-            class="mobile-benefit-item"
-          >
+          <div v-for="metric in comparisonMetrics" :key="metric.key" class="mobile-benefit-item">
             <span class="benefit-label">{{ metric.label }}</span>
             <div class="benefit-value">
-              <div
-                class="benefit-bar"
-                :style="{ width: `${metric.values[card.id!] ?? 10}%` }"
-              ></div>
+              <div class="benefit-bar" :style="{ width: `${metric.values[card.id!] ?? 10}%` }"></div>
               <span class="benefit-text">{{ metric.format(metric.values[card.id!] ?? 0, card) }}</span>
             </div>
           </div>
@@ -80,16 +73,13 @@
           class="comparison-table-cell"
           :class="{
             'comparison-table-cell--active': card.id === selectedCardId,
-            'comparison-table-cell--highlight': card.id === hoveredCardId
+            'comparison-table-cell--highlight': card.id === hoveredCardId,
           }"
         >
           <div class="metric-visualization">
             <!-- 条形图 -->
             <div class="metric-bar-container">
-              <div
-                class="metric-bar"
-                :style="{ width: `${metric.values[card.id!] ?? 10}%` }"
-              ></div>
+              <div class="metric-bar" :style="{ width: `${metric.values[card.id!] ?? 10}%` }"></div>
             </div>
 
             <!-- 数值显示 -->
@@ -159,84 +149,82 @@ const isMobile = computed(() => {
 })
 
 // 对比指标配置
-const comparisonMetrics = computed<ComparisonMetric[]>(() => {
-  return [
-    {
-      key: 'price',
-      label: '价格优势',
-      desc: '性价比评估',
-      values: toValueMap((card) => {
-        const price = Number(card.jiage) || 0
-        // 价格越低，性价比越高（用100减去标准化价格）
-        const maxPrice = Math.max(...props.cards.map(c => Number(c.jiage) || 0))
-        const minPrice = Math.min(...props.cards.map(c => Number(c.jiage) || 0))
-        if (maxPrice === minPrice) return 50
-        return 100 - ((price - minPrice) / (maxPrice - minPrice)) * 80
-      }),
-      format: (value: number) => {
-        if (value >= 80) return '超高'
-        if (value >= 60) return '较高'
-        if (value >= 40) return '中等'
-        return '基础'
-      },
+const comparisonMetrics = computed<ComparisonMetric[]>(() => [
+  {
+    key: 'price',
+    label: '价格优势',
+    desc: '性价比评估',
+    values: toValueMap(card => {
+      const price = Number(card.jiage) || 0
+      // 价格越低，性价比越高（用100减去标准化价格）
+      const maxPrice = Math.max(...props.cards.map(c => Number(c.jiage) || 0))
+      const minPrice = Math.min(...props.cards.map(c => Number(c.jiage) || 0))
+      if (maxPrice === minPrice) return 50
+      return 100 - ((price - minPrice) / (maxPrice - minPrice)) * 80
+    }),
+    format: (value: number) => {
+      if (value >= 80) return '超高'
+      if (value >= 60) return '较高'
+      if (value >= 40) return '中等'
+      return '基础'
     },
-    {
-      key: 'duration',
-      label: '有效期',
-      desc: '服务时长',
-      values: toValueMap((card) => {
-        const months = parseInt(card.youxiaoqi || '12', 10)
-        return Math.min(100, months * 8)
-      }),
-      format: (_: number, card: Huiyuanka) => card.youxiaoqi || '12 个月',
+  },
+  {
+    key: 'duration',
+    label: '有效期',
+    desc: '服务时长',
+    values: toValueMap(card => {
+      const months = parseInt(card.youxiaoqi || '12', 10)
+      return Math.min(100, months * 8)
+    }),
+    format: (_: number, card: Huiyuanka) => card.youxiaoqi || '12 个月',
+  },
+  {
+    key: 'priority',
+    label: '预约优先级',
+    desc: '预约响应速度',
+    values: toValueMap((card, index) => 30 + index * (70 / (props.cards.length || 1))),
+    format: (value: number) => {
+      if (value >= 80) return '尊享优先'
+      if (value >= 60) return '高级优先'
+      if (value >= 40) return '标准优先'
+      return '普通预约'
     },
-    {
-      key: 'priority',
-      label: '预约优先级',
-      desc: '预约响应速度',
-      values: toValueMap((card, index) => 30 + index * (70 / (props.cards.length || 1))),
-      format: (value: number) => {
-        if (value >= 80) return '尊享优先'
-        if (value >= 60) return '高级优先'
-        if (value >= 40) return '标准优先'
-        return '普通预约'
-      },
+  },
+  {
+    key: 'trainer_discount',
+    label: '私教折扣',
+    desc: '私人教练优惠',
+    values: toValueMap((card, index) => {
+      // 根据卡种等级设置不同的折扣力度
+      const discounts = [70, 80, 90, 95] // 7折, 8折, 9折, 9.5折
+      return discounts[index % discounts.length] || 70
+    }),
+    format: (value: number) => `${value / 10} 折`,
+  },
+  {
+    key: 'facility_access',
+    label: '设施权限',
+    desc: '场馆设施使用',
+    values: toValueMap((card, index) => 40 + index * (60 / (props.cards.length || 1))),
+    format: (value: number) => {
+      if (value >= 80) return '全部开放'
+      if (value >= 60) return '大部分开放'
+      if (value >= 40) return '基础设施'
+      return '限时使用'
     },
-    {
-      key: 'trainer_discount',
-      label: '私教折扣',
-      desc: '私人教练优惠',
-      values: toValueMap((card, index) => {
-        // 根据卡种等级设置不同的折扣力度
-        const discounts = [70, 80, 90, 95] // 7折, 8折, 9折, 9.5折
-        return discounts[index % discounts.length] || 70
-      }),
-      format: (value: number) => `${value / 10} 折`,
+  },
+  {
+    key: 'guest_benefits',
+    label: '嘉宾权益',
+    desc: '特殊活动邀请',
+    values: toValueMap((card, index) => index * (100 / (props.cards.length || 1))),
+    format: (value: number, card: Huiyuanka) => {
+      const benefits = deriveGuestBenefits(card)
+      return benefits.length > 0 ? `${benefits.length} 项` : '无'
     },
-    {
-      key: 'facility_access',
-      label: '设施权限',
-      desc: '场馆设施使用',
-      values: toValueMap((card, index) => 40 + index * (60 / (props.cards.length || 1))),
-      format: (value: number) => {
-        if (value >= 80) return '全部开放'
-        if (value >= 60) return '大部分开放'
-        if (value >= 40) return '基础设施'
-        return '限时使用'
-      },
-    },
-    {
-      key: 'guest_benefits',
-      label: '嘉宾权益',
-      desc: '特殊活动邀请',
-      values: toValueMap((card, index) => index * (100 / (props.cards.length || 1))),
-      format: (value: number, card: Huiyuanka) => {
-        const benefits = deriveGuestBenefits(card)
-        return benefits.length > 0 ? `${benefits.length} 项` : '无'
-      },
-    },
-  ]
-})
+  },
+])
 
 // 将卡片数据转换为数值映射
 function toValueMap(getter: (card: Huiyuanka, index: number) => number): Record<number, number> {
@@ -251,12 +239,12 @@ function toValueMap(getter: (card: Huiyuanka, index: number) => number): Record<
 // 从卡片数据中提取嘉宾权益
 function deriveGuestBenefits(card: Huiyuanka): string[] {
   const text = card.shiyongshuoming || card.huiyuankaxiangqing || ''
-  const segments = text.split(/[\n、。,，]/).map(item => item.trim()).filter(Boolean)
-  return segments.filter(item =>
-    item.includes('嘉宾') ||
-    item.includes('活动') ||
-    item.includes('workshop') ||
-    item.includes('讲座')
+  const segments = text
+    .split(/[\n、。,，]/)
+    .map(item => item.trim())
+    .filter(Boolean)
+  return segments.filter(
+    item => item.includes('嘉宾') || item.includes('活动') || item.includes('workshop') || item.includes('讲座'),
   )
 }
 </script>
@@ -502,11 +490,7 @@ function deriveGuestBenefits(card: Huiyuanka): string[] {
 
 .metric-bar {
   height: 100%;
-  background: linear-gradient(90deg,
-    rgba(253, 216, 53, 0.9),
-    rgba(253, 216, 53, 0.6),
-    rgba(253, 216, 53, 0.3)
-  );
+  background: linear-gradient(90deg, rgba(253, 216, 53, 0.9), rgba(253, 216, 53, 0.6), rgba(253, 216, 53, 0.3));
   border-radius: 4px;
   transition: width 0.3s ease;
   position: relative;
@@ -518,18 +502,18 @@ function deriveGuestBenefits(card: Huiyuanka): string[] {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     animation: bar-shine 2s infinite;
   }
 }
 
 @keyframes bar-shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .metric-value {

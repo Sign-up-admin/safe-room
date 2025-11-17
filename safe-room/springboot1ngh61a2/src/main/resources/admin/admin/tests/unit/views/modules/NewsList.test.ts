@@ -4,16 +4,11 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import NewsList from '@/views/modules/news/list.vue'
 import http from '@/utils/http'
+import { mountComponent, createElementPlusMocks } from '@/tests/utils/unit-test-helpers'
 
-vi.mock('element-plus', () => ({
-  ElMessage: {
-    success: vi.fn(),
-    error: vi.fn()
-  },
-  ElMessageBox: {
-    confirm: vi.fn()
-  }
-}))
+// Mock Element Plus components using unified helpers
+const elMocks = createElementPlusMocks()
+vi.mock('element-plus', () => elMocks)
 
 vi.mock('@/utils/http', () => ({
   default: {
@@ -23,6 +18,14 @@ vi.mock('@/utils/http', () => ({
     delete: vi.fn()
   }
 }))
+
+// Mock HTTP for testing
+const mockHttp = {
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  delete: vi.fn()
+}
 
 describe('NewsList', () => {
   let router: any
@@ -41,7 +44,7 @@ describe('NewsList', () => {
 
   describe('Component Rendering', () => {
     it('should render the news list component', () => {
-      const wrapper = mount(NewsList, {
+      const wrapper = mountComponent(NewsList, {
         global: {
           plugins: [router, pinia]
         }
@@ -64,7 +67,7 @@ describe('NewsList', () => {
         }
       })
 
-      const wrapper = mount(NewsList, {
+      const wrapper = mountComponent(NewsList, {
         global: {
           plugins: [router, pinia]
         }
@@ -76,7 +79,7 @@ describe('NewsList', () => {
     })
 
     it('should handle news CRUD operations', () => {
-      const wrapper = mount(NewsList, {
+      const wrapper = mountComponent(NewsList, {
         global: {
           plugins: [router, pinia]
         }

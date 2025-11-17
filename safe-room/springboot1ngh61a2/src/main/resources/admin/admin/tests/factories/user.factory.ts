@@ -1,5 +1,8 @@
 import { faker } from '@faker-js/faker'
 
+/**
+ * Admin用户接口
+ */
 export interface AdminUser {
   id: number
   username: string
@@ -10,188 +13,204 @@ export interface AdminUser {
   role: string
   roles: string[]
   permissions: string[]
-  status: number
+  status: number // 0: inactive, 1: active
   createTime: string
   updateTime?: string
   lastLoginTime?: string
   deptId?: number
   deptName?: string
+  isVerified: boolean
+  twoFactorEnabled: boolean
+  loginAttempts: number
 }
 
 /**
- * Create a mock admin user with default values
+ * 用户预设数据
  */
-export function createMockUser(overrides: Partial<AdminUser> = {}): AdminUser {
-  const role = faker.helpers.arrayElement(['admin', 'manager', 'user'])
-  const roles = role === 'admin' ? ['admin'] : [role]
-  const permissions = role === 'admin' ? ['all'] : faker.helpers.arrayElements([
-    'user:view', 'user:create', 'user:update', 'user:delete',
-    'course:view', 'course:create', 'course:update', 'course:delete',
-    'booking:view', 'booking:create', 'booking:update', 'booking:delete',
-    'system:view', 'system:update'
-  ], { min: 3, max: 8 })
-
-  return {
-    id: faker.number.int({ min: 1, max: 1000 }),
-    username: faker.internet.username(),
-    realName: faker.person.fullName(),
-    email: faker.internet.email(),
-    phone: faker.phone.number(),
-    avatar: faker.image.avatar(),
-    role,
-    roles,
-    permissions,
-    status: faker.helpers.arrayElement([0, 1]),
-    createTime: faker.date.past().toISOString(),
-    updateTime: faker.date.recent().toISOString(),
-    lastLoginTime: faker.date.recent().toISOString(),
-    deptId: faker.number.int({ min: 1, max: 10 }),
-    deptName: faker.company.name(),
-    ...overrides
-  }
-}
-
-/**
- * Create a mock admin user
- */
-export function createMockAdminUser(overrides: Partial<AdminUser> = {}): AdminUser {
-  return createMockUser({
+export const USER_PRESETS = {
+  admin: {
     role: 'admin',
     roles: ['admin'],
-    permissions: ['all'],
-    username: 'admin',
-    email: 'admin@example.com',
-    realName: 'Administrator',
-    ...overrides
-  })
-}
-
-/**
- * Create a mock manager user
- */
-export function createMockManagerUser(overrides: Partial<AdminUser> = {}): AdminUser {
-  return createMockUser({
+    permissions: [
+      'user:view', 'user:create', 'user:update', 'user:delete',
+      'course:view', 'course:create', 'course:update', 'course:delete',
+      'system:view', 'system:update', 'reports:view'
+    ],
+    status: 1,
+    isVerified: true,
+    twoFactorEnabled: false
+  },
+  manager: {
     role: 'manager',
     roles: ['manager'],
     permissions: [
       'user:view', 'user:create', 'user:update',
       'course:view', 'course:create', 'course:update',
-      'booking:view', 'booking:create', 'booking:update'
+      'reports:view'
     ],
+    status: 1,
+    isVerified: true,
+    twoFactorEnabled: false
+  },
+  operator: {
+    role: 'operator',
+    roles: ['operator'],
+    permissions: [
+      'user:view', 'course:view', 'reports:view'
+    ],
+    status: 1,
+    isVerified: true,
+    twoFactorEnabled: false
+  },
+  testUser: {
+    username: 'testadmin',
+    email: 'admin@test.com',
+    realName: '测试管理员',
+    role: 'admin',
+    roles: ['admin'],
+    permissions: ['all'],
+    status: 1,
+    isVerified: true,
+    twoFactorEnabled: false,
+    loginAttempts: 0
+  }
+}
+
+/**
+ * 创建单个管理员用户
+ */
+export function createAdminUser(overrides: Partial<AdminUser> = {}): AdminUser {
+  const id = overrides.id ?? faker.number.int({ min: 1, max: 10000 })
+  const roles = ['admin', 'manager', 'operator', 'viewer']
+  const departments = ['技术部', '运营部', '市场部', '财务部', '人事部']
+
+  return {
+    id,
+    username: overrides.username ?? `admin_${id}_${faker.string.alphanumeric(4)}`,
+    realName: overrides.realName ?? faker.person.fullName(),
+    email: overrides.email ?? faker.internet.email(),
+    phone: overrides.phone ?? faker.phone.number(),
+    avatar: overrides.avatar ?? faker.image.avatar(),
+    role: overrides.role ?? faker.helpers.arrayElement(roles),
+    roles: overrides.roles ?? [overrides.role ?? faker.helpers.arrayElement(roles)],
+    permissions: overrides.permissions ?? ['user:view', 'course:view'],
+    status: overrides.status ?? faker.helpers.arrayElement([0, 1]),
+    createTime: overrides.createTime ?? faker.date.past().toISOString(),
+    updateTime: overrides.updateTime ?? faker.date.recent().toISOString(),
+    lastLoginTime: overrides.lastLoginTime ?? faker.date.recent().toISOString(),
+    deptId: overrides.deptId ?? faker.number.int({ min: 1, max: 10 }),
+    deptName: overrides.deptName ?? faker.helpers.arrayElement(departments),
+    isVerified: overrides.isVerified ?? true,
+    twoFactorEnabled: overrides.twoFactorEnabled ?? faker.datatype.boolean(),
+    loginAttempts: overrides.loginAttempts ?? faker.number.int({ min: 0, max: 5 }),
+    ...overrides
+  }
+}
+
+/**
+ * 创建多个管理员用户
+ */
+export function createAdminUsers(count: number, overrides: Partial<AdminUser> = {}): AdminUser[] {
+  return Array.from({ length: count }, () => createAdminUser(overrides))
+}
+
+/**
+ * 创建测试管理员
+ */
+export function createTestAdmin(overrides: Partial<AdminUser> = {}): AdminUser {
+  return createAdminUser({
+    ...USER_PRESETS.testUser,
     ...overrides
   })
 }
 
 /**
- * Create a mock regular user
+ * 创建管理员
  */
-export function createMockRegularUser(overrides: Partial<AdminUser> = {}): AdminUser {
-  return createMockUser({
-    role: 'user',
-    roles: ['user'],
-    permissions: ['user:view', 'course:view', 'booking:view'],
+export function createAdmin(overrides: Partial<AdminUser> = {}): AdminUser {
+  return createAdminUser({
+    ...USER_PRESETS.admin,
+    username: 'admin',
+    realName: '管理员',
     ...overrides
   })
 }
 
 /**
- * Create multiple mock users
+ * 创建经理
  */
-export function createMockUsers(count: number, overrides: Partial<AdminUser> = {}): AdminUser[] {
-  return Array.from({ length: count }, () => createMockUser(overrides))
-}
-
-/**
- * Create mock users by role
- */
-export function createMockUsersByRole(role: string, count = 5): AdminUser[] {
-  return createMockUsers(count, { role, roles: [role] })
-}
-
-/**
- * Create a mock user profile for admin panel
- */
-export function createMockUserProfile(overrides: Partial<AdminUser & {
-  bio?: string
-  location?: string
-  position?: string
-  joinDate?: string
-  lastActive?: string
-}> = {}) {
-  return {
-    ...createMockUser(overrides),
-    bio: faker.lorem.paragraph(),
-    location: faker.location.city(),
-    position: faker.person.jobTitle(),
-    joinDate: faker.date.past({ years: 5 }).toISOString(),
-    lastActive: faker.date.recent().toISOString(),
+export function createManager(overrides: Partial<AdminUser> = {}): AdminUser {
+  return createAdminUser({
+    ...USER_PRESETS.manager,
     ...overrides
+  })
+}
+
+/**
+ * 创建操作员
+ */
+export function createOperator(overrides: Partial<AdminUser> = {}): AdminUser {
+  return createAdminUser({
+    ...USER_PRESETS.operator,
+    ...overrides
+  })
+}
+
+/**
+ * 验证管理员用户数据
+ */
+export function validateAdminUserData(user: any): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  // 基础字段验证
+  if (!user.username || typeof user.username !== 'string' || user.username.trim().length === 0) {
+    errors.push('用户名不能为空')
+  }
+  if (!user.realName || typeof user.realName !== 'string' || user.realName.trim().length === 0) {
+    errors.push('真实姓名不能为空')
+  }
+  if (!user.email || typeof user.email !== 'string' || !user.email.includes('@')) {
+    errors.push('邮箱格式无效')
+  }
+  if (user.status !== 0 && user.status !== 1) {
+    warnings.push(`AdminUser ${user.username || 'unknown'} has invalid status: ${user.status}`)
+  }
+
+  // 验证角色
+  const validRoles = ['admin', 'manager', 'operator', 'viewer']
+  if (!validRoles.includes(user.role)) {
+    warnings.push(`AdminUser ${user.username || 'unknown'} has invalid role: ${user.role}`)
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
   }
 }
 
 /**
- * Create mock user login log
+ * 验证操作日志数据
  */
-export function createMockUserLoginLog(overrides: Partial<{
-  id: number
-  userId: number
-  username: string
-  loginTime: string
-  logoutTime?: string
-  ip: string
-  userAgent: string
-  status: number
-  message?: string
-}> = {}) {
-  const user = createMockUser()
-  return {
-    id: faker.number.int({ min: 1, max: 10000 }),
-    userId: user.id,
-    username: user.username,
-    loginTime: faker.date.recent().toISOString(),
-    logoutTime: faker.helpers.maybe(() => faker.date.recent().toISOString(), { probability: 0.8 }),
-    ip: faker.internet.ip(),
-    userAgent: faker.internet.userAgent(),
-    status: faker.helpers.arrayElement([0, 1]),
-    message: faker.helpers.maybe(() => faker.lorem.sentence(), { probability: 0.3 }),
-    ...overrides
-  }
-}
+export function validateOperationLogData(log: any): boolean {
+  const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+  const validStatuses = [0, 1]
 
-/**
- * Create mock user operation log
- */
-export function createMockUserOperationLog(overrides: Partial<{
-  id: number
-  userId: number
-  username: string
-  operation: string
-  method: string
-  params?: string
-  result?: string
-  ip: string
-  createTime: string
-  status: number
-  duration: number
-}> = {}) {
-  const user = createMockUser()
-  const operations = [
-    '用户登录', '用户登出', '创建用户', '更新用户', '删除用户',
-    '创建课程', '更新课程', '删除课程', '查看报表', '系统设置'
-  ]
-
-  return {
-    id: faker.number.int({ min: 1, max: 10000 }),
-    userId: user.id,
-    username: user.username,
-    operation: faker.helpers.arrayElement(operations),
-    method: faker.helpers.arrayElement(['GET', 'POST', 'PUT', 'DELETE']),
-    params: faker.helpers.maybe(() => JSON.stringify({ id: faker.number.int() }), { probability: 0.6 }),
-    result: faker.helpers.maybe(() => 'success', { probability: 0.9 }),
-    ip: faker.internet.ip(),
-    createTime: faker.date.recent().toISOString(),
-    status: faker.helpers.arrayElement([0, 1]),
-    duration: faker.number.int({ min: 10, max: 2000 }),
-    ...overrides
-  }
+  return (
+    log &&
+    typeof log === 'object' &&
+    typeof log.id === 'number' &&
+    typeof log.userId === 'number' &&
+    typeof log.username === 'string' &&
+    typeof log.operation === 'string' &&
+    validMethods.includes(log.method) &&
+    typeof log.url === 'string' &&
+    validStatuses.includes(log.status) &&
+    typeof log.createTime === 'string'
+  )
 }

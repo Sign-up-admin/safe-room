@@ -1,48 +1,14 @@
 <template>
   <div class="assets-page">
-    <el-card class="filter-card" shadow="never">
-      <el-form :model="filterForm" label-width="70px" inline>
-        <el-form-item label="关键词">
-          <el-input v-model="filterForm.keyword" placeholder="名称/标签" clearable />
-        </el-form-item>
-        <el-form-item label="类型">
-          <el-select v-model="filterForm.assetType" placeholder="全部" clearable>
-            <el-option v-for="item in assetTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="模块">
-          <el-select v-model="filterForm.module" placeholder="全部" clearable filterable>
-            <el-option v-for="item in moduleOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用途">
-          <el-select v-model="filterForm.usage" placeholder="全部" clearable filterable>
-            <el-option v-for="item in usageOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="filterForm.status" placeholder="全部" clearable>
-            <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间">
-          <el-date-picker
-            v-model="filterForm.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
-          />
-        </el-form-item>
-        <el-form-item>
-          <div class="filter-actions">
-            <el-button type="primary" @click="applyFilters">查询</el-button>
-            <el-button @click="resetFilters">重置</el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    <TableFilter
+      v-model="filterForm"
+      :asset-type-options="assetTypeOptions"
+      :module-options="moduleOptions"
+      :usage-options="usageOptions"
+      :status-options="statusOptions"
+      @search="applyFilters"
+      @reset="resetFilters"
+    />
     <ModuleCrudPage
       ref="crudRef"
       module-key="assets"
@@ -51,35 +17,15 @@
       enable-selection
     >
       <template #toolbar="{ selectedRows }">
-        <el-button
-          type="danger"
-          plain
-          :disabled="!(selectedRows && selectedRows.length)"
-          @click="handleBatchDelete(selectedRows as FormModel[])"
-        >
-          批量删除
-        </el-button>
-        <el-button
-          plain
-          :disabled="!(selectedRows && selectedRows.length)"
-          @click="handleBatchStatus(selectedRows as FormModel[], 'active')"
-        >
-          批量启用
-        </el-button>
-        <el-button
-          plain
-          :disabled="!(selectedRows && selectedRows.length)"
-          @click="handleBatchStatus(selectedRows as FormModel[], 'deprecated')"
-        >
-          批量停用
-        </el-button>
-        <el-button
-          plain
-          :disabled="!(selectedRows && selectedRows.length)"
-          @click="exportSelection(selectedRows as FormModel[])"
-        >
-          导出索引
-        </el-button>
+        <div class="toolbar-content">
+          <BatchOperationBar
+            :selected-rows="selectedRows"
+            @batch-delete="handleBatchDelete"
+            @batch-enable="(rows) => handleBatchStatus(rows, 'active')"
+            @batch-disable="(rows) => handleBatchStatus(rows, 'deprecated')"
+          />
+          <ExportButton :data="selectedRows" />
+        </div>
       </template>
       <template #columns>
         <el-table-column label="预览" width="140">
@@ -222,7 +168,10 @@
 import { reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { PictureFilled } from '@element-plus/icons-vue'
-import ModuleCrudPage from '../components/ModuleCrudPage.vue'
+import ModuleCrudPage from '@/components/common/ModuleCrudPage.vue'
+import TableFilter from '@/components/common/TableFilter.vue'
+import BatchOperationBar from '@/components/common/BatchOperationBar.vue'
+import ExportButton from '@/components/common/ExportButton.vue'
 import http from '@/utils/http'
 import base from '@/utils/base'
 
@@ -389,45 +338,6 @@ const handleBatchStatus = async (rows: FormModel[], status: string) => {
   crudRef.value?.refresh()
 }
 
-const exportSelection = (rows: FormModel[]) => {
-  if (!rows.length) {
-    ElMessage.warning('请选择需要导出的素材')
-    return
-  }
-  const headers = ['ID', '名称', '类型', '模块', '用途', '版本', '状态', '路径', '标签']
-  const lines = rows.map(item =>
-    [
-      item.id,
-      item.assetName,
-      item.assetType,
-      item.module,
-      item.usage,
-      item.version,
-      item.status,
-      item.filePath,
-      item.tags,
-    ]
-      .map(toCsvValue)
-      .join(','),
-  )
-  const csvContent = [headers.join(','), ...lines].join('\n')
-  const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `assets_${Date.now()}.csv`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-  ElMessage.success('已导出素材索引')
-}
-
-const toCsvValue = (value: unknown) => {
-  if (value === null || value === undefined) return '""'
-  const str = String(value).replace(/"/g, '""')
-  return `"${str}"`
-}
 
 const applyFilters = () => {
   appliedFilters.keyword = filterForm.keyword.trim()
@@ -463,13 +373,10 @@ applyFilters()
   padding: 24px;
 }
 
-.filter-card {
-  margin-bottom: 24px;
-}
-
-.filter-actions {
+.toolbar-content {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
 }
 
 .asset-form {

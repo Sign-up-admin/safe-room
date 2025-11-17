@@ -228,7 +228,8 @@ function goLogin() {
   align-items: center;
   justify-content: center;
   padding: 48px 24px;
-  background: radial-gradient(circle at 15% 15%, rgba(253, 216, 53, 0.28), transparent 45%),
+  background:
+    radial-gradient(circle at 15% 15%, rgba(253, 216, 53, 0.28), transparent 45%),
     radial-gradient(circle at 80% 10%, rgba(253, 216, 53, 0.18), transparent 45%), #020202;
 }
 
@@ -315,4 +316,3 @@ function goLogin() {
   }
 }
 </style>
-

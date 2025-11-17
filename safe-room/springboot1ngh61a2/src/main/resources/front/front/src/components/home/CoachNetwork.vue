@@ -1,5 +1,5 @@
 <template>
-  <section class="coach-network" ref="networkRef">
+  <section ref="networkRef" class="coach-network">
     <canvas ref="particleCanvasRef" class="coach-network__canvas coach-network__canvas--particles" aria-hidden="true" />
     <div ref="canvasContainerRef" class="coach-network__canvas coach-network__canvas--model"></div>
 
@@ -21,9 +21,7 @@
           <p class="coach-network__panel-label">学员评分</p>
         </li>
       </ul>
-      <button class="coach-network__panel-cta" @click.stop="$emit('navigate', activeNode)">
-        了解详情
-      </button>
+      <button class="coach-network__panel-cta" @click.stop="$emit('navigate', activeNode)">了解详情</button>
     </aside>
   </section>
 </template>
@@ -105,6 +103,9 @@ const props = withDefaults(defineProps<Props>(), {
   links: () => [],
 })
 
+const emit = defineEmits<{
+  navigate: [node: CoachMeta]
+}>()
 const networkRef = ref<HTMLElement>()
 const particleCanvasRef = ref<HTMLCanvasElement>()
 const canvasContainerRef = ref<HTMLElement>()
@@ -131,17 +132,13 @@ let cleanupMouseControls: (() => void) | null = null
 // 面的顺序：右(+X), 左(-X), 上(+Y), 下(-Y), 前(+Z), 后(-Z)
 const faceIndices = [0, 1, 2, 3, 4, 5]
 
-const emit = defineEmits<{
-  navigate: [node: CoachMeta]
-}>()
-
 // 创建教练纹理
-function createCoachTexture(coach: CoachMeta, size: number = 512): THREE.CanvasTexture {
+function createCoachTexture(coach: CoachMeta, size = 512): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
   const ctx = canvas.getContext('2d')!
-  
+
   if (!ctx) {
     throw new Error('无法创建Canvas 2D上下文')
   }
@@ -224,7 +221,7 @@ function createCoachTexture(coach: CoachMeta, size: number = 512): THREE.CanvasT
   texture.wrapT = THREE.ClampToEdgeWrapping
   // 优化纹理清晰度
   texture.anisotropy = 16
-  
+
   return texture
 }
 
@@ -245,7 +242,7 @@ function createDefaultMaterial(): THREE.MeshStandardMaterial {
 // 创建教练材质
 function createCoachMaterial(coach: CoachMeta): THREE.MeshStandardMaterial {
   const texture = createCoachTexture(coach)
-  
+
   return new THREE.MeshStandardMaterial({
     color: 0xffffff, // 白色，让纹理颜色更准确
     map: texture,
@@ -263,8 +260,8 @@ function createCoachMaterial(coach: CoachMeta): THREE.MeshStandardMaterial {
 // 清理材质和纹理资源
 function disposeMaterials(materials: THREE.Material | THREE.Material[]) {
   const materialArray = Array.isArray(materials) ? materials : [materials]
-  
-  materialArray.forEach((mat) => {
+
+  materialArray.forEach(mat => {
     if (mat instanceof THREE.MeshStandardMaterial) {
       // 清理纹理
       if (mat.map) {
@@ -290,17 +287,17 @@ function disposeMaterials(materials: THREE.Material | THREE.Material[]) {
 function createCoachRhombicDodecahedron() {
   if (cube) {
     scene.remove(cube)
-    
+
     // 清理旧材质和纹理
     if (cube.material) {
       disposeMaterials(cube.material)
     }
-    
+
     // 清理几何体
     if (cube.geometry) {
       cube.geometry.dispose()
     }
-    
+
     cube = null as any
   }
 
@@ -315,30 +312,30 @@ function createCoachRhombicDodecahedron() {
   const vertices: number[] = []
   const indices: number[] = []
   const faceGroups: number[] = []
-  
+
   // 定义14个顶点（标准坐标）
   // 8个顶点（三个菱形公共顶点）：(±1, ±1, ±1)
   const cubeVertices = [
-    [scale, scale, scale],      // 0: (1, 1, 1)
-    [scale, scale, -scale],     // 1: (1, 1, -1)
-    [scale, -scale, scale],     // 2: (1, -1, 1)
-    [scale, -scale, -scale],    // 3: (1, -1, -1)
-    [-scale, scale, scale],     // 4: (-1, 1, 1)
-    [-scale, scale, -scale],    // 5: (-1, 1, -1)
-    [-scale, -scale, scale],    // 6: (-1, -1, 1)
-    [-scale, -scale, -scale]    // 7: (-1, -1, -1)
+    [scale, scale, scale], // 0: (1, 1, 1)
+    [scale, scale, -scale], // 1: (1, 1, -1)
+    [scale, -scale, scale], // 2: (1, -1, 1)
+    [scale, -scale, -scale], // 3: (1, -1, -1)
+    [-scale, scale, scale], // 4: (-1, 1, 1)
+    [-scale, scale, -scale], // 5: (-1, 1, -1)
+    [-scale, -scale, scale], // 6: (-1, -1, 1)
+    [-scale, -scale, -scale], // 7: (-1, -1, -1)
   ]
-  
+
   // 6个顶点（四个菱形公共顶点）：(±2, 0, 0), (0, ±2, 0), (0, 0, ±2)
   const faceCenters = [
-    [2 * scale, 0, 0],          // 8: (2, 0, 0) +X
-    [-2 * scale, 0, 0],         // 9: (-2, 0, 0) -X
-    [0, 2 * scale, 0],          // 10: (0, 2, 0) +Y
-    [0, -2 * scale, 0],         // 11: (0, -2, 0) -Y
-    [0, 0, 2 * scale],          // 12: (0, 0, 2) +Z
-    [0, 0, -2 * scale]          // 13: (0, 0, -2) -Z
+    [2 * scale, 0, 0], // 8: (2, 0, 0) +X
+    [-2 * scale, 0, 0], // 9: (-2, 0, 0) -X
+    [0, 2 * scale, 0], // 10: (0, 2, 0) +Y
+    [0, -2 * scale, 0], // 11: (0, -2, 0) -Y
+    [0, 0, 2 * scale], // 12: (0, 0, 2) +Z
+    [0, 0, -2 * scale], // 13: (0, 0, -2) -Z
   ]
-  
+
   // 创建12个菱形面（标准定义）
   // 每个菱形面由4个顶点组成：2个立方体顶点(±1,±1,±1) + 2个面心顶点(±2,0,0)等
   // 面的顺序：+X面2个、-X面2个、+Y面2个、-Y面2个、+Z面2个、-Z面2个
@@ -346,75 +343,79 @@ function createCoachRhombicDodecahedron() {
   // 每个面的顶点按逆时针顺序排列（从外部观察），确保法线方向正确
   const rhombusFaces = [
     // +X方向（右面）2个菱形
-    [cubeVertices[0], faceCenters[2], cubeVertices[1], faceCenters[0]],  // (1,1,1)-(0,2,0)-(1,1,-1)-(2,0,0)
-    [cubeVertices[2], faceCenters[0], cubeVertices[3], faceCenters[3]],  // (1,-1,1)-(2,0,0)-(1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[0], faceCenters[2], cubeVertices[1], faceCenters[0]], // (1,1,1)-(0,2,0)-(1,1,-1)-(2,0,0)
+    [cubeVertices[2], faceCenters[0], cubeVertices[3], faceCenters[3]], // (1,-1,1)-(2,0,0)-(1,-1,-1)-(0,-2,0)
+
     // -X方向（左面）2个菱形
-    [cubeVertices[4], faceCenters[2], cubeVertices[5], faceCenters[1]],  // (-1,1,1)-(0,2,0)-(-1,1,-1)-(-2,0,0)
-    [cubeVertices[6], faceCenters[1], cubeVertices[7], faceCenters[3]],  // (-1,-1,1)-(-2,0,0)-(-1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[4], faceCenters[2], cubeVertices[5], faceCenters[1]], // (-1,1,1)-(0,2,0)-(-1,1,-1)-(-2,0,0)
+    [cubeVertices[6], faceCenters[1], cubeVertices[7], faceCenters[3]], // (-1,-1,1)-(-2,0,0)-(-1,-1,-1)-(0,-2,0)
+
     // +Y方向（上面）2个菱形
-    [cubeVertices[0], faceCenters[4], cubeVertices[4], faceCenters[2]],  // (1,1,1)-(0,0,2)-(-1,1,1)-(0,2,0)
-    [cubeVertices[1], faceCenters[5], cubeVertices[5], faceCenters[2]],  // (1,1,-1)-(0,0,-2)-(-1,1,-1)-(0,2,0)
-    
+    [cubeVertices[0], faceCenters[4], cubeVertices[4], faceCenters[2]], // (1,1,1)-(0,0,2)-(-1,1,1)-(0,2,0)
+    [cubeVertices[1], faceCenters[5], cubeVertices[5], faceCenters[2]], // (1,1,-1)-(0,0,-2)-(-1,1,-1)-(0,2,0)
+
     // -Y方向（下面）2个菱形
-    [cubeVertices[2], faceCenters[4], cubeVertices[6], faceCenters[3]],  // (1,-1,1)-(0,0,2)-(-1,-1,1)-(0,-2,0)
-    [cubeVertices[3], faceCenters[5], cubeVertices[7], faceCenters[3]],  // (1,-1,-1)-(0,0,-2)-(-1,-1,-1)-(0,-2,0)
-    
+    [cubeVertices[2], faceCenters[4], cubeVertices[6], faceCenters[3]], // (1,-1,1)-(0,0,2)-(-1,-1,1)-(0,-2,0)
+    [cubeVertices[3], faceCenters[5], cubeVertices[7], faceCenters[3]], // (1,-1,-1)-(0,0,-2)-(-1,-1,-1)-(0,-2,0)
+
     // +Z方向（前面）2个菱形
-    [cubeVertices[0], faceCenters[0], cubeVertices[2], faceCenters[4]],  // (1,1,1)-(2,0,0)-(1,-1,1)-(0,0,2)
-    [cubeVertices[4], faceCenters[4], cubeVertices[6], faceCenters[1]],  // (-1,1,1)-(0,0,2)-(-1,-1,1)-(-2,0,0)
-    
+    [cubeVertices[0], faceCenters[0], cubeVertices[2], faceCenters[4]], // (1,1,1)-(2,0,0)-(1,-1,1)-(0,0,2)
+    [cubeVertices[4], faceCenters[4], cubeVertices[6], faceCenters[1]], // (-1,1,1)-(0,0,2)-(-1,-1,1)-(-2,0,0)
+
     // -Z方向（后面）2个菱形
-    [cubeVertices[1], faceCenters[0], cubeVertices[3], faceCenters[5]],  // (1,1,-1)-(2,0,0)-(1,-1,-1)-(0,0,-2)
-    [cubeVertices[5], faceCenters[5], cubeVertices[7], faceCenters[1]]   // (-1,1,-1)-(0,0,-2)-(-1,-1,-1)-(-2,0,0)
+    [cubeVertices[1], faceCenters[0], cubeVertices[3], faceCenters[5]], // (1,1,-1)-(2,0,0)-(1,-1,-1)-(0,0,-2)
+    [cubeVertices[5], faceCenters[5], cubeVertices[7], faceCenters[1]], // (-1,1,-1)-(0,0,-2)-(-1,-1,-1)-(-2,0,0)
   ]
-  
+
   // 构建顶点和索引，为每个面创建独立的顶点以便正确映射UV
   // 为了支持每个面不同的纹理，我们需要为每个面创建独立的顶点
   const uvs: number[] = []
   let indexOffset = 0
-  
+
   rhombusFaces.forEach((face, faceIndex) => {
     // 为每个面创建4个独立的顶点
     const baseIndex = vertices.length / 3
-    
+
     // 添加4个顶点（确保正确的顶点顺序以产生向外的法线）
     vertices.push(...face[0], ...face[1], ...face[2], ...face[3])
-    
+
     // 创建两个三角形组成菱形（确保逆时针顺序以产生向外的法线）
     indices.push(
-      baseIndex, baseIndex + 1, baseIndex + 2,  // 第一个三角形
-      baseIndex, baseIndex + 2, baseIndex + 3   // 第二个三角形
+      baseIndex,
+      baseIndex + 1,
+      baseIndex + 2, // 第一个三角形
+      baseIndex,
+      baseIndex + 2,
+      baseIndex + 3, // 第二个三角形
     )
-    
+
     // 为这个面的4个顶点添加UV坐标（菱形面的UV映射）
     uvs.push(0, 0) // v0
     uvs.push(1, 0) // v1
     uvs.push(1, 1) // v2
     uvs.push(0, 1) // v3
-    
+
     // 记录这个面的索引范围（6个索引：2个三角形）
     faceGroups.push(indexOffset, 6, faceIndex)
     indexOffset += 6
   })
-  
+
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
   geometry.setIndex(indices)
-  
+
   // 为每个面创建组，以便使用不同的材质
   for (let i = 0; i < 12; i++) {
     geometry.addGroup(i * 6, 6, i)
   }
-  
+
   geometry.computeVertexNormals()
-  
+
   // 为每个面创建材质（最多12个教练）
   const materials: THREE.MeshStandardMaterial[] = []
   const coachesToShow = props.nodes.slice(0, 12)
-  
+
   // 确保至少有12个材质（即使教练不足12个）
   for (let i = 0; i < 12; i++) {
     if (i < coachesToShow.length) {
@@ -428,8 +429,8 @@ function createCoachRhombicDodecahedron() {
 
   // 创建网格对象
   cube = new THREE.Mesh(geometry, materials)
-  cube.userData = { 
-    coaches: coachesToShow, 
+  cube.userData = {
+    coaches: coachesToShow,
     faceGroups,
     materials, // 保存材质引用以便后续清理
   }
@@ -453,8 +454,8 @@ function initThreeScene() {
   camera.position.set(0, 0, 20)
 
   // 创建渲染器
-  renderer = new THREE.WebGLRenderer({ 
-    antialias: true, 
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
     alpha: true,
     preserveDrawingBuffer: false,
   })
@@ -636,7 +637,7 @@ watch(
       activeNode.value = props.nodes[0] ?? null
     }
   },
-  { deep: true }
+  { deep: true },
 )
 
 onMounted(() => {
@@ -675,12 +676,12 @@ onBeforeUnmount(() => {
   // 清理 Three.js 资源
   if (cube) {
     scene.remove(cube)
-    
+
     // 清理材质和纹理
     if (cube.material) {
       disposeMaterials(cube.material)
     }
-    
+
     // 清理几何体
     if (cube.geometry) {
       cube.geometry.dispose()
@@ -701,8 +702,7 @@ onBeforeUnmount(() => {
   position: relative;
   min-height: 560px;
   padding: 140px 6vw;
-  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.1), transparent),
-    #020202;
+  background: radial-gradient(circle at 10% 20%, rgba(253, 216, 53, 0.1), transparent), #020202;
   overflow: hidden;
 
   &__canvas {
@@ -786,7 +786,9 @@ onBeforeUnmount(() => {
     color: #0a0a0a;
     font-weight: 600;
     letter-spacing: 0.1em;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover {
       transform: translateY(-2px);

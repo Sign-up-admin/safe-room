@@ -26,6 +26,7 @@ import IndexAside from '@/components/index/IndexAsideStatic.vue'
 import IndexHeader from '@/components/index/IndexHeader.vue'
 import TagsView from '@/components/index/TagsView/index.vue'
 import type { MenuRole } from '@/types/menu'
+import { useUserStore } from '@/stores/user'
 import menu from '@/utils/menu'
 import storage from '@/utils/storage'
 
@@ -33,6 +34,7 @@ const savedCollapse = storage.get('asideCollapse') === 'true'
 const menuList = ref<MenuRole[]>([])
 const role = ref('')
 const title = ref('')
+const userStore = useUserStore()
 const isCollapse = ref(savedCollapse)
 const preferredCollapse = ref(savedCollapse)
 const isMobile = ref(false)
@@ -69,7 +71,7 @@ function handleResize() {
 onMounted(() => {
   const menus = menu.list()
   menuList.value = menus
-  role.value = storage.get('role') || ''
+  role.value = userStore.userRole || ''
   handleResize()
   window.addEventListener('resize', handleResize)
   init()

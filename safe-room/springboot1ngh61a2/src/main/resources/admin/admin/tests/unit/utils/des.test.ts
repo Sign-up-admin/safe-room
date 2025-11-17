@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { encryptDes, decryptDes, encryptAes, decryptAes } from '../../../src/utils/des'
+import { encryptDes, decryptDes, encryptAes, decryptAes } from '@/utils/des'
 
 describe('DES/AES加密工具', () => {
   describe('DES加密解密', () => {

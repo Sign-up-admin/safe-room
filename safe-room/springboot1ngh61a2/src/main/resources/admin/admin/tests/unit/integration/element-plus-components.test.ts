@@ -90,7 +90,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(wrapper.$el.querySelector('ul')).toBeTruthy()
   })
 
-  it('should handle component name resolution correctly', () => {
+  it('should handle component name resolution correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -105,7 +105,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(app.component('el-submenu')).toBeDefined()
   })
 
-  it('should handle component props correctly', () => {
+  it('should handle component props correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -145,7 +145,7 @@ describe('Element Plus Component Registration Tests', () => {
     })
   })
 
-  it('should handle component resolution in templates', () => {
+  it('should handle component resolution in templates', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 
@@ -214,7 +214,7 @@ describe('Element Plus Component Registration Tests', () => {
     expect(resolvedComponent.name).toBe('AsyncSubMenu')
   })
 
-  it('should validate component props correctly', () => {
+  it('should validate component props correctly', async () => {
     const ElementPlus = (await import('element-plus')).default
     app.use(ElementPlus)
 

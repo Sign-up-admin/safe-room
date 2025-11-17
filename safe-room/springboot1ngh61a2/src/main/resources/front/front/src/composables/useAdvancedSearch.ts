@@ -43,7 +43,7 @@ export function useAdvancedSearch(options: SearchOptions = {}) {
     enableSuggestions = true,
     maxSuggestions = 10,
     enableHistory = true,
-    historyKey = 'discussion-search-history'
+    historyKey = 'discussion-search-history',
   } = options
 
   // 响应式状态
@@ -54,7 +54,7 @@ export function useAdvancedSearch(options: SearchOptions = {}) {
     timeRange: '',
     status: [],
     sort: 'latest',
-    author: ''
+    author: '',
   })
 
   const isSearching = ref(false)
@@ -62,7 +62,7 @@ export function useAdvancedSearch(options: SearchOptions = {}) {
     items: [],
     total: 0,
     filtered: 0,
-    hasMore: false
+    hasMore: false,
   })
 
   const searchHistory = ref<string[]>([])
@@ -86,11 +86,11 @@ export function useAdvancedSearch(options: SearchOptions = {}) {
 
   const filterStats = computed(() => ({
     total: searchResults.value.total,
-    filtered: searchResults.value.filtered
+    filtered: searchResults.value.filtered,
   }))
 
-// 防抖搜索
-let searchTimeout: number | null = null
+  // 防抖搜索
+  let searchTimeout: number | null = null
 
   const debouncedSearch = (callback: () => void) => {
     if (searchTimeout) {
@@ -128,9 +128,18 @@ let searchTimeout: number | null = null
   // 本地生成搜索建议
   const generateLocalSuggestions = (keyword: string): string[] => {
     const commonTerms = [
-      '训练技巧', '饮食建议', '健身计划', '教练推荐',
-      '运动经验', '减肥方法', '增肌训练', '瑜伽课程',
-      '跑步技巧', '力量训练', '有氧运动', '康复训练'
+      '训练技巧',
+      '饮食建议',
+      '健身计划',
+      '教练推荐',
+      '运动经验',
+      '减肥方法',
+      '增肌训练',
+      '瑜伽课程',
+      '跑步技巧',
+      '力量训练',
+      '有氧运动',
+      '康复训练',
     ]
 
     const suggestions: string[] = []
@@ -189,9 +198,8 @@ let searchTimeout: number | null = null
       // 触发搜索完成事件
       emit('search-completed', {
         filters: { ...filters },
-        results: mockResults
+        results: mockResults,
       })
-
     } catch (error) {
       console.error('搜索失败:', error)
       ElMessage.error('搜索失败，请稍后重试')
@@ -204,7 +212,7 @@ let searchTimeout: number | null = null
   const buildSearchParams = () => {
     const params: Record<string, any> = {
       page: 1,
-      limit: 20
+      limit: 20,
     }
 
     if (filters.keyword) params.content = filters.keyword
@@ -236,11 +244,11 @@ let searchTimeout: number | null = null
         createTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
         tags: params.tags ? params.tags.split(',') : ['健身', '训练'],
         replyCount: Math.floor(Math.random() * 20),
-        viewCount: Math.floor(Math.random() * 100)
+        viewCount: Math.floor(Math.random() * 100),
       })),
       total: totalItems,
       filtered: filteredItems,
-      hasMore: filteredItems > 20
+      hasMore: filteredItems > 20,
     }
   }
 
@@ -253,7 +261,7 @@ let searchTimeout: number | null = null
       timeRange: '',
       status: [],
       sort: 'latest',
-      author: ''
+      author: '',
     })
     searchSuggestions.value = []
   }
@@ -273,7 +281,7 @@ let searchTimeout: number | null = null
         { id: '2', kehnegmingcheng: '力量训练基础' },
         { id: '3', kehnegmingcheng: '有氧运动指导' },
         { id: '4', kehnegmingcheng: '康复训练课程' },
-        { id: '5', kehnegmingcheng: '营养饮食指导' }
+        { id: '5', kehnegmingcheng: '营养饮食指导' },
       ]
       availableCourses.value = mockCourses
     } catch (error) {
@@ -294,7 +302,7 @@ let searchTimeout: number | null = null
         { name: '营养饮食', count: 35, level: 'trending' },
         { name: '教练推荐', count: 18, level: 'normal' },
         { name: '训练技巧', count: 42, level: 'hot' },
-        { name: '运动经验', count: 28, level: 'trending' }
+        { name: '运动经验', count: 28, level: 'trending' },
       ]
       availableTags.value = mockTags
     } catch (error) {
@@ -358,10 +366,7 @@ let searchTimeout: number | null = null
   // 初始化
   const init = async () => {
     loadSearchHistory()
-    await Promise.all([
-      loadAvailableCourses(),
-      loadAvailableTags()
-    ])
+    await Promise.all([loadAvailableCourses(), loadAvailableTags()])
   }
 
   // 监听筛选变化自动搜索
@@ -372,7 +377,7 @@ let searchTimeout: number | null = null
         performSearch()
       })
     },
-    { deep: true }
+    { deep: true },
   )
 
   // 自定义事件发射器
@@ -407,6 +412,6 @@ let searchTimeout: number | null = null
     toggleTag,
     updateFilters,
     clearSearchHistory,
-    init
+    init,
   }
 }

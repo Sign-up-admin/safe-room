@@ -17,6 +17,77 @@ param(
     [switch]$UI
 )
 
+# 跨平台命令执行函数
+function Invoke-CrossPlatformCommand {
+    param(
+        [string]$Command,
+        [string]$WorkingDirectory = $null
+    )
+
+    try {
+        # 解析命令和参数
+        $commandParts = $Command -split ' '
+        $executable = $commandParts[0]
+        $arguments = if ($commandParts.Length -gt 1) { $commandParts[1..($commandParts.Length-1)] } else { @() }
+
+        $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $startInfo.FileName = $executable
+        $startInfo.Arguments = $arguments -join ' '
+        $startInfo.UseShellExecute = $false
+        $startInfo.RedirectStandardOutput = $true
+        $startInfo.RedirectStandardError = $true
+        $startInfo.CreateNoWindow = $true
+
+        if ($WorkingDirectory) {
+            $startInfo.WorkingDirectory = $WorkingDirectory
+        }
+
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = $startInfo
+
+        # 捕获输出
+        $outputBuilder = New-Object System.Text.StringBuilder
+        $errorBuilder = New-Object System.Text.StringBuilder
+
+        $process.OutputDataReceived += {
+            param($sender, $e)
+            if ($e.Data) {
+                $outputBuilder.AppendLine($e.Data)
+            }
+        }
+
+        $process.ErrorDataReceived += {
+            param($sender, $e)
+            if ($e.Data) {
+                $errorBuilder.AppendLine($e.Data)
+            }
+        }
+
+        $process.Start()
+        $process.BeginOutputReadLine()
+        $process.BeginErrorReadLine()
+        $process.WaitForExit()
+
+        $output = $outputBuilder.ToString()
+        $errorOutput = $errorBuilder.ToString()
+
+        # 设置全局退出码
+        $global:LASTEXITCODE = $process.ExitCode
+
+        # 返回组合输出
+        if ($errorOutput) {
+            return $output + "`n" + $errorOutput
+        } else {
+            return $output
+        }
+    }
+    catch {
+        Write-Host "Command execution failed: $_" -ForegroundColor Red
+        $global:LASTEXITCODE = 1
+        return $_.Exception.Message
+    }
+}
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "前端自动化测试启动器" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -88,7 +159,7 @@ function Start-Test {
         }
         
         # 运行测试
-        Invoke-Expression $command
+        $null = Invoke-CrossPlatformCommand -Command $command
     }
     finally {
         Pop-Location

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import type { validateApiResponse } from '../../../../../../../tests/shared/types/api-response.types'
 
 export interface AdminModule {
   id: number
@@ -49,74 +50,34 @@ export function createMockModule(overrides: Partial<AdminModule> = {}): AdminMod
     'setting', 'lock', 'chart', 'file-text', 'message'
   ])
 
+  const id = overrides.id ?? faker.number.int({ min: 1, max: 1000 })
+
   return {
-    id: faker.number.int({ min: 1, max: 1000 }),
-    name,
-    path,
-    component,
-    redirect: faker.helpers.maybe(() => path + '/index', { probability: 0.2 }),
-    icon,
-    title: name,
-    hidden: faker.datatype.boolean(),
-    sort: faker.number.int({ min: 1, max: 100 }),
-    parentId: faker.helpers.maybe(() => faker.number.int({ min: 1, max: 10 }), { probability: 0.3 }),
-    children: [],
+    id,
+    name: overrides.name ?? name,
+    path: overrides.path ?? path,
+    component: overrides.component ?? component,
+    redirect: overrides.redirect,
+    icon: overrides.icon ?? icon,
+    title: overrides.title ?? name,
+    hidden: overrides.hidden ?? faker.datatype.boolean(),
+    sort: overrides.sort ?? faker.number.int({ min: 1, max: 100 }),
+    parentId: overrides.parentId ?? faker.helpers.maybe(() => faker.number.int({ min: 1, max: 50 }), { probability: 0.3 }),
+    children: overrides.children,
     meta: {
-      title: name,
-      icon,
-      hidden: faker.datatype.boolean(),
-      keepAlive: faker.datatype.boolean(),
-      roles: faker.helpers.arrayElements(['admin', 'manager', 'user'], { min: 1, max: 3 }),
-      permissions: faker.helpers.arrayElements([
-        'view', 'create', 'update', 'delete', 'export'
-      ], { min: 1, max: 4 }).map(p => `${path.replace('/', '')}:${p}`)
+      title: overrides.meta?.title ?? name,
+      icon: overrides.meta?.icon ?? icon,
+      hidden: overrides.meta?.hidden ?? faker.datatype.boolean(),
+      keepAlive: overrides.meta?.keepAlive ?? faker.datatype.boolean(),
+      roles: overrides.meta?.roles ?? ['admin'],
+      permissions: overrides.meta?.permissions ?? ['read'],
+      ...overrides.meta
     },
-    status: faker.helpers.arrayElement([0, 1]),
-    createTime: faker.date.past().toISOString(),
-    updateTime: faker.date.recent().toISOString(),
+    status: overrides.status ?? faker.helpers.arrayElement([0, 1]),
+    createTime: overrides.createTime ?? faker.date.past().toISOString(),
+    updateTime: overrides.updateTime ?? faker.date.recent().toISOString(),
     ...overrides
   }
-}
-
-/**
- * Create a mock menu module (top-level)
- */
-export function createMockMenuModule(overrides: Partial<AdminModule> = {}): AdminModule {
-  return createMockModule({
-    parentId: undefined,
-    hidden: false,
-    sort: faker.number.int({ min: 1, max: 20 }),
-    ...overrides
-  })
-}
-
-/**
- * Create a mock submenu module
- */
-export function createMockSubmenuModule(parentId: number, overrides: Partial<AdminModule> = {}): AdminModule {
-  return createMockModule({
-    parentId,
-    path: faker.helpers.arrayElement([
-      'list', 'create', 'edit', 'detail', 'statistics'
-    ]),
-    hidden: faker.datatype.boolean(),
-    sort: faker.number.int({ min: 1, max: 50 }),
-    ...overrides
-  })
-}
-
-/**
- * Create a complete menu tree with parent and children
- */
-export function createMockMenuTree(overrides: Partial<AdminModule & { childrenCount: number }> = {}): AdminModule {
-  const { childrenCount = faker.number.int({ min: 2, max: 5 }), ...moduleOverrides } = overrides
-  const parentModule = createMockMenuModule(moduleOverrides)
-
-  parentModule.children = Array.from({ length: childrenCount }, () =>
-    createMockSubmenuModule(parentModule.id)
-  )
-
-  return parentModule
 }
 
 /**
@@ -127,130 +88,91 @@ export function createMockModules(count: number, overrides: Partial<AdminModule>
 }
 
 /**
- * Create mock modules by type
+ * Create a hierarchical module structure
  */
-export function createMockModulesByType(type: 'menu' | 'submenu', count = 5): AdminModule[] {
-  if (type === 'menu') {
-    return createMockModules(count, { parentId: undefined, hidden: false })
-  } else {
-    return createMockModules(count, { parentId: faker.number.int({ min: 1, max: 10 }) })
+export function createMockModuleTree(depth = 2, overrides: Partial<AdminModule> = {}): AdminModule[] {
+  const modules: AdminModule[] = []
+
+  // Create root modules
+  for (let i = 0; i < 5; i++) {
+    const rootModule = createMockModule({
+      ...overrides,
+      parentId: undefined,
+      id: i + 1
+    })
+
+    if (depth > 1) {
+      rootModule.children = []
+      // Create child modules
+      for (let j = 0; j < faker.number.int({ min: 2, max: 5 }); j++) {
+        const childModule = createMockModule({
+          ...overrides,
+          parentId: rootModule.id,
+          id: (i + 1) * 100 + j + 1
+        })
+        rootModule.children.push(childModule)
+      }
+    }
+
+    modules.push(rootModule)
   }
+
+  return modules
 }
 
 /**
- * Create a full navigation menu structure
+ * Create a menu module
  */
-export function createMockNavigationMenu(): AdminModule[] {
-  const menuItems = [
-    { name: '首页', path: '/dashboard', component: 'dashboard/index', icon: 'dashboard' },
-    { name: '用户管理', path: '/users', component: 'users/index', icon: 'user' },
-    { name: '课程管理', path: '/courses', component: 'courses/index', icon: 'book' },
-    { name: '预约管理', path: '/bookings', component: 'bookings/index', icon: 'calendar' },
-    { name: '订单管理', path: '/orders', component: 'orders/index', icon: 'shopping' },
-    { name: '财务管理', path: '/finance', component: 'finance/index', icon: 'money' },
-    { name: '系统设置', path: '/settings', component: 'settings/index', icon: 'setting' }
-  ]
-
-  return menuItems.map((item, index) => {
-    const module = createMockMenuModule({
-      id: index + 1,
-      name: item.name,
-      path: item.path,
-      component: item.component,
-      icon: item.icon,
-      sort: index + 1
-    })
-
-    // Add some children to key modules
-    if (['用户管理', '课程管理', '预约管理', '订单管理'].includes(item.name)) {
-      module.children = [
-        createMockSubmenuModule(module.id, {
-          name: `${item.name}-列表`,
-          path: 'list',
-          component: `${item.component}/list`,
-          sort: 1
-        }),
-        createMockSubmenuModule(module.id, {
-          name: `${item.name}-新增`,
-          path: 'create',
-          component: `${item.component}/create`,
-          sort: 2
-        }),
-        createMockSubmenuModule(module.id, {
-          name: `${item.name}-编辑`,
-          path: 'edit',
-          component: `${item.component}/edit`,
-          sort: 3
-        })
-      ]
-    }
-
-    return module
+export function createMockMenuModule(overrides: Partial<AdminModule> = {}): AdminModule {
+  return createMockModule({
+    hidden: false,
+    meta: {
+      title: faker.lorem.words({ min: 1, max: 2 }),
+      icon: faker.helpers.arrayElement(['home', 'user', 'setting', 'chart', 'file']),
+      hidden: false,
+      keepAlive: true,
+      roles: ['admin', 'manager'],
+      permissions: ['read', 'write']
+    },
+    ...overrides
   })
 }
 
 /**
- * Create mock permission data
+ * Create a hidden system module
  */
-export function createMockPermission(overrides: Partial<{
-  id: number
-  name: string
-  code: string
-  type: string
-  parentId?: number
-  description: string
-  status: number
-  createTime: string
-}> = {}) {
-  const types = ['menu', 'button', 'api']
-  const type = faker.helpers.arrayElement(types)
-
-  return {
-    id: faker.number.int({ min: 1, max: 1000 }),
-    name: faker.lorem.words({ min: 1, max: 3 }),
-    code: faker.string.alphanumeric(10),
-    type,
-    parentId: faker.helpers.maybe(() => faker.number.int({ min: 1, max: 100 }), { probability: 0.4 }),
-    description: faker.lorem.sentence(),
-    status: faker.helpers.arrayElement([0, 1]),
-    createTime: faker.date.past().toISOString(),
+export function createMockSystemModule(overrides: Partial<AdminModule> = {}): AdminModule {
+  return createMockModule({
+    hidden: true,
+    path: `/system/${faker.string.alphanumeric(8)}`,
+    component: 'system/index',
+    meta: {
+      title: `系统${faker.lorem.word()}`,
+      icon: 'setting',
+      hidden: true,
+      keepAlive: false,
+      roles: ['super_admin'],
+      permissions: ['admin']
+    },
     ...overrides
-  }
+  })
 }
 
 /**
- * Create mock role data
+ * Create a permission-based module
  */
-export function createMockRole(overrides: Partial<{
-  id: number
-  name: string
-  code: string
-  description: string
-  status: number
-  permissions: string[]
-  createTime: string
-  updateTime?: string
-}> = {}) {
-  const roleNames = ['超级管理员', '管理员', '普通用户', '访客']
-  const roleCodes = ['super_admin', 'admin', 'user', 'guest']
-
-  const index = faker.number.int({ min: 0, max: 3 })
-
-  return {
-    id: faker.number.int({ min: 1, max: 100 }),
-    name: roleNames[index],
-    code: roleCodes[index],
-    description: faker.lorem.sentence(),
-    status: faker.helpers.arrayElement([0, 1]),
-    permissions: faker.helpers.arrayElements([
-      'user:view', 'user:create', 'user:update', 'user:delete',
-      'course:view', 'course:create', 'course:update', 'course:delete',
-      'system:view', 'system:update', 'all'
-    ], { min: 3, max: 10 }),
-    createTime: faker.date.past().toISOString(),
-    updateTime: faker.date.recent().toISOString(),
+export function createMockPermissionModule(permission: string, overrides: Partial<AdminModule> = {}): AdminModule {
+  return createMockModule({
+    meta: {
+      title: `${permission}管理`,
+      icon: 'lock',
+      hidden: false,
+      keepAlive: true,
+      roles: ['admin'],
+      permissions: [permission]
+    },
     ...overrides
-  }
+  })
 }
 
 /**
@@ -280,5 +202,81 @@ export function createMockDepartment(overrides: Partial<{
     sort: faker.number.int({ min: 1, max: 100 }),
     createTime: faker.date.past().toISOString(),
     ...overrides
+  }
+}
+
+/**
+ * Validate module data structure
+ */
+export function validateModuleData(module: any): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  if (!module.name || typeof module.name !== 'string') {
+    errors.push('模块名称不能为空')
+  }
+
+  if (!module.path || typeof module.path !== 'string') {
+    errors.push('模块路径不能为空')
+  }
+
+  if (!module.component || typeof module.component !== 'string') {
+    errors.push('模块组件不能为空')
+  }
+
+  if (module.status !== 0 && module.status !== 1) {
+    warnings.push(`模块状态无效: ${module.status}`)
+  }
+
+  if (module.meta && typeof module.meta !== 'object') {
+    errors.push('模块meta信息格式错误')
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  }
+}
+
+/**
+ * Validate module hierarchy
+ */
+export function validateModuleHierarchy(modules: AdminModule[]): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  const moduleMap = new Map<number, AdminModule>()
+  modules.forEach(module => moduleMap.set(module.id, module))
+
+  modules.forEach(module => {
+    if (module.parentId) {
+      const parent = moduleMap.get(module.parentId)
+      if (!parent) {
+        errors.push(`模块 ${module.id} 的父模块 ${module.parentId} 不存在`)
+      }
+    }
+
+    if (module.children) {
+      module.children.forEach(child => {
+        if (child.parentId !== module.id) {
+          warnings.push(`子模块 ${child.id} 的parentId与父模块 ${module.id} 不匹配`)
+        }
+      })
+    }
+  })
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
   }
 }

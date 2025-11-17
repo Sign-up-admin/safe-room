@@ -1,22 +1,29 @@
 <template>
-  <div class="discussion-replies" v-if="replies && replies.length > 0">
+  <div v-if="replies && replies.length > 0" class="discussion-replies">
     <div class="replies-header">
       <span class="replies-count">{{ replies.length }} 条回复</span>
       <button
         class="toggle-replies-btn"
-        @click="toggleExpanded"
         :aria-expanded="isExpanded"
         :aria-label="isExpanded ? '收起回复' : '展开回复'"
+        @click="toggleExpanded"
       >
         {{ isExpanded ? '收起' : '展开' }}
         <svg
-          :class="['toggle-icon', { 'toggle-icon--expanded': isExpanded }]"
+          class="toggle-icon"
+          :class="[{ 'toggle-icon--expanded': isExpanded }]"
           width="16"
           height="16"
           viewBox="0 0 24 24"
           fill="none"
         >
-          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </button>
     </div>
@@ -45,38 +52,46 @@
                 <strong class="reply-username">{{ reply.userNickname }}</strong>
                 <span v-if="reply.isOfficial" class="official-badge">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2"/>
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    />
                   </svg>
                   官方回复
                 </span>
-                <span v-if="reply.parentUserNickname" class="reply-to">
-                  回复 @{{ reply.parentUserNickname }}
-                </span>
+                <span v-if="reply.parentUserNickname" class="reply-to"> 回复 @{{ reply.parentUserNickname }} </span>
               </div>
               <div class="reply-actions">
                 <button
                   class="action-btn like-btn"
                   :class="{ 'like-btn--liked': reply.isLiked }"
-                  @click="toggleReplyLike(reply)"
                   :aria-label="reply.isLiked ? '取消点赞' : '点赞'"
+                  @click="toggleReplyLike(reply)"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                   {{ reply.likeCount || 0 }}
                 </button>
                 <button
                   class="action-btn reply-btn"
-                  @click="showReplyInputHandler(reply)"
                   :aria-label="'回复 ' + reply.userNickname"
+                  @click="showReplyInputHandler(reply)"
                 >
                   回复
                 </button>
                 <button
                   v-if="canReport(reply)"
                   class="action-btn report-btn"
-                  @click="reportReplyHandler(reply)"
                   :aria-label="'举报 ' + reply.userNickname + '的回复'"
+                  @click="reportReplyHandler(reply)"
                 >
                   举报
                 </button>
@@ -107,9 +122,7 @@
               @keydown.ctrl.enter="submitNestedReply(reply, props.discussionId)"
             ></textarea>
             <div class="reply-input-actions">
-              <div class="character-count">
-                {{ (reply.replyContent || '').length }}/500
-              </div>
+              <div class="character-count">{{ (reply.replyContent || '').length }}/500</div>
               <div class="input-buttons">
                 <TechButton size="sm" variant="outline" @click="cancelReplyHandler(reply)">取消</TechButton>
                 <TechButton size="sm" @click="submitNestedReplyHandler(reply)">回复</TechButton>
@@ -168,7 +181,7 @@ const {
   formatReplyContent,
   formatTimeAgo,
   canReport,
-  isCurrentUser
+  isCurrentUser,
 } = useDiscussionInteraction()
 
 // 计算属性

@@ -151,8 +151,7 @@ export function useSuccessAnimation(options: SuccessAnimationOptions = {}) {
     return timeline.value
   }
 
-  const createCheckmarkSVG = (size: number = resolved.checkmarkSize): string => {
-    return `
+  const createCheckmarkSVG = (size: number = resolved.checkmarkSize): string => `
       <svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" fill="none" stroke="${resolved.particleColor}" stroke-width="3" opacity="0.3"/>
         <path
@@ -165,7 +164,6 @@ export function useSuccessAnimation(options: SuccessAnimationOptions = {}) {
         />
       </svg>
     `
-  }
 
   onBeforeUnmount(() => {
     if (timeline.value) {
@@ -180,4 +178,3 @@ export function useSuccessAnimation(options: SuccessAnimationOptions = {}) {
     timeline,
   }
 }
-

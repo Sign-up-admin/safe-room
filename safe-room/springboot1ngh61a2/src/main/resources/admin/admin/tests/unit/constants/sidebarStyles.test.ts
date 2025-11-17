@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { VERTICAL_STYLE_2 } from '../../../src/constants/sidebarStyles'
+import { VERTICAL_STYLE_2 } from '@/constants/sidebarStyles'
 
 describe('sidebarStyles', () => {
   describe('VERTICAL_STYLE_2', () => {

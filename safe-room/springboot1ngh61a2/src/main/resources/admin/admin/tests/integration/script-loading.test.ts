@@ -189,9 +189,9 @@ describe('Script Loading Integration Tests', () => {
 
         // 模拟脚本加载结果
         if (scripts[index] === 'error.js') {
-          setTimeout(() => script.onerror(), 10)
+          setTimeout(() => script.onerror?.(), 10)
         } else {
-          setTimeout(() => script.onload(), 10)
+          setTimeout(() => script.onload?.(), 10)
         }
 
         document.body.appendChild(script)
@@ -273,10 +273,10 @@ describe('Script Loading Integration Tests', () => {
       }
 
       const _global = (function(){ return this || (0, eval)('this') }())
-      if (typeof module !== "undefined" && module.exports) {
-        module.exports = window.RotateVerify
-      } else if (typeof define === "function" && define.amd) {
-        define(() => window.RotateVerify)
+      if (typeof (globalThis as any).module !== "undefined" && (globalThis as any).module.exports) {
+        (globalThis as any).module.exports = window.RotateVerify
+      } else if (typeof (globalThis as any).define === "function" && (globalThis as any).define.amd) {
+        (globalThis as any).define(() => window.RotateVerify)
       } else {
         !('RotateVerify' in _global) && (_global.RotateVerify = window.RotateVerify)
       }

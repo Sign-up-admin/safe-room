@@ -3,8 +3,10 @@ package com.controller;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.KechengyuyueEntity;
 import com.service.KechengyuyueService;
+import com.utils.TestDataCleanup;
 import com.utils.TestUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,6 +22,13 @@ class KechengyuyueControllerTest extends AbstractControllerIntegrationTest {
 
     @Autowired
     private KechengyuyueService kechengyuyueService;
+
+    @AfterEach
+    void cleanupTestData() {
+        // 清理测试课程预约数据
+        TestDataCleanup.cleanupByPrefix(kechengyuyueService, "kechengmingcheng", "测试课程");
+        TestDataCleanup.cleanupByPrefix(kechengyuyueService, "kechengmingcheng", "delete");
+    }
 
     @Test
     void shouldAddReservationFromFrontend() throws Exception {
@@ -46,6 +55,7 @@ class KechengyuyueControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         KechengyuyueEntity updated = kechengyuyueService.getById(entity.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getSfsh()).isEqualTo("已审核");
         assertThat(updated.getIspay()).isEqualTo("已支付");
     }
@@ -212,6 +222,8 @@ class KechengyuyueControllerTest extends AbstractControllerIntegrationTest {
 
         KechengyuyueEntity updated1 = kechengyuyueService.getById(reservation1.getId());
         KechengyuyueEntity updated2 = kechengyuyueService.getById(reservation2.getId());
+        assertThat(updated1).isNotNull();
+        assertThat(updated2).isNotNull();
         assertThat(updated1.getSfsh()).isEqualTo("已审核");
         assertThat(updated1.getShhf()).isEqualTo("审核通过");
         assertThat(updated2.getSfsh()).isEqualTo("已审核");
@@ -233,6 +245,7 @@ class KechengyuyueControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         KechengyuyueEntity updated = kechengyuyueService.getById(reservation.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getSfsh()).isEqualTo("已拒绝");
         assertThat(updated.getShhf()).isEqualTo("不符合条件");
     }

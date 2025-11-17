@@ -102,13 +102,13 @@ function getCompetence() {
   nextTick(() => {
     os.value = false //切换成关闭摄像头
 
-    thisCanvas = canvasRef.value || (document.getElementById('canvasCamera') as HTMLCanvasElement)
+    thisCanvas = canvasRef.value
     if (!thisCanvas) return
 
     thisContext = thisCanvas.getContext('2d')
     if (!thisContext) return
 
-    thisVideo = videoRef.value || (document.getElementById('videoCamera') as HTMLVideoElement)
+    thisVideo = videoRef.value
     if (!thisVideo) return
 
     // 旧版本浏览器可能根本不支持mediaDevices，我们首先设置一个空对象
@@ -190,17 +190,16 @@ function drawImage() {
   }
 }
 
-function clearCanvas(id: string) {
-  const c = document.getElementById(id) as HTMLCanvasElement
-  if (!c) return
-  const cxt = c.getContext('2d')
+function clearCanvas() {
+  if (!canvasRef.value) return
+  const cxt = canvasRef.value.getContext('2d')
   if (!cxt) return
-  cxt.clearRect(0, 0, c.width, c.height)
+  cxt.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
 }
 
 function resetCanvas() {
   imgSrc.value = ''
-  clearCanvas('canvasCamera')
+  clearCanvas()
 }
 
 function stopNavigator() {

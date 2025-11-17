@@ -5,9 +5,10 @@
       :key="toast.id"
       class="notification-toast"
       :class="{
-        'notification-toast--high-priority': toast.notification.priority === 'high' || toast.notification.priority === 'urgent',
+        'notification-toast--high-priority':
+          toast.notification.priority === 'high' || toast.notification.priority === 'urgent',
         'notification-toast--entering': toast.state === 'entering',
-        'notification-toast--leaving': toast.state === 'leaving'
+        'notification-toast--leaving': toast.state === 'leaving',
       }"
       @click="handleToastClick(toast)"
     >
@@ -33,34 +34,20 @@
 
       <!-- 操作按钮 -->
       <div class="notification-toast__actions">
-        <el-button
-          type="text"
-          size="small"
-          @click.stop="handleDismiss(toast.id)"
-        >
+        <el-button type="text" size="small" @click.stop="handleDismiss(toast.id)">
           <el-icon size="16"><Close /></el-icon>
         </el-button>
       </div>
 
       <!-- 进度条 -->
-      <div
-        class="notification-toast__progress"
-        :style="{ animationDuration: `${duration}ms` }"
-      ></div>
+      <div class="notification-toast__progress" :style="{ animationDuration: `${duration}ms` }"></div>
     </div>
   </TransitionGroup>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import {
-  Close,
-  Bell,
-  Calendar,
-  CreditCard,
-  User,
-  Warning
-} from '@element-plus/icons-vue'
+import { Close, Bell, Calendar, CreditCard, User, Warning } from '@element-plus/icons-vue'
 import type { Notification } from '@/types/notification'
 import { NotificationType } from '@/types/notification'
 import { formatDate } from '@/utils/formatters'
@@ -79,7 +66,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   duration: 5000, // 默认5秒
-  maxToasts: 3    // 最大同时显示3个
+  maxToasts: 3, // 最大同时显示3个
 })
 
 // 响应式数据
@@ -134,7 +121,7 @@ const showToast = (notification: Notification) => {
   const toast: ToastItem = {
     id: toastId,
     notification,
-    state: 'entering'
+    state: 'entering',
   }
 
   // 添加到队列
@@ -206,7 +193,7 @@ defineExpose({
       }
     })
     toasts.value = []
-  }
+  },
 })
 
 // 清理定时器

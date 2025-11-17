@@ -1,6 +1,7 @@
 package com.controller;
 
 import com.controller.support.AbstractControllerIntegrationTest;
+import com.utils.TestDataCleanup;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,7 +31,8 @@ class JianshenkechengControllerTest extends AbstractControllerIntegrationTest {
     @AfterEach
     void cleanupTestData() {
         // 清理测试数据，避免影响其他测试
-        // 这里可以根据需要添加清理逻辑
+        // 注意：本测试类主要进行HTTP请求测试，不直接操作数据库
+        // 如需要清理特定数据，请在此添加相应的清理逻辑
     }
 
     @Nested

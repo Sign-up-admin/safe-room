@@ -1,13 +1,7 @@
 <template>
-  <header
-    :class="[
-      'smart-header',
-      `smart-header--${theme}`,
-      { 'smart-header--condensed': isCondensed },
-    ]"
-  >
+  <header class="smart-header" :class="[`smart-header--${theme}`, { 'smart-header--condensed': isCondensed }]">
     <div class="smart-header__inner">
-      <div class="smart-header__logo" ref="logoRef">
+      <div ref="logoRef" class="smart-header__logo">
         <slot name="logo">
           <span class="smart-header__logo-text">GYM TECH</span>
         </slot>
@@ -30,8 +24,8 @@
       <!-- 移动端汉堡菜单按钮 -->
       <button
         class="smart-header__mobile-toggle"
-        @click="toggleMobileMenu"
         :class="{ 'smart-header__mobile-toggle--active': isMobileMenuOpen }"
+        @click="toggleMobileMenu"
       >
         <span></span>
         <span></span>
@@ -89,16 +83,15 @@ const props = withDefaults(defineProps<Props>(), {
   scrollThreshold: 40,
 })
 
-const isCondensed = ref(false)
-const isMobileMenuOpen = ref(false)
-const logoRef = ref<HTMLDivElement>()
-const headerTimeline = ref<gsap.core.Timeline>()
-
 const emit = defineEmits<{
   (e: 'navigate', item: NavItem): void
   (e: 'cta'): void
   (e: 'hover', item: NavItem): void
 }>()
+const isCondensed = ref(false)
+const isMobileMenuOpen = ref(false)
+const logoRef = ref<HTMLDivElement>()
+const headerTimeline = ref<gsap.core.Timeline>()
 
 const emitHover = (item: NavItem) => {
   emit('hover', item)
@@ -119,7 +112,7 @@ const handleMobileCta = () => {
 }
 
 // 触摸手势支持
-const handleTouchStart = (e: TouchEvent) => {
+const handleTouchStart = (_e: TouchEvent) => {
   // 可以在这里添加触摸开始的逻辑
 }
 
@@ -131,8 +124,12 @@ const handleTouchEnd = (e: TouchEvent) => {
     const rect = menuElement.getBoundingClientRect()
 
     // 如果在菜单区域外触摸，关闭菜单
-    if (touch.clientX < rect.left || touch.clientX > rect.right ||
-        touch.clientY < rect.top || touch.clientY > rect.bottom) {
+    if (
+      touch.clientX < rect.left ||
+      touch.clientX > rect.right ||
+      touch.clientY < rect.top ||
+      touch.clientY > rect.bottom
+    ) {
       isMobileMenuOpen.value = false
     }
   }
@@ -441,4 +438,3 @@ onUnmounted(() => {
   }
 }
 </style>
-

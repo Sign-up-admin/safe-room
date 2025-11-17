@@ -3,8 +3,8 @@ import { ref, nextTick, type Ref } from 'vue'
 // 焦点管理选项
 export interface FocusManagementOptions {
   returnFocus?: boolean // 操作完成后是否返回原始焦点
-  autoFocus?: boolean   // 是否自动聚焦到指定元素
-  trapFocus?: boolean   // 是否在容器内捕获焦点
+  autoFocus?: boolean // 是否自动聚焦到指定元素
+  trapFocus?: boolean // 是否在容器内捕获焦点
   initialFocus?: string // 初始聚焦的选择器
   restoreFocus?: boolean // 是否恢复之前的焦点
 }
@@ -13,13 +13,7 @@ export interface FocusManagementOptions {
 const focusStack: HTMLElement[] = []
 
 export function useFocusManagement(containerRef: Ref<HTMLElement | null>, options: FocusManagementOptions = {}) {
-  const {
-    returnFocus = true,
-    autoFocus = false,
-    trapFocus = false,
-    initialFocus,
-    restoreFocus = true
-  } = options
+  const { returnFocus = true, autoFocus = false, trapFocus = false, initialFocus, restoreFocus = true } = options
 
   const previousFocus = ref<HTMLElement | null>(null)
   const isActive = ref(false)
@@ -61,11 +55,11 @@ export function useFocusManagement(containerRef: Ref<HTMLElement | null>, option
     if (!containerRef.value) return
 
     const focusableElements = containerRef.value.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     )
 
     if (focusableElements.length > 0) {
-      (focusableElements[0] as HTMLElement).focus()
+      ;(focusableElements[0] as HTMLElement).focus()
     }
   }
 
@@ -76,11 +70,11 @@ export function useFocusManagement(containerRef: Ref<HTMLElement | null>, option
     if (!containerRef.value) return
 
     const focusableElements = containerRef.value.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     )
 
     if (focusableElements.length > 0) {
-      (focusableElements[focusableElements.length - 1] as HTMLElement).focus()
+      ;(focusableElements[focusableElements.length - 1] as HTMLElement).focus()
     }
   }
 
@@ -112,7 +106,7 @@ export function useFocusManagement(containerRef: Ref<HTMLElement | null>, option
     if (!trapFocus || !containerRef.value) return
 
     const focusableElements = containerRef.value.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     )
 
     const firstElement = focusableElements[0] as HTMLElement
@@ -162,7 +156,7 @@ export function useFocusManagement(containerRef: Ref<HTMLElement | null>, option
     activate,
     deactivate,
     handleTabKey,
-    handleEscapeKey
+    handleEscapeKey,
   }
 }
 
@@ -256,7 +250,7 @@ export function useScreenReaderAnnouncements() {
     announceError,
     announceSuccess,
     announceNavigation,
-    announceLoading
+    announceLoading,
   }
 }
 
@@ -288,12 +282,12 @@ export function useAccessibleRouting() {
     setTimeout(() => {
       const headings = document.querySelectorAll('h1, [role="heading"]')
       if (headings.length > 0) {
-        (headings[0] as HTMLElement).focus()
+        ;(headings[0] as HTMLElement).focus()
       } else {
         // 如果没有标题，聚焦页面主要内容
         const main = document.querySelector('main, [role="main"]')
         if (main) {
-          (main as HTMLElement).focus()
+          ;(main as HTMLElement).focus()
         }
       }
     }, 100)
@@ -320,6 +314,6 @@ export function useAccessibleRouting() {
   return {
     announceRouteChange,
     goBack,
-    routeHistory
+    routeHistory,
   }
 }

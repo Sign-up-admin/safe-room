@@ -47,7 +47,7 @@ export function useModuleList<K extends ModuleKey>(key: K, initialParams: Partia
   }
 
   function resetSearch() {
-    Object.keys(searchForm).forEach((key) => {
+    Object.keys(searchForm).forEach(key => {
       searchForm[key] = undefined
     })
     pagination.page = 1
@@ -121,10 +121,11 @@ export function useModuleForm<K extends ModuleKey>(key: K, initialData: Partial<
   async function submit(isEdit = false) {
     saving.value = true
     try {
+      const formData = toRaw(formModel) as Partial<ModuleEntityMap[K]>
       if (isEdit) {
-        await service.update(toRaw(formModel))
+        await service.update(formData)
       } else {
-        await service.create(toRaw(formModel))
+        await service.create(formData)
       }
     } finally {
       saving.value = false
@@ -132,7 +133,7 @@ export function useModuleForm<K extends ModuleKey>(key: K, initialData: Partial<
   }
 
   function resetForm() {
-    Object.keys(formModel).forEach((key) => {
+    Object.keys(formModel).forEach(key => {
       delete formModel[key as keyof typeof formModel]
     })
     Object.assign(formModel, initialData)
@@ -147,5 +148,3 @@ export function useModuleForm<K extends ModuleKey>(key: K, initialData: Partial<
     resetForm,
   }
 }
-
-

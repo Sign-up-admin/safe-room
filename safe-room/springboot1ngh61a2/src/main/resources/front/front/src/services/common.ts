@@ -6,18 +6,18 @@ export interface OptionParams {
   conditionValue?: string | number
   level?: string
   parent?: string
-  [key: string]: any
+  [key: string]: string | number | undefined
 }
 
 export async function getOptions(table: string, column: string, params: OptionParams = {}): Promise<string[]> {
   const response = await http.get<ApiResponse<string[]>>(`/common/option/${table}/${column}`, {
-    params: params || ({} as any),
+    params,
   })
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   return response.data.data || []
 }
 
-export async function followRecord<T = Record<string, any>>(
+export async function followRecord<T = Record<string, unknown>>(
   table: string,
   column: string,
   value: string | number,
@@ -42,7 +42,7 @@ export async function updateShStatus(table: string, payload: ShStatusPayload): P
 export interface RemindParams {
   remindstart?: number
   remindend?: number
-  [key: string]: any
+  [key: string]: string | number | undefined
 }
 
 export async function getRemindCount(
@@ -53,7 +53,7 @@ export async function getRemindCount(
 ): Promise<number> {
   const response = await http.get<ApiResponse<{ count: number } | number>>(
     `/common/remind/${table}/${column}/${type}`,
-    { params: params || ({} as any) },
+    { params },
   )
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   const data = response.data.data
@@ -71,10 +71,10 @@ export async function getRemindCount(
 export async function calculateColumn(
   table: string,
   column: string,
-  params: Record<string, any> = {},
+  params: Record<string, string | number> = {},
 ): Promise<Record<string, number | string>> {
   const response = await http.get<ApiResponse<Record<string, number | string>>>(`/common/cal/${table}/${column}`, {
-    params: params || ({} as any),
+    params,
   })
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   return response.data.data || {}
@@ -83,11 +83,11 @@ export async function calculateColumn(
 export async function groupByColumn(
   table: string,
   column: string,
-  params: Record<string, any> = {},
+  params: Record<string, string | number> = {},
 ): Promise<Array<Record<string, number | string>>> {
   const response = await http.get<ApiResponse<Array<Record<string, number | string>>>>(
     `/common/group/${table}/${column}`,
-    { params: params || ({} as any) },
+    { params },
   )
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   return response.data.data || []
@@ -97,11 +97,11 @@ export async function getValueStats(
   table: string,
   xColumn: string,
   yColumn: string,
-  params: Record<string, any> = {},
+  params: Record<string, string | number> = {},
 ): Promise<Array<Record<string, number | string>>> {
   const response = await http.get<ApiResponse<Array<Record<string, number | string>>>>(
     `/common/value/${table}/${xColumn}/${yColumn}`,
-    { params: params || ({} as any) },
+    { params },
   )
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   return response.data.data || []
@@ -112,13 +112,12 @@ export async function getTimeValueStats(
   xColumn: string,
   yColumn: string,
   timeStatType: 'day' | 'week' | 'month',
-  params: Record<string, any> = {},
+  params: Record<string, string | number> = {},
 ): Promise<Array<Record<string, number | string>>> {
   const response = await http.get<ApiResponse<Array<Record<string, number | string>>>>(
     `/common/value/${table}/${xColumn}/${yColumn}/${timeStatType}`,
-    { params: params || ({} as any) },
+    { params },
   )
   // HTTP 拦截器已经处理了错误码，如果到这里说明 code === 0
   return response.data.data || []
 }
-

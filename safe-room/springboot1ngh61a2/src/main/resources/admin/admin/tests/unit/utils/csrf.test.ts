@@ -12,7 +12,7 @@ import {
   clearCsrfToken,
   validateCsrfToken,
   CSRF_TOKEN_HEADER,
-} from '../../../src/utils/csrf'
+} from '@/utils/csrf'
 
 describe('CSRF Token工具', () => {
   beforeEach(() => {

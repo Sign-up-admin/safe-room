@@ -113,6 +113,27 @@ class AuthorizationInterceptorTest {
         assertThat(buffer.toString()).contains("请先登录");
     }
 
+    @Test
+    void shouldSkipAuthenticationWhenConfigured() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getRequestURI()).thenReturn("/api/test");
+
+        // Set skipAuthentication to true
+        Field skipField = AuthorizationInterceptor.class.getDeclaredField("skipAuthentication");
+        skipField.setAccessible(true);
+        skipField.set(interceptor, true);
+
+        HandlerMethod handlerMethod = new HandlerMethod(new TestController(), TestController.class.getMethod("secured"));
+
+        boolean result = interceptor.preHandle(request, response, handlerMethod);
+
+        assertThat(result).isTrue();
+        verifyNoInteractions(tokenService);
+        verifyNoInteractions(response);
+    }
+
     static class TestController {
         @IgnoreAuth
         public void ignored() {

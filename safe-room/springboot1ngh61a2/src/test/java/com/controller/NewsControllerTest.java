@@ -128,6 +128,7 @@ class NewsControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.msg").value("投票成功"));
 
         NewsEntity updated = newsService.getById(news.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getThumbsupnum()).isEqualTo(1);
     }
 
@@ -144,6 +145,7 @@ class NewsControllerTest extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.msg").value("投票成功"));
 
         NewsEntity updated = newsService.getById(news.getId());
+        assertThat(updated).isNotNull();
         assertThat(updated.getCrazilynum()).isEqualTo(1);
     }
 

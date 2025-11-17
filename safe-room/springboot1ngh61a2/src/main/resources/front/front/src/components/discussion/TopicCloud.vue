@@ -5,17 +5,14 @@
         v-for="(tag, index) in displayTags"
         :key="tag.name"
         ref="tagElements"
-        :class="[
-          'topic-cloud__item',
-          `topic-cloud__item--${tag.level}`,
-          { 'topic-cloud__item--active': activeTag === tag.name }
-        ]"
+        class="topic-cloud__item"
+        :class="[`topic-cloud__item--${tag.level}`, { 'topic-cloud__item--active': activeTag === tag.name }]"
         :style="getTagStyle(tag, index)"
+        :aria-label="`${tag.name}标签，${tag.count}个讨论`"
+        :tabindex="0"
         @click="handleTagClick(tag)"
         @mouseenter="handleTagHover(tag, true)"
         @mouseleave="handleTagHover(tag, false)"
-        :aria-label="`${tag.name}标签，${tag.count}个讨论`"
-        :tabindex="0"
         @keydown.enter="handleTagClick(tag)"
         @keydown.space.prevent="handleTagClick(tag)"
       >
@@ -25,9 +22,23 @@
         </sup>
         <span v-if="tag.trend" class="topic-cloud__trend" :class="`topic-cloud__trend--${tag.trend}`">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
-            <path v-if="tag.trend === 'up'" d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path v-else-if="tag.trend === 'down'" d="M7 7L17 17M17 17H7M17 17V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle v-else cx="12" cy="12" r="3" fill="currentColor"/>
+            <path
+              v-if="tag.trend === 'up'"
+              d="M7 17L17 7M17 7H7M17 7V17"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              v-else-if="tag.trend === 'down'"
+              d="M7 7L17 17M17 17H7M17 17V7"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle v-else cx="12" cy="12" r="3" fill="currentColor" />
           </svg>
         </span>
       </span>
@@ -73,7 +84,7 @@ const props = withDefaults(defineProps<Props>(), {
   showCount: true,
   showStats: false,
   threshold: 5,
-  maxTags: 50
+  maxTags: 50,
 })
 
 // Emits
@@ -88,24 +99,18 @@ const activeTag = ref<string>('')
 
 // 计算属性
 const displayTags = computed(() => {
-  const sortedTags = [...props.tags]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, props.maxTags)
+  const sortedTags = [...props.tags].sort((a, b) => b.count - a.count).slice(0, props.maxTags)
 
   // 为标签分配位置（模拟云状布局）
   return sortedTags.map((tag, index) => ({
     ...tag,
-    position: calculateTagPosition(index, sortedTags.length)
+    position: calculateTagPosition(index, sortedTags.length),
   }))
 })
 
-const hotTagsCount = computed(() => {
-  return props.tags.filter(tag => tag.level === 'hot').length
-})
+const hotTagsCount = computed(() => props.tags.filter(tag => tag.level === 'hot').length)
 
-const totalDiscussions = computed(() => {
-  return props.tags.reduce((sum, tag) => sum + tag.count, 0)
-})
+const totalDiscussions = computed(() => props.tags.reduce((sum, tag) => sum + tag.count, 0))
 
 // 方法
 const calculateTagPosition = (index: number, total: number) => {
@@ -127,7 +132,7 @@ const getTagStyle = (tag: TagItem & { position: { x: number; y: number } }, inde
     left: `${position.x}px`,
     top: `${position.y}px`,
     transform: `translate(-50%, -50%) ${props.animated ? `rotate(${Math.sin(index) * 5}deg)` : ''}`,
-    transitionDelay: `${index * 50}ms`
+    transitionDelay: `${index * 50}ms`,
   }
 }
 
@@ -136,7 +141,7 @@ const getTagSize = (level: string): number => {
     low: 0.8,
     medium: 1.0,
     high: 1.2,
-    hot: 1.5
+    hot: 1.5,
   }
   return sizes[level as keyof typeof sizes] || 1.0
 }
@@ -341,7 +346,8 @@ onMounted(() => {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) translateY(0px);
   }
   50% {

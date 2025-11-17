@@ -75,4 +75,3 @@ export function useLoadingGlow(target: MaybeElement | Ref<MaybeElement>) {
     tween?.kill()
   })
 }
-

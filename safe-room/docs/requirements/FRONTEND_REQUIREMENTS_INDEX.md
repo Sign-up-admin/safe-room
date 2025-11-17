@@ -317,8 +317,9 @@ category: requirements
 | 设施管理 | 1 | 1 | 0 | 0 | 0 | 100% |
 | 会员管理 | 3 | 3 | 1 | 0 | 0 | 100% |
  系统功能 | 6 | 6 | 0 | 0 | 0 | 100% |
-| 综合文档 | 2 | 2 | 0 | 0 | 0 | 100% |
-| **总计** | **27** | **27** | **6** | **0** | **0** | **100%** |
+| 综合文档 | 4 | 4 | 0 | 0 | 0 | 100% |
+| 新增需求 | 6 | 6 | 0 | 0 | 0 | 100% |
+| **总计** | **33** | **33** | **6** | **0** | **0** | **100%** |
 
 ### 6.2 Admin项目文档完整性
 
@@ -405,9 +406,19 @@ category: requirements
 - ✅ **ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md** - 系统管理需求
 - ✅ **requirements\requirements\ADMIN_CONFIG_CENTER_REQUIREMENTS.md** - 配置中心需求
 
-### 7.3 综合文档（2个）
+### 7.3 综合文档（4个）
 - ✅ **requirements\requirements\ALL_PAGES_REQUIREMENTS_REVIEW.md** - 全站页面需求审查
 - ✅ **PENDING_PAGES_IMPLEMENTATION.md** - 待实现页面功能清单
+- ✅ **FRONTEND_REQUIREMENTS_ENGINEERING_ANALYSIS.md** - 前端需求工程深度分析报告
+
+### 7.4 新增需求文档（6个）
+- ✅ **REALTIME_BOOKING_CONFLICT_DETECTION_REQUIREMENTS.md** - 实时预约冲突检测增强需求（P0）
+- ✅ **INTELLIGENT_MEMBERSHIP_RENEWAL_REQUIREMENTS.md** - 会员卡续费智能化需求（P0）
+- ✅ **DATA_VISUALIZATION_ENHANCEMENT_REQUIREMENTS.md** - 数据可视化深化需求（P1）
+- ✅ **SOCIAL_FEATURES_ENHANCEMENT_REQUIREMENTS.md** - 社交功能增强需求（P1）
+- ✅ **ACCESSIBILITY_ENHANCEMENT_REQUIREMENTS.md** - 无障碍访问完善需求（P1）
+- ✅ **PERFORMANCE_MONITORING_REQUIREMENTS.md** - 性能监控体系需求（P2）
+- ✅ **OFFLINE_FUNCTIONALITY_REQUIREMENTS.md** - 离线功能支持需求（P2）
 
 ---
 

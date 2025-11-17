@@ -256,5 +256,112 @@ describe('useBookingRecommend', () => {
       expect(pattern.bookingFrequency).toBe(1)
       expect(pattern.successRate).toBe(0.5) // Default success rate
     })
+
+    it('should handle bookings with different time formats', () => {
+      const mockBookings: Kechengyuyue[] = [
+        {
+          id: 1,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-15 19:00:00',
+          kechengmingcheng: 'Evening Course'
+        },
+        {
+          id: 2,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-16T20:00:00.000Z', // ISO format
+          kechengmingcheng: 'Night Course'
+        },
+        {
+          id: 3,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-17 19:00', // Without seconds
+          kechengmingcheng: 'Another Evening Course'
+        }
+      ]
+
+      const { analyzeBookingPattern } = require('@/composables/useBookingRecommend')
+      const pattern = analyzeBookingPattern(mockBookings)
+
+      expect(pattern.bookingFrequency).toBeGreaterThan(0)
+      expect(pattern.preferredTimes).toContain('19:00')
+      expect(pattern.preferredTimes).toContain('20:00')
+    })
+
+    it('should handle very old booking data', () => {
+      const mockBookings: Kechengyuyue[] = [
+        {
+          id: 1,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2020-01-15 19:00:00', // Very old date
+          kechengmingcheng: 'Old Course'
+        }
+      ]
+
+      const { analyzeBookingPattern } = require('@/composables/useBookingRecommend')
+      const pattern = analyzeBookingPattern(mockBookings)
+
+      // Should still analyze but with low frequency due to old data
+      expect(pattern.bookingFrequency).toBeLessThan(0.1)
+    })
+
+    it('should handle weekend vs weekday preferences', () => {
+      const mockBookings: Kechengyuyue[] = [
+        {
+          id: 1,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-11 10:00:00', // Saturday
+          kechengmingcheng: 'Weekend Course 1'
+        },
+        {
+          id: 2,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-12 10:00:00', // Sunday
+          kechengmingcheng: 'Weekend Course 2'
+        },
+        {
+          id: 3,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-13 19:00:00', // Monday
+          kechengmingcheng: 'Weekday Course'
+        }
+      ]
+
+      const { analyzeBookingPattern } = require('@/composables/useBookingRecommend')
+      const pattern = analyzeBookingPattern(mockBookings)
+
+      expect(pattern.bookingFrequency).toBeGreaterThan(0)
+      // Should recognize morning weekend preference
+      expect(pattern.preferredTimes).toContain('10:00')
+    })
+
+    it('should predict booking success rate for different times', () => {
+      const mockBookings: Kechengyuyue[] = [
+        {
+          id: 1,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-15 19:00:00',
+          kechengmingcheng: 'Evening Course'
+        },
+        {
+          id: 2,
+          yonghuzhanghao: 'testuser',
+          yuyueshijian: '2025-01-16 20:00:00',
+          kechengmingcheng: 'Night Course'
+        }
+      ]
+
+      mockService.list.mockResolvedValueOnce({ list: mockBookings, total: 2 })
+
+      const { predictBookingSuccess } = useBookingRecommend()
+
+      // Test prediction for preferred time
+      const preferredTimeRate = predictBookingSuccess('19:00', '2025-01-20')
+      // Test prediction for non-preferred time
+      const nonPreferredTimeRate = predictBookingSuccess('14:00', '2025-01-20')
+
+      expect(preferredTimeRate).toBeGreaterThan(nonPreferredTimeRate)
+      expect(preferredTimeRate).toBeGreaterThan(0)
+      expect(preferredTimeRate).toBeLessThanOrEqual(1)
+    })
   })
 })

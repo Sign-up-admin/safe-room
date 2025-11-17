@@ -6,6 +6,13 @@ import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+// 导入需要手动注册的Element Plus组件
+import {
+  ElMenu,
+  ElMenuItem,
+  ElMenuItemGroup,
+  ElSubMenu
+} from 'element-plus'
 // Admin 样式系统（统一入口）
 import '@/styles/index.scss'
 // Import echart
@@ -53,6 +60,17 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 // Element Plus 已经全局注册了所有组件，这些组件应该已经被包含在内
 // 如果仍然有问题，可能是构建时的tree-shaking导致的
 
+// 手动注册 Element Plus 菜单组件，确保它们在模板中可用
+// 即使使用了 unplugin-vue-components，也需要显式注册这些组件
+app.component('ElMenu', ElMenu)
+app.component('ElMenuItem', ElMenuItem)
+app.component('ElMenuItemGroup', ElMenuItemGroup)
+app.component('ElSubMenu', ElSubMenu)
+// 同时注册 kebab-case 版本，确保 Vue 编译器能正确解析
+app.component('ElMenu', ElMenu)
+app.component('ElMenuItem', ElMenuItem)
+app.component('ElMenuItemGroup', ElMenuItemGroup)
+app.component('ElSubmenu', ElSubMenu)
 
 setupIcons(app)
 
