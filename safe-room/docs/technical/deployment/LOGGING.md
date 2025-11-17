@@ -1,0 +1,682 @@
+---
+title: LOGGING
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# 日志管理指南
+
+> 版本：v1.0
+> 更新日期：2025-11-16
+> 适用范围：Docker部署环境
+
+---
+
+## 概述
+
+本文档介绍健身房综合管理系统的日志管理策略，包括日志文件位置、日志级别配置、日志轮转策略、日志查看和分析方法，以及基于日志的错误排查指南。
+
+## 日志架构
+
+### 1.1 系统组件日志
+
+健身房管理系统包含多个组件，每个组件都有独立的日志输出：
+
+| 组件 | 日志类型 | 位置 | 说明 |
+|------|---------|------|------|
+| **Spring Boot后端** | 应用日志 | `/app/logs/` | 业务逻辑、数据库操作、API调用 |
+| **PostgreSQL数据库** | 数据库日志 | 容器内日志 | 数据库操作、连接、错误 |
+| **MinIO对象存储** | 服务日志 | 容器内日志 | 文件上传下载、存储操作 |
+| **Nginx（可选）** | 访问日志 | `/var/log/nginx/` | HTTP请求、响应状态 |
+| **Docker容器** | 容器日志 | `docker logs` | 容器启动、停止、健康检查 |
+
+### 1.2 日志级别
+
+系统使用标准的日志级别定义：
+
+| 级别 | 数值 | 说明 | 使用场景 |
+|------|------|------|----------|
+| **TRACE** | 5000 | 最详细的跟踪信息 | 开发调试，生产环境不推荐 |
+| **DEBUG** | 10000 | 详细的调试信息 | 开发环境调试特定组件 |
+| **INFO** | 20000 | 一般信息 | 重要的业务操作、系统状态 |
+| **WARN** | 30000 | 警告信息 | 潜在问题、不影响正常功能 |
+| **ERROR** | 40000 | 错误信息 | 系统错误、异常情况 |
+| **FATAL** | 50000 | 致命错误 | 系统无法继续运行 |
+
+---
+
+## 2. 日志配置
+
+### 2.1 Spring Boot日志配置
+
+#### 开发环境配置（application.yml）
+
+```yaml
+logging:
+  level:
+    root: INFO
+    com.controller.UsersController: DEBUG  # 特定控制器调试
+    com.service: INFO                     # 服务层信息
+    org.springframework: WARN             # Spring框架警告以上
+    org.mybatis: INFO                     # MyBatis信息
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+```
+
+#### 生产环境配置（application-prod.yml）
+
+```yaml
+logging:
+  level:
+    root: INFO
+    com: INFO                    # 应用包信息级别
+    org.springframework: WARN    # Spring框架只显示警告和错误
+    org.mybatis: DEBUG          # MyBatis调试级别（SQL语句）
+  file:
+    name: logs/springboot-schema.log  # 日志文件位置
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+```
+
+### 2.2 PostgreSQL日志配置
+
+在`docker-compose.yml`中配置PostgreSQL日志：
+
+```yaml
+postgres:
+  image: postgres:16-alpine
+  environment:
+    POSTGRES_DB: fitness_gym
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+  command:
+    - "postgres"
+    - "-c"
+    - "log_statement=all"           # 记录所有SQL语句
+    - "-c"
+    - "log_line_prefix=%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h "
+    - "-c"
+    - "log_min_messages=INFO"       # 最小日志级别
+    - "-c"
+    - "log_min_error_statement=ERROR" # 记录导致错误的SQL
+    - "-c"
+    - "log_connections=on"          # 记录连接
+    - "-c"
+    - "log_disconnections=on"       # 记录断开连接
+```
+
+### 2.3 Docker日志配置
+
+```yaml
+services:
+  backend:
+    # ... 其他配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"      # 单个日志文件最大大小
+        max-file: "3"        # 保留的日志文件数量
+    volumes:
+      - backend_logs:/app/logs  # 应用日志持久化
+```
+
+---
+
+## 3. 日志文件位置
+
+### 3.1 Docker环境日志位置
+
+#### 后端应用日志
+
+```bash
+# 容器内日志位置
+/app/logs/
+├── springboot-schema.log          # 主应用日志
+├── springboot-schema.log.2024-01-01.0.gz  # 轮转的压缩日志
+├── springboot-schema.log.2024-01-01.1.gz
+└── springboot-schema.log.2024-01-01.2.gz
+
+# 宿主机映射位置（通过Docker卷）
+/var/lib/docker/volumes/safe-room_backend_logs/_data/
+```
+
+#### 数据库日志
+
+```bash
+# PostgreSQL日志位置（容器内）
+/var/lib/postgresql/data/log/
+├── postgresql.log                 # 主日志文件
+└── postgresql.csv                 # CSV格式日志
+
+# 查看数据库日志
+docker-compose logs postgres
+```
+
+#### MinIO日志
+
+```bash
+# 查看MinIO日志
+docker-compose logs minio
+```
+
+### 3.2 日志轮转配置
+
+#### Spring Boot日志轮转
+
+在`logback-spring.xml`中配置（如果使用Logback）：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATH" value="logs"/>
+    <property name="LOG_FILE" value="${LOG_PATH}/springboot-schema"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 错误日志 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-error.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+</configuration>
+```
+
+#### 自动化日志轮转脚本
+
+```bash
+#!/bin/bash
+# log-rotate.sh - 日志轮转脚本
+
+LOG_DIR="/app/logs"
+MAX_SIZE="10M"     # 最大文件大小
+MAX_FILES=30       # 最大文件数量
+
+# 检查并轮转日志
+find $LOG_DIR -name "*.log" -type f -size +$MAX_SIZE -exec bash -c '
+    for file do
+        base="${file%.log}"
+        timestamp=$(date +%Y%m%d_%H%M%S)
+        mv "$file" "${base}_${timestamp}.log"
+        gzip "${base}_${timestamp}.log"
+        echo "Rotated: $file -> ${base}_${timestamp}.log.gz"
+    done
+' bash {} +
+
+# 清理旧日志
+find $LOG_DIR -name "*.gz" -type f -printf "%T@ %p\n" | sort -n | head -n -$MAX_FILES | cut -d" " -f2- | xargs -r rm
+
+echo "Log rotation completed"
+```
+
+---
+
+## 4. 日志查看命令
+
+### 4.1 基本日志查看
+
+#### 查看后端应用日志
+
+```bash
+# 实时查看日志
+docker-compose logs -f backend
+
+# 查看最近100行日志
+docker-compose logs --tail=100 backend
+
+# 查看特定时间范围的日志
+docker-compose logs --since "2024-01-01T00:00:00" --until "2024-01-01T23:59:59" backend
+
+# 查看错误日志
+docker-compose logs backend | grep -i error
+
+# 进入容器查看日志文件
+docker-compose exec backend bash
+ls -la /app/logs/
+tail -f /app/logs/springboot-schema.log
+```
+
+#### 查看数据库日志
+
+```bash
+# 查看PostgreSQL日志
+docker-compose logs -f postgres
+
+# 查看数据库连接日志
+docker-compose logs postgres | grep -i connection
+
+# 查看数据库错误
+docker-compose logs postgres | grep -i error
+```
+
+### 4.2 高级日志查询
+
+#### 按时间过滤日志
+
+```bash
+# 查看今天的所有日志
+docker-compose logs --since "$(date +%Y-%m-%d)T00:00:00" backend
+
+# 查看最近1小时的日志
+docker-compose logs --since "1h" backend
+
+# 查看包含特定关键词的日志
+docker-compose logs backend | grep "用户登录\|login"
+
+# 查看特定用户的操作日志
+docker-compose logs backend | grep "user.*123"
+```
+
+#### 日志统计分析
+
+```bash
+# 统计各日志级别的数量
+docker-compose logs backend | grep -E "(INFO|WARN|ERROR)" | awk '{print $3}' | sort | uniq -c
+
+# 统计HTTP状态码
+docker-compose logs backend | grep -o "HTTP/[0-9.]* [0-9]\{3\}" | awk '{print $2}' | sort | uniq -c | sort -nr
+
+# 统计API调用次数
+docker-compose logs backend | grep -o "/api/[^\" ]*" | sort | uniq -c | sort -nr | head -10
+
+# 统计数据库查询类型
+docker-compose logs backend | grep -i "select\|insert\|update\|delete" | awk '{print tolower($0)}' | grep -o "select\|insert\|update\|delete" | sort | uniq -c
+```
+
+#### 性能相关日志分析
+
+```bash
+# 查看慢查询（如果有性能日志）
+docker-compose logs backend | grep -i "slow\|timeout\|performance"
+
+# 查看内存使用日志
+docker-compose logs backend | grep -i "memory\|gc\|heap\|jvm"
+
+# 查看数据库连接池日志
+docker-compose logs backend | grep -i "hikari\|connection.*pool"
+
+# 查看API响应时间
+docker-compose logs backend | grep -o "execution time: [0-9]*ms" | awk '{sum+=$3; count++} END {print "Average:", sum/count, "ms, Total:", count, "requests"}'
+```
+
+---
+
+## 5. 日志分析工具
+
+### 5.1 命令行工具
+
+#### 使用grep进行日志过滤
+
+```bash
+# 查找包含特定用户ID的日志
+docker-compose logs backend | grep "userId.*12345"
+
+# 查找特定时间范围内的错误
+docker-compose logs --since "2024-01-15T10:00:00" --until "2024-01-15T11:00:00" backend | grep ERROR
+
+# 查找数据库连接问题
+docker-compose logs backend | grep -i "connection.*refused\|timeout\|connection.*reset"
+
+# 查找文件上传相关日志
+docker-compose logs backend | grep -i "upload\|file"
+```
+
+#### 使用awk进行日志解析
+
+```bash
+# 提取API调用时间线
+docker-compose logs backend | grep "API call" | awk -F'[\\[\\]]' '{print $2, $0}' | sort
+
+# 统计每个小时的请求数量
+docker-compose logs backend | grep "HTTP" | awk '{print substr($1,12,2)}' | sort | uniq -c
+
+# 提取异常堆栈跟踪
+docker-compose logs backend | grep -A 20 "Exception\|Error" | head -50
+```
+
+#### 使用sed进行日志格式化
+
+```bash
+# 提取JSON格式的日志字段
+docker-compose logs backend | sed -n 's/.*"user":"\([^"]*\)".*"action":"\([^"]*\)".*/\1 -> \2/p'
+
+# 清理日志中的控制字符
+docker-compose logs backend | sed 's/\x1b\[[0-9;]*m//g'
+```
+
+### 5.2 日志分析脚本
+
+#### 日志健康检查脚本
+
+```bash
+#!/bin/bash
+# log-health-check.sh
+
+LOG_FILE="/app/logs/springboot-schema.log"
+ERROR_THRESHOLD=10
+WARN_THRESHOLD=50
+
+echo "=== 日志健康检查 $(date) ==="
+
+# 检查日志文件是否存在
+if [ ! -f "$LOG_FILE" ]; then
+    echo "❌ 日志文件不存在: $LOG_FILE"
+    exit 1
+fi
+
+# 统计错误数量
+ERROR_COUNT=$(grep -c "ERROR" "$LOG_FILE")
+WARN_COUNT=$(grep -c "WARN" "$LOG_FILE")
+
+echo "错误数量: $ERROR_COUNT"
+echo "警告数量: $WARN_COUNT"
+
+# 检查阈值
+if [ $ERROR_COUNT -gt $ERROR_THRESHOLD ]; then
+    echo "❌ 错误数量超过阈值 ($ERROR_THRESHOLD)"
+    exit 1
+fi
+
+if [ $WARN_COUNT -gt $WARN_THRESHOLD ]; then
+    echo "⚠️ 警告数量超过阈值 ($WARN_THRESHOLD)"
+fi
+
+echo "✅ 日志健康检查通过"
+```
+
+#### 日志聚合分析脚本
+
+```bash
+#!/bin/bash
+# log-analyzer.sh
+
+LOG_FILE="/app/logs/springboot-schema.log"
+OUTPUT_DIR="/tmp/log-analysis"
+mkdir -p $OUTPUT_DIR
+
+echo "分析日志文件: $LOG_FILE"
+
+# 1. 错误统计
+echo "=== 错误统计 ===" > $OUTPUT_DIR/error-summary.txt
+grep "ERROR" "$LOG_FILE" | awk -F']' '{print $3}' | sort | uniq -c | sort -nr >> $OUTPUT_DIR/error-summary.txt
+
+# 2. API调用统计
+echo "=== API调用统计 ===" > $OUTPUT_DIR/api-summary.txt
+grep "/api/" "$LOG_FILE" | sed 's/.*GET \|.*POST \|.*PUT \|.*DELETE //' | sed 's/ .*//' | sort | uniq -c | sort -nr | head -20 >> $OUTPUT_DIR/api-summary.txt
+
+# 3. 用户活动统计
+echo "=== 用户活动统计 ===" > $OUTPUT_DIR/user-activity.txt
+grep "user.*login\|user.*logout" "$LOG_FILE" | awk '{print $1, $2}' | sort | uniq -c >> $OUTPUT_DIR/user-activity.txt
+
+# 4. 性能统计
+echo "=== 性能统计 ===" > $OUTPUT_DIR/performance.txt
+grep "execution time" "$LOG_FILE" | awk '{sum+=$NF; count++} END {if(count>0) print "平均响应时间:", sum/count, "ms"}' >> $OUTPUT_DIR/performance.txt
+
+echo "分析完成，结果保存在: $OUTPUT_DIR"
+```
+
+---
+
+## 6. 错误排查指南
+
+### 6.1 常见错误模式识别
+
+#### 数据库连接错误
+
+```bash
+# 查找数据库连接错误
+docker-compose logs backend | grep -i "connection.*refused\|timeout\|connection.*reset\|psql.*error"
+
+# 检查数据库状态
+docker-compose ps postgres
+docker-compose exec postgres pg_isready -U postgres -d fitness_gym
+
+# 查看数据库连接数
+docker-compose exec postgres psql -U postgres -d fitness_gym -c "
+SELECT state, count(*) FROM pg_stat_activity GROUP BY state;"
+```
+
+#### 内存不足错误
+
+```bash
+# 查找内存相关错误
+docker-compose logs backend | grep -i "outofmemory\|gc.*overhead\|memory.*limit"
+
+# 检查容器资源使用
+docker stats fitness_gym_backend
+
+# 查看JVM内存使用
+docker-compose exec backend jcmd 1 VM.native_memory summary
+```
+
+#### 文件上传错误
+
+```bash
+# 查找上传相关错误
+docker-compose logs backend | grep -i "upload.*failed\|file.*not found\|storage.*error"
+
+# 检查MinIO状态
+docker-compose ps minio
+docker-compose logs minio | grep -i error
+
+# 检查上传目录权限
+docker-compose exec backend ls -la /app/static/upload/
+```
+
+#### API调用错误
+
+```bash
+# 查找HTTP错误
+docker-compose logs backend | grep "HTTP/[0-9.]* [45][0-9][0-9]"
+
+# 查找特定API的错误
+docker-compose logs backend | grep "/api/users" | grep -i error
+
+# 查找超时错误
+docker-compose logs backend | grep -i "timeout\|read timed out"
+```
+
+### 6.2 错误排查流程
+
+#### 步骤1：收集错误信息
+
+```bash
+# 获取详细错误信息
+ERROR_LOG=$(docker-compose logs --tail=50 backend | grep -A 10 -B 5 "ERROR\|Exception")
+
+# 保存到文件用于分析
+echo "$ERROR_LOG" > error_analysis_$(date +%Y%m%d_%H%M%S).txt
+
+# 收集系统状态信息
+echo "=== 系统状态 ===" > system_status.txt
+docker-compose ps >> system_status.txt
+docker stats --no-stream >> system_status.txt
+df -h >> system_status.txt
+```
+
+#### 步骤2：分析错误原因
+
+```bash
+# 检查错误模式
+grep -o "Caused by:.*" error_analysis.txt | sort | uniq -c | sort -nr
+
+# 查找相关配置问题
+grep -i "config\|property\|environment" error_analysis.txt
+
+# 检查依赖服务状态
+curl -f http://localhost:8080/springboot1ngh61a2/user/login || echo "后端服务异常"
+docker-compose exec postgres pg_isready -U postgres -d fitness_gym || echo "数据库连接异常"
+```
+
+#### 步骤3：执行修复措施
+
+根据错误类型执行相应修复：
+
+```bash
+# 重启服务
+docker-compose restart backend
+
+# 清理缓存
+docker-compose exec backend rm -rf /tmp/*
+
+# 恢复数据库连接
+docker-compose restart postgres
+
+# 清理磁盘空间
+docker system prune -f
+```
+
+### 6.3 错误监控告警
+
+#### 设置错误告警
+
+```bash
+#!/bin/bash
+# error-monitor.sh
+
+LOG_FILE="/app/logs/springboot-schema.log"
+ALERT_EMAIL="admin@example.com"
+ERROR_THRESHOLD=5
+
+# 检查最近5分钟的错误数量
+RECENT_ERRORS=$(docker-compose logs --since "5m" backend | grep -c "ERROR")
+
+if [ $RECENT_ERRORS -gt $ERROR_THRESHOLD ]; then
+    SUBJECT="健身房管理系统错误告警"
+    MESSAGE="检测到 $RECENT_ERRORS 个错误，超过阈值 $ERROR_THRESHOLD
+
+最近的错误日志：
+$(docker-compose logs --tail=10 backend | grep ERROR)"
+
+    echo "$MESSAGE" | mail -s "$SUBJECT" $ALERT_EMAIL
+fi
+```
+
+---
+
+## 7. 日志安全与合规
+
+### 7.1 敏感信息保护
+
+```yaml
+# 日志配置 - 避免记录敏感信息
+logging:
+  level:
+    root: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    # 注意：避免在日志中输出密码、token等敏感信息
+  config: classpath:logback-spring.xml
+```
+
+### 7.2 日志审计
+
+#### 审计日志配置
+
+```bash
+# 记录重要操作的审计日志
+AUDIT_LOG="/app/logs/audit.log"
+
+# 用户登录审计
+echo "$(date): LOGIN - User: $USERNAME, IP: $CLIENT_IP, Success: $SUCCESS" >> $AUDIT_LOG
+
+# 数据修改审计
+echo "$(date): MODIFY - User: $USER, Table: $TABLE, Action: $ACTION, ID: $RECORD_ID" >> $AUDIT_LOG
+
+# 管理员操作审计
+echo "$(date): ADMIN - User: $ADMIN_USER, Action: $ADMIN_ACTION, Target: $TARGET" >> $AUDIT_LOG
+```
+
+#### 审计日志分析
+
+```bash
+# 统计用户活动
+grep "LOGIN.*Success" /app/logs/audit.log | awk '{print $4}' | sort | uniq -c | sort -nr
+
+# 查找可疑活动
+grep "LOGIN.*Failed" /app/logs/audit.log | awk '{print $4, $6}' | sort | uniq -c | sort -nr | head -10
+
+# 管理员操作审计
+grep "ADMIN" /app/logs/audit.log | tail -20
+```
+
+### 7.3 日志保留策略
+
+| 日志类型 | 保留期 | 存储位置 | 压缩 |
+|---------|--------|----------|------|
+| 应用运行日志 | 30天 | 本地压缩 | 是 |
+| 错误日志 | 90天 | 本地压缩 | 是 |
+| 审计日志 | 1年 | 本地+云存储 | 是 |
+| 数据库日志 | 30天 | 本地 | 否 |
+| 访问日志 | 90天 | 本地 | 是 |
+
+---
+
+## 8. 最佳实践
+
+### 8.1 日志配置最佳实践
+
+- **结构化日志**：使用JSON格式便于分析
+- **适当日志级别**：生产环境避免TRACE/DEBUG
+- **日志轮转**：防止日志文件过大影响性能
+- **异步日志**：使用异步appender提升性能
+
+### 8.2 日志分析最佳实践
+
+- **建立基准**：记录正常情况下的日志模式
+- **异常检测**：监控日志模式变化
+- **定期审查**：定期分析日志发现潜在问题
+- **自动化监控**：设置自动化的日志监控和告警
+
+### 8.3 故障排查最佳实践
+
+- **分层分析**：从应用层到系统层逐步排查
+- **对比分析**：对比正常和异常情况的日志
+- **关联分析**：分析不同组件日志的关联关系
+- **文档记录**：记录排查过程和解决方案
+
+---
+
+## 相关文档
+
+- [运维操作指南](DEPLOYMENT_OPERATIONS.md) - 日常运维操作流程
+- [监控指南](MONITORING.md) - 系统监控和告警配置
+- [故障排查指南](TROUBLESHOOTING.md) - 常见问题诊断和解决
+- [备份恢复指南](BACKUP_RECOVERY.md) - 数据备份和恢复策略

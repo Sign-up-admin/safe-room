@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-11-16T17:08:10.483Z",
+  "total": 138,
+  "byCategory": {
+    "其他": 138
+  },
+  "byStatus": {
+    "活跃": 130
+  },
+  "byType": {},
+  "metadataStats": {
+    "withVersion": 132,
+    "withLastUpdated": 132,
+    "withStatus": 130,
+    "withCategory": 130
+  }
+}

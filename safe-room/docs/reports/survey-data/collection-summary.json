@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-11-16T17:08:14.513Z",
+  "collected": [
+    "stats",
+    "quality",
+    "history",
+    "relationships"
+  ],
+  "outputDir": "docs/reports/survey-data",
+  "summary": {
+    "stats": {
+      "totalDocuments": 138,
+      "categories": 1,
+      "withMetadata": {
+        "withVersion": 132,
+        "withLastUpdated": 132,
+        "withStatus": 130,
+        "withCategory": 130
+      }
+    },
+    "quality": {
+      "formatIssues": 1,
+      "contentIssues": 0,
+      "linkIssues": 51
+    },
+    "history": {
+      "totalCommits": 0,
+      "filesWithHistory": 0
+    },
+    "relationships": {
+      "filesWithLinks": 24,
+      "totalLinks": 96
+    }
+  }
+}

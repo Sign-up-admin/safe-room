@@ -1,0 +1,187 @@
+name: Backend Coverage Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/**'
+      - '.github/workflows/backend-coverage.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/**'
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: test123
+          POSTGRES_DB: springboot1ngh61a2
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Initialize database
+      run: |
+        cd springboot1ngh61a2
+        PGPASSWORD=test123 psql -h localhost -U postgres -d springboot1ngh61a2 -f db/springboot1ngh61a2.sql
+        PGPASSWORD=test123 psql -h localhost -U postgres -d springboot1ngh61a2 -f src/main/resources/schema-postgresql.sql
+
+    - name: Run tests with coverage
+      run: |
+        cd springboot1ngh61a2
+        mvn clean test jacoco:report -Dspring.profiles.active=test
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          springboot1ngh61a2/target/site/jacoco/
+          springboot1ngh61a2/target/surefire-reports/
+
+    - name: Coverage Check
+      run: |
+        cd springboot1ngh61a2
+        # Extract coverage percentages from JaCoCo report
+        if [ -f target/site/jacoco/jacoco.xml ]; then
+          # Parse XML and extract coverage values
+          LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+          BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+          INSTRUCTION_COVERAGE=$(grep -oP '(?<=<counter type="INSTRUCTION" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+          METHOD_COVERAGE=$(grep -oP '(?<=<counter type="METHOD" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+          CLASS_COVERAGE=$(grep -oP '(?<=<counter type="CLASS" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+
+          echo "Line Coverage: $LINE_COVERAGE%"
+          echo "Branch Coverage: $BRANCH_COVERAGE%"
+          echo "Instruction Coverage: $INSTRUCTION_COVERAGE%"
+          echo "Method Coverage: $METHOD_COVERAGE%"
+          echo "Class Coverage: $CLASS_COVERAGE%"
+
+          # Check against thresholds (updated to match pom.xml configuration)
+          if (( $(echo "$LINE_COVERAGE < 65" | bc -l) )); then
+            echo "❌ Line coverage $LINE_COVERAGE% is below threshold 65%"
+            exit 1
+          fi
+
+          if (( $(echo "$BRANCH_COVERAGE < 45" | bc -l) )); then
+            echo "❌ Branch coverage $BRANCH_COVERAGE% is below threshold 45%"
+            exit 1
+          fi
+
+          if (( $(echo "$INSTRUCTION_COVERAGE < 65" | bc -l) )); then
+            echo "❌ Instruction coverage $INSTRUCTION_COVERAGE% is below threshold 65%"
+            exit 1
+          fi
+
+          if (( $(echo "$METHOD_COVERAGE < 75" | bc -l) )); then
+            echo "❌ Method coverage $METHOD_COVERAGE% is below threshold 75%"
+            exit 1
+          fi
+
+          if (( $(echo "$CLASS_COVERAGE < 90" | bc -l) )); then
+            echo "❌ Class coverage $CLASS_COVERAGE% is below threshold 90%"
+            exit 1
+          fi
+
+          echo "✅ All coverage thresholds passed!"
+        else
+          echo "❌ JaCoCo report not found"
+          exit 1
+        fi
+
+    - name: Generate coverage badge
+      if: success()
+      run: |
+        cd springboot1ngh61a2
+        # Create coverage badge using shields.io format
+        LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+        BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+
+        echo "Creating coverage badges..."
+        echo "https://img.shields.io/badge/Line_Coverage-$LINE_COVERAGE%25-green" > coverage-line-badge.txt
+        echo "https://img.shields.io/badge/Branch_Coverage-$BRANCH_COVERAGE%25-blue" > coverage-branch-badge.txt
+
+    - name: Upload coverage badge
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-badge
+        path: springboot1ngh61a2/coverage-*-badge.txt
+
+    - name: SonarQube Scan
+      if: env.SONAR_TOKEN != ''
+      run: |
+        cd springboot1ngh61a2
+        mvn sonar:sonar \
+          -Dsonar.projectKey=springboot-schema \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Coverage Trend Analysis
+      run: |
+        cd springboot1ngh61a2
+        # Store current coverage metrics for trend analysis
+        mkdir -p coverage-history
+        CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
+
+        # Extract coverage data
+        if [ -f target/site/jacoco/jacoco.xml ]; then
+          LINE_COVERAGE=$(grep -oP '(?<=<counter type="LINE" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+          BRANCH_COVERAGE=$(grep -oP '(?<=<counter type="BRANCH" covered=")[^"]*' target/site/jacoco/jacoco.xml | head -1)
+
+          # Create coverage data file
+          cat > coverage-history/coverage_${CURRENT_DATE}.json << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "line_coverage": ${LINE_COVERAGE:-0},
+            "branch_coverage": ${BRANCH_COVERAGE:-0},
+            "build_url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          }
+          EOF
+
+          echo "Coverage data saved: coverage_${CURRENT_DATE}.json"
+        fi
+
+    - name: Upload coverage history
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-history
+        path: springboot1ngh61a2/coverage-history/
+
+    - name: Comment PR with coverage
+      if: github.event_name == 'pull_request'
+      uses: dorny/test-reporter@v1
+      with:
+        name: Backend Coverage Report
+        path: springboot1ngh61a2/target/surefire-reports/*.xml
+        reporter: java-junit
+        fail-on-error: false

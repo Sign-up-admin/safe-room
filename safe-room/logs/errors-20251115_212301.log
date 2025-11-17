@@ -1,0 +1,7 @@
+[2025-11-15 21:23:01] [INFO] Start frontend dev server...
+[2025-11-15 21:23:01] [INFO] Node.js 版本: v20.18.0
+[2025-11-15 21:23:02] [INFO] npm 版本: 10.8.2
+[2025-11-15 21:23:02] [INFO] 已切换到目录: C:\safe-room\springboot1ngh61a2\src\main\resources\front\front
+[2025-11-15 21:23:02] [INFO] node_modules already exists, skipping install
+[2025-11-15 21:23:03] [WARN] Warning: port 8082 already in use, Vite will pick another port
+[2025-11-15 21:23:03] [INFO] Starting Vite dev server...

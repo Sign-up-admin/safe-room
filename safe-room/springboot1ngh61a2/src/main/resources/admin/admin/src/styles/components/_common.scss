@@ -1,0 +1,35 @@
+// 通用组件样式
+@use '../tokens' as *;
+@use '../mixins' as *;
+
+.glass-card {
+  @include glass-card();
+}
+
+.primary-button {
+  @include primary-button();
+}
+
+.primary-outline-button {
+  @include primary-button(true);
+}
+
+.secondary-button {
+  @include secondary-button();
+}
+
+.text-button {
+  @include text-button();
+}
+
+.section-eyebrow {
+  @include section-eyebrow;
+}
+
+.panel-divider {
+  border: none;
+  height: 1px;
+  width: 100%;
+  background: $color-divider;
+  margin: spacing(lg) 0;
+}

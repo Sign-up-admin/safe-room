@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/types/notification.ts",
+    "src/services/notification.ts",
+    "src/stores/notification.ts",
+    "src/composables/useNotificationWebSocket.ts",
+    "src/components/NotificationCenter.vue",
+    "src/components/NotificationItem.vue",
+    "src/components/NotificationToast.vue",
+    "src/components/NotificationSettings.vue",
+    "src/pages/center/center.vue",
+    "src/App.vue",
+    "src/router/index.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.js",
+    "**/*.js.map",
+    "src/**/*.js"
+  ]
+}

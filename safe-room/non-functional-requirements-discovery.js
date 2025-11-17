@@ -1,0 +1,340 @@
+const fs = require('fs');
+const path = require('path');
+
+function discoverNonFunctionalRequirements() {
+  const analysis = {
+    performance: [],
+    security: [],
+    usability: [],
+    maintainability: [],
+    analysisTime: new Date().toISOString()
+  };
+
+  // 1. 性能需求发掘
+  function discoverPerformanceRequirements() {
+    console.log('分析性能需求...');
+
+    // 基于业务流程分析推导性能需求
+    const userFlows = require('./docs/reports/business-process-discovery.json').userFlows;
+    const adminFlows = require('./docs/reports/business-process-discovery.json').adminFlows;
+
+    // 用户操作性能需求
+    userFlows.forEach(flow => {
+      flow.steps.forEach(step => {
+        if (step.api) {
+          analysis.performance.push({
+            type: 'api_response_time',
+            context: `${flow.name} - ${step.action}`,
+            requirement: `API响应时间 ≤ 500ms`,
+            priority: 'P1',
+            rationale: '良好的用户体验要求快速响应',
+            measurement: '平均响应时间 < 500ms，95%请求 < 1000ms'
+          });
+        }
+
+        if (step.page && step.page.includes('list')) {
+          analysis.performance.push({
+            type: 'page_load_time',
+            context: `${flow.name} - ${step.page}页面加载`,
+            requirement: `列表页面首次加载时间 ≤ 2秒`,
+            priority: 'P1',
+            rationale: '列表页面需要快速展示数据',
+            measurement: 'First Contentful Paint < 2秒'
+          });
+        }
+      });
+    });
+
+    // 并发处理需求
+    analysis.performance.push({
+      type: 'concurrency',
+      context: '课程预约高峰期并发处理',
+      requirement: '支持1000并发用户同时预约',
+      priority: 'P0',
+      rationale: '高峰期课程预约需要高并发处理能力',
+      measurement: '支持1000并发请求，响应时间 < 2秒'
+    });
+
+    // 数据查询性能
+    analysis.performance.push({
+      type: 'database_query',
+      context: '复杂查询性能优化',
+      requirement: '复杂查询响应时间 ≤ 1秒',
+      priority: 'P1',
+      rationale: '搜索和筛选功能需要快速响应',
+      measurement: '查询响应时间 < 1秒，索引命中率 > 95%'
+    });
+
+    // 前端渲染性能
+    analysis.performance.push({
+      type: 'frontend_rendering',
+      context: '页面切换和组件渲染',
+      requirement: '页面切换时间 ≤ 300ms，组件渲染 < 100ms',
+      priority: 'P2',
+      rationale: '流畅的用户交互体验',
+      measurement: '页面切换延迟 < 300ms，组件渲染时间 < 100ms'
+    });
+  }
+
+  // 2. 安全需求发掘
+  function discoverSecurityRequirements() {
+    console.log('分析安全需求...');
+
+    // 用户认证安全
+    analysis.security.push({
+      type: 'authentication',
+      context: '用户登录安全',
+      requirement: '密码安全存储，使用bcrypt哈希算法，盐值随机生成',
+      priority: 'P0',
+      rationale: '防止密码泄露和彩虹表攻击',
+      implementation: 'bcrypt.hash(password, 12)'
+    });
+
+    analysis.security.push({
+      type: 'session_management',
+      context: '会话安全管理',
+      requirement: '会话超时30分钟，无操作自动登出',
+      priority: 'P0',
+      rationale: '防止未授权访问和会话劫持',
+      implementation: 'JWT token with expiration'
+    });
+
+    // 数据传输安全
+    analysis.security.push({
+      type: 'data_transmission',
+      context: '敏感数据传输加密',
+      requirement: '所有API使用HTTPS协议，敏感数据加密传输',
+      priority: 'P0',
+      rationale: '防止数据在传输过程中被窃取',
+      implementation: 'TLS 1.3, API Gateway with SSL termination'
+    });
+
+    // 输入验证安全
+    analysis.security.push({
+      type: 'input_validation',
+      context: '用户输入安全过滤',
+      requirement: '所有用户输入进行XSS和SQL注入过滤',
+      priority: 'P0',
+      rationale: '防止跨站脚本攻击和SQL注入攻击',
+      implementation: 'DOMPurify for XSS, parameterized queries for SQL'
+    });
+
+    // 访问控制
+    analysis.security.push({
+      type: 'access_control',
+      context: '基于角色的访问控制',
+      requirement: '管理员功能需要角色验证，用户数据隔离',
+      priority: 'P0',
+      rationale: '防止越权访问和数据泄露',
+      implementation: 'RBAC with role-based middleware'
+    });
+
+    // 审计日志
+    analysis.security.push({
+      type: 'audit_logging',
+      context: '安全操作审计',
+      requirement: '所有管理操作记录审计日志，包括操作人、时间、IP',
+      priority: 'P1',
+      rationale: '追踪安全事件和异常操作',
+      implementation: '操作日志记录，定期审计检查'
+    });
+
+    // 支付安全
+    analysis.security.push({
+      type: 'payment_security',
+      context: '支付数据保护',
+      requirement: '支付信息不存储在本地，实时转发到支付网关',
+      priority: 'P0',
+      rationale: '符合PCI DSS支付卡行业安全标准',
+      implementation: '支付token化，不存储敏感支付信息'
+    });
+  }
+
+  // 3. 可用性需求发掘
+  function discoverUsabilityRequirements() {
+    console.log('分析可用性需求...');
+
+    // 无障碍访问
+    analysis.usability.push({
+      type: 'accessibility',
+      context: '无障碍访问支持',
+      requirement: '支持WCAG 2.1 AA标准，键盘导航和屏幕阅读器',
+      priority: 'P2',
+      rationale: '确保所有用户都能正常使用系统',
+      implementation: 'ARIA标签，键盘事件处理，颜色对比度检查'
+    });
+
+    // 响应式设计
+    analysis.usability.push({
+      type: 'responsive_design',
+      context: '多设备适配',
+      requirement: '完美支持桌面、平板、手机等各种设备',
+      priority: 'P1',
+      rationale: '用户可能在不同设备上使用系统',
+      implementation: 'CSS媒体查询，弹性布局，移动优先设计'
+    });
+
+    // 错误处理友好性
+    analysis.usability.push({
+      type: 'error_handling',
+      context: '用户友好的错误提示',
+      requirement: '错误信息清晰易懂，提供解决建议',
+      priority: 'P1',
+      rationale: '帮助用户快速理解和解决问题',
+      implementation: '本地化错误消息，操作指导，联系支持'
+    });
+
+    // 加载状态反馈
+    analysis.usability.push({
+      type: 'loading_feedback',
+      context: '操作进度反馈',
+      requirement: '长时间操作显示进度条和状态信息',
+      priority: 'P2',
+      rationale: '让用户了解操作进度，减少焦虑',
+      implementation: '加载动画，进度指示器，状态消息'
+    });
+
+    // 数据验证即时反馈
+    analysis.usability.push({
+      type: 'validation_feedback',
+      context: '表单验证即时反馈',
+      requirement: '输入错误立即显示，不需要提交后才知道',
+      priority: 'P1',
+      rationale: '提升表单填写效率和用户体验',
+      implementation: '实时验证，视觉反馈，错误消息定位'
+    });
+
+    // 操作可逆转性
+    analysis.usability.push({
+      type: 'undo_functionality',
+      context: '重要操作可撤销',
+      requirement: '删除、修改等重要操作提供撤销功能',
+      priority: 'P2',
+      rationale: '减少用户误操作的影响',
+      implementation: '操作历史，撤销按钮，确认对话框'
+    });
+  }
+
+  // 4. 可维护性需求发掘
+  function discoverMaintainabilityRequirements() {
+    console.log('分析可维护性需求...');
+
+    // 代码质量
+    analysis.maintainability.push({
+      type: 'code_quality',
+      context: '代码规范和质量',
+      requirement: 'TypeScript严格模式，ESLint代码检查，单元测试覆盖率>80%',
+      priority: 'P1',
+      rationale: '保证代码质量和可维护性',
+      implementation: 'Prettier格式化，ESLint规则，Jest测试框架'
+    });
+
+    // 组件化设计
+    analysis.maintainability.push({
+      type: 'component_design',
+      context: '组件复用和解耦',
+      requirement: '组件高内聚低耦合，可独立测试和维护',
+      priority: 'P1',
+      rationale: '提高代码复用性和维护效率',
+      implementation: '单一职责原则，依赖注入，组合式API'
+    });
+
+    // API设计规范
+    analysis.maintainability.push({
+      type: 'api_design',
+      context: 'RESTful API设计',
+      requirement: '遵循RESTful规范，版本控制，统一错误处理',
+      priority: 'P1',
+      rationale: 'API易于理解和维护',
+      implementation: '标准HTTP状态码，一致的响应格式，API文档'
+    });
+
+    // 配置管理
+    analysis.maintainability.push({
+      type: 'configuration_management',
+      context: '环境配置分离',
+      requirement: '开发、测试、生产环境配置分离，支持运行时配置',
+      priority: 'P1',
+      rationale: '不同环境部署和维护的便利性',
+      implementation: '环境变量，配置中心，配置验证'
+    });
+
+    // 日志记录
+    analysis.maintainability.push({
+      type: 'logging',
+      context: '结构化日志记录',
+      requirement: '所有重要操作记录结构化日志，便于问题排查',
+      priority: 'P1',
+      rationale: '快速定位和解决问题',
+      implementation: '日志分级，上下文信息，集中日志管理'
+    });
+
+    // 文档完整性
+    analysis.maintainability.push({
+      type: 'documentation',
+      context: '代码和API文档',
+      requirement: '代码注释完整，API文档自动生成和同步',
+      priority: 'P1',
+      rationale: '降低维护成本和学习成本',
+      implementation: 'JSDoc注释，Swagger文档，README更新'
+    });
+
+    // 错误监控
+    analysis.maintainability.push({
+      type: 'error_monitoring',
+      context: '生产环境错误监控',
+      requirement: '实时错误监控，性能指标收集，告警机制',
+      priority: 'P1',
+      rationale: '快速发现和解决问题',
+      implementation: '错误追踪，性能监控，告警系统'
+    });
+  }
+
+  // 执行所有分析
+  discoverPerformanceRequirements();
+  discoverSecurityRequirements();
+  discoverUsabilityRequirements();
+  discoverMaintainabilityRequirements();
+
+  // 生成报告
+  console.log('=== 非功能性需求发掘报告 ===');
+  console.log(`分析时间: ${analysis.analysisTime}`);
+  console.log();
+
+  console.log('非功能性需求统计:');
+  console.log(`- 性能需求: ${analysis.performance.length}项`);
+  console.log(`- 安全需求: ${analysis.security.length}项`);
+  console.log(`- 可用性需求: ${analysis.usability.length}项`);
+  console.log(`- 可维护性需求: ${analysis.maintainability.length}项`);
+  console.log(`- 总计: ${analysis.performance.length + analysis.security.length + analysis.usability.length + analysis.maintainability.length}项`);
+  console.log();
+
+  // 优先级统计
+  const allRequirements = [
+    ...analysis.performance,
+    ...analysis.security,
+    ...analysis.usability,
+    ...analysis.maintainability
+  ];
+
+  const priorityStats = { P0: 0, P1: 0, P2: 0 };
+  allRequirements.forEach(req => {
+    if (priorityStats[req.priority] !== undefined) {
+      priorityStats[req.priority]++;
+    }
+  });
+
+  console.log('需求优先级分布:');
+  console.log(`- P0核心需求: ${priorityStats.P0}项`);
+  console.log(`- P1重要需求: ${priorityStats.P1}项`);
+  console.log(`- P2辅助需求: ${priorityStats.P2}项`);
+  console.log();
+
+  // 保存详细报告
+  fs.writeFileSync('docs/reports/non-functional-requirements-discovery.json', JSON.stringify(analysis, null, 2));
+  console.log('详细报告已保存到: docs/reports/non-functional-requirements-discovery.json');
+
+  return analysis;
+}
+
+discoverNonFunctionalRequirements();

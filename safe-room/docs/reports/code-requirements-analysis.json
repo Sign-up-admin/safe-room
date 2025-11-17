@@ -1,0 +1,710 @@
+{
+  "timestamp": "2025-11-16T17:21:23.591Z",
+  "components": {
+    "total": 116,
+    "pages": 64,
+    "components": 51,
+    "composables": 0,
+    "byDirectory": {
+      "": 1,
+      "components\\booking": 6,
+      "components": 11,
+      "components\\common": 10,
+      "components\\courses": 2,
+      "components\\discussion": 4,
+      "components\\favorites": 1,
+      "components\\home": 7,
+      "components\\membership": 3,
+      "components\\modules": 3,
+      "components\\payment": 4,
+      "pages\\api": 1,
+      "pages\\center": 1,
+      "pages\\chat": 2,
+      "pages\\daoqitixing": 3,
+      "pages\\discussjianshenkecheng": 3,
+      "pages\\error": 2,
+      "pages\\home": 1,
+      "pages\\huiyuanka": 3,
+      "pages\\huiyuankagoumai": 3,
+      "pages\\huiyuanxufei": 3,
+      "pages": 1,
+      "pages\\jianshenjiaolian": 3,
+      "pages\\jianshenkecheng": 3,
+      "pages\\jianshenqicai": 4,
+      "pages\\kechengleixing": 3,
+      "pages\\kechengtuike": 3,
+      "pages\\kechengyuyue": 3,
+      "pages\\legal": 4,
+      "pages\\login": 1,
+      "pages\\news": 2,
+      "pages\\newstype": 3,
+      "pages\\pay": 1,
+      "pages\\register": 1,
+      "pages\\shared": 3,
+      "pages\\sijiaoyuyue": 3,
+      "pages\\storeup": 1,
+      "pages\\yonghu": 3
+    },
+    "byType": {
+      "template": 116,
+      "script": 116,
+      "style": 82
+    }
+  },
+  "composables": {
+    "total": 27,
+    "files": [
+      "useAdvancedSearch.ts",
+      "useAnimations.ts",
+      "useBookingConflict.ts",
+      "useBookingRecommend.ts",
+      "useCoachRecommend.ts",
+      "useDiscussionInteraction.ts",
+      "useDiscussionManagement.ts",
+      "useFavoritesStore.ts",
+      "useFocusManagement.ts",
+      "useHotTopics.ts",
+      "useHoverGlow.ts",
+      "useKeyboardNavigation.ts",
+      "useLoadingGlow.ts",
+      "useMembershipSelection.ts",
+      "useMessageCenter.ts",
+      "useModuleCrud.ts",
+      "useMotion.ts",
+      "useNotificationWebSocket.ts",
+      "usePageTransition.ts",
+      "useParticleSystem.ts",
+      "usePaymentStatus.ts",
+      "usePricingEngine.ts",
+      "useRecommendation.ts",
+      "useScrollAnimation.ts",
+      "useStepTransition.ts",
+      "useSuccessAnimation.ts",
+      "useTheme.ts"
+    ],
+    "byCategory": {
+      "utility": 19,
+      "animation": 3,
+      "business": 3,
+      "communication": 2
+    },
+    "dependencies": {
+      "useAdvancedSearch.ts": [
+        "vue",
+        "element-plus"
+      ],
+      "useAnimations.ts": [
+        "vue",
+        "gsap"
+      ],
+      "useBookingConflict.ts": [
+        "vue",
+        "@/services/crud",
+        "@/types/modules",
+        "@/utils/formatters"
+      ],
+      "useBookingRecommend.ts": [
+        "vue",
+        "../services/crud",
+        "../types/modules",
+        "../utils/formatters"
+      ],
+      "useCoachRecommend.ts": [
+        "vue",
+        "@/types/modules"
+      ],
+      "useDiscussionInteraction.ts": [
+        "vue",
+        "element-plus"
+      ],
+      "useDiscussionManagement.ts": [
+        "vue",
+        "element-plus"
+      ],
+      "useFavoritesStore.ts": [
+        "vue",
+        "../services/crud",
+        "../types/modules",
+        "../utils/formatters"
+      ],
+      "useFocusManagement.ts": [
+        "vue"
+      ],
+      "useHotTopics.ts": [
+        "vue",
+        "@/types/modules"
+      ],
+      "useHoverGlow.ts": [
+        "vue",
+        "gsap"
+      ],
+      "useKeyboardNavigation.ts": [
+        "vue"
+      ],
+      "useLoadingGlow.ts": [
+        "vue",
+        "gsap"
+      ],
+      "useMembershipSelection.ts": [
+        "vue",
+        "pinia",
+        "@/types/modules"
+      ],
+      "useMessageCenter.ts": [
+        "vue",
+        "../services/crud",
+        "../types/modules"
+      ],
+      "useModuleCrud.ts": [
+        "vue",
+        "@/types/modules",
+        "@/types/api",
+        "@/config/modules",
+        "@/services/crud"
+      ],
+      "useMotion.ts": [
+        "vue",
+        "gsap"
+      ],
+      "useNotificationWebSocket.ts": [
+        "vue",
+        "@/types/notification",
+        "@/stores/notification",
+        "@/services/notification"
+      ],
+      "usePageTransition.ts": [
+        "gsap"
+      ],
+      "useParticleSystem.ts": [
+        "vue",
+        "@/utils/particleSystem"
+      ],
+      "usePaymentStatus.ts": [
+        "vue"
+      ],
+      "usePricingEngine.ts": [
+        "vue",
+        "@/types/modules"
+      ],
+      "useRecommendation.ts": [
+        "vue",
+        "@/types/modules"
+      ],
+      "useScrollAnimation.ts": [
+        "vue"
+      ],
+      "useStepTransition.ts": [
+        "vue",
+        "gsap"
+      ],
+      "useSuccessAnimation.ts": [
+        "vue",
+        "gsap",
+        "./useParticleSystem"
+      ],
+      "useTheme.ts": [
+        "vue"
+      ]
+    }
+  },
+  "utils": {
+    "total": 11,
+    "files": [
+      "animationConfig.ts",
+      "api.ts",
+      "csrf.ts",
+      "fileUpload.ts",
+      "forceGraph.ts",
+      "formatters.ts",
+      "mask.ts",
+      "particleSystem.ts",
+      "secureStorage.ts",
+      "security.ts",
+      "validator.ts"
+    ],
+    "byCategory": {
+      "utility": 10,
+      "network": 1
+    },
+    "functions": {
+      "animationConfig.ts": [
+        "animationConfig",
+        "breakpoints"
+      ],
+      "api.ts": [],
+      "csrf.ts": [
+        "generateCsrfToken",
+        "getOrCreateCsrfToken",
+        "getCsrfToken",
+        "setCsrfToken",
+        "clearCsrfToken",
+        "validateCsrfToken",
+        "CSRF_TOKEN_HEADER"
+      ],
+      "fileUpload.ts": [
+        "validateFile",
+        "createBeforeUpload",
+        "formatFileSize",
+        "getFileExtension",
+        "IMAGE_EXTENSIONS",
+        "DOCUMENT_EXTENSIONS",
+        "VIDEO_EXTENSIONS",
+        "isImageFile",
+        "isDocumentFile",
+        "isVideoFile"
+      ],
+      "forceGraph.ts": [
+        "createForceGraph"
+      ],
+      "formatters.ts": [
+        "formatDate",
+        "formatDateTime",
+        "formatCurrency",
+        "stripHtml"
+      ],
+      "mask.ts": [
+        "maskPhone",
+        "maskIdCard",
+        "maskBankCard",
+        "maskEmail",
+        "maskName",
+        "maskAddress",
+        "maskSensitiveData"
+      ],
+      "particleSystem.ts": [],
+      "secureStorage.ts": [
+        "secureStorage",
+        "tokenStorage"
+      ],
+      "security.ts": [
+        "sanitizeHtml",
+        "escapeHtml",
+        "stripHtml",
+        "containsXss",
+        "sanitizeInput"
+      ],
+      "validator.ts": [
+        "validateEmail",
+        "validatePhone",
+        "validateIdCard",
+        "validateUrl",
+        "containsSqlInjection",
+        "containsXss",
+        "validateFileExtension",
+        "validateMimeType",
+        "validateFileSize",
+        "validatePasswordStrength",
+        "validateUsername",
+        "validateInput"
+      ]
+    }
+  },
+  "types": {
+    "total": 7,
+    "files": [
+      "api.ts",
+      "content.ts",
+      "cryptojs.d.ts",
+      "menu.ts",
+      "modules.ts",
+      "notification.ts",
+      "views.ts"
+    ],
+    "interfaces": {
+      "api.ts": [
+        "ApiResponse",
+        "PageResult",
+        "PageParams"
+      ],
+      "content.ts": [
+        "CarouselItem",
+        "NewsItem",
+        "StoreupItem"
+      ],
+      "cryptojs.d.ts": [
+        "WordArray",
+        "CipherParams",
+        "Encoder",
+        "Utf8",
+        "Base64",
+        "Mode",
+        "Pad",
+        "DES",
+        "AES"
+      ],
+      "menu.ts": [
+        "MenuChild",
+        "MenuItem",
+        "MenuRole"
+      ],
+      "modules.ts": [
+        "BaseEntity",
+        "Yonghu",
+        "Jianshenjiaolian",
+        "Sijiaoyuyue",
+        "Kechengleixing",
+        "Jianshenkecheng",
+        "Kechengyuyue",
+        "Kechengtuike",
+        "Huiyuanka",
+        "Huiyuankagoumai",
+        "Daoqitixing",
+        "Huiyuanxufei",
+        "Jianshenqicai",
+        "Newstype",
+        "Discussjianshenkecheng",
+        "Chat",
+        "News",
+        "MessageEntity",
+        "StoreupItem",
+        "ModuleEntityMap"
+      ],
+      "notification.ts": [
+        "Notification",
+        "NotificationPreferences",
+        "NotificationQuery",
+        "NotificationListResponse",
+        "WebSocketNotificationMessage",
+        "NotificationActionResponse",
+        "BatchNotificationAction",
+        "NotificationStats",
+        "NotificationTemplate"
+      ],
+      "views.ts": [
+        "CoachNodeView",
+        "CoachView",
+        "CourseView",
+        "EquipmentView"
+      ]
+    },
+    "types": {
+      "api.ts": [],
+      "content.ts": [],
+      "cryptojs.d.ts": [],
+      "menu.ts": [],
+      "modules.ts": [
+        "ModuleKey",
+        "ModuleEntity"
+      ],
+      "notification.ts": [],
+      "views.ts": []
+    },
+    "enums": {
+      "api.ts": [],
+      "content.ts": [],
+      "cryptojs.d.ts": [],
+      "menu.ts": [],
+      "modules.ts": [],
+      "notification.ts": [
+        "NotificationType",
+        "NotificationChannel",
+        "NotificationStatus"
+      ],
+      "views.ts": []
+    }
+  },
+  "styles": {
+    "total": 5,
+    "files": [
+      "design-tokens.scss",
+      "element-plus-theme.scss",
+      "error-pages.scss",
+      "responsive.scss",
+      "theme.scss"
+    ],
+    "byType": {
+      "design-tokens": 1,
+      "theme": 2,
+      "utility": 1,
+      "responsive": 1
+    },
+    "customProperties": {
+      "design-tokens.scss": [
+        "--tech-color-bg-deep: var(--color-bg-deep);",
+        "--tech-color-bg-dark: var(--color-bg-dark);",
+        "--tech-color-panel: var(--color-bg-card);",
+        "--tech-color-panel-strong: var(--color-bg-panel);",
+        "--tech-color-panel-ghost: var(--color-bg-ghost);",
+        "--tech-color-yellow: var(--color-primary);",
+        "--tech-color-yellow-soft: var(--color-primary-soft);",
+        "--tech-color-yellow-glow: var(--color-primary-glow);",
+        "--tech-color-text-primary: var(--color-text-primary);",
+        "--tech-color-text-secondary: var(--color-text-secondary);",
+        "--tech-color-text-muted: var(--color-text-muted);",
+        "--tech-color-border: var(--color-border-light);",
+        "--tech-color-divider: var(--color-divider);",
+        "--color-bg-deep: var(--tech-color-bg-deep);",
+        "--color-bg-dark: var(--tech-color-bg-dark);",
+        "--color-bg-panel: var(--tech-color-panel);",
+        "--color-yellow: var(--tech-color-yellow);",
+        "--color-yellow-soft: var(--tech-color-yellow-soft);",
+        "--color-yellow-glow: var(--tech-color-yellow-glow);",
+        "--color-text-primary: var(--tech-color-text-primary);",
+        "--color-text-secondary: var(--tech-color-text-secondary);",
+        "--color-text-muted: var(--tech-color-text-muted);",
+        "--color-border: var(--tech-color-border);",
+        "--color-divider: var(--tech-color-divider);",
+        "--card-radius: var(--border-radius-2xl);",
+        "--transition-base: var(--transition-normal);",
+        "--shadow-soft: var(--shadow-xl);",
+        "--spacing-xs: var(--spacing-6);",
+        "--spacing-sm: var(--spacing-8);",
+        "--spacing-md: var(--spacing-12);",
+        "--spacing-lg: var(--spacing-16);",
+        "--spacing-xl: var(--spacing-24);",
+        "--el-color-primary: var(--color-primary);",
+        "--el-color-primary-light-3: #ffe766;",
+        "--el-color-primary-light-5: #ffef99;",
+        "--el-color-primary-light-7: #fff6cc;",
+        "--el-color-primary-light-8: rgba(253, 216, 53, 0.4);",
+        "--el-color-primary-light-9: rgba(253, 216, 53, 0.2);",
+        "--el-color-primary-dark-2: #c4a900;",
+        "--el-text-color-primary: var(--color-text-primary);",
+        "--el-text-color-regular: #d5d8de;",
+        "--el-text-color-secondary: var(--color-text-secondary);",
+        "--el-bg-color: var(--color-bg-dark);",
+        "--el-fill-color-blank: var(--color-bg-ghost);",
+        "--el-border-color: var(--color-border-medium);"
+      ],
+      "element-plus-theme.scss": [
+        "--el-color-primary: var(--color-primary);",
+        "--el-color-primary-dark-2: #c4a900;",
+        "--el-color-primary-light-1: #fde047;",
+        "--el-color-primary-light-2: #fef08a;",
+        "--el-color-primary-light-3: #ffe766;",
+        "--el-color-primary-light-4: #ffef99;",
+        "--el-color-primary-light-5: #ffef99;",
+        "--el-color-primary-light-6: #fff6cc;",
+        "--el-color-primary-light-7: #fff6cc;",
+        "--el-color-primary-light-8: rgba(253, 216, 53, 0.4);",
+        "--el-color-primary-light-9: rgba(253, 216, 53, 0.2);",
+        "--el-text-color-primary: var(--color-text-primary);",
+        "--el-text-color-regular: var(--color-text-secondary);",
+        "--el-text-color-secondary: var(--color-text-tertiary);",
+        "--el-text-color-placeholder: var(--color-text-muted);",
+        "--el-text-color-disabled: var(--color-text-muted);",
+        "--el-bg-color: var(--color-bg-dark);",
+        "--el-bg-color-page: var(--color-bg-deep);",
+        "--el-bg-color-overlay: var(--color-bg-overlay);",
+        "--el-fill-color-blank: var(--color-bg-ghost);",
+        "--el-fill-color-light: var(--color-bg-ghost);",
+        "--el-fill-color-lighter: rgba(255, 255, 255, 0.06);",
+        "--el-fill-color-dark: rgba(255, 255, 255, 0.04);",
+        "--el-fill-color-darker: rgba(0, 0, 0, 0.04);",
+        "--el-border-color: var(--color-border-medium);",
+        "--el-border-color-light: var(--color-border-light);",
+        "--el-border-color-lighter: rgba(255, 255, 255, 0.08);",
+        "--el-border-color-dark: rgba(255, 255, 255, 0.12);",
+        "--el-border-color-darker: rgba(255, 255, 255, 0.16);",
+        "--el-box-shadow: var(--shadow-sm);",
+        "--el-box-shadow-light: var(--shadow-xs);",
+        "--el-box-shadow-lighter: 0 1px 2px 0 rgba(0, 0, 0, 0.04);",
+        "--el-box-shadow-dark: var(--shadow-md);",
+        "--el-font-size-extra-large: var(--font-size-4xl);",
+        "--el-font-size-large: var(--font-size-2xl);",
+        "--el-font-size-medium: var(--font-size-lg);",
+        "--el-font-size-base: var(--font-size-base);",
+        "--el-font-size-small: var(--font-size-sm);",
+        "--el-font-size-extra-small: var(--font-size-xs);",
+        "--el-border-radius-base: var(--border-radius-md);",
+        "--el-border-radius-small: var(--border-radius-sm);",
+        "--el-border-radius-round: var(--border-radius-full);",
+        "--el-border-radius-circle: var(--border-radius-full);",
+        "--el-index-normal: 1;",
+        "--el-index-top: 1000;",
+        "--el-index-popper: 2000;",
+        "--el-transition-duration: var(--duration-normal);",
+        "--el-transition-duration-fast: var(--duration-fast);",
+        "--el-transition-duration-slow: var(--duration-slow);",
+        "--el-transition-easing: var(--easing-out);",
+        "--el-index-normal: 1;",
+        "--el-index-top: 1000;",
+        "--el-index-popper: 2000;",
+        "--el-button-border-radius: var(--border-radius-lg);",
+        "--el-button-font-size: var(--font-size-sm);",
+        "--el-button-font-weight: var(--font-weight-medium);",
+        "--el-button-bg-color: var(--color-primary);",
+        "--el-button-border-color: var(--color-primary);",
+        "--el-button-hover-bg-color: var(--color-primary-hover);",
+        "--el-button-hover-border-color: var(--color-primary-hover);",
+        "--el-button-active-bg-color: var(--color-primary-hover);",
+        "--el-button-active-border-color: var(--color-primary-hover);",
+        "--el-button-bg-color: var(--color-bg-ghost);",
+        "--el-button-border-color: var(--color-border-medium);",
+        "--el-button-text-color: var(--color-text-primary);",
+        "--el-button-hover-bg-color: rgba(255, 255, 255, 0.1);",
+        "--el-button-hover-border-color: var(--color-border-light);",
+        "--el-button-text-color: var(--color-text-secondary);",
+        "--el-button-hover-text-color: var(--color-text-primary);",
+        "--el-input-border-radius: var(--border-radius-lg);",
+        "--el-input-border-color: var(--color-border-medium);",
+        "--el-input-bg-color: var(--color-bg-ghost);",
+        "--el-input-text-color: var(--color-text-primary);",
+        "--el-input-placeholder-color: var(--color-text-secondary);",
+        "--el-input-border-color: var(--color-primary);",
+        "--el-input-box-shadow: 0 0 0 2px rgba(253, 216, 53, 0.1);",
+        "--el-select-border-radius: var(--border-radius-lg);",
+        "--el-select-border-color: var(--color-border-medium);",
+        "--el-select-input-bg-color: var(--color-bg-ghost);",
+        "--el-select-dropdown-bg-color: var(--color-bg-panel);",
+        "--el-select-dropdown-border-color: var(--color-border-medium);",
+        "--el-select-dropdown-shadow: var(--shadow-lg);",
+        "--el-select-option-text-color: var(--color-text-primary);",
+        "--el-select-option-hover-bg-color: var(--color-bg-ghost);",
+        "--el-select-option-selected-text-color: var(--color-primary);",
+        "--el-table-border-color: var(--color-border-medium);",
+        "--el-table-text-color: var(--color-text-primary);",
+        "--el-table-header-text-color: var(--color-text-secondary);",
+        "--el-table-bg-color: var(--color-bg-card);",
+        "--el-table-row-hover-bg-color: var(--color-bg-ghost);",
+        "--el-table-header-bg-color: var(--color-bg-panel);",
+        "--el-table-row-bg-color: var(--color-bg-card);",
+        "--el-dialog-bg-color: var(--color-bg-panel);",
+        "--el-dialog-border-radius: var(--border-radius-xl);",
+        "--el-dialog-box-shadow: var(--shadow-modal);",
+        "--el-dialog-title-text-color: var(--color-text-primary);",
+        "--el-message-bg-color: var(--color-bg-panel);",
+        "--el-message-border-radius: var(--border-radius-lg);",
+        "--el-message-text-color: var(--color-text-primary);",
+        "--el-message-shadow: var(--shadow-lg);",
+        "--el-message-bg-color: rgba(76, 175, 80, 0.1);",
+        "--el-message-border-color: rgba(76, 175, 80, 0.2);",
+        "--el-message-bg-color: rgba(255, 152, 0, 0.1);",
+        "--el-message-border-color: rgba(255, 152, 0, 0.2);",
+        "--el-message-bg-color: rgba(244, 67, 54, 0.1);",
+        "--el-message-border-color: rgba(244, 67, 54, 0.2);",
+        "--el-loading-mask-bg-color: var(--color-bg-overlay);",
+        "--el-pagination-button-bg-color: var(--color-bg-ghost);",
+        "--el-pagination-button-text-color: var(--color-text-secondary);",
+        "--el-pagination-button-hover-bg-color: rgba(255, 255, 255, 0.1);",
+        "--el-pagination-button-active-bg-color: var(--color-primary);",
+        "--el-pagination-button-active-text-color: var(--color-text-inverse);",
+        "--el-tabs-header-bg-color: var(--color-bg-card);",
+        "--el-tabs-nav-bg-color: var(--color-bg-card);",
+        "--el-tabs-item-text-color: var(--color-text-secondary);",
+        "--el-tabs-item-hover-text-color: var(--color-text-primary);",
+        "--el-tabs-item-text-color: var(--color-primary);",
+        "--el-tabs-item-border-color: var(--color-primary);",
+        "--el-form-item-label-text-color: var(--color-text-primary);",
+        "--el-form-item-error-text-color: var(--color-error);",
+        "--el-card-bg-color: var(--color-bg-card);",
+        "--el-card-border-radius: var(--border-radius-xl);",
+        "--el-card-border-color: var(--color-border-medium);",
+        "--el-card-shadow: var(--shadow-card);",
+        "--el-card-header-text-color: var(--color-text-primary);",
+        "--el-card-header-bg-color: var(--color-bg-panel);",
+        "--el-menu-bg-color: var(--color-bg-panel);",
+        "--el-menu-text-color: var(--color-text-secondary);",
+        "--el-menu-hover-bg-color: var(--color-bg-ghost);",
+        "--el-menu-active-bg-color: var(--color-primary);",
+        "--el-menu-active-text-color: var(--color-text-inverse);",
+        "--el-tooltip-bg-color: var(--color-bg-panel);",
+        "--el-tooltip-text-color: var(--color-text-primary);",
+        "--el-tooltip-border-color: var(--color-border-medium);",
+        "--el-tooltip-shadow: var(--shadow-tooltip);",
+        "--el-drawer-bg-color: var(--color-bg-panel);",
+        "--el-drawer-border-color: var(--color-border-medium);",
+        "--el-progress-bg-color: var(--color-bg-ghost);",
+        "--el-progress-text-color: var(--color-text-primary);",
+        "--el-progress-bar-bg-color: var(--color-primary);",
+        "--el-progress-bar-bg-color: var(--color-primary);",
+        "--el-tag-border-radius: var(--border-radius-full);",
+        "--el-tag-font-size: var(--font-size-xs);",
+        "--el-tag-bg-color: var(--color-info-bg);",
+        "--el-tag-text-color: var(--color-info);",
+        "--el-tag-border-color: var(--color-info);",
+        "--el-tag-bg-color: var(--color-success-bg);",
+        "--el-tag-text-color: var(--color-success);",
+        "--el-tag-border-color: var(--color-success);",
+        "--el-tag-bg-color: var(--color-warning-bg);",
+        "--el-tag-text-color: var(--color-warning);",
+        "--el-tag-border-color: var(--color-warning);",
+        "--el-tag-bg-color: var(--color-error-bg);",
+        "--el-tag-text-color: var(--color-error);",
+        "--el-tag-border-color: var(--color-error);",
+        "--el-checkbox-text-color: var(--color-text-primary);",
+        "--el-checkbox-input-border-color: var(--color-border-medium);",
+        "--el-checkbox-input-bg-color: var(--color-bg-ghost);",
+        "--el-checkbox-input-border-color: var(--color-primary);",
+        "--el-checkbox-input-bg-color: var(--color-primary);",
+        "--el-radio-text-color: var(--color-text-primary);",
+        "--el-radio-input-border-color: var(--color-border-medium);",
+        "--el-radio-input-border-color: var(--color-primary);",
+        "--el-radio-input-bg-color: var(--color-primary);",
+        "--el-switch-off-bg-color: var(--color-border-medium);",
+        "--el-switch-on-bg-color: var(--color-primary);",
+        "--el-slider-track-bg-color: var(--color-bg-ghost);",
+        "--el-slider-button-bg-color: var(--color-primary);",
+        "--el-date-editor-border-radius: var(--border-radius-lg);",
+        "--el-date-editor-border-color: var(--color-border-medium);",
+        "--el-date-editor-bg-color: var(--color-bg-ghost);",
+        "--el-upload-border-color: var(--color-border-medium);",
+        "--el-upload-bg-color: var(--color-bg-ghost);",
+        "--el-upload-dragger-bg-color: var(--color-bg-ghost);",
+        "--el-upload-dragger-hover-bg-color: rgba(255, 255, 255, 0.05);",
+        "--el-step__title-text-color: var(--color-text-primary);",
+        "--el-step__description-text-color: var(--color-text-secondary);",
+        "--el-step__icon-bg-color: var(--color-primary);",
+        "--el-step__icon-bg-color: var(--color-success);",
+        "--el-step__icon-bg-color: var(--color-error);",
+        "--el-skeleton-bg-color: var(--color-bg-ghost);",
+        "--el-empty-text-color: var(--color-text-secondary);",
+        "--el-statistic-title-text-color: var(--color-text-secondary);",
+        "--el-statistic-content-text-color: var(--color-text-primary);",
+        "--el-collapse-header-text-color: var(--color-text-primary);",
+        "--el-collapse-header-bg-color: var(--color-bg-card);",
+        "--el-collapse-content-bg-color: var(--color-bg-ghost);",
+        "--el-carousel-indicator-bg-color: var(--color-bg-ghost);",
+        "--el-carousel-indicator-active-bg-color: var(--color-primary);",
+        "--el-timeline-item__node-bg-color: var(--color-primary);",
+        "--el-timeline-item__content-text-color: var(--color-text-primary);",
+        "--el-transition-duration: 0.01ms;",
+        "--el-transition-duration-fast: 0.01ms;",
+        "--el-transition-duration-slow: 0.01ms;",
+        "--el-border-color: var(--color-text-primary);",
+        "--el-border-color-light: var(--color-text-primary);",
+        "--el-border-color-lighter: var(--color-text-primary);",
+        "--el-box-shadow: none;",
+        "--el-box-shadow-light: none;",
+        "--el-box-shadow-lighter: none;",
+        "--el-box-shadow-dark: none;",
+        "--el-bg-color: var(--color-bg-dark);",
+        "--el-bg-color-page: var(--color-bg-deep);",
+        "--el-text-color-primary: var(--color-text-primary);",
+        "--el-text-color-regular: var(--color-text-secondary);",
+        "--el-border-color: var(--color-border-medium);",
+        "--el-fill-color-blank: var(--color-bg-ghost);",
+        "--el-color-primary: var(--color-primary);",
+        "--el-bg-color: var(--color-bg-dark);",
+        "--el-text-color-primary: var(--color-text-primary);",
+        "--el-border-color: var(--color-border-medium);"
+      ],
+      "error-pages.scss": [],
+      "responsive.scss": [],
+      "theme.scss": []
+    }
+  },
+  "docRequirements": {
+    "componentDocs": 116,
+    "composableDocs": 27,
+    "utilDocs": 11,
+    "typeDocs": 7,
+    "styleDocs": 5,
+    "total": 166,
+    "byCategory": {
+      "pages": 64,
+      "components": 51,
+      "businessLogic": 3,
+      "animations": 3,
+      "communication": 2,
+      "utilities": 30,
+      "types": 7,
+      "styles": 5
+    }
+  },
+  "summary": {
+    "totalFiles": 166,
+    "docGap": 136,
+    "docCoverage": "18.1%"
+  }
+}

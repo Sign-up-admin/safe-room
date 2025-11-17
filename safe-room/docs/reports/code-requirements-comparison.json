@@ -1,0 +1,1546 @@
+{
+  "implementedFeatures": {
+    "frontend": {
+      "pages": [
+        {
+          "module": "api",
+          "pages": [
+            "docs"
+          ],
+          "route": "/api"
+        },
+        {
+          "module": "center",
+          "pages": [
+            "center"
+          ],
+          "route": "/center"
+        },
+        {
+          "module": "chat",
+          "pages": [
+            "add",
+            "list"
+          ],
+          "route": "/chat"
+        },
+        {
+          "module": "daoqitixing",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/daoqitixing"
+        },
+        {
+          "module": "discussjianshenkecheng",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/discussjianshenkecheng"
+        },
+        {
+          "module": "error",
+          "pages": [
+            "404",
+            "ErrorPage"
+          ],
+          "route": "/error"
+        },
+        {
+          "module": "home",
+          "pages": [
+            "home"
+          ],
+          "route": "/home"
+        },
+        {
+          "module": "huiyuanka",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/huiyuanka"
+        },
+        {
+          "module": "huiyuankagoumai",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/huiyuankagoumai"
+        },
+        {
+          "module": "huiyuanxufei",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/huiyuanxufei"
+        },
+        {
+          "module": "jianshenjiaolian",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/jianshenjiaolian"
+        },
+        {
+          "module": "jianshenkecheng",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/jianshenkecheng"
+        },
+        {
+          "module": "jianshenqicai",
+          "pages": [
+            "add",
+            "detail",
+            "EquipmentDetail",
+            "list"
+          ],
+          "route": "/jianshenqicai"
+        },
+        {
+          "module": "kechengleixing",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/kechengleixing"
+        },
+        {
+          "module": "kechengtuike",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/kechengtuike"
+        },
+        {
+          "module": "kechengyuyue",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/kechengyuyue"
+        },
+        {
+          "module": "legal",
+          "pages": [
+            "disclaimer",
+            "privacy",
+            "requirements",
+            "terms"
+          ],
+          "route": "/legal"
+        },
+        {
+          "module": "login",
+          "pages": [
+            "login"
+          ],
+          "route": "/login"
+        },
+        {
+          "module": "news",
+          "pages": [
+            "news-detail",
+            "news-list"
+          ],
+          "route": "/news"
+        },
+        {
+          "module": "newstype",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/newstype"
+        },
+        {
+          "module": "pay",
+          "pages": [
+            "index"
+          ],
+          "route": "/pay"
+        },
+        {
+          "module": "register",
+          "pages": [
+            "register"
+          ],
+          "route": "/register"
+        },
+        {
+          "module": "shared",
+          "pages": [
+            "ModuleDetailPage",
+            "ModuleFormPage",
+            "ModuleListPage"
+          ],
+          "route": "/shared"
+        },
+        {
+          "module": "sijiaoyuyue",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/sijiaoyuyue"
+        },
+        {
+          "module": "storeup",
+          "pages": [
+            "list"
+          ],
+          "route": "/storeup"
+        },
+        {
+          "module": "yonghu",
+          "pages": [
+            "add",
+            "detail",
+            "list"
+          ],
+          "route": "/yonghu"
+        }
+      ],
+      "components": [
+        {
+          "category": "booking",
+          "components": [
+            "BookingCalendar",
+            "BookingSummary",
+            "CoachRecommend",
+            "CoursePicker",
+            "GoalSelector",
+            "SchedulePlanner"
+          ]
+        },
+        {
+          "category": "common",
+          "components": [
+            "Equipment3DViewer",
+            "MobileForm",
+            "RecommendationCard",
+            "RotateVerify",
+            "SafeHtml",
+            "Stepper",
+            "TechButton",
+            "TechCard",
+            "TechStepper",
+            "VerifyCode"
+          ]
+        },
+        {
+          "category": "courses",
+          "components": [
+            "CourseBenefitsChart",
+            "CourseCard"
+          ]
+        },
+        {
+          "category": "discussion",
+          "components": [
+            "AdvancedFilters",
+            "DiscussionComposer",
+            "DiscussionReplies",
+            "TopicCloud"
+          ]
+        },
+        {
+          "category": "favorites",
+          "components": [
+            "FavoritesOverview"
+          ]
+        },
+        {
+          "category": "home",
+          "components": [
+            "CoachNetwork",
+            "FloatingServiceButton",
+            "Footer",
+            "HeroSection",
+            "ServiceCards",
+            "SmartHeader",
+            "Testimonials"
+          ]
+        },
+        {
+          "category": "membership",
+          "components": [
+            "MembershipBenefits",
+            "MembershipCard",
+            "MembershipComparison"
+          ]
+        },
+        {
+          "category": "modules",
+          "components": [
+            "ModuleDetail",
+            "ModuleForm",
+            "ModuleList"
+          ]
+        },
+        {
+          "category": "payment",
+          "components": [
+            "MobilePaymentConfirm",
+            "PaymentMethodCard",
+            "PaymentResult",
+            "PaymentStepper"
+          ]
+        }
+      ],
+      "composables": [
+        "useAdvancedSearch",
+        "useAnimations",
+        "useBookingConflict",
+        "useBookingRecommend",
+        "useCoachRecommend",
+        "useDiscussionInteraction",
+        "useDiscussionManagement",
+        "useFavoritesStore",
+        "useFocusManagement",
+        "useHotTopics",
+        "useHoverGlow",
+        "useKeyboardNavigation",
+        "useLoadingGlow",
+        "useMembershipSelection",
+        "useMessageCenter",
+        "useModuleCrud",
+        "useMotion",
+        "useNotificationWebSocket",
+        "usePageTransition",
+        "useParticleSystem",
+        "usePaymentStatus",
+        "usePricingEngine",
+        "useRecommendation",
+        "useScrollAnimation",
+        "useStepTransition",
+        "useSuccessAnimation",
+        "useTheme"
+      ]
+    },
+    "backend": {
+      "controllers": [
+        "Admin",
+        "Assets",
+        "Chat",
+        "Common",
+        "Config",
+        "Daoqitixing",
+        "Discussjianshenkecheng",
+        "ErrorReport",
+        "File",
+        "Huiyuanka",
+        "Huiyuankagoumai",
+        "Huiyuanxufei",
+        "Jianshenjiaolian",
+        "Jianshenkecheng",
+        "Jianshenqicai",
+        "Kechengleixing",
+        "Kechengtuike",
+        "Kechengyuyue",
+        "LegalTerms",
+        "Message",
+        "News",
+        "Newstype",
+        "OperationLog",
+        "Sijiaoyuyue",
+        "Storeup",
+        "User",
+        "Users",
+        "Yonghu"
+      ],
+      "services": [
+        "AssetsService",
+        "ChatService",
+        "CommonService",
+        "ConfigService",
+        "DaoqitixingService",
+        "DiscussjianshenkechengService",
+        "HuiyuankagoumaiService",
+        "HuiyuankaService",
+        "HuiyuanxufeiService",
+        "JianshenjiaolianService",
+        "JianshenkechengService",
+        "JianshenqicaiService",
+        "KechengleixingService",
+        "KechengtuikeService",
+        "KechengyuyueService",
+        "LegalTermsService",
+        "MembershipCardService",
+        "MessageService",
+        "MinioService",
+        "NewsService",
+        "NewstypeService",
+        "OperationLogService",
+        "PasswordService",
+        "SijiaoyuyueService",
+        "StoreupService",
+        "TokenService",
+        "UserService",
+        "UsersService",
+        "YonghuService"
+      ],
+      "entities": [
+        "Assets",
+        "Chat",
+        "Config",
+        "CourseReservation",
+        "CourseType",
+        "Daoqitixing",
+        "Discussjianshenkecheng",
+        "FitnessCoach",
+        "FitnessCourseDiscussion",
+        "FitnessCourse",
+        "FitnessEquipment",
+        "Huiyuanka",
+        "Huiyuankagoumai",
+        "Huiyuanxufei",
+        "Jianshenjiaolian",
+        "Jianshenkecheng",
+        "Jianshenqicai",
+        "Kechengleixing",
+        "Kechengtuike",
+        "Kechengyuyue",
+        "LegalTerms",
+        "MembershipCard",
+        "MembershipCardPurchase",
+        "Message",
+        "News",
+        "Newstype",
+        "OperationLog",
+        "Sijiaoyuyue",
+        "Storeup",
+        "Token",
+        "User",
+        "Users",
+        "Yonghu"
+      ]
+    },
+    "database": {
+      "tables": []
+    }
+  },
+  "documentedFeatures": {
+    "frontend": [
+      {
+        "file": "FRONTEND_MISSING_FEATURES_REQUIREMENTS.md",
+        "module": "frontend_missing_features"
+      },
+      {
+        "file": "FRONTEND_REQUIREMENTS_INDEX.md",
+        "module": "frontend_requirements_index.md"
+      },
+      {
+        "file": "FRONTEND_REQUIREMENTS_OVERVIEW.md",
+        "module": "frontend_requirements_overview.md"
+      },
+      {
+        "file": "FRONTEND_REQUIREMENTS_VERIFICATION_REPORT.md",
+        "module": "frontend_requirements_verification_report.md"
+      }
+    ],
+    "admin": [
+      {
+        "file": "ADMIN_CONFIG_CENTER_REQUIREMENTS.md",
+        "module": "admin_config_center"
+      },
+      {
+        "file": "ADMIN_FORGOT_PASSWORD_REQUIREMENTS.md",
+        "module": "admin_forgot_password"
+      },
+      {
+        "file": "ADMIN_HOME_REQUIREMENTS.md",
+        "module": "admin_home"
+      },
+      {
+        "file": "ADMIN_LAYOUT_REQUIREMENTS.md",
+        "module": "admin_layout"
+      },
+      {
+        "file": "ADMIN_LOGIN_REQUIREMENTS.md",
+        "module": "admin_login"
+      },
+      {
+        "file": "ADMIN_MODULE_CRUD_REQUIREMENTS.md",
+        "module": "admin_module_crud"
+      },
+      {
+        "file": "ADMIN_OVERVIEW_REQUIREMENTS.md",
+        "module": "admin_overview"
+      },
+      {
+        "file": "ADMIN_REGISTER_REQUIREMENTS.md",
+        "module": "admin_register"
+      },
+      {
+        "file": "ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md",
+        "module": "admin_system_management"
+      }
+    ],
+    "common": [
+      {
+        "file": "ALL_PAGES_REQUIREMENTS_REVIEW.md",
+        "module": "all_pages_requirements_review.md"
+      },
+      {
+        "file": "ANIMATION_LIBRARY_REQUIREMENTS.md",
+        "module": "animation_library"
+      },
+      {
+        "file": "ASSETS_REQUIREMENTS.md",
+        "module": "assets"
+      },
+      {
+        "file": "CHAT_FEEDBACK_REQUIREMENTS.md",
+        "module": "chat_feedback"
+      },
+      {
+        "file": "COACHES_DETAIL_REQUIREMENTS.md",
+        "module": "coaches_detail"
+      },
+      {
+        "file": "COACHES_LIST_REQUIREMENTS.md",
+        "module": "coaches_list"
+      },
+      {
+        "file": "COURSES_DETAIL_REQUIREMENTS.md",
+        "module": "courses_detail"
+      },
+      {
+        "file": "COURSES_LIST_REQUIREMENTS.md",
+        "module": "courses_list"
+      },
+      {
+        "file": "COURSE_BOOKING_REQUIREMENTS.md",
+        "module": "course_booking"
+      },
+      {
+        "file": "COURSE_DISCUSSION_REQUIREMENTS.md",
+        "module": "course_discussion"
+      },
+      {
+        "file": "COURSE_REFUND_REQUIREMENTS.md",
+        "module": "course_refund"
+      },
+      {
+        "file": "EQUIPMENT_REQUIREMENTS.md",
+        "module": "equipment"
+      },
+      {
+        "file": "ERROR_HANDLING_REQUIREMENTS.md",
+        "module": "error_handling"
+      },
+      {
+        "file": "ERROR_PAGES_REQUIREMENTS.md",
+        "module": "error_pages"
+      },
+      {
+        "file": "FAVORITES_REQUIREMENTS.md",
+        "module": "favorites"
+      },
+      {
+        "file": "HOMEPAGE_REQUIREMENTS.md",
+        "module": "homepage"
+      },
+      {
+        "file": "INDEX.md",
+        "module": "index.md"
+      },
+      {
+        "file": "MEMBERSHIP_CARDS_REQUIREMENTS.md",
+        "module": "membership_cards"
+      },
+      {
+        "file": "MEMBERSHIP_EXPIRY_REMINDER_REQUIREMENTS.md",
+        "module": "membership_expiry_reminder"
+      },
+      {
+        "file": "MEMBERSHIP_PURCHASE_REQUIREMENTS.md",
+        "module": "membership_purchase"
+      },
+      {
+        "file": "MEMBERSHIP_RENEWAL_REQUIREMENTS.md",
+        "module": "membership_renewal"
+      },
+      {
+        "file": "NEWS_DETAIL_REQUIREMENTS.md",
+        "module": "news_detail"
+      },
+      {
+        "file": "NEWS_LIST_REQUIREMENTS.md",
+        "module": "news_list"
+      },
+      {
+        "file": "NOTIFICATION_SYSTEM_REQUIREMENTS.md",
+        "module": "notification_system"
+      },
+      {
+        "file": "PAGE_REQUIREMENTS_TEMPLATE.md",
+        "module": "page_requirements_template.md"
+      },
+      {
+        "file": "PAYMENT_REQUIREMENTS.md",
+        "module": "payment"
+      },
+      {
+        "file": "PRIVATE_COACH_BOOKING_REQUIREMENTS.md",
+        "module": "private_coach_booking"
+      },
+      {
+        "file": "RESPONSIVE_STRATEGY_REQUIREMENTS.md",
+        "module": "responsive_strategy"
+      },
+      {
+        "file": "USER_CENTER_REQUIREMENTS.md",
+        "module": "user_center"
+      }
+    ]
+  },
+  "comparison": {
+    "implementedNotDocumented": [
+      {
+        "type": "frontend_page",
+        "module": "api",
+        "feature": "docs",
+        "route": "/api"
+      },
+      {
+        "type": "frontend_page",
+        "module": "center",
+        "feature": "center",
+        "route": "/center"
+      },
+      {
+        "type": "frontend_page",
+        "module": "chat",
+        "feature": "add",
+        "route": "/chat"
+      },
+      {
+        "type": "frontend_page",
+        "module": "chat",
+        "feature": "list",
+        "route": "/chat"
+      },
+      {
+        "type": "frontend_page",
+        "module": "daoqitixing",
+        "feature": "add",
+        "route": "/daoqitixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "daoqitixing",
+        "feature": "detail",
+        "route": "/daoqitixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "daoqitixing",
+        "feature": "list",
+        "route": "/daoqitixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "discussjianshenkecheng",
+        "feature": "add",
+        "route": "/discussjianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "discussjianshenkecheng",
+        "feature": "detail",
+        "route": "/discussjianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "discussjianshenkecheng",
+        "feature": "list",
+        "route": "/discussjianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "error",
+        "feature": "404",
+        "route": "/error"
+      },
+      {
+        "type": "frontend_page",
+        "module": "error",
+        "feature": "ErrorPage",
+        "route": "/error"
+      },
+      {
+        "type": "frontend_page",
+        "module": "home",
+        "feature": "home",
+        "route": "/home"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanka",
+        "feature": "add",
+        "route": "/huiyuanka"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanka",
+        "feature": "detail",
+        "route": "/huiyuanka"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanka",
+        "feature": "list",
+        "route": "/huiyuanka"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuankagoumai",
+        "feature": "add",
+        "route": "/huiyuankagoumai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuankagoumai",
+        "feature": "detail",
+        "route": "/huiyuankagoumai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuankagoumai",
+        "feature": "list",
+        "route": "/huiyuankagoumai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanxufei",
+        "feature": "add",
+        "route": "/huiyuanxufei"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanxufei",
+        "feature": "detail",
+        "route": "/huiyuanxufei"
+      },
+      {
+        "type": "frontend_page",
+        "module": "huiyuanxufei",
+        "feature": "list",
+        "route": "/huiyuanxufei"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenjiaolian",
+        "feature": "add",
+        "route": "/jianshenjiaolian"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenjiaolian",
+        "feature": "detail",
+        "route": "/jianshenjiaolian"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenjiaolian",
+        "feature": "list",
+        "route": "/jianshenjiaolian"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenkecheng",
+        "feature": "add",
+        "route": "/jianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenkecheng",
+        "feature": "detail",
+        "route": "/jianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenkecheng",
+        "feature": "list",
+        "route": "/jianshenkecheng"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenqicai",
+        "feature": "add",
+        "route": "/jianshenqicai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenqicai",
+        "feature": "detail",
+        "route": "/jianshenqicai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenqicai",
+        "feature": "EquipmentDetail",
+        "route": "/jianshenqicai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "jianshenqicai",
+        "feature": "list",
+        "route": "/jianshenqicai"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengleixing",
+        "feature": "add",
+        "route": "/kechengleixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengleixing",
+        "feature": "detail",
+        "route": "/kechengleixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengleixing",
+        "feature": "list",
+        "route": "/kechengleixing"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengtuike",
+        "feature": "add",
+        "route": "/kechengtuike"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengtuike",
+        "feature": "detail",
+        "route": "/kechengtuike"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengtuike",
+        "feature": "list",
+        "route": "/kechengtuike"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengyuyue",
+        "feature": "add",
+        "route": "/kechengyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengyuyue",
+        "feature": "detail",
+        "route": "/kechengyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "kechengyuyue",
+        "feature": "list",
+        "route": "/kechengyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "legal",
+        "feature": "disclaimer",
+        "route": "/legal"
+      },
+      {
+        "type": "frontend_page",
+        "module": "legal",
+        "feature": "privacy",
+        "route": "/legal"
+      },
+      {
+        "type": "frontend_page",
+        "module": "legal",
+        "feature": "requirements",
+        "route": "/legal"
+      },
+      {
+        "type": "frontend_page",
+        "module": "legal",
+        "feature": "terms",
+        "route": "/legal"
+      },
+      {
+        "type": "frontend_page",
+        "module": "login",
+        "feature": "login",
+        "route": "/login"
+      },
+      {
+        "type": "frontend_page",
+        "module": "news",
+        "feature": "news-detail",
+        "route": "/news"
+      },
+      {
+        "type": "frontend_page",
+        "module": "news",
+        "feature": "news-list",
+        "route": "/news"
+      },
+      {
+        "type": "frontend_page",
+        "module": "newstype",
+        "feature": "add",
+        "route": "/newstype"
+      },
+      {
+        "type": "frontend_page",
+        "module": "newstype",
+        "feature": "detail",
+        "route": "/newstype"
+      },
+      {
+        "type": "frontend_page",
+        "module": "newstype",
+        "feature": "list",
+        "route": "/newstype"
+      },
+      {
+        "type": "frontend_page",
+        "module": "pay",
+        "feature": "index",
+        "route": "/pay"
+      },
+      {
+        "type": "frontend_page",
+        "module": "register",
+        "feature": "register",
+        "route": "/register"
+      },
+      {
+        "type": "frontend_page",
+        "module": "shared",
+        "feature": "ModuleDetailPage",
+        "route": "/shared"
+      },
+      {
+        "type": "frontend_page",
+        "module": "shared",
+        "feature": "ModuleFormPage",
+        "route": "/shared"
+      },
+      {
+        "type": "frontend_page",
+        "module": "shared",
+        "feature": "ModuleListPage",
+        "route": "/shared"
+      },
+      {
+        "type": "frontend_page",
+        "module": "sijiaoyuyue",
+        "feature": "add",
+        "route": "/sijiaoyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "sijiaoyuyue",
+        "feature": "detail",
+        "route": "/sijiaoyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "sijiaoyuyue",
+        "feature": "list",
+        "route": "/sijiaoyuyue"
+      },
+      {
+        "type": "frontend_page",
+        "module": "storeup",
+        "feature": "list",
+        "route": "/storeup"
+      },
+      {
+        "type": "frontend_page",
+        "module": "yonghu",
+        "feature": "add",
+        "route": "/yonghu"
+      },
+      {
+        "type": "frontend_page",
+        "module": "yonghu",
+        "feature": "detail",
+        "route": "/yonghu"
+      },
+      {
+        "type": "frontend_page",
+        "module": "yonghu",
+        "feature": "list",
+        "route": "/yonghu"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "BookingCalendar"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "BookingSummary"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "CoachRecommend"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "CoursePicker"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "GoalSelector"
+      },
+      {
+        "type": "frontend_component",
+        "category": "booking",
+        "feature": "SchedulePlanner"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "Equipment3DViewer"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "MobileForm"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "RecommendationCard"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "RotateVerify"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "SafeHtml"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "Stepper"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "TechButton"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "TechCard"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "TechStepper"
+      },
+      {
+        "type": "frontend_component",
+        "category": "common",
+        "feature": "VerifyCode"
+      },
+      {
+        "type": "frontend_component",
+        "category": "courses",
+        "feature": "CourseBenefitsChart"
+      },
+      {
+        "type": "frontend_component",
+        "category": "courses",
+        "feature": "CourseCard"
+      },
+      {
+        "type": "frontend_component",
+        "category": "discussion",
+        "feature": "AdvancedFilters"
+      },
+      {
+        "type": "frontend_component",
+        "category": "discussion",
+        "feature": "DiscussionComposer"
+      },
+      {
+        "type": "frontend_component",
+        "category": "discussion",
+        "feature": "DiscussionReplies"
+      },
+      {
+        "type": "frontend_component",
+        "category": "discussion",
+        "feature": "TopicCloud"
+      },
+      {
+        "type": "frontend_component",
+        "category": "favorites",
+        "feature": "FavoritesOverview"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "CoachNetwork"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "FloatingServiceButton"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "Footer"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "HeroSection"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "ServiceCards"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "SmartHeader"
+      },
+      {
+        "type": "frontend_component",
+        "category": "home",
+        "feature": "Testimonials"
+      },
+      {
+        "type": "frontend_component",
+        "category": "membership",
+        "feature": "MembershipBenefits"
+      },
+      {
+        "type": "frontend_component",
+        "category": "membership",
+        "feature": "MembershipCard"
+      },
+      {
+        "type": "frontend_component",
+        "category": "membership",
+        "feature": "MembershipComparison"
+      },
+      {
+        "type": "frontend_component",
+        "category": "modules",
+        "feature": "ModuleDetail"
+      },
+      {
+        "type": "frontend_component",
+        "category": "modules",
+        "feature": "ModuleForm"
+      },
+      {
+        "type": "frontend_component",
+        "category": "modules",
+        "feature": "ModuleList"
+      },
+      {
+        "type": "frontend_component",
+        "category": "payment",
+        "feature": "MobilePaymentConfirm"
+      },
+      {
+        "type": "frontend_component",
+        "category": "payment",
+        "feature": "PaymentMethodCard"
+      },
+      {
+        "type": "frontend_component",
+        "category": "payment",
+        "feature": "PaymentResult"
+      },
+      {
+        "type": "frontend_component",
+        "category": "payment",
+        "feature": "PaymentStepper"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useAdvancedSearch"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useAnimations"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useBookingConflict"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useBookingRecommend"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useCoachRecommend"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useDiscussionInteraction"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useDiscussionManagement"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useFavoritesStore"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useFocusManagement"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useHotTopics"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useHoverGlow"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useKeyboardNavigation"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useLoadingGlow"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useMembershipSelection"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useMessageCenter"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useModuleCrud"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useMotion"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useNotificationWebSocket"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "usePageTransition"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useParticleSystem"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "usePaymentStatus"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "usePricingEngine"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useRecommendation"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useScrollAnimation"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useStepTransition"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useSuccessAnimation"
+      },
+      {
+        "type": "frontend_composable",
+        "feature": "useTheme"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Assets"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Chat"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Common"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Daoqitixing"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Discussjianshenkecheng"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "ErrorReport"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "File"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Huiyuanka"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Huiyuankagoumai"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Huiyuanxufei"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Jianshenjiaolian"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Jianshenkecheng"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Jianshenqicai"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Kechengleixing"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Kechengtuike"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Kechengyuyue"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "LegalTerms"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Message"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "News"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Newstype"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "OperationLog"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Sijiaoyuyue"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Storeup"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "User"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Users"
+      },
+      {
+        "type": "backend_controller",
+        "feature": "Yonghu"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "CourseReservation"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "CourseType"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Daoqitixing"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Discussjianshenkecheng"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "FitnessCoach"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "FitnessCourseDiscussion"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "FitnessCourse"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Huiyuanka"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Huiyuankagoumai"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Huiyuanxufei"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Jianshenjiaolian"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Jianshenkecheng"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Jianshenqicai"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Kechengleixing"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Kechengtuike"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Kechengyuyue"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "LegalTerms"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "MembershipCard"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "MembershipCardPurchase"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Message"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Newstype"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "OperationLog"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Sijiaoyuyue"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Storeup"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Token"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Users"
+      },
+      {
+        "type": "backend_entity",
+        "feature": "Yonghu"
+      }
+    ],
+    "documentedNotImplemented": [
+      {
+        "type": "frontend_requirement",
+        "feature": "FRONTEND_MISSING_FEATURES_REQUIREMENTS.md",
+        "module": "frontend_missing_features"
+      },
+      {
+        "type": "frontend_requirement",
+        "feature": "FRONTEND_REQUIREMENTS_INDEX.md",
+        "module": "frontend_requirements_index.md"
+      },
+      {
+        "type": "frontend_requirement",
+        "feature": "FRONTEND_REQUIREMENTS_OVERVIEW.md",
+        "module": "frontend_requirements_overview.md"
+      },
+      {
+        "type": "frontend_requirement",
+        "feature": "FRONTEND_REQUIREMENTS_VERIFICATION_REPORT.md",
+        "module": "frontend_requirements_verification_report.md"
+      }
+    ],
+    "fullyMatched": []
+  },
+  "analysisTime": "2025-11-17T01:39:19.640Z"
+}

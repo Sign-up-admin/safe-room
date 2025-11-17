@@ -1,0 +1,67 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Front: Chrome + Vite",
+      "url": "http://localhost:8082",
+      "webRoot": "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front",
+      "preLaunchTask": "npm: dev (front)",
+      "smartStep": true,
+      "trace": true,
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front/**",
+        "!**/node_modules/**"
+      ],
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "presentation": {
+        "group": "frontend",
+        "order": 1
+      }
+    },
+    {
+      "type": "pwa-msedge",
+      "request": "launch",
+      "name": "Front: Edge + Vite",
+      "url": "http://localhost:8082",
+      "webRoot": "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front",
+      "preLaunchTask": "npm: dev (front)",
+      "smartStep": true,
+      "trace": true,
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front/**",
+        "!**/node_modules/**"
+      ],
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ],
+      "presentation": {
+        "group": "frontend",
+        "order": 2
+      }
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "attach",
+      "name": "Front: 附加到Chrome (9222)",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front",
+      "sourceMaps": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/springboot1ngh61a2/src/main/resources/front/front/**",
+        "!**/node_modules/**"
+      ],
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**"
+      ]
+    }
+  ]
+}

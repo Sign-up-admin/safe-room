@@ -1,0 +1,1876 @@
+---
+title: AUTOMATION
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# 自动化运维指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: 运维团队
+
+## 概述
+
+本指南涵盖健身房管理系统的自动化运维体系，包括CI/CD流水线、监控告警、备份恢复、部署自动化等核心组件，为系统提供7×24小时稳定运行保障。
+
+## 目录
+
+- [1. CI/CD 自动化](#1-cicd-自动化)
+- [2. 部署自动化](#2-部署自动化)
+- [3. 监控和告警自动化](#3-监控和告警自动化)
+- [4. 备份恢复自动化](#4-备份恢复自动化)
+- [5. 基础设施自动化](#5-基础设施自动化)
+- [6. 安全自动化](#6-安全自动化)
+- [7. 文档自动化](#7-文档自动化)
+- [8. 运维流程自动化](#8-运维流程自动化)
+
+---
+
+## 1. CI/CD 自动化
+
+### 1.1 GitHub Actions 工作流
+
+#### 完整 CI/CD 流水线
+
+```yaml
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 代码质量检查
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint code
+        run: npm run lint
+      - name: Run tests
+        run: npm test
+      - name: Security scan
+        run: npm audit --audit-level high
+
+  # 构建和容器化
+  build:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker images
+        run: |
+          docker build -t fitness-gym-api:${{ github.sha }} ./api
+          docker build -t fitness-gym-frontend:${{ github.sha }} ./frontend
+      - name: Run integration tests
+        run: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+      - name: Push to registry
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push fitness-gym-api:${{ github.sha }}
+          docker push fitness-gym-frontend:${{ github.sha }}
+
+  # 部署到不同环境
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to staging
+        run: |
+          ssh user@staging-server << EOF
+            cd /opt/fitness-gym
+            docker-compose pull
+            docker-compose up -d
+            ./docker-deploy.sh health
+          EOF
+
+  deploy-production:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to production
+        run: |
+          ssh user@prod-server << EOF
+            cd /opt/fitness-gym
+            ./docker-deploy.sh up --environment production --blue-green
+          EOF
+```
+
+#### 文档发布工作流
+
+```yaml
+# .github/workflows/docs-publish.yml
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Validate documentation
+        run: npm run validate-docs
+      - name: Generate docs
+        run: npm run generate-docs
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build
+```
+
+### 1.2 自动化测试策略
+
+#### 测试金字塔结构
+
+```
+端到端测试 (E2E)     ████░░░░  (20%)
+集成测试 (Integration) ████████  (35%)
+单元测试 (Unit)       ██████████ (45%)
+```
+
+#### 自动化测试脚本
+
+```bash
+#!/bin/bash
+# scripts/run-tests.sh
+
+echo "🏃 运行测试套件..."
+
+# 单元测试
+npm test -- --coverage --watchAll=false
+
+# 集成测试
+docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+# E2E 测试
+npx cypress run --record --parallel
+
+# 性能测试
+npx artillery run performance-test.yml
+
+echo "✅ 所有测试完成"
+```
+
+### 1.3 代码质量门禁
+
+#### 质量检查配置
+
+```yaml
+# .github/workflows/quality-gate.yml
+name: Quality Gate
+
+on: [push, pull_request]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Code quality checks
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test coverage
+        run: |
+          npm run test:coverage
+          # 要求最低覆盖率 80%
+          npx istanbul check-coverage --statements 80 --branches 75 --functions 80 --lines 80
+```
+
+---
+
+## 2. 部署自动化
+
+### 2.1 增强部署脚本
+
+#### Bash 部署脚本功能
+
+```bash
+#!/bin/bash
+# docker-deploy.sh
+
+SCRIPT_VERSION="2.0.0"
+LOG_FILE="/var/log/fitness-gym-deploy.log"
+DEPLOYMENT_BACKUP_DIR="/opt/fitness-gym/backups"
+
+# 环境验证
+validate_environment() {
+    echo "🔍 验证环境..."
+    check_system_resources
+    check_port_availability
+    validate_environment_variables
+}
+
+# 预部署检查
+pre_deployment_checks() {
+    echo "🛡️  执行预部署检查..."
+    create_deployment_backup
+    backup_database
+    stop_services_gracefully
+}
+
+# 部署执行
+perform_deployment() {
+    echo "🚀 执行部署..."
+    pull_images
+    update_configuration
+    start_services
+    run_database_migrations
+}
+
+# 健康检查
+perform_health_checks() {
+    echo "🏥 执行健康检查..."
+    wait_for_services
+    run_health_checks
+    validate_deployment
+}
+
+# 回滚功能
+perform_rollback() {
+    echo "⏪ 执行回滚..."
+    stop_current_services
+    restore_from_backup
+    start_previous_version
+    run_health_checks
+}
+
+# 生成部署报告
+generate_deployment_report() {
+    echo "📊 生成部署报告..."
+    collect_deployment_metrics
+    create_deployment_summary
+    send_notification
+}
+```
+
+#### PowerShell 部署脚本
+
+```powershell
+# docker-deploy.ps1
+
+param(
+    [string]$Action = "up",
+    [switch]$Build,
+    [switch]$Detached,
+    [switch]$RemoveVolumes,
+    [switch]$SkipChecks,
+    [switch]$RollbackTag,
+    [string]$Environment = "development",
+    [switch]$Help
+)
+
+$SCRIPT_VERSION = "2.0.0"
+$LOG_FILE = "C:\logs\fitness-gym-deploy.log"
+$DEPLOYMENT_BACKUP_DIR = "C:\backups\fitness-gym"
+
+function Test-Environment {
+    Write-Host "🔍 验证环境..."
+    Test-SystemResources
+    Test-PortAvailability
+    Test-EnvironmentVariables
+}
+
+function Invoke-PreDeploymentChecks {
+    Write-Host "🛡️  执行预部署检查..."
+    New-DeploymentBackup
+    Backup-Database
+    Stop-ServicesGracefully
+}
+
+function Invoke-Deployment {
+    Write-Host "🚀 执行部署..."
+    Update-ContainerImages
+    Update-Configuration
+    Start-Services
+    Invoke-DatabaseMigrations
+}
+
+function Invoke-HealthChecks {
+    Write-Host "🏥 执行健康检查..."
+    Wait-Services
+    Test-HealthChecks
+    Test-Deployment
+}
+
+function Invoke-Rollback {
+    param([string]$Tag)
+    Write-Host "⏪ 执行回滚到 $Tag..."
+    Stop-CurrentServices
+    Restore-FromBackup -Tag $Tag
+    Start-PreviousVersion -Tag $Tag
+    Test-HealthChecks
+}
+```
+
+### 2.2 多环境部署策略
+
+#### 环境配置管理
+
+```yaml
+# config/environments.yml
+environments:
+  development:
+    replicas: 1
+    resources:
+      cpu: "0.5"
+      memory: "512Mi"
+    databases:
+      - name: fitness_gym_dev
+        backup_schedule: "0 */6 * * *"
+
+  staging:
+    replicas: 2
+    resources:
+      cpu: "1"
+      memory: "1Gi"
+    databases:
+      - name: fitness_gym_staging
+        backup_schedule: "0 */4 * * *"
+
+  production:
+    replicas: 3
+    resources:
+      cpu: "2"
+      memory: "2Gi"
+    databases:
+      - name: fitness_gym_prod
+        backup_schedule: "0 */2 * * *"
+```
+
+#### 蓝绿部署实现
+
+```bash
+#!/bin/bash
+# scripts/blue-green-deploy.sh
+
+BLUE_PORT=8080
+GREEN_PORT=8081
+CURRENT_COLOR=$(get_current_color)
+
+if [ "$CURRENT_COLOR" = "blue" ]; then
+    NEW_COLOR="green"
+    OLD_PORT=$BLUE_PORT
+    NEW_PORT=$GREEN_PORT
+else
+    NEW_COLOR="blue"
+    OLD_PORT=$GREEN_PORT
+    NEW_PORT=$BLUE_PORT
+fi
+
+echo "🚀 启动 $NEW_COLOR 环境..."
+docker-compose -f docker-compose.$NEW_COLOR.yml up -d
+
+echo "🏥 等待服务启动..."
+wait_for_service $NEW_PORT
+
+echo "🧪 运行冒烟测试..."
+run_smoke_tests $NEW_PORT
+
+if [ $? -eq 0 ]; then
+    echo "✅ 测试通过，切换流量..."
+    switch_traffic $NEW_COLOR
+    echo "🧹 清理旧环境..."
+    docker-compose -f docker-compose.$CURRENT_COLOR.yml down
+    update_current_color $NEW_COLOR
+else
+    echo "❌ 测试失败，回滚..."
+    docker-compose -f docker-compose.$NEW_COLOR.yml down
+fi
+```
+
+### 2.3 部署验证和回滚
+
+#### 部署后验证
+
+```bash
+#!/bin/bash
+# scripts/validate-deployment.sh
+
+SERVICES=("api" "frontend" "database")
+ENDPOINTS=(
+    "http://localhost:3000/health"
+    "http://localhost:8080/api/health"
+    "postgres://user:pass@localhost:5432/fitness_gym"
+)
+
+validate_services() {
+    for service in "${SERVICES[@]}"; do
+        if ! docker-compose ps $service | grep -q "Up"; then
+            echo "❌ 服务 $service 未运行"
+            return 1
+        fi
+    done
+    echo "✅ 所有服务运行正常"
+}
+
+validate_endpoints() {
+    for endpoint in "${ENDPOINTS[@]}"; do
+        if ! curl -f -s $endpoint > /dev/null; then
+            echo "❌ 端点 $endpoint 无响应"
+            return 1
+        fi
+    done
+    echo "✅ 所有端点响应正常"
+}
+
+validate_database() {
+    if ! docker-compose exec -T database pg_isready -U fitness_user -d fitness_gym; then
+        echo "❌ 数据库连接失败"
+        return 1
+    fi
+    echo "✅ 数据库连接正常"
+}
+
+# 执行验证
+validate_services && validate_endpoints && validate_database
+```
+
+---
+
+## 3. 监控和告警自动化
+
+### 3.1 Prometheus + Grafana 栈
+
+#### Prometheus 配置
+
+```yaml
+# monitoring/prometheus.yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'fitness-gym-api'
+    static_configs:
+      - targets: ['api:3000']
+    metrics_path: '/metrics'
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+```
+
+#### Alertmanager 配置
+
+```yaml
+# monitoring/alertmanager.yml
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@fitness-gym.com'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'team-notifications'
+
+receivers:
+- name: 'team-notifications'
+  email_configs:
+  - to: 'ops@fitness-gym.com'
+    send_resolved: true
+  slack_configs:
+  - api_url: 'https://hooks.slack.com/services/.../.../...'
+    channel: '#alerts'
+    send_resolved: true
+```
+
+### 3.2 自定义监控指标
+
+#### 应用指标收集
+
+```javascript
+// api/src/metrics.js
+const promClient = require('prom-client');
+
+// 创建注册器
+const register = new promClient.Registry();
+
+// 添加默认指标
+promClient.collectDefaultMetrics({ register });
+
+// 自定义指标
+const httpRequestDuration = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status_code'],
+  buckets: [0.1, 0.5, 1, 2, 5, 10]
+});
+
+const activeUsers = new promClient.Gauge({
+  name: 'fitness_gym_active_users',
+  help: 'Number of currently active users'
+});
+
+const workoutBookings = new promClient.Counter({
+  name: 'fitness_gym_workout_bookings_total',
+  help: 'Total number of workout bookings'
+});
+
+// 中间件
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = (Date.now() - start) / 1000;
+    httpRequestDuration
+      .labels(req.method, req.route?.path || req.path, res.statusCode)
+      .observe(duration);
+  });
+  next();
+});
+
+// 指标端点
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+```
+
+#### 业务指标监控
+
+```javascript
+// 业务指标更新
+app.post('/api/workouts/:id/book', (req, res) => {
+  // 预订逻辑...
+  workoutBookings.inc();
+  activeUsers.inc();
+
+  // 其他业务逻辑...
+});
+```
+
+### 3.3 告警规则和响应
+
+#### 智能告警规则
+
+```yaml
+# monitoring/alerts.yml
+groups:
+- name: fitness_gym_alerts
+  rules:
+  # 应用性能告警
+  - alert: APISlowResponse
+    expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "API 响应时间过慢"
+      description: "95th percentile 响应时间超过 2 秒"
+      runbook_url: "https://docs.fitness-gym.com/runbooks/api-slow-response"
+
+  # 系统资源告警
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "CPU 使用率过高"
+      description: "CPU 使用率超过 85%"
+
+  # 业务指标告警
+  - alert: LowActiveUsers
+    expr: fitness_gym_active_users < 10
+    for: 15m
+    labels:
+      severity: info
+    annotations:
+      summary: "活跃用户数过低"
+      description: "当前活跃用户少于 10 人"
+
+  # 服务可用性告警
+  - alert: ServiceDown
+    expr: up == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "服务不可用"
+      description: "服务 {{ $labels.job }} 已经宕机超过 2 分钟"
+```
+
+### 3.4 自动化告警响应
+
+#### 告警响应脚本
+
+```bash
+#!/bin/bash
+# monitoring/scripts/alert-responder.sh
+
+ALERT_TYPE=$1
+INSTANCE=$2
+
+case $ALERT_TYPE in
+    "HighCPUUsage")
+        echo "🔥 CPU 使用率过高，执行自动扩容..."
+        docker-compose up -d --scale api=2
+        ;;
+    "ServiceDown")
+        echo "💀 服务宕机，执行自动重启..."
+        docker-compose restart $INSTANCE
+        ;;
+    "DatabaseConnectionError")
+        echo "🔌 数据库连接错误，检查数据库状态..."
+        docker-compose exec database pg_isready
+        if [ $? -ne 0 ]; then
+            docker-compose restart database
+        fi
+        ;;
+    *)
+        echo "⚠️ 未知告警类型: $ALERT_TYPE"
+        ;;
+esac
+
+# 发送响应通知
+curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"自动响应完成: $ALERT_TYPE\"}" \
+    $SLACK_WEBHOOK_URL
+```
+
+---
+
+## 4. 备份恢复自动化
+
+### 4.1 数据库备份策略
+
+#### 自动化备份脚本
+
+```powershell
+# scripts/backup/backup-database.ps1
+
+param(
+    [ValidateSet("full", "incremental", "differential")]
+    [string]$BackupType = "full",
+    [switch]$Compress,
+    [switch]$Encrypt,
+    [string]$EncryptionKey,
+    [switch]$UploadToS3,
+    [string]$S3Bucket,
+    [string]$S3Path
+)
+
+$BACKUP_DIR = "C:\backups\fitness-gym"
+$TIMESTAMP = Get-Date -Format "yyyyMMdd_HHmmss"
+$BACKUP_FILE = "$BACKUP_DIR\fitness_gym_db_backup_$BackupType_$TIMESTAMP.sql"
+
+# 创建备份目录
+if (!(Test-Path $BACKUP_DIR)) {
+    New-Item -ItemType Directory -Path $BACKUP_DIR -Force
+}
+
+# 执行备份
+switch ($BackupType) {
+    "full" {
+        Write-Host "📦 执行完整备份..."
+        pg_dump -U fitness_user -h localhost -d fitness_gym -f $BACKUP_FILE
+    }
+    "incremental" {
+        Write-Host "🔄 执行增量备份..."
+        # 增量备份逻辑
+        pg_dump -U fitness_user -h localhost -d fitness_gym --format=directory --compress=9 --file=$BACKUP_FILE
+    }
+}
+
+# 压缩备份
+if ($Compress) {
+    Write-Host "🗜️ 压缩备份文件..."
+    & "C:\Program Files\7-Zip\7z.exe" a "$BACKUP_FILE.7z" $BACKUP_FILE
+    Remove-Item $BACKUP_FILE
+    $BACKUP_FILE = "$BACKUP_FILE.7z"
+}
+
+# 加密备份
+if ($Encrypt) {
+    Write-Host "🔐 加密备份文件..."
+    # 使用 AES 加密
+    $encryptedFile = "$BACKUP_FILE.aes"
+    # 加密逻辑...
+}
+
+# 上传到 S3
+if ($UploadToS3) {
+    Write-Host "☁️ 上传到 S3..."
+    & aws s3 cp $BACKUP_FILE s3://$S3Bucket/$S3Path/ --recursive
+}
+
+# 清理旧备份
+Write-Host "🧹 清理旧备份..."
+Get-ChildItem $BACKUP_DIR | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-30) } | Remove-Item
+
+Write-Host "✅ 备份完成: $BACKUP_FILE"
+```
+
+#### 备份验证脚本
+
+```powershell
+# scripts/backup/verify-backup.ps1
+
+param(
+    [string]$BackupFile,
+    [switch]$RestoreTest,
+    [string]$TestDatabase = "fitness_gym_test_restore"
+)
+
+Write-Host "🔍 验证备份文件..."
+
+# 检查文件完整性
+if (!(Test-Path $BackupFile)) {
+    Write-Error "备份文件不存在: $BackupFile"
+    exit 1
+}
+
+# 计算文件哈希
+$hash = Get-FileHash $BackupFile -Algorithm SHA256
+Write-Host "文件哈希: $($hash.Hash)"
+
+# 测试恢复（可选）
+if ($RestoreTest) {
+    Write-Host "🧪 执行恢复测试..."
+
+    # 创建测试数据库
+    psql -U postgres -c "CREATE DATABASE $TestDatabase;"
+
+    # 恢复到测试数据库
+    if ($BackupFile -like "*.7z") {
+        # 解压并恢复
+        & "C:\Program Files\7-Zip\7z.exe" x $BackupFile -o"$env:TEMP\backup_extract"
+        pg_restore -U fitness_user -d $TestDatabase "$env:TEMP\backup_extract"
+    } else {
+        pg_restore -U fitness_user -d $TestDatabase $BackupFile
+    }
+
+    # 验证数据完整性
+    $recordCount = psql -U fitness_user -d $TestDatabase -c "SELECT COUNT(*) FROM users;" -t
+    Write-Host "恢复的记录数: $recordCount"
+
+    # 清理测试数据库
+    psql -U postgres -c "DROP DATABASE $TestDatabase;"
+}
+
+Write-Host "✅ 备份验证完成"
+```
+
+### 4.2 备份监控和告警
+
+#### 备份状态监控
+
+```powershell
+# scripts/backup/backup-monitor.ps1
+
+param(
+    [string]$BackupDir = "C:\backups\fitness-gym",
+    [switch]$GenerateReport,
+    [switch]$SendNotifications,
+    [string]$SlackWebhookUrl
+)
+
+$BACKUP_THRESHOLD_HOURS = 25  # 备份间隔阈值（小时）
+$MIN_BACKUP_SIZE_MB = 10     # 最小备份大小（MB）
+
+Write-Host "📊 监控备份状态..."
+
+# 检查最新备份
+$latestBackup = Get-ChildItem $BackupDir -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+if (!$latestBackup) {
+    Write-Warning "❌ 未找到备份文件"
+    $status = "CRITICAL"
+} else {
+    $hoursSinceBackup = (Get-Date) - $latestBackup.LastWriteTime).TotalHours
+    $backupSizeMB = [math]::Round($latestBackup.Length / 1MB, 2)
+
+    if ($hoursSinceBackup -gt $BACKUP_THRESHOLD_HOURS) {
+        Write-Warning "⚠️  备份太旧: $([math]::Round($hoursSinceBackup, 1)) 小时前"
+        $status = "WARNING"
+    } elseif ($backupSizeMB -lt $MIN_BACKUP_SIZE_MB) {
+        Write-Warning "⚠️  备份文件太小: $backupSizeMB MB"
+        $status = "WARNING"
+    } else {
+        Write-Host "✅ 备份正常: $backupSizeMB MB, $([math]::Round($hoursSinceBackup, 1)) 小时前"
+        $status = "OK"
+    }
+}
+
+# 生成报告
+if ($GenerateReport) {
+    $report = @{
+        timestamp = Get-Date
+        status = $status
+        latest_backup = $latestBackup.Name
+        backup_age_hours = $hoursSinceBackup
+        backup_size_mb = $backupSizeMB
+        backup_location = $BackupDir
+    }
+
+    $report | ConvertTo-Json | Out-File "backup-status-report.json"
+    Write-Host "📄 报告已生成: backup-status-report.json"
+}
+
+# 发送通知
+if ($SendNotifications -and $status -ne "OK") {
+    $message = @{
+        text = "备份状态告警: $status`n最新备份: $($latestBackup.Name)`n备份时间: $($latestBackup.LastWriteTime)`n状态详情: $(if ($status -eq 'CRITICAL') { '无备份文件' } else { "$([math]::Round($hoursSinceBackup, 1)) 小时前, $backupSizeMB MB" })"
+    }
+
+    Invoke-RestMethod -Uri $SlackWebhookUrl -Method Post -Body ($message | ConvertTo-Json) -ContentType 'application/json'
+}
+
+Write-Host "🏁 备份监控完成"
+```
+
+### 4.3 灾难恢复演练
+
+#### 恢复演练脚本
+
+```bash
+#!/bin/bash
+# scripts/disaster-recovery/dr-drill.sh
+
+LOG_FILE="/var/log/dr-drill.log"
+DRILL_DATE=$(date +%Y%m%d_%H%M%S)
+DRILL_TAG="dr-drill-$DRILL_DATE"
+
+echo "🧪 开始灾难恢复演练 - $DRILL_DATE" | tee -a $LOG_FILE
+
+# 记录开始时间
+START_TIME=$(date +%s)
+
+# 步骤 1: 模拟故障
+echo "💥 模拟生产环境故障..." | tee -a $LOG_FILE
+simulate_production_failure
+
+# 步骤 2: 激活灾难恢复
+echo "🚨 激活灾难恢复流程..." | tee -a $LOG_FILE
+activate_disaster_recovery
+
+# 步骤 3: 恢复数据
+echo "💾 从备份恢复数据..." | tee -a $LOG_FILE
+restore_from_backup
+
+# 步骤 4: 重建服务
+echo "🔨 重建服务栈..." | tee -a $LOG_FILE
+rebuild_services
+
+# 步骤 5: 验证恢复
+echo "✅ 验证系统恢复..." | tee -a $LOG_FILE
+validate_recovery
+
+# 计算恢复时间
+END_TIME=$(date +%s)
+RECOVERY_TIME=$((END_TIME - START_TIME))
+
+echo "⏱️  恢复时间: $RECOVERY_TIME 秒" | tee -a $LOG_FILE
+
+# 生成演练报告
+generate_drill_report $RECOVERY_TIME $DRILL_TAG
+
+echo "📊 灾难恢复演练完成 - 查看报告: dr-drill-report-$DRILL_TAG.json" | tee -a $LOG_FILE
+```
+
+---
+
+## 5. 基础设施自动化
+
+### 5.1 Docker 容器编排
+
+#### Docker Compose 配置
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:pass@database:5432/fitness_gym
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  database:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=fitness_gym
+      - POSTGRES_USER=fitness_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitness_user -d fitness_gym"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+### 5.2 容器健康检查
+
+#### 自定义健康检查脚本
+
+```bash
+#!/bin/bash
+# monitoring/scripts/health-check.sh
+
+# API 健康检查
+check_api() {
+    if curl -f -s --max-time 10 http://localhost:3000/health > /dev/null; then
+        echo "✅ API 服务正常"
+        return 0
+    else
+        echo "❌ API 服务异常"
+        return 1
+    fi
+}
+
+# 数据库健康检查
+check_database() {
+    if docker-compose exec -T database pg_isready -U fitness_user -d fitness_gym > /dev/null; then
+        echo "✅ 数据库连接正常"
+        return 0
+    else
+        echo "❌ 数据库连接异常"
+        return 1
+    fi
+}
+
+# 前端健康检查
+check_frontend() {
+    if curl -f -s --max-time 10 http://localhost:8080 > /dev/null; then
+        echo "✅ 前端服务正常"
+        return 0
+    else
+        echo "❌ 前端服务异常"
+        return 1
+    fi
+}
+
+# Redis 健康检查
+check_redis() {
+    if docker-compose exec -T redis redis-cli ping | grep -q PONG; then
+        echo "✅ Redis 服务正常"
+        return 0
+    else
+        echo "❌ Redis 服务异常"
+        return 1
+    fi
+}
+
+# 运行所有检查
+run_all_checks() {
+    local failed_checks=()
+
+    check_api || failed_checks+=("API")
+    check_database || failed_checks+=("Database")
+    check_frontend || failed_checks+=("Frontend")
+    check_redis || failed_checks+=("Redis")
+
+    if [ ${#failed_checks[@]} -eq 0 ]; then
+        echo "🎉 所有服务运行正常"
+        return 0
+    else
+        echo "⚠️  以下服务异常: ${failed_checks[*]}"
+        return 1
+    fi
+}
+
+# 主函数
+main() {
+    case "${1:-all}" in
+        "api") check_api ;;
+        "database") check_database ;;
+        "frontend") check_frontend ;;
+        "redis") check_redis ;;
+        "all") run_all_checks ;;
+        *) echo "用法: $0 [api|database|frontend|redis|all]"; exit 1 ;;
+    esac
+}
+
+main "$@"
+```
+
+### 5.3 自动扩缩容
+
+#### 基于指标的自动扩缩容
+
+```bash
+#!/bin/bash
+# scripts/auto-scaling.sh
+
+CPU_THRESHOLD=80
+MEMORY_THRESHOLD=85
+MAX_INSTANCES=5
+MIN_INSTANCES=1
+
+while true; do
+    # 获取当前实例数
+    CURRENT_INSTANCES=$(docker-compose ps api | grep -c "Up")
+
+    # 获取 CPU 使用率
+    CPU_USAGE=$(docker stats --no-stream --format "table {{.CPUPerc}}" | tail -n +2 | sed 's/%//' | awk '{sum+=$1} END {print sum/NR}')
+
+    # 获取内存使用率
+    MEMORY_USAGE=$(docker stats --no-stream --format "table {{.MemPerc}}" | tail -n +2 | sed 's/%//' | awk '{sum+=$1} END {print sum/NR}')
+
+    echo "$(date): CPU: ${CPU_USAGE}%, Memory: ${MEMORY_USAGE}%, Instances: $CURRENT_INSTANCES"
+
+    # 扩容条件
+    if (( $(echo "$CPU_USAGE > $CPU_THRESHOLD" | bc -l) )) || (( $(echo "$MEMORY_USAGE > $MEMORY_THRESHOLD" | bc -l) )); then
+        if [ $CURRENT_INSTANCES -lt $MAX_INSTANCES ]; then
+            NEW_INSTANCES=$((CURRENT_INSTANCES + 1))
+            echo "📈 扩容到 $NEW_INSTANCES 个实例"
+            docker-compose up -d --scale api=$NEW_INSTANCES
+        fi
+
+    # 缩容条件
+    elif (( $(echo "$CPU_USAGE < 30" | bc -l) )) && (( $(echo "$MEMORY_USAGE < 40" | bc -l) )); then
+        if [ $CURRENT_INSTANCES -gt $MIN_INSTANCES ]; then
+            NEW_INSTANCES=$((CURRENT_INSTANCES - 1))
+            echo "📉 缩容到 $NEW_INSTANCES 个实例"
+            docker-compose up -d --scale api=$NEW_INSTANCES
+        fi
+    fi
+
+    sleep 60  # 每分钟检查一次
+done
+```
+
+---
+
+## 6. 安全自动化
+
+### 6.1 自动化安全扫描
+
+#### 容器镜像安全扫描
+
+```yaml
+# .github/workflows/security-scan.yml
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # 每日凌晨2点
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker images
+        run: |
+          docker build -t fitness-gym-api ./api
+          docker build -t fitness-gym-frontend ./frontend
+
+      - name: Scan API image
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          scan-ref: 'fitness-gym-api'
+          format: 'sarif'
+          output: 'trivy-api-results.sarif'
+
+      - name: Scan Frontend image
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          scan-ref: 'fitness-gym-frontend'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-api-results.sarif'
+
+      - name: Upload Frontend scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-frontend-results.sarif'
+
+      - name: Dependency check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Fitness Gym'
+          path: '.'
+          format: 'ALL'
+```
+
+#### 代码安全扫描
+
+```yaml
+# .github/workflows/code-security.yml
+name: Code Security
+
+on: [push, pull_request]
+
+jobs:
+  code-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=package.json
+
+      - name: CodeQL Analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript, python
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+```
+
+### 6.2 自动化密钥管理
+
+#### 密钥轮换脚本
+
+```bash
+#!/bin/bash
+# scripts/security/rotate-secrets.sh
+
+# JWT 密钥轮换
+rotate_jwt_secrets() {
+    echo "🔄 轮换 JWT 密钥..."
+
+    # 生成新密钥
+    NEW_JWT_SECRET=$(openssl rand -hex 32)
+    NEW_JWT_REFRESH_SECRET=$(openssl rand -hex 32)
+
+    # 更新环境变量
+    sed -i "s/JWT_SECRET=.*/JWT_SECRET=$NEW_JWT_SECRET/" .env
+    sed -i "s/JWT_REFRESH_SECRET=.*/JWT_REFRESH_SECRET=$NEW_JWT_REFRESH_SECRET/" .env
+
+    # 重启服务
+    docker-compose restart api
+
+    echo "✅ JWT 密钥轮换完成"
+}
+
+# 数据库密码轮换
+rotate_database_password() {
+    echo "🔄 轮换数据库密码..."
+
+    # 生成新密码
+    NEW_DB_PASSWORD=$(openssl rand -base64 16)
+
+    # 更新 PostgreSQL 密码
+    docker-compose exec database psql -U postgres -c "ALTER USER fitness_user PASSWORD '$NEW_DB_PASSWORD';"
+
+    # 更新环境变量
+    sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$NEW_DB_PASSWORD/" .env
+
+    # 重启服务
+    docker-compose restart api
+
+    echo "✅ 数据库密码轮换完成"
+}
+
+# API Key 轮换
+rotate_api_keys() {
+    echo "🔄 轮换 API 密钥..."
+
+    # 生成新密钥
+    NEW_STRIPE_SECRET=$(openssl rand -hex 32)
+    NEW_SENDGRID_API_KEY=$(openssl rand -hex 32)
+
+    # 更新环境变量
+    sed -i "s/STRIPE_SECRET_KEY=.*/STRIPE_SECRET_KEY=$NEW_STRIPE_SECRET/" .env
+    sed -i "s/SENDGRID_API_KEY=.*/SENDGRID_API_KEY=$NEW_SENDGRID_API_KEY/" .env
+
+    # 重启服务
+    docker-compose restart api
+
+    echo "✅ API 密钥轮换完成"
+}
+
+# 主函数
+main() {
+    case "${1:-all}" in
+        "jwt") rotate_jwt_secrets ;;
+        "database") rotate_database_password ;;
+        "api-keys") rotate_api_keys ;;
+        "all")
+            rotate_jwt_secrets
+            rotate_database_password
+            rotate_api_keys
+            ;;
+        *) echo "用法: $0 [jwt|database|api-keys|all]"; exit 1 ;;
+    esac
+}
+
+main "$@"
+```
+
+---
+
+## 7. 文档自动化
+
+### 7.1 文档生成工具
+
+#### API 文档自动生成
+
+```javascript
+// docs/scripts/generate-api-docs.js
+
+const swaggerJsdoc = require('swagger-jsdoc');
+const fs = require('fs');
+const path = require('path');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Fitness Gym API',
+      version: '1.0.0',
+      description: '健身房管理系统 API 文档',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: '开发环境',
+      },
+      {
+        url: 'https://api.fitness-gym.com',
+        description: '生产环境',
+      },
+    ],
+  },
+  apis: ['./api/routes/*.js', './api/models/*.js'], // API 路由和模型文件
+};
+
+const specs = swaggerJsdoc(options);
+
+// 生成 Markdown 格式文档
+function generateMarkdown(specs) {
+  let markdown = '# Fitness Gym API 文档\n\n';
+
+  // 遍历所有端点
+  Object.keys(specs.paths).forEach(path => {
+    Object.keys(specs.paths[path]).forEach(method => {
+      const endpoint = specs.paths[path][method];
+      markdown += `## ${method.toUpperCase()} ${path}\n\n`;
+      markdown += `**描述**: ${endpoint.summary || '无描述'}\n\n`;
+
+      if (endpoint.parameters) {
+        markdown += '**参数**:\n\n';
+        endpoint.parameters.forEach(param => {
+          markdown += `- \`${param.name}\` (${param.in}): ${param.description || '无描述'}\n`;
+        });
+        markdown += '\n';
+      }
+
+      if (endpoint.responses) {
+        markdown += '**响应**:\n\n';
+        Object.keys(endpoint.responses).forEach(code => {
+          const response = endpoint.responses[code];
+          markdown += `- \`${code}\`: ${response.description || '无描述'}\n`;
+        });
+        markdown += '\n';
+      }
+
+      markdown += '---\n\n';
+    });
+  });
+
+  return markdown;
+}
+
+const markdownDocs = generateMarkdown(specs);
+fs.writeFileSync('./docs/api/API_DOCUMENTATION.md', markdownDocs);
+
+console.log('✅ API 文档生成完成');
+```
+
+#### 部署文档自动生成
+
+```javascript
+// docs/scripts/generate-deployment-docs.js
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+function generateDeploymentDocs() {
+  const docs = {};
+
+  // 获取 Docker 镜像信息
+  try {
+    const images = execSync('docker images --format "table {{.Repository}}:{{.Tag}}\\t{{.Size}}\\t{{.CreatedAt}}"', { encoding: 'utf8' });
+    docs.dockerImages = images;
+  } catch (error) {
+    docs.dockerImages = '无法获取 Docker 镜像信息';
+  }
+
+  // 获取环境变量
+  const envPath = path.join(__dirname, '../../.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    const envVars = envContent.split('\n')
+      .filter(line => line.includes('='))
+      .map(line => line.split('=')[0])
+      .join(', ');
+    docs.environmentVariables = envVars;
+  }
+
+  // 获取最近的部署历史
+  try {
+    const gitLog = execSync('git log --oneline -10 --grep="deploy"', { encoding: 'utf8' });
+    docs.deploymentHistory = gitLog;
+  } catch (error) {
+    docs.deploymentHistory = '无法获取部署历史';
+  }
+
+  // 生成部署文档
+  const deploymentDoc = `# 部署配置文档
+
+## Docker 镜像信息
+
+\`\`\`
+${docs.dockerImages}
+\`\`\`
+
+## 环境变量
+
+配置的环境变量: ${docs.environmentVariables}
+
+## 最近部署历史
+
+\`\`\`
+${docs.deploymentHistory}
+\`\`\`
+
+*生成时间: ${new Date().toISOString()}*
+`;
+
+  fs.writeFileSync('./docs/deployment/DEPLOYMENT_CONFIG.md', deploymentDoc);
+  console.log('✅ 部署文档生成完成');
+}
+
+generateDeploymentDocs();
+```
+
+### 7.2 文档验证和发布
+
+#### 文档验证脚本
+
+```javascript
+// docs/scripts/validate-docs.js
+
+const fs = require('fs');
+const path = require('path');
+const markdownLinkCheck = require('markdown-link-check');
+
+const DOCS_DIR = './docs';
+
+function validateMarkdownFile(filePath) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', (err, content) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const errors = [];
+
+      // 检查必需的章节
+      const requiredSections = ['概述', '安装', '使用', '配置'];
+      requiredSections.forEach(section => {
+        if (!content.includes(`# ${section}`) && !content.includes(`## ${section}`)) {
+          errors.push(`缺少必需章节: ${section}`);
+        }
+      });
+
+      // 检查链接
+      markdownLinkCheck(content, { baseUrl: 'file://' + path.dirname(filePath) }, (err, results) => {
+        if (err) {
+          errors.push(`链接检查错误: ${err.message}`);
+        } else {
+          results.forEach(result => {
+            if (result.status === 'dead') {
+              errors.push(`无效链接: ${result.link}`);
+            }
+          });
+        }
+
+        resolve({ file: filePath, errors });
+      });
+    });
+  });
+}
+
+async function validateAllDocs() {
+  const markdownFiles = [];
+
+  function findMarkdownFiles(dir) {
+    const files = fs.readdirSync(dir);
+    files.forEach(file => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat.isDirectory()) {
+        findMarkdownFiles(filePath);
+      } else if (file.endsWith('.md')) {
+        markdownFiles.push(filePath);
+      }
+    });
+  }
+
+  findMarkdownFiles(DOCS_DIR);
+
+  console.log(`🔍 验证 ${markdownFiles.length} 个文档文件...`);
+
+  const results = await Promise.all(markdownFiles.map(validateMarkdownFile));
+  const totalErrors = results.reduce((sum, result) => sum + result.errors.length, 0);
+
+  if (totalErrors === 0) {
+    console.log('✅ 所有文档验证通过');
+  } else {
+    console.log(`❌ 发现 ${totalErrors} 个问题:`);
+    results.forEach(result => {
+      if (result.errors.length > 0) {
+        console.log(`📄 ${result.file}:`);
+        result.errors.forEach(error => console.log(`  - ${error}`));
+      }
+    });
+    process.exit(1);
+  }
+}
+
+validateAllDocs();
+```
+
+#### 文档发布工作流
+
+```yaml
+# .github/workflows/docs-publish.yml
+name: Publish Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'api/**'
+      - 'docker-compose.yml'
+
+jobs:
+  publish-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate documentation
+        run: npm run validate-docs
+
+      - name: Generate API docs
+        run: npm run generate-api-docs
+
+      - name: Generate deployment docs
+        run: npm run generate-deployment-docs
+
+      - name: Update documentation index
+        run: npm run update-doc-index
+
+      - name: Build documentation site
+        run: |
+          cd docs
+          npm install
+          npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build
+          cname: docs.fitness-gym.com
+```
+
+---
+
+## 8. 运维流程自动化
+
+### 8.1 定期维护任务
+
+#### 数据库维护脚本
+
+```bash
+#!/bin/bash
+# scripts/maintenance/database-maintenance.sh
+
+LOG_FILE="/var/log/database-maintenance.log"
+
+echo "$(date): 开始数据库维护" >> $LOG_FILE
+
+# 分析表统计信息
+echo "$(date): 分析表统计信息..." >> $LOG_FILE
+docker-compose exec database psql -U fitness_user -d fitness_gym -c "ANALYZE VERBOSE;"
+
+# 清理过期数据
+echo "$(date): 清理过期日志..." >> $LOG_FILE
+docker-compose exec database psql -U fitness_user -d fitness_gym -c "
+DELETE FROM audit_logs WHERE created_at < NOW() - INTERVAL '90 days';
+DELETE FROM session_logs WHERE created_at < NOW() - INTERVAL '30 days';
+"
+
+# 重新索引
+echo "$(date): 重新索引大表..." >> $LOG_FILE
+docker-compose exec database psql -U fitness_user -d fitness_gym -c "
+REINDEX TABLE CONCURRENTLY users;
+REINDEX TABLE CONCURRENTLY workouts;
+REINDEX TABLE CONCURRENTLY bookings;
+"
+
+# 清理表空间
+echo "$(date): 清理表空间..." >> $LOG_FILE
+docker-compose exec database psql -U fitness_user -d fitness_gym -c "VACUUM ANALYZE;"
+
+echo "$(date): 数据库维护完成" >> $LOG_FILE
+```
+
+#### 系统清理脚本
+
+```bash
+#!/bin/bash
+# scripts/maintenance/system-cleanup.sh
+
+LOG_FILE="/var/log/system-cleanup.log"
+
+echo "$(date): 开始系统清理" >> $LOG_FILE
+
+# 清理 Docker 资源
+echo "$(date): 清理未使用的 Docker 资源..." >> $LOG_FILE
+docker system prune -f
+docker volume prune -f
+docker image prune -f
+
+# 清理日志文件
+echo "$(date): 清理旧日志文件..." >> $LOG_FILE
+find /var/log -name "*.log" -mtime +30 -exec gzip {} \;
+find /var/log -name "*.gz" -mtime +90 -delete
+
+# 清理临时文件
+echo "$(date): 清理临时文件..." >> $LOG_FILE
+find /tmp -type f -mtime +7 -delete
+find /var/tmp -type f -mtime +7 -delete
+
+# 清理备份文件（保留最近7天的）
+echo "$(date): 清理旧备份文件..." >> $LOG_FILE
+find /opt/fitness-gym/backups -name "*.sql" -mtime +7 -delete
+find /opt/fitness-gym/backups -name "*.7z" -mtime +30 -delete
+
+echo "$(date): 系统清理完成" >> $LOG_FILE
+```
+
+### 8.2 容量规划自动化
+
+#### 容量监控脚本
+
+```bash
+#!/bin/bash
+# scripts/monitoring/capacity-planning.sh
+
+REPORT_FILE="/var/log/capacity-report.json"
+THRESHOLD_CPU=80
+THRESHOLD_MEMORY=85
+THRESHOLD_DISK=90
+
+# 收集当前指标
+collect_metrics() {
+    # CPU 使用率
+    CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+
+    # 内存使用率
+    MEMORY_USAGE=$(free | grep Mem | awk '{printf "%.2f", $3/$2 * 100.0}')
+
+    # 磁盘使用率
+    DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+
+    # 数据库连接数
+    DB_CONNECTIONS=$(docker-compose exec -T database psql -U fitness_user -d fitness_gym -c "SELECT count(*) FROM pg_stat_activity;" -t | tr -d ' ')
+
+    # API 响应时间 (P95)
+    API_RESPONSE_TIME=$(curl -s -w "%{time_total}" -o /dev/null http://localhost:3000/health)
+
+    echo "{
+  \"timestamp\": \"$(date -Iseconds)\",
+  \"cpu_usage_percent\": $CPU_USAGE,
+  \"memory_usage_percent\": $MEMORY_USAGE,
+  \"disk_usage_percent\": $DISK_USAGE,
+  \"db_connections\": $DB_CONNECTIONS,
+  \"api_response_time\": $API_RESPONSE_TIME
+}"
+}
+
+# 生成容量建议
+generate_recommendations() {
+    local metrics=$1
+
+    echo "基于当前指标的容量建议:"
+
+    local cpu=$(echo $metrics | jq -r '.cpu_usage_percent')
+    local memory=$(echo $metrics | jq -r '.memory_usage_percent')
+    local disk=$(echo $metrics | jq -r '.disk_usage_percent')
+
+    if (( $(echo "$cpu > $THRESHOLD_CPU" | bc -l) )); then
+        echo "- CPU 使用率过高 ($cpu%)，建议增加 CPU 核心或优化应用性能"
+    fi
+
+    if (( $(echo "$memory > $THRESHOLD_MEMORY" | bc -l) )); then
+        echo "- 内存使用率过高 ($memory%)，建议增加内存或优化内存使用"
+    fi
+
+    if (( disk > THRESHOLD_DISK )); then
+        echo "- 磁盘使用率过高 ($disk%)，建议清理磁盘空间或增加存储"
+    fi
+}
+
+# 主函数
+main() {
+    echo "📊 生成容量规划报告..."
+
+    METRICS=$(collect_metrics)
+    echo $METRICS > $REPORT_FILE
+
+    echo "📈 容量建议:"
+    generate_recommendations "$METRICS"
+
+    echo "✅ 容量规划报告已生成: $REPORT_FILE"
+}
+
+main
+```
+
+### 8.3 自动化报告生成
+
+#### 每日运维报告
+
+```bash
+#!/bin/bash
+# scripts/reports/daily-ops-report.sh
+
+REPORT_DATE=$(date +%Y-%m-%d)
+REPORT_FILE="/var/log/daily-ops-report-$REPORT_DATE.md"
+
+# 生成报告头部
+cat > $REPORT_FILE << EOF
+# 每日运维报告 - $REPORT_DATE
+
+## 系统状态概览
+
+EOF
+
+# 系统资源状态
+echo "### 系统资源" >> $REPORT_FILE
+echo "- **CPU 使用率**: $(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')%" >> $REPORT_FILE
+echo "- **内存使用率**: $(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100.0}')%" >> $REPORT_FILE
+echo "- **磁盘使用率**: $(df / | tail -1 | awk '{print $5}')%" >> $REPORT_FILE
+
+# 服务状态
+echo "" >> $REPORT_FILE
+echo "### 服务状态" >> $REPORT_FILE
+
+services=("api" "frontend" "database" "redis")
+for service in "${services[@]}"; do
+    if docker-compose ps $service | grep -q "Up"; then
+        status="✅ 正常"
+    else
+        status="❌ 异常"
+    fi
+    echo "- **$service**: $status" >> $REPORT_FILE
+done
+
+# 备份状态
+echo "" >> $REPORT_FILE
+echo "### 备份状态" >> $REPORT_FILE
+
+LATEST_BACKUP=$(ls -t /opt/fitness-gym/backups/*.sql 2>/dev/null | head -1)
+if [ -n "$LATEST_BACKUP" ]; then
+    BACKUP_TIME=$(stat -c %y "$LATEST_BACKUP" | cut -d'.' -f1)
+    BACKUP_SIZE=$(du -h "$LATEST_BACKUP" | cut -f1)
+    echo "- **最新备份**: $BACKUP_TIME ($BACKUP_SIZE)" >> $REPORT_FILE
+else
+    echo "- **最新备份**: ❌ 未找到备份文件" >> $REPORT_FILE
+fi
+
+# 告警事件
+echo "" >> $REPORT_FILE
+echo "### 告警事件" >> $REPORT_FILE
+
+ALERT_COUNT=$(grep "$(date +%Y-%m-%d)" /var/log/prometheus/alerts.log 2>/dev/null | wc -l)
+echo "- **告警数量**: $ALERT_COUNT" >> $REPORT_FILE
+
+if [ $ALERT_COUNT -gt 0 ]; then
+    echo "" >> $REPORT_FILE
+    echo "#### 告警详情" >> $REPORT_FILE
+    grep "$(date +%Y-%m-%d)" /var/log/prometheus/alerts.log 2>/dev/null | head -10 >> $REPORT_FILE
+fi
+
+# 性能指标
+echo "" >> $REPORT_FILE
+echo "### 性能指标" >> $REPORT_FILE
+
+# API 响应时间
+API_RESPONSE=$(curl -s -w "%{time_total}" -o /dev/null http://localhost:3000/health)
+echo "- **API 响应时间**: ${API_RESPONSE}s" >> $REPORT_FILE
+
+# 数据库连接数
+DB_CONNECTIONS=$(docker-compose exec -T database psql -U fitness_user -d fitness_gym -c "SELECT count(*) FROM pg_stat_activity;" -t | tr -d ' ')
+echo "- **数据库连接数**: $DB_CONNECTIONS" >> $REPORT_FILE
+
+echo "" >> $REPORT_FILE
+echo "*报告生成时间: $(date)*" >> $REPORT_FILE
+
+echo "📄 每日运维报告已生成: $REPORT_FILE"
+
+# 发送报告邮件
+if [ -n "$ADMIN_EMAIL" ]; then
+    mail -s "健身房系统每日运维报告 - $REPORT_DATE" $ADMIN_EMAIL < $REPORT_FILE
+fi
+```
+
+---
+
+## 总结
+
+本自动化运维指南涵盖了现代 DevOps 实践的核心组件：
+
+### 🔄 CI/CD 流水线
+- 自动化代码质量检查和测试
+- 多环境自动部署
+- 回滚和蓝绿部署支持
+
+### 📊 监控和告警
+- Prometheus + Grafana 监控栈
+- 智能告警规则和自动响应
+- 全面的系统和应用指标
+
+### 💾 备份和恢复
+- 自动化数据库备份策略
+- 备份完整性验证
+- 灾难恢复演练流程
+
+### 🏗️ 基础设施自动化
+- Docker 容器编排
+- 自动扩缩容
+- 健康检查和自愈
+
+### 🔒 安全自动化
+- 容器镜像安全扫描
+- 自动化密钥轮换
+- 依赖漏洞检查
+
+### 📚 文档自动化
+- API 文档自动生成
+- 部署文档维护
+- 文档验证和发布
+
+### 🔧 运维流程自动化
+- 定期维护任务
+- 容量规划监控
+- 自动化报告生成
+
+通过实施这些自动化措施，系统能够实现：
+- **7×24 小时稳定运行**
+- **快速故障检测和恢复**
+- **持续的性能优化**
+- **自动化的安全防护**
+- **标准化的运维流程**
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: 运维团队*

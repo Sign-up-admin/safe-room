@@ -1,0 +1,776 @@
+---
+category: development
+version: v1.0.1
+last_updated: 2025-11-16
+------
+title: DOC TOOLS GUIDE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: development
+tags: [documentation, tools, guide, automation]
+---
+
+# 📚 文档工具使用指南
+
+> **版本**：v1.0.0
+> **更新日期**：2025-11-16
+> **适用范围**：文档工具使用指导
+> **关键词**：文档工具, 使用指南, 自动化工具
+
+---
+
+## 📋 目录
+
+- [概述](#概述)
+- [工具总览](#工具总览)
+- [快速开始](#快速开始)
+- [详细使用指南](#详细使用指南)
+- [故障排除](#故障排除)
+- [最佳实践](#最佳实践)
+
+---
+
+## 📖 概述
+
+### 工具链介绍
+
+健身房综合管理系统提供了完整的文档自动化工具链，涵盖文档编写、校验、维护、发布等各个环节。所有工具都位于 `docs/scripts/` 目录下，使用 Node.js 运行。
+
+### 主要功能
+
+- **文档校验**：格式检查、内容验证、质量评估
+- **自动化修复**：批量修复格式问题和元数据缺失
+- **索引管理**：自动生成和维护文档索引
+- **质量监控**：生成质量报告和趋势分析
+- **关系管理**：验证和管理文档关联关系
+- **重组优化**：文档分类和结构重组
+
+### 环境要求
+
+```json
+{
+  "node": ">=18.0.0",
+  "npm": ">=8.0.0",
+  "dependencies": {
+    "glob": "^8.0.0"
+  }
+}
+```
+
+### 安装依赖
+
+```bash
+cd docs/scripts
+npm install
+```
+
+---
+
+## 🛠️ 工具总览
+
+### 核心工具列表
+
+| 工具名称 | 文件位置 | 主要功能 | 使用频率 |
+|----------|----------|----------|----------|
+| **文档校验工具** | `validate-docs.js` | 格式校验、质量检查 | 每次提交前 |
+| **元数据修复工具** | `fix-doc-metadata.js` | 自动修复头部信息 | 按需使用 |
+| **索引更新工具** | `update-doc-index.js` | 生成文档索引 | 定期/变更后 |
+| **质量报告工具** | `generate-quality-report.js` | 质量评估报告 | 每周/按需 |
+| **关联关系验证工具** | `validate-doc-relationships.js` | 关联关系检查 | 定期/变更后 |
+| **文档重组工具** | `reorganize-docs.js` | 文档结构重组 | 按需使用 |
+
+### 辅助工具列表
+
+| 工具名称 | 文件位置 | 主要功能 | 说明 |
+|----------|----------|----------|------|
+| **API文档生成器** | `generate-api-docs.js` | 从代码生成API文档 | 开发完成后 |
+| **部署文档生成器** | `generate-deployment-docs.js` | 生成部署配置文档 | 部署前 |
+| **测试报告生成器** | `generate-test-reports.js` | 生成测试结果文档 | 测试完成后 |
+
+### 配置文件
+
+| 配置文件 | 位置 | 用途 |
+|----------|------|------|
+| **元数据标准配置** | `docs/.doc-metadata.json` | 定义文档头部格式规范 |
+| **分类规则配置** | `docs/.doc-classification-rules.md` | 文档分类标准和规则 |
+| **文档关系配置** | `docs/DOC_RELATIONSHIPS.json` | 文档关联关系定义 |
+
+---
+
+## 🚀 快速开始
+
+### 环境设置
+
+```bash
+# 1. 进入脚本目录
+cd docs/scripts
+
+# 2. 安装依赖
+npm install
+
+# 3. 验证安装
+node validate-docs.js --help
+```
+
+### 基本工作流
+
+```bash
+# 1. 编写或修改文档
+# 编辑 docs/your-document.md
+
+# 2. 校验文档格式
+node validate-docs.js docs/your-document.md
+
+# 3. 修复格式问题（如有）
+node fix-doc-metadata.js docs/your-document.md
+
+# 4. 更新文档索引
+node update-doc-index.js
+
+# 5. 生成质量报告
+node generate-quality-report.js
+```
+
+### CI/CD 集成
+
+在 GitHub Actions 中的使用：
+
+```yaml
+- name: Validate Documentation
+  run: node docs/scripts/validate-docs.js --strict docs/
+
+- name: Check Relationships
+  run: node docs/scripts/validate-doc-relationships.js
+
+- name: Update Index
+  run: node docs/scripts/update-doc-index.js --update-versions
+```
+
+---
+
+## 📖 详细使用指南
+
+### 1. 文档校验工具 (validate-docs.js)
+
+#### 功能特性
+
+- 文档格式规范检查
+- 元数据完整性验证
+- 链接有效性检查
+- 过期文档检测
+- 文档结构验证
+
+#### 基本用法
+
+```bash
+# 校验单个文件
+node validate-docs.js docs/README.md
+
+# 校验整个文档目录
+node validate-docs.js docs/
+
+# 严格模式校验（警告也算错误）
+node validate-docs.js --strict docs/
+
+# 检查过期文档
+node validate-docs.js --check-expiry docs/
+
+# 详细输出模式
+node validate-docs.js --verbose docs/
+```
+
+#### 高级用法
+
+```bash
+# 校验特定类型的文档
+node validate-docs.js --type technical docs/
+
+# 跳过某些检查
+node validate-docs.js --skip links docs/
+
+# 输出结果到文件
+node validate-docs.js --output validation-results.json docs/
+```
+
+#### 校验规则说明
+
+##### 格式校验
+- 文档头部信息完整性
+- YAML 元数据格式正确性
+- Markdown 语法规范性
+- 文件编码和行结束符
+
+##### 内容校验
+- 必需章节的完整性
+- 文档结构的合理性
+- 术语使用的一致性
+- 代码示例的正确性
+
+##### 关联校验
+- 内部链接的有效性
+- 外部链接的可访问性
+- 图片和资源的引用正确性
+
+##### 时效校验
+- 文档更新日期的合理性
+- 过期文档的标识
+- 版本信息的准确性
+
+### 2. 元数据修复工具 (fix-doc-metadata.js)
+
+#### 功能特性
+
+- 自动添加标准头部信息
+- 修复格式问题
+- 批量处理多个文档
+- 支持交互式确认
+- 创建备份文件
+
+#### 基本用法
+
+```bash
+# 扫描文档问题（不修复）
+node fix-doc-metadata.js --scan-only docs/
+
+# 自动修复所有问题
+node fix-doc-metadata.js --force docs/
+
+# 交互式修复（逐个确认）
+node fix-doc-metadata.js docs/
+
+# 修复特定分类的文档
+node fix-doc-metadata.js --category requirements docs/
+```
+
+#### 高级用法
+
+```bash
+# 创建备份并修复
+node fix-doc-metadata.js --backup --force docs/
+
+# 只修复缺少版本号的文档
+node fix-doc-metadata.js --fix version docs/
+
+# 自定义模板修复
+node fix-doc-metadata.js --template custom docs/
+```
+
+#### 修复内容说明
+
+##### 自动添加的字段
+- `title`: 从文件名生成或使用现有标题
+- `version`: 默认为 "v1.0.0"
+- `last_updated`: 当前日期
+- `status`: 默认为 "active"
+- `category`: 根据路径和内容自动判断
+- `tags`: 根据文档类型添加相关标签
+
+##### 格式标准化
+- YAML 前置元数据格式化
+- 日期格式统一为 YYYY-MM-DD
+- 标签格式标准化
+- 版本号格式规范化
+
+### 3. 索引更新工具 (update-doc-index.js)
+
+#### 功能特性
+
+- 自动扫描文档结构
+- 生成主索引和分类子索引
+- 更新文档版本信息
+- 生成文档关系图
+- 创建导航页面
+
+#### 基本用法
+
+```bash
+# 更新所有索引
+node update-doc-index.js
+
+# 自动更新文档版本号
+node update-doc-index.js --update-versions
+
+# 包含质量检查
+node update-doc-index.js --check-quality
+
+# 预览模式（不写入文件）
+node update-doc-index.js --dry-run
+```
+
+#### 高级用法
+
+```bash
+# 只更新特定分类的索引
+node update-doc-index.js --category technical
+
+# 生成详细的关系图
+node update-doc-index.js --relations-detailed
+
+# 自定义输出目录
+node update-doc-index.js --output-dir custom-docs/
+```
+
+#### 生成内容说明
+
+##### 主索引 (INDEX.md)
+- 项目概述和快速开始
+- 文档分类导航
+- 核心文档推荐
+- 文档统计信息
+
+##### 分类索引
+- requirements/INDEX.md: 需求文档索引
+- technical/INDEX.md: 技术文档索引
+- development/INDEX.md: 开发文档索引
+- reports/INDEX.md: 报告文档索引
+
+##### 关系图
+- DOC_RELATIONSHIPS.md: Mermaid 格式的关系图
+- DOC_RELATIONSHIPS.json: JSON 格式的关系数据
+
+### 4. 质量报告工具 (generate-quality-report.js)
+
+#### 功能特性
+
+- 全面的质量评估
+- 详细的问题诊断
+- 改进建议生成
+- 多格式报告输出
+- 趋势分析支持
+
+#### 基本用法
+
+```bash
+# 生成默认 Markdown 报告
+node generate-quality-report.js
+
+# 指定输出文件
+node generate-quality-report.js --output custom-report.md
+
+# 生成 JSON 格式报告
+node generate-quality-report.js --format json
+
+# 生成 HTML 格式报告
+node generate-quality-report.js --format html
+```
+
+#### 高级用法
+
+```bash
+# 与基准文件比较趋势
+node generate-quality-report.js --baseline previous-report.json
+
+# 只分析特定分类
+node generate-quality-report.js --category technical
+
+# 包含详细的建议
+node generate-quality-report.js --detailed-suggestions
+```
+
+#### 报告内容说明
+
+##### 质量指标
+- **格式规范性**: 文档头部、格式、语法
+- **内容完整性**: 章节完整性、描述准确性
+- **时效性**: 更新频率、过期检查
+- **关联关系**: 链接有效性、引用正确性
+
+##### 分类分析
+- 各分类的质量统计
+- 问题分布情况
+- 改进优先级排序
+
+##### 改进建议
+- 具体可行的改进措施
+- 优先级和实施难度
+- 预期效果评估
+
+### 5. 关联关系验证工具 (validate-doc-relationships.js)
+
+#### 功能特性
+
+- 文档关联关系验证
+- 双向一致性检查
+- 孤立文档检测
+- 自动修复简单问题
+
+#### 基本用法
+
+```bash
+# 验证所有关联关系
+node validate-doc-relationships.js
+
+# 自动修复可修复的问题
+node validate-doc-relationships.js --fix
+
+# 严格模式检查
+node validate-doc-relationships.js --strict
+```
+
+#### 高级用法
+
+```bash
+# 只检查特定文档的关联
+node validate-doc-relationships.js --doc docs/README.md
+
+# 生成关联关系报告
+node validate-doc-relationships.js --report relationships-report.md
+
+# 更新关系配置文件
+node validate-doc-relationships.js --update-json
+```
+
+#### 验证内容说明
+
+##### 关系有效性
+- 引用的文档是否存在
+- 链接路径的正确性
+- 锚点链接的有效性
+
+##### 双向一致性
+- A引用B，B是否也引用A
+- 关联关系的对称性检查
+- 循环引用的检测
+
+##### 完整性检查
+- 孤立文档的识别
+- 缺少必要关联的文档
+- 关联关系覆盖率的统计
+
+### 6. 文档重组工具 (reorganize-docs.js)
+
+#### 功能特性
+
+- 文档分类分析
+- 自动文档重组
+- 引用关系更新
+- 备份和恢复功能
+
+#### 基本用法
+
+```bash
+# 分析文档分类分布
+node reorganize-docs.js --analyze
+
+# 执行文档重组
+node reorganize-docs.js --execute
+
+# 试运行模式
+node reorganize-docs.js --dry-run
+```
+
+#### 高级用法
+
+```bash
+# 只重组特定分类
+node reorganize-docs.js --category technical --execute
+
+# 创建备份并重组
+node reorganize-docs.js --backup --execute
+
+# 自定义重组规则
+node reorganize-docs.js --rules custom-rules.json --execute
+```
+
+#### 重组流程说明
+
+##### 分析阶段
+- 扫描所有文档的分类信息
+- 识别需要移动的文档
+- 生成重组计划报告
+
+##### 执行阶段
+- 创建备份文件
+- 移动文档到正确位置
+- 更新文档元数据
+- 修复所有引用关系
+
+##### 验证阶段
+- 检查重组结果的正确性
+- 验证链接的有效性
+- 生成重组报告
+
+---
+
+## 🔧 故障排除
+
+### 常见问题
+
+#### 工具无法运行
+
+**问题**: `Command not found` 或 `Cannot find module`
+
+**解决方案**:
+```bash
+# 1. 检查 Node.js 版本
+node --version
+
+# 2. 进入脚本目录
+cd docs/scripts
+
+# 3. 重新安装依赖
+rm -rf node_modules package-lock.json
+npm install
+
+# 4. 检查文件权限
+chmod +x *.js
+```
+
+#### 校验失败
+
+**问题**: 文档校验失败，但不确定具体问题
+
+**解决方案**:
+```bash
+# 使用详细输出模式
+node validate-docs.js --verbose docs/your-file.md
+
+# 只检查特定类型的错误
+node validate-docs.js --type format docs/your-file.md
+
+# 查看完整的错误信息
+node validate-docs.js docs/ 2>&1 | tee validation.log
+```
+
+#### 索引更新失败
+
+**问题**: 索引更新过程中出错
+
+**解决方案**:
+```bash
+# 检查文件权限
+ls -la docs/
+
+# 验证配置文件
+cat docs/.doc-metadata.json
+
+# 单独测试索引生成
+node update-doc-index.js --dry-run --verbose
+```
+
+#### 质量报告生成失败
+
+**问题**: 无法生成质量报告
+
+**解决方案**:
+```bash
+# 检查输出目录权限
+mkdir -p docs/reports
+ls -la docs/reports/
+
+# 验证基准文件（如果使用）
+cat baseline-report.json
+
+# 简化报告生成
+node generate-quality-report.js --format json --output test.json
+```
+
+### 调试技巧
+
+#### 启用调试模式
+
+```bash
+# 设置环境变量启用调试
+DEBUG=docs:* node validate-docs.js docs/
+
+# 使用详细日志
+node validate-docs.js --verbose --debug docs/
+```
+
+#### 查看工具内部状态
+
+```bash
+# 生成工具执行报告
+node validate-docs.js --report internal-state.json docs/
+
+# 检查配置文件加载
+node -e "console.log(require('./validate-docs.js').loadMetadataConfig())"
+```
+
+#### 性能优化
+
+```bash
+# 对于大型文档库，使用并行处理
+node validate-docs.js --parallel 4 docs/
+
+# 缓存中间结果
+node validate-docs.js --cache docs/
+```
+
+---
+
+## 🎯 最佳实践
+
+### 日常使用模式
+
+#### 开发人员工作流
+
+```bash
+# 1. 编写文档后立即校验
+node validate-docs.js docs/new-feature.md
+
+# 2. 修复发现的问题
+node fix-doc-metadata.js docs/new-feature.md
+
+# 3. 提交前最终检查
+node validate-docs.js --strict docs/
+```
+
+#### 维护人员工作流
+
+```bash
+# 每周质量检查
+node generate-quality-report.js
+
+# 每月文档更新
+node update-doc-index.js --update-versions
+
+# 每季度结构优化
+node reorganize-docs.js --analyze
+```
+
+### 自动化集成
+
+#### Git Hooks 集成
+
+在 `.git/hooks/pre-commit` 中添加：
+
+```bash
+#!/bin/bash
+# 校验文档格式
+node docs/scripts/validate-docs.js --strict docs/
+if [ $? -ne 0 ]; then
+    echo "文档校验失败，请修复后重新提交"
+    exit 1
+fi
+```
+
+#### CI/CD 流水线
+
+```yaml
+# .github/workflows/docs-ci.yml
+name: Documentation CI
+
+on: [push, pull_request]
+
+jobs:
+  docs-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: cd docs/scripts && npm install
+
+      - name: Validate documentation
+        run: node docs/scripts/validate-docs.js --strict docs/
+
+      - name: Check relationships
+        run: node docs/scripts/validate-doc-relationships.js
+
+      - name: Generate quality report
+        run: node docs/scripts/generate-quality-report.js
+```
+
+### 性能和可扩展性
+
+#### 大型项目优化
+
+```bash
+# 分批处理大型文档库
+node validate-docs.js --batch-size 50 docs/
+
+# 使用缓存加速重复检查
+node validate-docs.js --cache --cache-dir .docs-cache docs/
+
+# 并行处理多个目录
+node validate-docs.js --parallel docs/requirements/ docs/technical/
+```
+
+#### 自定义规则扩展
+
+```javascript
+// 在工具脚本中添加自定义规则
+const customRules = {
+  validateSpecialFormat: (content) => {
+    // 自定义校验逻辑
+    return true;
+  }
+};
+
+module.exports = { ...customRules };
+```
+
+### 监控和报告
+
+#### 定期健康检查
+
+```bash
+# 创建监控脚本
+cat > docs/scripts/health-check.sh << 'EOF'
+#!/bin/bash
+echo "=== 文档健康检查 $(date) ==="
+
+# 基本校验
+node validate-docs.js --strict docs/ > validation.log 2>&1
+VALIDATION_EXIT=$?
+
+# 关系检查
+node validate-doc-relationships.js > relationships.log 2>&1
+RELATIONSHIPS_EXIT=$?
+
+# 质量报告
+node generate-quality-report.js > quality.log 2>&1
+
+# 生成摘要报告
+echo "校验结果: $VALIDATION_EXIT" > health-report.md
+echo "关系检查: $RELATIONSHIPS_EXIT" >> health-report.md
+echo "质量报告: 生成完成" >> health-report.md
+
+# 发送通知（如果失败）
+if [ $VALIDATION_EXIT -ne 0 ] || [ $RELATIONSHIPS_EXIT -ne 0 ]; then
+    echo "⚠️ 发现文档问题，请及时处理"
+    # 发送邮件或Slack通知
+fi
+EOF
+
+chmod +x docs/scripts/health-check.sh
+```
+
+---
+
+## 📚 相关文档
+
+### 核心文档
+
+- [文档编写指南](../development\development\development\development\DOCUMENTATION_GUIDE.md) - 文档编写规范和流程
+- [文档工程分析](../DOCUMENTATION_ENGINEERING_ANALYSIS.md) - 文档工程问题分析
+
+### 配置文件
+
+- [元数据标准配置](../../.doc-metadata.json) - 文档头部格式规范
+- [分类规则配置](../../.doc-classification-rules.md) - 文档分类标准
+
+### 外部资源
+
+- [Markdown 官方规范](https://daringfireball.net/projects/markdown/) - Markdown 语法标准
+- [YAML 规范](https://yaml.org/spec/) - YAML 格式规范
+- [Prettier](https://prettier.io/) - 代码格式化工具
+
+---
+
+## 🔄 更新记录
+
+| 日期 | 版本 | 更新内容 | 更新人 |
+|------|------|----------|--------|
+| 2025-11-16 | v1.0.0 | 初始版本，完整文档工具使用指南 | 文档工程团队 |
+
+---
+
+*本文档由自动化工具生成和维护，最后更新时间：2025-11-16*

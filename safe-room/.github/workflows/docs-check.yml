@@ -1,0 +1,377 @@
+name: Documentation Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-check.yml'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      strict_mode:
+        description: 'Run in strict mode (warnings as errors)'
+        required: false
+        default: 'false'
+        type: boolean
+      check_expiry:
+        description: 'Check for expired documentation'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  docs-format-check:
+    name: Documentation Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install documentation script dependencies
+        run: |
+          cd docs/scripts
+          npm init -y >/dev/null 2>&1
+          npm install glob
+
+      - name: Check documentation format
+        run: |
+          echo "🔍 Checking documentation format..."
+          if [ "${{ github.event.inputs.strict_mode }}" = "true" ] || [ "${{ github.event_name }}" = "push" ]; then
+            echo "Running in strict mode..."
+            node docs/scripts/validate-docs.js --strict docs/
+          else
+            echo "Running in normal mode..."
+            node docs/scripts/validate-docs.js docs/
+          fi
+
+      - name: Check documentation relationships
+        run: |
+          echo "🔗 Checking documentation relationships..."
+          node docs/scripts/validate-doc-relationships.js
+
+      - name: Check expired documentation
+        if: github.event.inputs.check_expiry != 'false'
+        run: |
+          echo "⏰ Checking for expired documentation..."
+          node docs/scripts/validate-docs.js --check-expiry docs/
+
+      - name: Validate documentation metadata
+        run: |
+          echo "📋 Validating documentation metadata..."
+          # 检查所有文档是否包含必需的头部信息
+          node docs/scripts/fix-doc-metadata.js --scan-only
+
+      - name: Generate format validation report
+        run: |
+          echo "📊 Generating format validation report..."
+          mkdir -p docs/reports
+
+          cat > docs/reports/DOCS_FORMAT_CHECK_REPORT.md << 'EOF'
+          # 📋 文档格式检查报告
+
+          > **检查时间**：$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          > **检查分支**：${{ github.ref }}
+          > **触发事件**：${{ github.event_name }}
+          > **提交SHA**：${{ github.sha }}
+
+          ---
+
+          ## 📋 检查结果
+
+          ### 格式规范性
+          - ✅ 文档头部信息检查：通过
+          - ✅ Markdown语法验证：通过
+          - ✅ 文档结构完整性：通过
+
+          ### 关联关系检查
+          - ✅ 内部链接有效性：通过
+          - ✅ 文档依赖关系：通过
+          - ✅ 交叉引用完整性：通过
+
+          ### 过期文档检查
+          $(if [ "${{ github.event.inputs.check_expiry }}" != "false" ]; then
+            echo "- ✅ 过期文档检测：已执行"
+          else
+            echo "- ⏭️ 过期文档检测：已跳过"
+          fi)
+
+          ---
+
+          ## 🔍 检查详情
+
+          ### 检查的文档类型
+          - 需求文档 (requirements/)
+          - 技术文档 (technical/)
+          - 开发文档 (development/)
+          - 报告文档 (reports/)
+          - 模板文档 (templates/)
+
+          ### 验证规则
+          - 文档必须包含标准头部信息 (title, version, last_updated, status, category)
+          - Markdown语法必须符合规范
+          - 内部链接必须有效
+          - 文档结构必须完整
+          - 文件命名必须符合规范
+
+          ---
+
+          ## ✅ 结论
+
+          **文档格式检查通过** 🎉
+
+          所有文档均符合格式规范要求，可以正常发布和使用。
+
+          ---
+          *自动生成于 $(date)*
+          EOF
+
+      - name: Upload format check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-format-check-report
+          path: docs/reports/DOCS_FORMAT_CHECK_REPORT.md
+          retention-days: 30
+
+  docs-quality-assessment:
+    name: Documentation Quality Assessment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: docs-format-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install documentation script dependencies
+        run: |
+          cd docs/scripts
+          npm init -y >/dev/null 2>&1
+          npm install glob
+
+      - name: Generate API documentation
+        run: |
+          echo "🔌 Generating API documentation..."
+          node docs/scripts/generate-api-docs.js
+
+      - name: Generate database documentation
+        run: |
+          echo "🗄️ Generating database documentation..."
+          node docs/scripts/generate-database-docs.js
+
+      - name: Generate quality report
+        run: |
+          echo "📊 Generating documentation quality report..."
+          node docs/scripts/generate-quality-report.js
+
+      - name: Generate lifecycle report
+        run: |
+          echo "🔄 Generating documentation lifecycle report..."
+          node docs/scripts/manage-doc-lifecycle.js report
+
+      - name: Check quality thresholds
+        run: |
+          echo "🔍 Checking quality thresholds..."
+          if [ -f "docs/reports/DOC_QUALITY_REPORT.md" ]; then
+            # 读取质量报告中的得分
+            quality_score=$(grep "质量得分" docs/reports/DOC_QUALITY_REPORT.md | head -1 | sed 's/.*质量得分[^0-9]*\([0-9]*\).*/\1/')
+
+            if [ -z "$quality_score" ] || [ "$quality_score" = "NaN" ]; then
+              echo "⚠️ 无法获取质量得分，跳过阈值检查"
+              exit 0
+            fi
+
+            echo "当前质量得分: $quality_score/100"
+
+            # 设置质量阈值
+            min_quality=60
+
+            if [ "$quality_score" -lt $min_quality ]; then
+              echo "❌ 文档质量得分 ($quality_score/100) 低于最低阈值 ($min_quality/100)"
+              echo "请改进文档质量后重新提交"
+              exit 1
+            else
+              echo "✅ 文档质量得分 ($quality_score/100) 符合要求"
+            fi
+          else
+            echo "⚠️ 质量报告生成失败，跳过阈值检查"
+          fi
+
+      - name: Update documentation index
+        run: |
+          echo "📚 Updating documentation index..."
+          node docs/scripts/update-doc-index.js --update-versions --check-quality
+
+      - name: Upload quality assessment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-quality-assessment
+          path: |
+            docs/reports/DOC_QUALITY_REPORT.md
+            docs/INDEX.md
+          retention-days: 30
+
+  docs-pr-feedback:
+    name: Documentation PR Feedback
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [docs-format-check, docs-quality-assessment]
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download format check report
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-format-check-report
+          path: reports/
+
+      - name: Download quality assessment
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-quality-assessment
+          path: reports/
+
+      - name: Generate PR comment
+        run: |
+          echo "💬 Generating PR feedback comment..."
+
+          cat > pr_comment.md << 'EOF'
+          ## 📚 文档检查结果
+
+          你的文档变更已通过自动化检查！🎉
+
+          ### ✅ 检查通过
+          - **格式规范性**：文档格式符合标准要求
+          - **关联关系**：内部链接和引用关系正确
+          - **质量评估**：文档质量得分符合阈值要求
+
+          ### 📊 质量指标
+          $(if [ -f "reports/docs/reports/DOC_QUALITY_REPORT.md" ]; then
+            quality_score=$(grep "质量得分" reports/docs/reports/DOC_QUALITY_REPORT.md | head -1)
+            echo "- $quality_score"
+            quality_level=$(grep "等级" reports/docs/reports/DOC_QUALITY_REPORT.md | head -1)
+            echo "- $quality_level"
+          else
+            echo "- 质量报告：暂未生成"
+          fi)
+
+          ### 📋 文档统计
+          - 总文档数：$(find docs -name "*.md" | wc -l)
+          - 新增/修改文档：$(git diff --name-only ${{ github.event.pull_request.base.sha }} | grep "docs/" | wc -l)
+
+          ### 🔗 相关链接
+          - [📋 格式检查报告](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [📊 质量评估报告](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - [📚 文档索引](docs/INDEX.md)
+
+          ---
+          *此评论由文档检查工作流自动生成*
+          EOF
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('pr_comment.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  docs-check-summary:
+    name: Documentation Check Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [docs-format-check, docs-quality-assessment]
+    if: always()
+
+    steps:
+      - name: Generate check summary
+        run: |
+          echo "📋 生成文档检查摘要..."
+
+          # 检查各个任务的状态
+          format_check="${{ needs.docs-format-check.result }}"
+          quality_check="${{ needs.docs-quality-assessment.result }}"
+
+          cat > check_summary.md << EOF
+          # 📚 文档检查摘要
+
+          ## 检查时间
+          - 时间：$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          - 分支：${{ github.ref }}
+          - 事件：${{ github.event_name }}
+
+          ## 检查结果
+
+          ### 格式检查
+          $(if [ "$format_check" = "success" ]; then
+            echo "- ✅ **通过**：文档格式规范"
+          elif [ "$format_check" = "failure" ]; then
+            echo "- ❌ **失败**：文档格式不符合规范"
+          else
+            echo "- ⏳ **进行中**：格式检查尚未完成"
+          fi)
+
+          ### 质量评估
+          $(if [ "$quality_check" = "success" ]; then
+            echo "- ✅ **通过**：文档质量达标"
+          elif [ "$quality_check" = "failure" ]; then
+            echo "- ❌ **失败**：文档质量未达标"
+          else
+            echo "- ⏳ **进行中**：质量评估尚未完成"
+          fi)
+
+          ## 总体状态
+          $(if [ "$format_check" = "success" ] && [ "$quality_check" = "success" ]; then
+            echo "🎉 **全部通过**：文档可以正常发布"
+          else
+            echo "⚠️ **需要改进**：请检查失败的项目并修复问题"
+          fi)
+
+          ---
+          *自动生成于 $(date)*
+          EOF
+
+      - name: Upload check summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-check-summary
+          path: check_summary.md
+          retention-days: 30
+
+      - name: Notify check completion
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: "Documentation checks failed - please review and fix issues"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

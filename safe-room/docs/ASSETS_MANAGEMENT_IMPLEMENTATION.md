@@ -1,0 +1,179 @@
+---
+title: ASSETS MANAGEMENT IMPLEMENTATION
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# 素材管理工程实践文档（v1.0）
+
+> 更新时间：2025-11-15  
+> 适用项目：`springboot1ngh61a2` 后台管理端（Vue 3 + Vite + TypeScript）
+
+---
+
+## 1. 需求回顾
+
+依据 `docs/requirements\requirements\ASSETS_REQUIREMENTS.md` 与后台 CRUD 规范，素材模块需满足：
+
+- 统一管理图片 / 视频 / 图标 / SVG / 3D 模型 / Lottie 等资产；
+- 记录元数据（尺寸、格式、用途、版本、标签、模块归属等）并可检索；
+- 提供管理员可用的上传、预览、批量操作与导出能力；
+- 保持与后台权限体系、菜单及通用 CRUD 组件一致。
+
+---
+
+## 2. 数据库设计
+
+在 `springboot1ngh61a2/src/main/resources/schema-postgresql.sql` 中新增 `assets` 表，核心字段如下：
+
+| 字段 | 说明 | 备注 |
+| --- | --- | --- |
+| `asset_name` | 素材名称 | 命名遵循 `[模块]_[用途]_[版本]` |
+| `asset_type` | 类型 | image / video / icon / svg / model / lottie / other |
+| `file_path` / `file_size` / `file_format` | 文件信息 | 便于快速定位及体积控制 |
+| `module` / `usage` | 业务模块与用途 | home / course / coach… & hero / thumbnail… |
+| `width` / `height` / `dimensions` | 尺寸 | 图片上传后自动探测 |
+| `version` / `tags` / `category` / `status` | 版本、标签、分类、状态 | category 默认 `static` |
+| `upload_user` | 上传人 | 记录责任人 |
+| `addtime` / `updatetime` | 创建 & 更新时间 | 索引按更新时间排序 |
+
+建立 `asset_type`、`module`、`usage` 单列索引，满足常用过滤。
+
+---
+
+## 3. 后端实现
+
+### 3.1 代码结构
+
+- `com/entity/AssetsEntity.java`：继承 MyBatis-Plus 实体模板，包含全部字段与 JSON 时间格式。
+- `com/dao/AssetsDao.java` + `resources/mapper/AssetsDao.xml`：基础 CRUD。
+- `com/service/AssetsService.java` + `impl/AssetsServiceImpl.java`：
+  - `queryPage(params, wrapper)` 支持统一分页；
+  - `buildWrapper` 对 `assetType/module/usage/status/keyword/startDate/endDate` 过滤；
+  - 默认按 `updatetime` → `addtime` 降序。
+- `com/controller/AssetsController.java`：
+  - `GET /assets/list`：分页 + 过滤；
+  - `POST /assets/save|update|delete|batchDelete`：标准 CRUD；
+  - `POST /assets/batchStatus`：批量状态更新；
+  - `GET /assets/info/{id}`、`/preview/{id}`：详情 & 预览元数据。
+
+### 3.2 素材上传接口
+
+`com/controller/FileController.java` 新增 `/file/uploadAsset`：
+
+- 校验扩展名 + 文件体积（图片 ≤3MB，视频 ≤60MB，其他默认 30MB）；
+- 目录结构：`static/upload/assets/{module}/{assetType}/`；
+- 生成 `module_usage_version_timestamp.ext` 文件名；
+- 图片自动读取 `width/height`，写入 `assets` 表；
+- 响应包含 `file`（路径）、`assetId`、`width`、`height`、`dimensions`，供前端回填。
+
+---
+
+## 4. 前端实现
+
+### 4.1 通用 CRUD 组件增强
+
+`views/modules/components/ModuleCrudPage.vue` 增加：
+
+- `queryParams`、`enableSelection` props；
+- `#form` / `#formFooter` / `#toolbar` / `#columns` 插槽；
+- 选择列 & `selectedRows` 暴露，便于页面自定义批量操作；
+- `defineExpose({ refresh, openForm, selectedRows, ... })`。
+
+### 4.2 素材管理页面
+
+文件：`views/modules/assets/list.vue`
+
+主要模块：
+
+1. **筛选卡片**：关键词、类型、模块、用途、状态、时间范围（双日历）；
+2. **表格增强**：
+   - 预览列：图片/视频缩略展示，SVG iframe 渲染；
+   - 选择列 + 批量操作工具条（删除 / 状态切换 / CSV 导出）；
+3. **自定义表单**（`#form` 插槽）：
+   - 资料字段（类型、模块、用途、版本、分类、状态、标签、描述、上传人）；
+   - 自定义上传流程：点击按钮触发 `<input type="file">` → 调用 `/file/uploadAsset` → 自动回填 `filePath/width/height/dimensions`；
+4. **预览弹窗**：支持图片、视频、SVG 动态加载，并展示元信息；
+5. **索引导出**：前端生成 CSV（UTF-8 BOM）下载。
+
+### 4.3 菜单与路由
+
+- `constants/menu.ts`：`System Management` 下新增 “Assets Management” 菜单（按钮权限：Add/View/Edit/Delete）。
+- `router/index.ts`：注册懒加载路由 `/assets` -> `views/modules/assets/list.vue`。
+
+---
+
+## 5. 使用指南
+
+1. **上传素材**
+   1. `素材管理 → 新增`；
+   2. 选择类型、模块、用途，填写版本/标签/描述；
+   3. 点击 “选择文件” 上传，成功后会回填 `filePath` 与尺寸；
+   4. 保存后在列表可预览 / 复制路径。
+2. **过滤与检索**
+   - 顶部筛选栏支持关键词、类型、模块、用途、状态、时间范围多条件组合；
+   - 支持模糊匹配名称、标签（`keyword`）。
+3. **批量操作**
+   - 选中多条后可：
+     - 批量删除（调用 `/assets/delete`）；
+     - 批量启用/停用（`/assets/batchStatus`）；
+     - 导出索引（CSV）共享给设计/开发。
+4. **预览**
+   - 点击缩略图进入预览弹窗，图片/video/SVG 即时展示，其他类型提示下载。
+
+---
+
+## 6. API 速览
+
+| Method & Path | 描述 | 备注 |
+| --- | --- | --- |
+| `GET /assets/list` | 分页查询 | 支持 `keyword/assetType/module/usage/status/startDate/endDate` |
+| `GET /assets/info/{id}` | 详情 | |
+| `GET /assets/preview/{id}` | 预览元数据 | 返回尺寸、路径等 |
+| `POST /assets/save` | 新增 | 与上传接口搭配 |
+| `POST /assets/update` | 编辑 | |
+| `POST /assets/delete` | 批量删除 | Body: `Long[]` |
+| `POST /assets/batchDelete` | 条件删除 | Body 携带 module/type/status |
+| `POST /assets/batchStatus` | 批量状态 | Body: `{ ids: Long[], status: string }` |
+| `POST /file/uploadAsset` | 上传文件并建档 | Multipart，自动写入 `assets` 表 |
+
+---
+
+## 7. 测试建议
+
+1. **单元/集成**：
+   - `FileController` 现有测试可扩展至 `uploadAsset`（校验返回字段、尺寸解析）。
+2. **手动测试**：
+   - 上传各类型素材（WebP/JPG/SVG/GLB/MP4），验证文件存储与预览；
+   - 筛选、分页、批量操作、CSV 导出；
+   - 权限校验：不同角色按钮可见性（基于 `menu.ts` 权限点）。
+3. **性能**：
+   - 大批量分页（≥500 条）滚动，确认请求参数与索引命中；
+   - 文件体积限制提示与错误处理。
+
+---
+
+## 8. 后续可扩展项
+
+- 引入对象存储（OSS / S3），将 `file_path` 替换为 CDN 地址；
+- 增加素材引用追踪（记录使用页面、组件）；
+- 支持在线裁剪/压缩与多规格管理；
+- 结合审批流（新增素材需审核后生效）。
+
+---
+
+如需进一步集成或新增字段，请同步更新：
+
+1. `schema-postgresql.sql` + `AssetsEntity`；
+2. `AssetsServiceImpl.buildWrapper`（过滤逻辑）；
+3. `assets/list.vue` 表单与显示字段；
+4. 文档本文件，以保持需求与实现同步。***
+
+
+
+
+
+
+
+

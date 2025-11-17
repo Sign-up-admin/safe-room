@@ -1,0 +1,341 @@
+# Prometheus Alert Rules for Fitness Gym System
+# Version: 1.0.0
+# Updated: 2025-11-17
+
+groups:
+  # Application Performance Alerts
+  - name: fitness_gym_application_alerts
+    rules:
+      # API Response Time Alert
+      - alert: APISlowResponse
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: backend
+          team: platform
+        annotations:
+          summary: "API Response Time Slow"
+          description: "95th percentile response time > 2s for 5 minutes. Current value: {{ $value }}s"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/api-slow-response"
+          dashboard_url: "http://grafana:3000/d/api-performance"
+
+      # API High Error Rate
+      - alert: APIHighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: backend
+          team: platform
+        annotations:
+          summary: "High API Error Rate"
+          description: "API error rate > 5% for 5 minutes. Current error rate: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/api-high-errors"
+
+      # API Down
+      - alert: APIDown
+        expr: up{job="fitness-gym-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: backend
+          team: platform
+        annotations:
+          summary: "Backend API is Down"
+          description: "Fitness Gym backend API has been down for 2 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/api-down"
+
+      # Database Connection Pool Exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: fitness_gym_db_connections_active / fitness_gym_db_connections_max > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+          team: platform
+        annotations:
+          summary: "Database Connection Pool Near Capacity"
+          description: "Database connection pool usage > 90%. Current usage: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/db-connection-pool"
+
+  # System Resource Alerts
+  - name: fitness_gym_system_alerts
+    rules:
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          team: infrastructure
+        annotations:
+          summary: "High CPU Usage"
+          description: "CPU usage > 85% for 5 minutes on {{ $labels.instance }}. Current usage: {{ $value }}%"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/high-cpu"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          team: infrastructure
+        annotations:
+          summary: "High Memory Usage"
+          description: "Memory usage > 90% for 5 minutes on {{ $labels.instance }}. Current usage: {{ $value }}%"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/high-memory"
+
+      # Low Disk Space
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          service: system
+          team: infrastructure
+        annotations:
+          summary: "Low Disk Space"
+          description: "Disk space < 10% available on {{ $labels.instance }} mountpoint {{ $labels.mountpoint }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/low-disk-space"
+
+      # System Load High
+      - alert: SystemLoadHigh
+        expr: node_load1 > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          team: infrastructure
+        annotations:
+          summary: "System Load High"
+          description: "System load 1-minute average > 5 on {{ $labels.instance }}. Current load: {{ $value }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/high-system-load"
+
+  # Database Alerts
+  - name: fitness_gym_database_alerts
+    rules:
+      # Database Down
+      - alert: DatabaseDown
+        expr: pg_up == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: database
+          team: database
+        annotations:
+          summary: "PostgreSQL Database Down"
+          description: "PostgreSQL database has been down for 2 minutes on {{ $labels.instance }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/database-down"
+
+      # Database High Connections
+      - alert: DatabaseHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+          team: database
+        annotations:
+          summary: "High Database Connections"
+          description: "Database connections > 80 for 5 minutes. Current connections: {{ $value }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/db-high-connections"
+
+      # Database Slow Queries
+      - alert: DatabaseSlowQueries
+        expr: rate(pg_stat_activity_max_tx_duration[5m]) > 30
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+          team: database
+        annotations:
+          summary: "Slow Database Queries"
+          description: "Slow queries detected (>30s) in the last 5 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/db-slow-queries"
+
+  # Redis Alerts
+  - name: fitness_gym_redis_alerts
+    rules:
+      # Redis Down
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: redis
+          team: infrastructure
+        annotations:
+          summary: "Redis Cache Down"
+          description: "Redis cache has been down for 2 minutes on {{ $labels.instance }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/redis-down"
+
+      # Redis High Memory Usage
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+          team: infrastructure
+        annotations:
+          summary: "Redis High Memory Usage"
+          description: "Redis memory usage > 90%. Current usage: {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/redis-high-memory"
+
+      # Redis High Connection Count
+      - alert: RedisHighConnections
+        expr: redis_connected_clients > 500
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+          team: infrastructure
+        annotations:
+          summary: "Redis High Connection Count"
+          description: "Redis connections > 500. Current connections: {{ $value }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/redis-high-connections"
+
+  # MinIO Storage Alerts
+  - name: fitness_gym_minio_alerts
+    rules:
+      # MinIO Down
+      - alert: MinIODown
+        expr: up{job="minio"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: storage
+          team: infrastructure
+        annotations:
+          summary: "MinIO Storage Down"
+          description: "MinIO storage service has been down for 2 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/minio-down"
+
+      # MinIO High Disk Usage
+      - alert: MinIOHighDiskUsage
+        expr: (minio_disk_total_bytes - minio_disk_used_bytes) / minio_disk_total_bytes < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: storage
+          team: infrastructure
+        annotations:
+          summary: "MinIO Low Disk Space"
+          description: "MinIO disk space < 10% available"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/minio-low-disk"
+
+  # Business Logic Alerts
+  - name: fitness_gym_business_alerts
+    rules:
+      # Low Active Users (might indicate system issues)
+      - alert: LowActiveUsers
+        expr: fitness_gym_active_users < 5
+        for: 15m
+        labels:
+          severity: info
+          service: business
+          team: business
+        annotations:
+          summary: "Low Active Users"
+          description: "Active users below normal threshold (< 5) for 15 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/low-active-users"
+
+      # High Failed Login Attempts
+      - alert: HighFailedLoginAttempts
+        expr: rate(fitness_gym_failed_logins_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: security
+          team: security
+        annotations:
+          summary: "High Failed Login Attempts"
+          description: "Failed login attempts > 10 per minute for 5 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/high-failed-logins"
+
+      # High Booking Rate (potential DoS)
+      - alert: HighBookingRate
+        expr: rate(fitness_gym_workout_bookings_total[1m]) > 100
+        for: 2m
+        labels:
+          severity: warning
+          service: business
+          team: business
+        annotations:
+          summary: "High Booking Rate Detected"
+          description: "Workout booking rate > 100 per minute for 2 minutes. Possible automated activity."
+          runbook_url: "https://docs.fitness-gym.com/runbooks/high-booking-rate"
+
+  # Container and Orchestration Alerts
+  - name: fitness_gym_container_alerts
+    rules:
+      # Container Restarting Frequently
+      - alert: ContainerRestarting
+        expr: rate(container_last_seen{container_state="exited"}[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: container
+          team: infrastructure
+        annotations:
+          summary: "Container Restarting Frequently"
+          description: "Container {{ $labels.container_name }} is restarting frequently"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/container-restarting"
+
+      # Container High CPU Usage
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: container
+          team: infrastructure
+        annotations:
+          summary: "Container High CPU Usage"
+          description: "Container {{ $labels.container_name }} CPU usage > 80% for 5 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/container-high-cpu"
+
+      # Container High Memory Usage
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: container
+          team: infrastructure
+        annotations:
+          summary: "Container High Memory Usage"
+          description: "Container {{ $labels.container_name }} memory usage > 90% for 5 minutes"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/container-high-memory"
+
+  # Network Alerts
+  - name: fitness_gym_network_alerts
+    rules:
+      # Network Errors High
+      - alert: NetworkErrorsHigh
+        expr: rate(node_network_receive_errs_total[5m]) > 10 or rate(node_network_transmit_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: network
+          team: infrastructure
+        annotations:
+          summary: "High Network Errors"
+          description: "Network errors > 10 per second on {{ $labels.device }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/network-errors"
+
+      # Network Saturation
+      - alert: NetworkSaturation
+        expr: rate(node_network_receive_bytes_total[5m]) / 1024 / 1024 > 100 or rate(node_network_transmit_bytes_total[5m]) / 1024 / 1024 > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: network
+          team: infrastructure
+        annotations:
+          summary: "Network Saturation"
+          description: "Network traffic > 100 MB/s on {{ $labels.device }}"
+          runbook_url: "https://docs.fitness-gym.com/runbooks/network-saturation"

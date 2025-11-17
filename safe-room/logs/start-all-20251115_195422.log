@@ -1,0 +1,15 @@
+[2025-11-15 19:54:22] [INFO] === Full-stack dev launcher ===
+[2025-11-15 19:54:22] [INFO] Docker check passed
+[2025-11-15 19:54:22] [INFO] Java check passed
+[2025-11-15 19:54:23] [INFO] Maven check passed
+[2025-11-15 19:54:23] [INFO] Node.js check passed
+[2025-11-15 19:54:24] [INFO] npm check passed
+[2025-11-15 19:54:24] [INFO] Skipping database (--SkipDatabase)
+[2025-11-15 19:54:24] [INFO] Skipping backend (--SkipBackend)
+[2025-11-15 19:54:24] [INFO] Skipping front-end (--SkipFrontend)
+[2025-11-15 19:54:25] [WARN] Note: port 8081 already in use; admin Vite will pick another port
+[2025-11-15 19:54:25] [INFO] Admin Vite started. Log: C:\safe-room\logs\admin-vite-20251115_195422.log. PID: 4012
+[2025-11-15 19:54:26] [INFO] Admin Vite port 127.0.0.1:8081 is ready
+[2025-11-15 19:54:26] [INFO] Process info written to: C:\safe-room\logs\start-all-processes.json
+[2025-11-15 19:54:26] [INFO] All services triggered. Check each console window for live logs.
+[2025-11-15 19:54:26] [INFO] Use .\stop-all.ps1 to stop services when finished.

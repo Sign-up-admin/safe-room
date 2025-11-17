@@ -1,0 +1,8 @@
+export { default as SmartHeader } from './SmartHeader.vue'
+export { default as HeroSection } from './HeroSection.vue'
+export { default as CoachNetwork } from './CoachNetwork.vue'
+export { default as ServiceCards } from './ServiceCards.vue'
+export { default as Testimonials } from './Testimonials.vue'
+export { default as FloatingServiceButton } from './FloatingServiceButton.vue'
+export { default as TechFooter } from './Footer.vue'
+

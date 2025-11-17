@@ -1,0 +1,210 @@
+---
+title: 需求文档索引
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: requirements
+---
+
+# 📋 需求文档索引
+
+> **版本**：v1.0.0
+> **更新日期**：2025-11-16
+> **适用范围**：需求文档导航
+> **关键词**：需求文档, 功能规格, 用户界面
+
+---
+
+## 📋 目录
+
+- [概述](#概述)
+- [前端需求文档](#前端需求文档)
+- [管理后台需求文档](#管理后台需求文档)
+- [通用需求文档](#通用需求文档)
+- [文档统计](#文档统计)
+
+---
+
+## 📖 概述
+
+### 文档定位
+
+需求文档是健身房综合管理系统的基础，定义了系统的功能范围、用户界面设计、业务流程和验收标准。
+
+### 适用对象
+
+- **产品经理**：负责需求定义和业务分析
+- **UI/UX设计师**：负责界面设计和用户体验
+- **开发人员**：了解功能需求和实现要求
+- **测试人员**：制定测试用例和验收标准
+
+### 文档层次
+
+```
+需求文档
+├── 前端需求 (11个文档)
+│   ├── 页面需求
+│   ├── 功能需求
+│   └── 交互设计
+├── 管理后台需求 (5个文档)
+│   ├── 管理功能
+│   ├── 数据管理
+│   └── 系统配置
+└── 通用需求
+    ├── 业务流程
+    ├── 用户体验
+    └── 技术约束
+```
+
+---
+
+## 🌐 前端需求文档
+
+### 核心功能模块
+
+#### 1. 用户中心模块
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [用户中心需求](frontend/USER_CENTER_REQUIREMENTS.md) | active | - | 用户个人信息管理 |
+| [会员购买需求](frontend/MEMBERSHIP_PURCHASE_REQUIREMENTS.md) | active | - | 会员卡购买流程 |
+| [会员卡需求](frontend/MEMBERSHIP_CARDS_REQUIREMENTS.md) | active | - | 会员卡展示和管理 |
+
+#### 2. 课程预约模块
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [课程列表需求](frontend/COURSES_LIST_REQUIREMENTS.md) | active | - | 课程信息展示 |
+| [课程详情需求](frontend/COURSES_DETAIL_REQUIREMENTS.md) | active | - | 课程详细信息 |
+| [课程预约需求](frontend/COURSE_BOOKING_REQUIREMENTS.md) | active | - | 预约流程设计 |
+| [课程退款需求](frontend/COURSE_REFUND_REQUIREMENTS.md) | active | - | 退款流程设计 |
+
+#### 3. 教练系统模块
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [教练列表需求](frontend/COACHES_LIST_REQUIREMENTS.md) | active | - | 教练信息展示 |
+| [教练详情需求](frontend/COACHES_DETAIL_REQUIREMENTS.md) | active | - | 教练详细信息 |
+| [私教预约需求](frontend/PRIVATE_COACH_BOOKING_REQUIREMENTS.md) | active | - | 私教预约流程 |
+
+### 通用功能
+
+#### 页面布局
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [首页需求](frontend/HOMEPAGE_REQUIREMENTS.md) | active | - | 网站首页设计 |
+
+### 需求概览
+
+- **[前端需求概览](frontend/FRONTEND_REQUIREMENTS_OVERVIEW.md)** - 前端需求总览和优先级
+- **[前端需求验证报告](FRONTEND_REQUIREMENTS_VERIFICATION_REPORT.md)** - 需求验证结果
+- **[前端需求索引](frontend/FRONTEND_REQUIREMENTS_INDEX.md)** - 前端文档导航
+
+---
+
+## 🖥️ 管理后台需求文档
+
+### 用户管理模块
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [管理员登录需求](admin/ADMIN_LOGIN_REQUIREMENTS.md) | active | - | 管理员登录功能 |
+| [管理员注册需求](admin/ADMIN_REGISTER_REQUIREMENTS.md) | active | - | 管理员注册功能 |
+| [管理员概览需求](admin/ADMIN_OVERVIEW_REQUIREMENTS.md) | active | - | 管理员主页功能 |
+
+### 系统管理模块
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [模块 CRUD 需求](admin/ADMIN_MODULE_CRUD_REQUIREMENTS.md) | active | - | 数据管理功能 |
+| [系统管理需求](admin/ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md) | active | - | 系统配置功能 |
+
+---
+
+## 🔧 通用需求文档
+
+### 业务功能需求
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [会员过期提醒需求](MEMBERSHIP_EXPIRY_REMINDER_REQUIREMENTS.md) | active | - | 会员到期提醒 |
+| [会员续费需求](MEMBERSHIP_RENEWAL_REQUIREMENTS.md) | active | - | 会员续费流程 |
+| [支付需求](PAYMENT_REQUIREMENTS.md) | active | - | 支付功能需求 |
+| [通知系统需求](NOTIFICATION_SYSTEM_REQUIREMENTS.md) | active | - | 系统通知功能 |
+
+### 用户体验需求
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [错误页面需求](ERROR_PAGES_REQUIREMENTS.md) | active | - | 错误页面设计 |
+| [响应式设计需求](RESPONSIVE_STRATEGY_REQUIREMENTS.md) | active | - | 响应式布局要求 |
+| [设计系统概览](DESIGN_SYSTEM_OVERVIEW.md) | active | - | 设计规范和组件 |
+
+### 内容管理需求
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [新闻列表需求](NEWS_LIST_REQUIREMENTS.md) | active | - | 新闻列表展示 |
+| [新闻详情需求](NEWS_DETAIL_REQUIREMENTS.md) | active | - | 新闻详情展示 |
+| [论坛功能需求](FORUM_IMPLEMENTATION_GUIDE.md) | active | - | 论坛功能设计 |
+| [收藏功能需求](FAVORITES_REQUIREMENTS.md) | active | - | 用户收藏功能 |
+
+---
+
+## 📊 文档统计
+
+### 数量统计
+
+| 分类 | 文档数量 | 占比 | 状态 |
+|------|----------|------|------|
+| 前端需求文档 | 11 | 68.8% | ✅ 完整 |
+| 管理后台需求文档 | 5 | 31.2% | ✅ 完整 |
+| 通用需求文档 | - | - | 分布在根目录 |
+| **总计** | **16** | **100%** | |
+
+### 文档状态分布
+
+| 状态 | 数量 | 占比 | 说明 |
+|------|------|------|------|
+| active | 16 | 100% | 所有需求文档都是活跃状态 |
+| draft | 0 | 0% | 无草稿文档 |
+| deprecated | 0 | 0% | 无过时文档 |
+
+### 更新频率
+
+- **最近1个月更新**: 2 个文档
+- **最近3个月更新**: 5 个文档
+- **超过3个月未更新**: 9 个文档
+
+---
+
+## 🔗 相关文档
+
+### 技术实现文档
+
+- [前端技术文档](../technical/architecture/ARCHITECTURE.md)
+- [API 文档](../technical/api/API.md)
+- [数据库设计](../technical/database/DATABASE.md)
+
+### 开发指南
+
+- [前端开发指南](../development/guides/DEVELOPMENT.md)
+- [测试策略](../development/testing/TESTING_STRATEGY.md)
+
+### 项目文档
+
+- [主索引](../INDEX.md)
+- [文档编写指南](../DOCUMENTATION_GUIDE.md)
+
+---
+
+## 📝 更新记录
+
+| 日期 | 版本 | 更新内容 | 更新人 |
+|------|------|----------|--------|
+| 2025-11-16 | v1.0.0 | 初始版本，建立需求文档索引 | 文档工程团队 |
+
+---
+
+*本文档由自动化工具生成和维护，最后更新时间：2025-11-16*

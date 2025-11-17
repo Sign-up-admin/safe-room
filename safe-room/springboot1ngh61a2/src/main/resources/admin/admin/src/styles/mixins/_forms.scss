@@ -1,0 +1,229 @@
+// 表单 mixins
+@use '../tokens' as *;
+
+@mixin form-field {
+  .el-input,
+  .el-select,
+  .el-date-editor {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper),
+  :deep(.el-date-editor.el-input__wrapper) {
+    background: $color-bg-panel;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    box-shadow: none;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: $color-border-dark;
+    }
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-input__placeholder) {
+    color: $color-text-primary;
+    font-size: $font-size-base;
+  }
+
+  :deep(.is-focus .el-input__wrapper),
+  :deep(.is-focus .el-select__wrapper),
+  :deep(.is-active .el-input__wrapper) {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px $color-primary-lighter;
+  }
+
+  :deep(.el-input__inner::placeholder) {
+    color: $color-text-muted;
+  }
+}
+
+@mixin form-field-dark {
+  // 保留深色主题的表单样式（用于特殊场景）
+  .el-input,
+  .el-select,
+  .el-date-editor {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper),
+  :deep(.el-date-editor.el-input__wrapper) {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: $radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-input__placeholder) {
+    color: $color-text-secondary;
+  }
+
+  :deep(.is-focus .el-input__wrapper),
+  :deep(.is-focus .el-select__wrapper),
+  :deep(.is-active .el-input__wrapper) {
+    border-color: $color-primary;
+    box-shadow: $shadow-glow;
+  }
+}
+
+@mixin form-group {
+  margin-bottom: spacing(lg);
+
+  label {
+    display: block;
+    margin-bottom: spacing(xs);
+    color: $color-text-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+}
+
+// 增强的表单字段样式（包含hover、focus状态）
+@mixin form-field-enhanced {
+  :deep(.el-input__wrapper) {
+    border-radius: $radius-lg;
+    box-shadow: $shadow-soft;
+    transition: $transition-slow;
+    background-color: $color-bg-panel !important;
+    border: 1px solid $color-border-form !important;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      border-color: $color-border-form-hover !important;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 $radius-xs $color-primary-lighter !important;
+      border-color: $color-primary !important;
+    }
+  }
+
+  :deep(.el-input__inner) {
+    font-size: $font-size-md;
+    color: $color-text-input !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  :deep(.el-input__prefix),
+  :deep(.el-input__suffix) {
+    color: $color-icon;
+
+    .el-icon {
+      color: $color-icon;
+    }
+  }
+
+  :deep(.el-textarea__inner) {
+    border-radius: $radius-md;
+    box-shadow: $shadow-soft;
+    transition: $transition-slow;
+
+    &:hover {
+      box-shadow: $shadow-md;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 $radius-xs $color-primary-lighter;
+      border-color: $color-primary;
+    }
+  }
+}
+
+// 增强的表单样式（包含标签、输入框、提示等）
+@mixin form-enhanced {
+  margin-top: spacing(xs);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  height: auto !important;
+  background: transparent !important;
+  padding: 0 !important;
+
+  :deep(.el-form-item) {
+    margin-bottom: spacing(lg);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  // 表单标签样式
+  :deep(.el-form-item__label) {
+    color: $color-text-label !important;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+    margin-bottom: spacing(xs);
+    padding: 0 !important;
+    line-height: $line-height-normal;
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+
+    // 移除右侧的伪元素
+    &::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    // 确保标签内的所有文本元素都是灰色
+    * {
+      color: $color-text-label !important;
+    }
+  }
+
+  // 必填字段样式
+  :deep(.el-form-item.is-required) {
+    .el-form-item__label {
+      color: $color-text-label !important;
+      padding-left: 0 !important;
+      position: relative;
+
+      // 移除右侧的伪元素
+      &::after {
+        display: none !important;
+        content: none !important;
+      }
+
+      // 添加自定义的左侧红色星号
+      &::before {
+        content: '*' !important;
+        display: inline-block !important;
+        color: $color-danger !important;
+        margin-right: $radius-xs;
+        font-weight: $font-weight-normal;
+        font-size: $font-size-base;
+        vertical-align: middle;
+      }
+
+      // 强制标签文本和所有子元素为灰色
+      &,
+      * {
+        color: $color-text-label !important;
+      }
+    }
+  }
+
+  // 错误提示样式
+  :deep(.el-form-item__error) {
+    padding-top: $radius-xs;
+    font-size: $font-size-xs;
+    color: $color-danger;
+    line-height: $line-height-normal;
+  }
+
+  // 输入框容器样式
+  :deep(.el-input) {
+    width: 100%;
+  }
+
+  @include form-field-enhanced;
+}

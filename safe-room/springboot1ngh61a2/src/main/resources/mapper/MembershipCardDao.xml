@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.MembershipCardDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.MembershipCardEntity" id="membershipCardMap">
+        <result property="membershipCardName" column="membership_card_name"/>
+        <result property="image" column="image"/>
+        <result property="validityPeriod" column="validity_period"/>
+        <result property="price" column="price"/>
+        <result property="usageInstructions" column="usage_instructions"/>
+        <result property="membershipCardDetails" column="membership_card_details"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.MembershipCardVO" >
+		SELECT * FROM membership_card  membership_card         
+        <where>
+            ${ew.sqlSegment}
+        </where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.MembershipCardVO" >
+		SELECT  membership_card.* FROM membership_card  membership_card 	
+ 		<where>
+            ${ew.sqlSegment}
+        </where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.MembershipCardView" >
+
+		SELECT  membership_card.* FROM membership_card  membership_card 	        
+        <where>
+            ${ew.sqlSegment}
+        </where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.MembershipCardView" >
+		SELECT * FROM membership_card  membership_card
+		<where>
+            ${ew.sqlSegment}
+        </where>
+	</select>
+	
+
+
+</mapper>
+
+
+
+

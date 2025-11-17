@@ -1,0 +1,1529 @@
+# 测试代码示例
+
+## 📋 目录
+
+- [前端测试示例](#前端测试示例)
+- [后端测试示例](#后端测试示例)
+- [集成测试示例](#集成测试示例)
+- [Mock和Stub示例](#mock和stub示例)
+- [测试数据示例](#测试数据示例)
+
+## 🎨 前端测试示例
+
+### 组件单元测试
+
+#### 基础组件测试
+
+```typescript
+// src/components/Button/__tests__/Button.test.ts
+import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils'
+import Button from '../Button.vue'
+
+describe('Button', () => {
+  it('renders correctly', () => {
+    const wrapper = mount(Button, {
+      props: {
+        text: 'Click me'
+      }
+    })
+
+    expect(wrapper.text()).toBe('Click me')
+  })
+
+  it('emits click event when clicked', async () => {
+    const wrapper = mount(Button)
+    const button = wrapper.find('button')
+
+    await button.trigger('click')
+
+    expect(wrapper.emitted('click')).toBeTruthy()
+  })
+
+  it('applies correct CSS classes', () => {
+    const wrapper = mount(Button, {
+      props: {
+        variant: 'primary',
+        size: 'large'
+      }
+    })
+
+    expect(wrapper.classes()).toContain('button--primary')
+    expect(wrapper.classes()).toContain('button--large')
+  })
+})
+```
+
+#### 复杂组件测试 - IndexHeader
+
+```typescript
+// src/components/index/IndexHeader/__tests__/IndexHeader.test.ts
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import IndexHeader from '../../../src/components/index/IndexHeader.vue'
+
+// Mock dependencies
+vi.mock('../../../src/utils/base', () => ({
+  default: {
+    get: vi.fn(() => ({
+      url: 'http://localhost:8080/springboot1ngh61a2/',
+      name: 'springboot1ngh61a2',
+      indexUrl: 'http://localhost:8080/springboot1ngh61a2/front/dist/index.html'
+    })),
+    getProjectName: vi.fn(() => ({
+      projectName: 'Gym Management System'
+    }))
+  }
+}))
+
+vi.mock('../../../src/utils/storage', () => ({
+  default: {
+    get: vi.fn(),
+    set: vi.fn(),
+    clear: vi.fn(),
+    remove: vi.fn()
+  }
+}))
+
+vi.mock('../../../src/utils/http', () => ({
+  default: {
+    get: vi.fn()
+  }
+}))
+
+vi.mock('element-plus', () => ({
+  ElMessage: {
+    error: vi.fn()
+  }
+}))
+
+vi.mock('../../../src/stores/tagsView', () => ({
+  useTagsViewStore: vi.fn(() => ({
+    delAllViews: vi.fn()
+  }))
+}))
+
+describe('IndexHeader', () => {
+  let router: any
+  let pinia: any
+
+  beforeEach(() => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+
+    router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { name: 'login', path: '/login' },
+        { name: 'home', path: '/' },
+        { name: 'center', path: '/center' }
+      ]
+    })
+
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  describe('Component Rendering', () => {
+    it('should render component correctly', () => {
+      const wrapper = mount(IndexHeader, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      expect(wrapper.exists()).toBe(true)
+      expect(wrapper.find('.navbar').exists()).toBe(true)
+      expect(wrapper.find('.title').exists()).toBe(true)
+      expect(wrapper.find('.user-dropdown').exists()).toBe(true)
+    })
+
+    it('should display project name', () => {
+      const wrapper = mount(IndexHeader, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      expect(wrapper.text()).toContain('Gym Management System')
+    })
+  })
+
+  describe('handleCommand', () => {
+    it('should navigate to home when command is empty string', async () => {
+      const wrapper = mount(IndexHeader, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const pushSpy = vi.spyOn(router, 'push')
+
+      await wrapper.vm.handleCommand('')
+
+      expect(pushSpy).toHaveBeenCalledWith('/')
+    })
+
+    it('should navigate to center when command is "center"', async () => {
+      const wrapper = mount(IndexHeader, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const pushSpy = vi.spyOn(router, 'push')
+
+      await wrapper.vm.handleCommand('center')
+
+      expect(pushSpy).toHaveBeenCalledWith('/center')
+    })
+  })
+
+  describe('onLogout', () => {
+    it('should clear storage, delete all views, and navigate to login', async () => {
+      const mockTagsViewStore = vi.mocked(require('../../../src/stores/tagsView').useTagsViewStore)
+
+      const wrapper = mount(IndexHeader, {
+        global: {
+          plugins: [router, pinia]
+        }
+      })
+
+      const clearSpy = vi.mocked(require('../../../src/utils/storage').default.clear)
+      const delAllViewsSpy = mockTagsViewStore().delAllViews
+      const replaceSpy = vi.spyOn(router, 'replace')
+
+      await wrapper.vm.onLogout()
+
+      expect(clearSpy).toHaveBeenCalled()
+      expect(delAllViewsSpy).toHaveBeenCalled()
+      expect(replaceSpy).toHaveBeenCalledWith({ name: 'login' })
+    })
+  })
+})
+```
+
+### 工具函数测试
+
+#### 错误处理工具测试
+
+```typescript
+// src/utils/__tests__/errorHandler.test.ts
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import {
+  vueErrorHandler,
+  unhandledRejectionHandler,
+  globalErrorHandler,
+  resourceErrorHandler,
+  setupErrorHandlers,
+  getStoredErrors,
+  clearStoredErrors,
+  clearErrorDedupeCache,
+} from '../errorHandler'
+
+// Setup browser APIs
+const setupBrowserAPIs = () => {
+  Object.defineProperty(window, 'localStorage', {
+    value: {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn()
+    },
+    writable: true
+  })
+}
+
+setupBrowserAPIs()
+
+describe('错误处理工具', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    clearErrorDedupeCache()
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'info').mockImplementation(() => {})
+    vi.spyOn(console, 'group').mockImplementation(() => {})
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {})
+
+    Object.defineProperty(window, 'navigator', {
+      value: { userAgent: 'test-agent', onLine: true },
+      writable: true,
+    })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    clearStoredErrors()
+  })
+
+  describe('vueErrorHandler', () => {
+    it('应该处理Vue组件错误', () => {
+      const error = new Error('Test error')
+      const instance = { $options: { name: 'TestComponent' } }
+      vueErrorHandler(error, instance, 'render')
+
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0].type).toBe('vue')
+      expect(errors[0].message).toContain('Vue 组件错误')
+      expect(errors[0].componentName).toBe('TestComponent')
+    })
+
+    it('应该处理字符串错误', () => {
+      vueErrorHandler('String error', null, 'render')
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0].message).toContain('String error')
+    })
+  })
+
+  describe('unhandledRejectionHandler', () => {
+    it('应该处理Promise拒绝', () => {
+      const error = new Error('Promise rejection')
+      const event = {
+        reason: error,
+        preventDefault: vi.fn(),
+      } as any
+
+      unhandledRejectionHandler(event)
+
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0].type).toBe('promise')
+      expect(errors[0].message).toContain('未处理的 Promise 拒绝')
+      expect(event.preventDefault).toHaveBeenCalled()
+    })
+  })
+
+  describe('globalErrorHandler', () => {
+    it('应该处理ErrorEvent', () => {
+      const error = new Error('Global error')
+      const event = new ErrorEvent('error', {
+        error,
+        message: 'Test error',
+        filename: 'test.js',
+        lineno: 10,
+        colno: 5,
+      })
+
+      globalErrorHandler(event)
+
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0].type).toBe('error')
+      expect(errors[0].source).toBe('test.js')
+      expect(errors[0].lineno).toBe(10)
+      expect(errors[0].colno).toBe(5)
+    })
+  })
+
+  describe('错误去重', () => {
+    it('5秒内相同错误应该只记录一次', () => {
+      vi.useFakeTimers()
+      const error = new Error('Same error')
+
+      vueErrorHandler(error, null, 'render')
+      vueErrorHandler(error, null, 'render')
+
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(1)
+
+      vi.useRealTimers()
+    })
+
+    it('5秒后相同错误应该再次记录', () => {
+      vi.useFakeTimers()
+      const error = new Error('Same error')
+
+      vueErrorHandler(error, null, 'render')
+      vi.advanceTimersByTime(6000)
+      vueErrorHandler(error, null, 'render')
+
+      const errors = getStoredErrors()
+      expect(errors.length).toBe(2)
+
+      vi.useRealTimers()
+    })
+  })
+})
+```
+
+### 组合式函数测试
+
+```typescript
+// src/composables/__tests__/useAuth.test.ts
+import { describe, it, expect, vi } from 'vitest'
+import { createTestingPinia } from '@pinia/testing'
+import { useAuth } from '../useAuth'
+
+// Mock API
+vi.mock('../api/auth', () => ({
+  login: vi.fn(),
+  logout: vi.fn(),
+  getCurrentUser: vi.fn()
+}))
+
+import { login, logout, getCurrentUser } from '../api/auth'
+
+describe('useAuth', () => {
+  const createComposable = () => {
+    const pinia = createTestingPinia()
+    return useAuth()
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('initialization', () => {
+    it('should return default values', () => {
+      const { isAuthenticated, user, loading, error } = createComposable()
+
+      expect(isAuthenticated.value).toBe(false)
+      expect(user.value).toBeNull()
+      expect(loading.value).toBe(false)
+      expect(error.value).toBeNull()
+    })
+  })
+
+  describe('login', () => {
+    it('should login successfully', async () => {
+      const { login, isAuthenticated, user, loading, error } = createComposable()
+
+      const mockUser = { id: 1, username: 'testuser', email: 'test@example.com' }
+      vi.mocked(login).mockResolvedValue({
+        success: true,
+        data: mockUser
+      })
+
+      await login('testuser', 'password')
+
+      expect(isAuthenticated.value).toBe(true)
+      expect(user.value).toEqual(mockUser)
+      expect(loading.value).toBe(false)
+      expect(error.value).toBeNull()
+    })
+
+    it('should handle login failure', async () => {
+      const { login, isAuthenticated, user, loading, error } = createComposable()
+
+      vi.mocked(login).mockRejectedValue(new Error('Invalid credentials'))
+
+      await login('testuser', 'wrongpassword')
+
+      expect(isAuthenticated.value).toBe(false)
+      expect(user.value).toBeNull()
+      expect(loading.value).toBe(false)
+      expect(error.value).toContain('Invalid credentials')
+    })
+  })
+
+  describe('logout', () => {
+    it('should logout successfully', async () => {
+      const { login, logout, isAuthenticated, user } = createComposable()
+
+      // 先登录
+      vi.mocked(login).mockResolvedValue({
+        success: true,
+        data: { id: 1, username: 'testuser' }
+      })
+      await login('testuser', 'password')
+
+      // 再登出
+      vi.mocked(logout).mockResolvedValue({ success: true })
+
+      await logout()
+
+      expect(isAuthenticated.value).toBe(false)
+      expect(user.value).toBeNull()
+    })
+  })
+})
+```
+
+### E2E测试示例
+
+```typescript
+// tests/e2e/auth/login.spec.ts
+import { test, expect } from '@playwright/test'
+
+test.describe('用户登录', () => {
+  test('成功登录', async ({ page }) => {
+    // 访问登录页面
+    await page.goto('/login')
+
+    // 填写登录表单
+    await page.fill('[data-test="username"]', 'admin')
+    await page.fill('[data-test="password"]', 'admin')
+
+    // 点击登录按钮
+    await page.click('[data-test="submit"]')
+
+    // 验证跳转到仪表板
+    await expect(page).toHaveURL('/admin/dashboard')
+
+    // 验证页面标题
+    await expect(page.locator('h1')).toContainText('仪表板')
+  })
+
+  test('登录失败显示错误信息', async ({ page }) => {
+    await page.goto('/login')
+
+    await page.fill('[data-test="username"]', 'invalid')
+    await page.fill('[data-test="password"]', 'invalid')
+
+    await page.click('[data-test="submit"]')
+
+    // 验证错误信息显示
+    await expect(page.locator('[data-test="error-message"]'))
+      .toContainText('用户名或密码错误')
+  })
+
+  test('必填字段验证', async ({ page }) => {
+    await page.goto('/login')
+
+    // 直接点击提交，不填写任何字段
+    await page.click('[data-test="submit"]')
+
+    // 验证错误信息
+    await expect(page.locator('[data-test="username-error"]'))
+      .toContainText('请输入用户名')
+    await expect(page.locator('[data-test="password-error"]'))
+      .toContainText('请输入密码')
+  })
+})
+```
+
+## 🔧 后端测试示例
+
+### Controller测试
+
+#### REST API测试
+
+```java
+// src/test/java/com/controller/UserControllerTest.java
+@WebMvcTest(UserController.class)
+@WithMockUser
+public class UserControllerTest extends AbstractControllerTest {
+
+    @Autowired
+    private UserController userController;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    void shouldReturnUser_WhenValidIdProvided() throws Exception {
+        // Given
+        Long userId = 1L;
+        UserDTO expectedUser = UserDTO.builder()
+            .id(userId)
+            .username("testuser")
+            .email("test@example.com")
+            .phone("13800138000")
+            .role("USER")
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        when(userService.getUserById(userId)).thenReturn(expectedUser);
+
+        // When & Then
+        mockMvc.perform(get("/api/users/{id}", userId))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.id").value(userId))
+               .andExpect(jsonPath("$.username").value("testuser"))
+               .andExpect(jsonPath("$.email").value("test@example.com"))
+               .andExpect(jsonPath("$.phone").value("13800138000"));
+    }
+
+    @Test
+    void shouldReturnNotFound_WhenUserDoesNotExist() throws Exception {
+        // Given
+        Long nonExistentId = 999L;
+        when(userService.getUserById(nonExistentId))
+            .thenThrow(new UserNotFoundException("用户不存在"));
+
+        // When & Then
+        mockMvc.perform(get("/api/users/{id}", nonExistentId))
+               .andExpect(status().isNotFound())
+               .andExpect(jsonPath("$.code").value(404))
+               .andExpect(jsonPath("$.msg").value("用户不存在"));
+    }
+
+    @Test
+    void shouldCreateUser_WhenValidDataProvided() throws Exception {
+        // Given
+        UserCreateRequest request = UserCreateRequest.builder()
+            .username("newuser")
+            .email("newuser@example.com")
+            .password("password123")
+            .phone("13800138000")
+            .build();
+
+        UserDTO expectedResponse = UserDTO.builder()
+            .id(1L)
+            .username("newuser")
+            .email("newuser@example.com")
+            .phone("13800138000")
+            .role("USER")
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        when(userService.createUser(request)).thenReturn(expectedResponse);
+
+        // When & Then
+        mockMvc.perform(post("/api/users")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(request)))
+               .andExpect(status().isCreated())
+               .andExpect(jsonPath("$.id").exists())
+               .andExpect(jsonPath("$.username").value("newuser"))
+               .andExpect(jsonPath("$.email").value("newuser@example.com"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenValidationFails() throws Exception {
+        // Given
+        UserCreateRequest invalidRequest = UserCreateRequest.builder()
+            .username("")  // 无效的用户名
+            .email("invalid-email")  // 无效的邮箱
+            .build();
+
+        // When & Then
+        mockMvc.perform(post("/api/users")
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(objectMapper.writeValueAsString(invalidRequest)))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.code").value(400));
+    }
+}
+```
+
+#### 分页API测试
+
+```java
+// src/test/java/com/controller/CourseControllerTest.java
+@WebMvcTest(CourseController.class)
+@WithMockUser
+public class CourseControllerTest extends AbstractControllerTest {
+
+    @MockBean
+    private CourseService courseService;
+
+    @Test
+    void shouldReturnPaginatedCourses_WhenValidParamsProvided() throws Exception {
+        // Given
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        List<CourseDTO> courses = Arrays.asList(
+            CourseDTO.builder().id(1L).name("瑜伽入门").price(BigDecimal.valueOf(99.00)).build(),
+            CourseDTO.builder().id(2L).name("力量训练").price(BigDecimal.valueOf(129.00)).build()
+        );
+        Page<CourseDTO> coursePage = new PageImpl<>(courses, pageRequest, 25);
+
+        when(courseService.getCourses(any(PageRequest.class), any(CourseQuery.class)))
+            .thenReturn(coursePage);
+
+        // When & Then
+        mockMvc.perform(get("/api/courses")
+                       .param("page", "0")
+                       .param("limit", "10")
+                       .param("name", "瑜伽"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.list").isArray())
+               .andExpect(jsonPath("$.list.length()").value(2))
+               .andExpect(jsonPath("$.total").value(25))
+               .andExpect(jsonPath("$.page").value(0))
+               .andExpect(jsonPath("$.limit").value(10))
+               .andExpect(jsonPath("$.list[0].name").value("瑜伽入门"))
+               .andExpect(jsonPath("$.list[1].name").value("力量训练"));
+    }
+}
+```
+
+#### 文件上传测试
+
+```java
+// src/test/java/com/controller/FileControllerTest.java
+@WebMvcTest(FileController.class)
+@WithMockUser
+public class FileControllerTest extends AbstractControllerTest {
+
+    @MockBean
+    private FileService fileService;
+
+    @Test
+    void shouldUploadFileSuccessfully() throws Exception {
+        // Given
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "test.jpg",
+            "image/jpeg",
+            "test image content".getBytes()
+        );
+
+        FileUploadResponse expectedResponse = FileUploadResponse.builder()
+            .fileId("file_123")
+            .filename("test.jpg")
+            .url("/uploads/test.jpg")
+            .size(18L)
+            .contentType("image/jpeg")
+            .build();
+
+        when(fileService.uploadFile(any(MultipartFile.class), anyString()))
+            .thenReturn(expectedResponse);
+
+        // When & Then
+        mockMvc.perform(multipart("/api/files/upload")
+                       .file(file)
+                       .param("category", "avatar"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.fileId").value("file_123"))
+               .andExpect(jsonPath("$.filename").value("test.jpg"))
+               .andExpect(jsonPath("$.url").value("/uploads/test.jpg"))
+               .andExpect(jsonPath("$.size").value(18))
+               .andExpect(jsonPath("$.contentType").value("image/jpeg"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_WhenFileIsEmpty() throws Exception {
+        // Given
+        MockMultipartFile emptyFile = new MockMultipartFile(
+            "file",
+            "empty.jpg",
+            "image/jpeg",
+            new byte[0]  // 空文件
+        );
+
+        // When & Then
+        mockMvc.perform(multipart("/api/files/upload")
+                       .file(emptyFile)
+                       .param("category", "avatar"))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.code").value(400))
+               .andExpect(jsonPath("$.msg").value("文件不能为空"));
+    }
+}
+```
+
+### Service层测试
+
+#### 业务逻辑测试
+
+```java
+// src/test/java/com/service/UserServiceImplTest.java
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplTest {
+
+    @InjectMocks
+    private UserServiceImpl userService;
+
+    @Mock
+    private UserDao userDao;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Test
+    void shouldCreateUserSuccessfully() {
+        // Given
+        UserCreateRequest request = UserCreateRequest.builder()
+            .username("testuser")
+            .email("test@example.com")
+            .password("password123")
+            .phone("13800138000")
+            .build();
+
+        UserEntity savedEntity = UserEntity.builder()
+            .id(1L)
+            .username("testuser")
+            .email("test@example.com")
+            .password("encoded_password")
+            .phone("13800138000")
+            .role("USER")
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        when(passwordEncoder.encode("password123")).thenReturn("encoded_password");
+        when(userDao.insert(any(UserEntity.class))).thenReturn(1);
+        when(userDao.selectById(1L)).thenReturn(savedEntity);
+
+        // When
+        UserDTO result = userService.createUser(request);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getUsername()).isEqualTo("testuser");
+        assertThat(result.getEmail()).isEqualTo("test@example.com");
+        assertThat(result.getPhone()).isEqualTo("13800138000");
+
+        verify(userDao).insert(any(UserEntity.class));
+        verify(notificationService).sendWelcomeNotification(anyString(), anyString());
+    }
+
+    @Test
+    void shouldThrowException_WhenUsernameAlreadyExists() {
+        // Given
+        UserCreateRequest request = UserCreateRequest.builder()
+            .username("existinguser")
+            .email("test@example.com")
+            .password("password123")
+            .build();
+
+        when(userDao.selectByUsername("existinguser"))
+            .thenReturn(new UserEntity());  // 用户已存在
+
+        // When & Then
+        assertThatThrownBy(() -> userService.createUser(request))
+            .isInstanceOf(UserAlreadyExistsException.class)
+            .hasMessage("用户名已存在");
+
+        verify(userDao, never()).insert(any(UserEntity.class));
+        verify(notificationService, never()).sendWelcomeNotification(anyString(), anyString());
+    }
+
+    @Test
+    void shouldUpdateUser_WhenUserExistsAndDataIsValid() {
+        // Given
+        Long userId = 1L;
+        UserUpdateRequest request = UserUpdateRequest.builder()
+            .realName("张三")
+            .phone("13800138999")
+            .build();
+
+        UserEntity existingUser = UserEntity.builder()
+            .id(userId)
+            .username("testuser")
+            .realName("李四")
+            .phone("13800138000")
+            .build();
+
+        when(userDao.selectById(userId)).thenReturn(existingUser);
+        when(userDao.update(any(UserEntity.class))).thenReturn(1);
+
+        // When
+        UserDTO result = userService.updateUser(userId, request);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getRealName()).isEqualTo("张三");
+        assertThat(result.getPhone()).isEqualTo("13800138999");
+
+        verify(userDao).update(any(UserEntity.class));
+    }
+}
+```
+
+#### 复杂业务逻辑测试
+
+```java
+// src/test/java/com/service/CourseBookingServiceTest.java
+@ExtendWith(MockitoExtension.class)
+class CourseBookingServiceTest {
+
+    @InjectMocks
+    private CourseBookingService courseBookingService;
+
+    @Mock
+    private CourseDao courseDao;
+
+    @Mock
+    private BookingDao bookingDao;
+
+    @Mock
+    private UserDao userDao;
+
+    @Mock
+    private PaymentService paymentService;
+
+    @Test
+    void shouldCreateBookingSuccessfully_WhenAllConditionsMet() {
+        // Given
+        Long userId = 1L;
+        Long courseId = 1L;
+        BookingRequest request = new BookingRequest(courseId, LocalDateTime.now().plusDays(1));
+
+        CourseEntity course = CourseEntity.builder()
+            .id(courseId)
+            .name("瑜伽课程")
+            .price(BigDecimal.valueOf(99.00))
+            .maxParticipants(20)
+            .currentParticipants(15)
+            .build();
+
+        UserEntity user = UserEntity.builder()
+            .id(userId)
+            .balance(BigDecimal.valueOf(200.00))
+            .build();
+
+        when(courseDao.selectById(courseId)).thenReturn(course);
+        when(userDao.selectById(userId)).thenReturn(user);
+        when(bookingDao.countByCourseIdAndDateTime(courseId, request.getBookingTime()))
+            .thenReturn(5);  // 当前时段已有5人预约
+        when(bookingDao.insert(any(BookingEntity.class))).thenReturn(1);
+        when(paymentService.processPayment(any(), any())).thenReturn(PaymentResult.success());
+
+        // When
+        BookingDTO result = courseBookingService.createBooking(userId, request);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(BookingStatus.CONFIRMED);
+
+        verify(bookingDao).insert(any(BookingEntity.class));
+        verify(paymentService).processPayment(any(), any());
+    }
+
+    @Test
+    void shouldThrowException_WhenCourseFullyBooked() {
+        // Given
+        Long courseId = 1L;
+        BookingRequest request = new BookingRequest(courseId, LocalDateTime.now().plusDays(1));
+
+        CourseEntity course = CourseEntity.builder()
+            .id(courseId)
+            .maxParticipants(20)
+            .currentParticipants(20)  // 已满
+            .build();
+
+        when(courseDao.selectById(courseId)).thenReturn(course);
+
+        // When & Then
+        assertThatThrownBy(() -> courseBookingService.createBooking(1L, request))
+            .isInstanceOf(CourseFullyBookedException.class)
+            .hasMessage("课程已满员");
+
+        verify(bookingDao, never()).insert(any(BookingEntity.class));
+        verify(paymentService, never()).processPayment(any(), any());
+    }
+
+    @Test
+    void shouldThrowException_WhenInsufficientBalance() {
+        // Given
+        Long userId = 1L;
+        Long courseId = 1L;
+        BookingRequest request = new BookingRequest(courseId, LocalDateTime.now().plusDays(1));
+
+        CourseEntity course = CourseEntity.builder()
+            .id(courseId)
+            .price(BigDecimal.valueOf(99.00))
+            .maxParticipants(20)
+            .currentParticipants(15)
+            .build();
+
+        UserEntity user = UserEntity.builder()
+            .id(userId)
+            .balance(BigDecimal.valueOf(50.00))  // 余额不足
+            .build();
+
+        when(courseDao.selectById(courseId)).thenReturn(course);
+        when(userDao.selectById(userId)).thenReturn(user);
+
+        // When & Then
+        assertThatThrownBy(() -> courseBookingService.createBooking(userId, request))
+            .isInstanceOf(InsufficientBalanceException.class)
+            .hasMessage("账户余额不足");
+
+        verify(bookingDao, never()).insert(any(BookingEntity.class));
+        verify(paymentService, never()).processPayment(any(), any());
+    }
+}
+```
+
+### DAO层测试
+
+#### MyBatis集成测试
+
+```java
+// src/test/java/com/dao/UserDaoTest.java
+@SpringBootTest
+@Sql(scripts = "/test-data.sql", executionPhase = BEFORE_TEST_METHOD)
+@Sql(scripts = "/cleanup.sql", executionPhase = AFTER_TEST_METHOD)
+class UserDaoTest extends AbstractDaoTest {
+
+    @Autowired
+    private UserDao userDao;
+
+    @Test
+    void shouldInsertUser() {
+        // Given
+        UserEntity user = UserEntity.builder()
+            .username("newuser")
+            .email("newuser@example.com")
+            .password("password")
+            .phone("13800138000")
+            .build();
+
+        // When
+        int result = userDao.insert(user);
+
+        // Then
+        assertThat(result).isEqualTo(1);
+        assertThat(user.getId()).isNotNull();
+
+        UserEntity inserted = userDao.selectById(user.getId());
+        assertThat(inserted).isNotNull();
+        assertThat(inserted.getUsername()).isEqualTo("newuser");
+        assertThat(inserted.getEmail()).isEqualTo("newuser@example.com");
+    }
+
+    @Test
+    void shouldFindUserByUsername() {
+        // Given - test-data.sql中已存在测试数据
+
+        // When
+        UserEntity user = userDao.selectByUsername("testuser");
+
+        // Then
+        assertThat(user).isNotNull();
+        assertThat(user.getEmail()).isEqualTo("test@example.com");
+        assertThat(user.getPhone()).isEqualTo("13800138000");
+    }
+
+    @Test
+    void shouldReturnNull_WhenUserNotFound() {
+        // When
+        UserEntity user = userDao.selectByUsername("nonexistent");
+
+        // Then
+        assertThat(user).isNull();
+    }
+
+    @Test
+    void shouldUpdateUserSuccessfully() {
+        // Given
+        UserEntity existingUser = userDao.selectByUsername("testuser");
+        Long userId = existingUser.getId();
+
+        UserEntity updateData = UserEntity.builder()
+            .id(userId)
+            .realName("张三")
+            .phone("13800138999")
+            .build();
+
+        // When
+        int updateResult = userDao.update(updateData);
+
+        // Then
+        assertThat(updateResult).isEqualTo(1);
+
+        UserEntity updated = userDao.selectById(userId);
+        assertThat(updated.getRealName()).isEqualTo("张三");
+        assertThat(updated.getPhone()).isEqualTo("13800138999");
+    }
+}
+```
+
+### 工具类测试
+
+#### JWT工具类测试
+
+```java
+// src/test/java/com/utils/JwtTokenServiceTest.java
+class JwtTokenServiceTest {
+
+    private static final Long TEST_USER_ID = 123L;
+    private static final String TEST_USERNAME = "testuser";
+    private static final String TEST_TABLE_NAME = "yonghu";
+    private static final String TEST_ROLE = "user";
+    private static final String TEST_DEVICE_FINGERPRINT = "test-fingerprint-123";
+
+    @Test
+    void shouldGenerateValidToken() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        assertThat(token).isNotNull();
+        assertThat(token).isNotEmpty();
+        assertThat(token.split("\\.")).hasSize(3);  // JWT has 3 parts separated by dots
+    }
+
+    @Test
+    void shouldExtractUserIdFromToken() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        Long extractedUserId = JwtTokenService.getUserIdFromToken(token);
+
+        assertThat(extractedUserId).isEqualTo(TEST_USER_ID);
+    }
+
+    @Test
+    void shouldExtractUsernameFromToken() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        String extractedUsername = JwtTokenService.getUsernameFromToken(token);
+
+        assertThat(extractedUsername).isEqualTo(TEST_USERNAME);
+    }
+
+    @Test
+    void shouldExtractRoleFromToken() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        String extractedRole = JwtTokenService.getRoleFromToken(token);
+
+        assertThat(extractedRole).isEqualTo(TEST_ROLE);
+    }
+
+    @Test
+    void shouldExtractTableNameFromToken() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        String extractedTableName = JwtTokenService.getTableNameFromToken(token);
+
+        assertThat(extractedTableName).isEqualTo(TEST_TABLE_NAME);
+    }
+
+    @Test
+    void shouldReturnTrue_WhenTokenIsValid() {
+        String token = JwtTokenService.generateToken(TEST_USER_ID, TEST_USERNAME,
+                TEST_TABLE_NAME, TEST_ROLE, TEST_DEVICE_FINGERPRINT);
+
+        boolean isValid = JwtTokenService.isTokenValid(token);
+
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_WhenTokenIsInvalid() {
+        String invalidToken = "invalid.jwt.token";
+
+        boolean isValid = JwtTokenService.isTokenValid(invalidToken);
+
+        assertThat(isValid).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_WhenTokenIsExpired() {
+        // Given - 创建一个已过期的token（通过设置过去的时间）
+        // 注意：实际实现中可能需要mock时间或使用特殊的过期token
+
+        String expiredToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MTYyMzkwMjIsInVzZXJJZCI6MTIzLCJ1c2VybmFtZSI6InRlc3R1c2VyIiwidGFibGVOYW1lIjoieW9uZ2h1Iiwicm9sZSI6InVzZXIiLCJkZXZpY2VGaW5nZXJwcmludCI6InRlc3QtZmluZ2VycHJpbnQtMTIzIn0.4K4mWJ4mWJ4mWJ4mWJ4mWJ4mWJ4mWJ4mWJ4mWJ4mWJ4m";
+
+        boolean isValid = JwtTokenService.isTokenValid(expiredToken);
+
+        assertThat(isValid).isFalse();
+    }
+}
+```
+
+#### MinIO服务测试
+
+```java
+// src/test/java/com/service/MinioServiceImplTest.java
+@ExtendWith(MockitoExtension.class)
+class MinioServiceImplTest {
+
+    @Mock
+    private MinioClient minioClient;
+
+    @Mock
+    private MinioConfig minioConfig;
+
+    @InjectMocks
+    private MinioServiceImpl minioService;
+
+    @BeforeEach
+    void setUp() {
+        when(minioConfig.getBucketName()).thenReturn("test-bucket");
+        when(minioConfig.getEndpoint()).thenReturn("http://localhost:9000");
+        when(minioConfig.getAccessKey()).thenReturn("test-access-key");
+        when(minioConfig.getSecretKey()).thenReturn("test-secret-key");
+    }
+
+    @Test
+    void shouldCreateMinioService() {
+        assertThat(minioService).isNotNull();
+    }
+
+    @Test
+    void shouldUploadFileSuccessfully() throws Exception {
+        // Given
+        String objectName = "test-file.jpg";
+        byte[] fileContent = "test content".getBytes();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent);
+
+        when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(null);
+
+        // When
+        String result = minioService.uploadFile(objectName, inputStream, fileContent.length, "image/jpeg");
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result).contains("test-bucket");
+
+        verify(minioClient).putObject(any(PutObjectArgs.class));
+    }
+
+    @Test
+    void shouldThrowException_WhenUploadFails() throws Exception {
+        // Given
+        String objectName = "test-file.jpg";
+        byte[] fileContent = "test content".getBytes();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent);
+
+        when(minioClient.putObject(any(PutObjectArgs.class)))
+            .thenThrow(new RuntimeException("Upload failed"));
+
+        // When & Then
+        assertThatThrownBy(() -> minioService.uploadFile(objectName, inputStream, fileContent.length, "image/jpeg"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("Upload failed");
+    }
+
+    @Test
+    void shouldGeneratePresignedUrl() throws Exception {
+        // Given
+        String objectName = "test-file.jpg";
+        int expirySeconds = 3600;
+
+        String expectedUrl = "http://localhost:9000/test-bucket/test-file.jpg?signature=abc123";
+        when(minioClient.getPresignedObjectUrl(any(GetPresignedObjectUrlArgs.class)))
+            .thenReturn(new URL(expectedUrl));
+
+        // When
+        String result = minioService.getPresignedUrl(objectName, expirySeconds);
+
+        // Then
+        assertThat(result).isEqualTo(expectedUrl);
+
+        verify(minioClient).getPresignedObjectUrl(any(GetPresignedObjectUrlArgs.class));
+    }
+}
+```
+
+## 🔗 集成测试示例
+
+### 完整业务流程测试
+
+```java
+// src/test/java/com/integration/UserRegistrationFlowTest.java
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "/integration-test-setup.sql")
+public class UserRegistrationFlowTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @LocalServerPort
+    private int port;
+
+    private String baseUrl;
+
+    @BeforeEach
+    void setUp() {
+        this.baseUrl = "http://localhost:" + port + "/springboot1ngh61a2";
+    }
+
+    @Test
+    void shouldCompleteFullRegistrationAndLoginFlow() {
+        // 1. 用户注册
+        UserRegistrationRequest registrationRequest = UserRegistrationRequest.builder()
+            .username("newuser")
+            .email("newuser@example.com")
+            .password("password123")
+            .phone("13800138000")
+            .build();
+
+        ResponseEntity<ApiResponse<UserDTO>> registrationResponse = restTemplate.postForEntity(
+            baseUrl + "/yonghu/register",
+            registrationRequest,
+            new ParameterizedTypeReference<ApiResponse<UserDTO>>() {}
+        );
+
+        assertThat(registrationResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(registrationResponse.getBody().getData()).isNotNull();
+
+        Long userId = registrationResponse.getBody().getData().getId();
+
+        // 2. 用户登录
+        LoginRequest loginRequest = new LoginRequest("newuser", "password123");
+
+        ResponseEntity<ApiResponse<LoginResponse>> loginResponse = restTemplate.postForEntity(
+            baseUrl + "/yonghu/login",
+            loginRequest,
+            new ParameterizedTypeReference<ApiResponse<LoginResponse>>() {}
+        );
+
+        assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        String token = loginResponse.getBody().getData().getToken();
+        assertThat(token).isNotNull();
+
+        // 3. 获取用户信息
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Token", token);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<ApiResponse<UserDTO>> userInfoResponse = restTemplate.exchange(
+            baseUrl + "/yonghu/info/" + userId,
+            HttpMethod.GET,
+            entity,
+            new ParameterizedTypeReference<ApiResponse<UserDTO>>() {}
+        );
+
+        assertThat(userInfoResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(userInfoResponse.getBody().getData().getUsername()).isEqualTo("newuser");
+
+        // 4. 更新用户信息
+        UserUpdateRequest updateRequest = UserUpdateRequest.builder()
+            .realName("张三")
+            .phone("13800138999")
+            .build();
+
+        HttpEntity<UserUpdateRequest> updateEntity = new HttpEntity<>(updateRequest, headers);
+
+        ResponseEntity<ApiResponse<UserDTO>> updateResponse = restTemplate.exchange(
+            baseUrl + "/yonghu/update/" + userId,
+            HttpMethod.PUT,
+            updateEntity,
+            new ParameterizedTypeReference<ApiResponse<UserDTO>>() {}
+        );
+
+        assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(updateResponse.getBody().getData().getRealName()).isEqualTo("张三");
+    }
+}
+```
+
+## 🎭 Mock和Stub示例
+
+### 前端Mock示例
+
+```typescript
+// tests/setup/api-mocks.ts
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+
+const mock = new MockAdapter(axios)
+
+// 用户API Mock
+mock.onGet('/api/users').reply(200, [
+  { id: 1, name: '张三', email: 'zhangsan@example.com' },
+  { id: 2, name: '李四', email: 'lisi@example.com' }
+])
+
+mock.onGet('/api/users/1').reply(200, {
+  id: 1,
+  name: '张三',
+  email: 'zhangsan@example.com'
+})
+
+mock.onPost('/api/users').reply(201, {
+  id: 3,
+  name: '王五',
+  email: 'wangwu@example.com'
+})
+
+// 课程API Mock
+mock.onGet('/api/courses').reply(200, [
+  { id: 1, name: '瑜伽入门', price: 99, instructor: '张教练' },
+  { id: 2, name: '力量训练', price: 129, instructor: '李教练' }
+])
+
+// 模拟网络延迟
+mock.onAny().reply((config) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([200, { message: 'Success' }])
+    }, 100)
+  })
+})
+
+export { mock }
+```
+
+### 后端Mock示例
+
+```java
+// src/test/java/com/service/PaymentServiceTest.java
+@ExtendWith(MockitoExtension.class)
+class PaymentServiceTest {
+
+    @InjectMocks
+    private PaymentService paymentService;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private PaymentConfig paymentConfig;
+
+    @Test
+    void shouldProcessPaymentSuccessfully() throws Exception {
+        // Given
+        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(99.00), "card_123");
+
+        String expectedApiUrl = "https://api.payment-gateway.com/v1/charges";
+        String expectedApiKey = "sk_test_123";
+
+        when(paymentConfig.getApiUrl()).thenReturn(expectedApiUrl);
+        when(paymentConfig.getApiKey()).thenReturn(expectedApiKey);
+
+        // Mock HTTP response
+        String mockResponse = """
+            {
+                "id": "ch_123456",
+                "amount": 9900,
+                "currency": "cny",
+                "status": "succeeded"
+            }
+        """;
+
+        ResponseEntity<String> mockHttpResponse = ResponseEntity.ok(mockResponse);
+        when(restTemplate.postForEntity(eq(expectedApiUrl), any(HttpEntity.class), eq(String.class)))
+            .thenReturn(mockHttpResponse);
+
+        // When
+        PaymentResult result = paymentService.processPayment(request);
+
+        // Then
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getTransactionId()).isEqualTo("ch_123456");
+        assertThat(result.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(99.00));
+
+        verify(restTemplate).postForEntity(eq(expectedApiUrl), any(HttpEntity.class), eq(String.class));
+    }
+
+    @Test
+    void shouldHandlePaymentFailure() throws Exception {
+        // Given
+        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(99.00), "card_invalid");
+
+        when(paymentConfig.getApiUrl()).thenReturn("https://api.payment-gateway.com/v1/charges");
+
+        // Mock failed HTTP response
+        String mockErrorResponse = """
+            {
+                "error": {
+                    "type": "card_error",
+                    "message": "Your card was declined."
+                }
+            }
+        """;
+
+        ResponseEntity<String> mockHttpResponse = ResponseEntity.badRequest().body(mockErrorResponse);
+        when(restTemplate.postForEntity(anyString(), any(HttpEntity.class), eq(String.class)))
+            .thenReturn(mockHttpResponse);
+
+        // When & Then
+        assertThatThrownBy(() -> paymentService.processPayment(request))
+            .isInstanceOf(PaymentException.class)
+            .hasMessage("Your card was declined.");
+    }
+}
+```
+
+## 📊 测试数据示例
+
+### 测试数据文件
+
+```sql
+-- src/test/resources/data/users.sql
+INSERT INTO users (id, username, password, email, phone, role, created_at) VALUES
+(1, 'admin', '$2a$10$encryptedpassword', 'admin@example.com', '13800138000', 'ADMIN', NOW()),
+(2, 'testuser', '$2a$10$encryptedpassword', 'user@example.com', '13800138001', 'USER', NOW()),
+(3, 'coach', '$2a$10$encryptedpassword', 'coach@example.com', '13800138002', 'COACH', NOW()),
+(4, 'member1', '$2a$10$encryptedpassword', 'member1@example.com', '13800138003', 'USER', NOW()),
+(5, 'member2', '$2a$10$encryptedpassword', 'member2@example.com', '13800138004', 'USER', NOW());
+
+-- src/test/resources/data/courses.sql
+INSERT INTO courses (id, name, description, price, duration, max_participants, instructor_id, created_at) VALUES
+(1, '瑜伽入门', '基础瑜伽课程', 99.00, 60, 20, 3, NOW()),
+(2, '力量训练', '肌肉力量训练课程', 129.00, 90, 15, 3, NOW()),
+(3, '普拉提', '普拉提核心训练', 109.00, 75, 18, 3, NOW()),
+(4, '舞蹈基础', '现代舞基础课程', 89.00, 45, 25, 3, NOW()),
+(5, '游泳入门', '游泳基础课程', 79.00, 50, 12, 3, NOW());
+
+-- src/test/resources/data/bookings.sql
+INSERT INTO bookings (id, user_id, course_id, booking_time, status, created_at) VALUES
+(1, 4, 1, NOW() + INTERVAL '1 day', 'confirmed', NOW()),
+(2, 5, 2, NOW() + INTERVAL '2 days', 'confirmed', NOW()),
+(3, 4, 3, NOW() + INTERVAL '3 days', 'pending', NOW());
+
+-- src/test/resources/cleanup.sql
+TRUNCATE TABLE bookings, courses, users RESTART IDENTITY CASCADE;
+```
+
+### 测试数据工厂
+
+```java
+// src/test/java/com/utils/TestDataFactory.java
+@Component
+public class TestDataFactory {
+
+    private static final Faker faker = new Faker(new Locale("zh_CN"));
+
+    public UserEntity createRandomUser() {
+        return UserEntity.builder()
+            .username(faker.name().username())
+            .email(faker.internet().emailAddress())
+            .password("password123")
+            .phone(faker.phoneNumber().phoneNumber())
+            .realName(faker.name().fullName())
+            .gender(faker.random().nextBoolean() ? "男" : "女")
+            .birthday(faker.date().birthday().toLocalDateTime().toLocalDate())
+            .address(faker.address().fullAddress())
+            .createdAt(LocalDateTime.now())
+            .build();
+    }
+
+    public CourseEntity createRandomCourse() {
+        return CourseEntity.builder()
+            .name(faker.book().title())
+            .description(faker.lorem().paragraph())
+            .price(BigDecimal.valueOf(faker.number().randomDouble(2, 50, 500)))
+            .duration(faker.number().numberBetween(30, 120))
+            .maxParticipants(faker.number().numberBetween(5, 20))
+            .currentParticipants(0)
+            .difficulty(faker.options().option("初级", "中级", "高级"))
+            .category(faker.options().option("瑜伽", "健身", "舞蹈", "武术"))
+            .build();
+    }
+
+    public List<UserEntity> createRandomUsers(int count) {
+        return IntStream.range(0, count)
+            .mapToObj(i -> createRandomUser())
+            .collect(Collectors.toList());
+    }
+
+    public List<CourseEntity> createRandomCourses(int count) {
+        return IntStream.range(0, count)
+            .mapToObj(i -> createRandomCourse())
+            .collect(Collectors.toList());
+    }
+
+    public BookingEntity createRandomBooking(Long userId, Long courseId) {
+        return BookingEntity.builder()
+            .userId(userId)
+            .courseId(courseId)
+            .bookingTime(LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30)))
+            .status(faker.options().option("confirmed", "pending", "cancelled"))
+            .createdAt(LocalDateTime.now())
+            .build();
+    }
+}
+```
+
+---
+
+## 📚 相关文档
+
+- [测试策略总览](TESTING_STRATEGY.md) - 测试策略和目标
+- [测试实现指南](TESTING_IMPLEMENTATION.md) - 具体测试编写方法
+- [测试最佳实践](TESTING_BEST_PRACTICES.md) - 测试编写规范
+- [前端测试指南](../FRONTEND_TESTING_GUIDE.md) - 前端测试详细说明
+- [后端测试指南](BACKEND_TESTING_GUIDE.md) - 后端测试详细说明

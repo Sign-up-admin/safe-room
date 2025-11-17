@@ -1,0 +1,23 @@
+// Admin 过渡动画设计令牌
+
+:root {
+  --admin-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --admin-transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --admin-transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --admin-transition-ease: ease;
+  --admin-transition-ease-in: ease-in;
+  --admin-transition-ease-out: ease-out;
+  --admin-transition-ease-in-out: ease-in-out;
+
+  /* Legacy aliases */
+  --transition-base: var(--admin-transition-base);
+}
+
+// SCSS 变量
+$transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1) !default;
+$transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1) !default;
+$transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1) !default;
+$transition-ease: ease !default;
+$transition-ease-in: ease-in !default;
+$transition-ease-out: ease-out !default;
+$transition-ease-in-out: ease-in-out !default;

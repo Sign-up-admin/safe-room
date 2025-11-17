@@ -1,0 +1,326 @@
+name: Documentation Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-quality-check.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs-quality-check.yml'
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: '检查类型'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - quality
+          - links
+          - format
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  docs-quality-check:
+    name: Documentation Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Get changed documentation files
+      id: changed-files
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          # 获取PR中变更的文档文件
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^docs/' || true)
+        else
+          # 获取推送中变更的文档文件
+          CHANGED_FILES=$(git diff --name-only HEAD~1 | grep '^docs/' || true)
+        fi
+
+        # 如果没有变更的文档文件，使用所有文档文件
+        if [ -z "$CHANGED_FILES" ]; then
+          CHANGED_FILES=$(find docs -name "*.md" -type f | head -10)
+          echo "No changed docs found, checking recent files"
+        fi
+
+        echo "changed_files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+        echo "📄 将检查以下文档文件:"
+        echo "$CHANGED_FILES"
+
+    - name: Documentation quality check
+      id: quality-check
+      run: |
+        echo "🔍 开始文档质量检查..."
+
+        # 创建检查结果目录
+        mkdir -p docs/reports/quality/checks
+
+        # 运行文档质量检查
+        if [ "${{ inputs.check_type }}" = "quality" ] || [ "${{ inputs.check_type }}" = "all" ]; then
+          echo "📋 检查文档质量..."
+          npm run docs:check > docs/reports/quality/checks/quality-check.log 2>&1 || true
+        fi
+
+        # 检查链接有效性
+        if [ "${{ inputs.check_type }}" = "links" ] || [ "${{ inputs.check_type }}" = "all" ]; then
+          echo "🔗 检查链接有效性..."
+          node docs/scripts/frontend-doc-checker.js --links-only > docs/reports/quality/checks/link-check.log 2>&1 || true
+        fi
+
+        # 检查格式规范
+        if [ "${{ inputs.check_type }}" = "format" ] || [ "${{ inputs.check_type }}" = "all" ]; then
+          echo "📝 检查格式规范..."
+          node docs/scripts/frontend-doc-checker.js --format-only > docs/reports/quality/checks/format-check.log 2>&1 || true
+        fi
+
+        echo "✅ 质量检查完成"
+
+    - name: Analyze check results
+      id: analyze-results
+      run: |
+        echo "📊 分析检查结果..."
+
+        # 统计错误和警告数量
+        ERROR_COUNT=$(grep -r "❌\|错误\|Error" docs/reports/quality/checks/ | wc -l)
+        WARNING_COUNT=$(grep -r "⚠️\|警告\|Warning" docs/reports/quality/checks/ | wc -l)
+
+        echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
+        echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
+
+        echo "📈 检查结果统计:"
+        echo "  错误数量: $ERROR_COUNT"
+        echo "  警告数量: $WARNING_COUNT"
+
+        # 判断是否通过
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "❌ 发现严重错误，检查失败"
+          echo "passed=false" >> $GITHUB_OUTPUT
+        else
+          echo "✅ 检查通过"
+          echo "passed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate quality report
+      if: always()
+      run: |
+        echo "📋 生成质量报告..."
+
+        # 生成综合报告
+        cat > docs/reports/quality/checks/summary-report.md << EOF
+        # 文档质量检查报告
+
+        **检查时间**: $(date)
+        **提交**: ${{ github.sha }}
+        **分支**: ${{ github.ref }}
+        **触发事件**: ${{ github.event_name }}
+
+        ## 检查结果
+
+        - 错误数量: ${{ steps.analyze-results.outputs.error_count }}
+        - 警告数量: ${{ steps.analyze-results.outputs.warning_count }}
+        - 检查状态: ${{ steps.analyze-results.outputs.passed == 'true' && '✅ 通过' || '❌ 失败' }}
+
+        ## 详细结果
+
+        ### 质量检查
+        \`\`\`
+        $(cat docs/reports/quality/checks/quality-check.log 2>/dev/null || echo "无质量检查日志")
+        \`\`\`
+
+        ### 链接检查
+        \`\`\`
+        $(cat docs/reports/quality/checks/link-check.log 2>/dev/null || echo "无链接检查日志")
+        \`\`\`
+
+        ### 格式检查
+        \`\`\`
+        $(cat docs/reports/quality/checks/format-check.log 2>/dev/null || echo "无格式检查日志")
+        \`\`\`
+
+        ---
+        *报告由 GitHub Actions 自动生成*
+        EOF
+
+    - name: Upload check results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: docs-quality-check-results-${{ github.run_number }}
+        path: docs/reports/quality/checks/
+        retention-days: 30
+
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+
+          // 读取检查结果
+          let summaryContent = '';
+          try {
+            summaryContent = fs.readFileSync('docs/reports/quality/checks/summary-report.md', 'utf8');
+          } catch (error) {
+            summaryContent = '无法读取检查报告';
+          }
+
+          // 创建PR评论
+          const comment = `## 📋 文档质量检查结果
+
+          ${summaryContent}
+
+          ---
+          详细结果请查看 [检查产物](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+    - name: Fail on quality issues
+      if: steps.analyze-results.outputs.passed == 'false'
+      run: |
+        echo "❌ 文档质量检查失败，发现严重问题"
+        echo "请修复以下问题后重新提交:"
+        echo ""
+        cat docs/reports/quality/checks/quality-check.log 2>/dev/null || echo "无详细错误信息"
+        exit 1
+
+    - name: Success notification
+      if: steps.analyze-results.outputs.passed == 'true'
+      run: |
+        echo "🎉 文档质量检查通过！"
+        if [ "${{ steps.analyze-results.outputs.warning_count }}" -gt 0 ]; then
+          echo "⚠️ 发现 ${{ steps.analyze-results.outputs.warning_count }} 个警告，建议关注但不影响合并"
+        fi
+
+  docs-lifecycle-check:
+    name: Documentation Lifecycle Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check documentation lifecycle
+      run: |
+        echo "🔄 检查文档生命周期状态..."
+
+        # 获取变更的文档文件
+        CHANGED_DOCS=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^docs/.*\.md$' || true)
+
+        if [ -n "$CHANGED_DOCS" ]; then
+          echo "📄 变更的文档文件:"
+          echo "$CHANGED_DOCS"
+
+          # 检查文档状态
+          echo "$CHANGED_DOCS" | while read -r file; do
+            if [ -f "$file" ]; then
+              echo "检查文件: $file"
+              # 检查是否包含必需的头部信息
+              if ! head -20 "$file" | grep -q "^status:"; then
+                echo "⚠️ 警告: $file 缺少状态信息"
+              fi
+
+              # 检查最后更新日期
+              if ! head -20 "$file" | grep -q "^last_updated:"; then
+                echo "⚠️ 警告: $file 缺少最后更新日期"
+              fi
+            fi
+          done
+        else
+          echo "ℹ️ 没有变更的文档文件"
+        fi
+
+  docs-index-update:
+    name: Update Documentation Index
+    runs-on: ubuntu-latest
+    needs: [docs-quality-check]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Update documentation indexes
+      run: |
+        echo "📊 更新文档索引..."
+
+        # 更新所有文档索引
+        npm run docs:index -- --all
+
+        echo "✅ 文档索引更新完成"
+
+    - name: Check for index changes
+      id: check-changes
+      run: |
+        if git diff --quiet docs/; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "📝 文档索引无变更"
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "📝 文档索引有变更"
+        fi
+
+    - name: Commit index updates
+      if: steps.check-changes.outputs.changed == 'true'
+      run: |
+        echo "💾 提交索引更新..."
+
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+        git add docs/
+        git commit -m "docs: update documentation indexes [automated]" || echo "无变更需要提交"
+
+        # 推送到main分支
+        git push origin main
+
+        echo "✅ 索引更新已提交"

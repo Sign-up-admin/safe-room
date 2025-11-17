@@ -1,0 +1,158 @@
+// =================================
+// Design Token System - Colors
+// =================================
+
+// Base Colors
+$color-black: #000000;
+$color-white: #ffffff;
+$color-transparent: transparent;
+
+// Primary Brand Colors
+$color-primary-yellow: #fdd835;
+$color-primary-yellow-hover: #f6c300;
+$color-primary-yellow-soft: rgba(253, 216, 53, 0.2);
+$color-primary-yellow-glow: rgba(253, 216, 53, 0.35);
+
+// Secondary Colors
+$color-secondary-blue: #4a90e2;
+$color-secondary-blue-soft: rgba(74, 144, 226, 0.2);
+$color-secondary-green: #4caf50;
+$color-secondary-green-soft: rgba(76, 175, 80, 0.2);
+$color-secondary-orange: #ff9800;
+$color-secondary-orange-soft: rgba(255, 152, 0, 0.2);
+$color-secondary-red: #f44336;
+$color-secondary-red-soft: rgba(244, 67, 54, 0.2);
+
+// Neutral Colors
+$color-gray-50: #fafafa;
+$color-gray-100: #f5f5f5;
+$color-gray-200: #eeeeee;
+$color-gray-300: #e0e0e0;
+$color-gray-400: #bdbdbd;
+$color-gray-500: #9e9e9e;
+$color-gray-600: #757575;
+$color-gray-700: #616161;
+$color-gray-800: #424242;
+$color-gray-900: #212121;
+
+// Background Colors
+$color-bg-deep: #020202;
+$color-bg-dark: #0a0a0a;
+$color-bg-card: rgba(10, 10, 10, 0.78);
+$color-bg-panel: rgba(8, 8, 8, 0.92);
+$color-bg-ghost: rgba(255, 255, 255, 0.04);
+$color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+// Text Colors
+$color-text-primary: #f7fbea;
+$color-text-secondary: #9ea1a6;
+$color-text-tertiary: #6f737c;
+$color-text-muted: #6f737c;
+$color-text-inverse: #0a0a0a;
+
+// Border Colors
+$color-border-light: rgba(253, 216, 53, 0.22);
+$color-border-medium: rgba(255, 255, 255, 0.12);
+$color-border-heavy: rgba(255, 255, 255, 0.25);
+
+// Status Colors
+$color-success: $color-secondary-green;
+$color-warning: $color-secondary-orange;
+$color-error: $color-secondary-red;
+$color-info: $color-secondary-blue;
+
+// Semantic Color Mapping
+$color-brand: $color-primary-yellow;
+$color-accent: $color-secondary-blue;
+$color-success-bg: $color-secondary-green-soft;
+$color-warning-bg: $color-secondary-orange-soft;
+$color-error-bg: $color-secondary-red-soft;
+$color-info-bg: $color-secondary-blue-soft;
+
+// CSS Custom Properties (for runtime theme switching)
+:root {
+  // Primary Colors
+  --color-primary: #{$color-primary-yellow};
+  --color-primary-hover: #{$color-primary-yellow-hover};
+  --color-primary-soft: #{$color-primary-yellow-soft};
+  --color-primary-glow: #{$color-primary-yellow-glow};
+
+  // Background Colors
+  --color-bg-deep: #{$color-bg-deep};
+  --color-bg-dark: #{$color-bg-dark};
+  --color-bg-card: #{$color-bg-card};
+  --color-bg-panel: #{$color-bg-panel};
+  --color-bg-ghost: #{$color-bg-ghost};
+  --color-bg-overlay: #{$color-bg-overlay};
+
+  // Text Colors
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --color-text-tertiary: #{$color-text-tertiary};
+  --color-text-muted: #{$color-text-muted};
+  --color-text-inverse: #{$color-text-inverse};
+
+  // Border Colors
+  --color-border-light: #{$color-border-light};
+  --color-border-medium: #{$color-border-medium};
+  --color-border-heavy: #{$color-border-heavy};
+
+  // Status Colors
+  --color-success: #{$color-success};
+  --color-warning: #{$color-warning};
+  --color-error: #{$color-error};
+  --color-info: #{$color-info};
+
+  // Semantic Colors
+  --color-brand: #{$color-brand};
+  --color-accent: #{$color-accent};
+  --color-success-bg: #{$color-success-bg};
+  --color-warning-bg: #{$color-warning-bg};
+  --color-error-bg: #{$color-error-bg};
+  --color-info-bg: #{$color-info-bg};
+}
+
+// Theme Variants
+[data-theme="light"] {
+  --color-bg-deep: #f8f9fa;
+  --color-bg-dark: #ffffff;
+  --color-bg-card: rgba(255, 255, 255, 0.9);
+  --color-bg-panel: rgba(255, 255, 255, 0.95);
+  --color-bg-ghost: rgba(0, 0, 0, 0.04);
+
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #616161;
+  --color-text-tertiary: #9e9e9e;
+  --color-text-muted: #9e9e9e;
+
+  --color-border-light: rgba(25, 118, 210, 0.3);
+  --color-border-medium: rgba(0, 0, 0, 0.12);
+  --color-border-heavy: rgba(0, 0, 0, 0.25);
+
+  --color-primary: #1976d2;
+  --color-primary-hover: #1565c0;
+  --color-primary-soft: rgba(25, 118, 210, 0.1);
+  --color-primary-glow: rgba(25, 118, 210, 0.25);
+}
+
+[data-theme="blue"] {
+  --color-bg-deep: #0f1419;
+  --color-bg-dark: #1a1d21;
+  --color-bg-card: rgba(26, 29, 33, 0.8);
+  --color-bg-panel: rgba(26, 29, 33, 0.95);
+  --color-bg-ghost: rgba(255, 255, 255, 0.04);
+
+  --color-text-primary: #f7f9fa;
+  --color-text-secondary: #8b98a5;
+  --color-text-tertiary: #5b7083;
+  --color-text-muted: #5b7083;
+
+  --color-border-light: rgba(29, 161, 242, 0.25);
+  --color-border-medium: rgba(255, 255, 255, 0.08);
+  --color-border-heavy: rgba(255, 255, 255, 0.15);
+
+  --color-primary: #1da1f2;
+  --color-primary-hover: #1991db;
+  --color-primary-soft: rgba(29, 161, 242, 0.1);
+  --color-primary-glow: rgba(29, 161, 242, 0.3);
+}

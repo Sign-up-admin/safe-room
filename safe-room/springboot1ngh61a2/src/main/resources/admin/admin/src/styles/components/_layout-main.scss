@@ -1,0 +1,76 @@
+// 主布局组件样式
+@use '../tokens' as *;
+
+// 内容区域样式
+.admin-layout__content {
+  min-height: 100%;
+  position: relative;
+  background: $color-bg-main;
+  transition: padding-left $transition-base;
+
+  // 垂直布局时的左侧内边距
+  &--vertical {
+    padding: 80px spacing(md) spacing(md) calc(210px + #{spacing(md)});
+
+    // 侧边栏收起时
+    &--collapsed {
+      padding-left: calc(64px + #{spacing(md)});
+    }
+  }
+
+  // 水平布局时
+  &--horizontal {
+    padding: 80px spacing(md) spacing(md);
+  }
+}
+
+// 头部样式
+.admin-layout__header {
+  padding: 0 150px 0 spacing(md);
+  border-color: $color-border;
+  align-items: center;
+  color: $color-text-secondary;
+  display: flex;
+  justify-content: flex-end;
+  top: 0;
+  left: 0;
+  background: $color-bg-panel;
+  backdrop-filter: blur(10px);
+  width: 100%;
+  position: fixed;
+  z-index: 1200;
+  height: 60px;
+  border-bottom: 1px solid $color-border;
+  box-shadow: $shadow-sm;
+}
+
+// 侧边栏样式
+.admin-layout__aside {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  border-color: $color-border;
+  bottom: 0;
+  transition: width $transition-base;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  background: $color-bg-panel;
+  position: fixed;
+  height: 100%;
+  z-index: 1100;
+
+  // 展开状态
+  &--expanded {
+    padding: spacing(xs) 0 0;
+    border-width: 0 1px 0 0;
+    width: 210px;
+  }
+
+  // 收起状态
+  &--collapsed {
+    padding: 0;
+    border-width: 0;
+    width: 64px;
+  }
+}
+
+

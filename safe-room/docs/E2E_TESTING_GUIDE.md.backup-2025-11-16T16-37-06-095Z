@@ -1,0 +1,547 @@
+---
+title: E2E TESTING GUIDE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# 前端E2E测试编写指南
+
+本文档详细介绍如何编写、运行和管理前端项目的端到端测试。
+
+## 📋 目录
+
+- [测试框架概述](#测试框架概述)
+- [项目结构](#项目结构)
+- [编写E2E测试](#编写e2e测试)
+- [页面对象模式](#页面对象模式)
+- [Mock数据使用](#mock数据使用)
+- [测试工具库](#测试工具库)
+- [最佳实践](#最佳实践)
+- [调试技巧](#调试技巧)
+- [常见问题](#常见问题)
+
+## 🧪 测试框架概述
+
+### 技术栈
+
+- **测试框架**: Playwright 1.56+
+- **测试运行器**: Playwright Test Runner
+- **断言库**: Playwright内置断言
+- **浏览器支持**: Chromium, Firefox, WebKit
+- **语言**: TypeScript
+
+### 支持的项目
+
+- **Front项目**: 用户端应用 (端口: 8082)
+- **Admin项目**: 管理端应用 (端口: 8081)
+
+## 🏗️ 项目结构
+
+```
+springboot1ngh61a2/src/main/resources/
+├── front/front/
+│   ├── tests/
+│   │   ├── e2e/
+│   │   │   ├── user-journey/          # 用户旅程测试
+│   │   │   ├── integration/           # 集成测试
+│   │   │   ├── auth.spec.ts          # 认证测试
+│   │   │   └── pages.spec.ts         # 页面测试
+│   │   ├── utils/
+│   │   │   ├── test-helpers.ts       # 测试工具库
+│   │   │   ├── mock-data.ts          # Mock数据
+│   │   │   ├── shared-helpers.ts     # 共享工具
+│   │   │   └── page-objects/         # 页面对象
+│   │   └── fixtures/                 # 测试固件
+│   ├── playwright.config.ts          # Playwright配置
+│   └── vitest.config.ts             # 单元测试配置
+└── admin/admin/
+    └── tests/
+        ├── e2e/
+        │   └── admin-journey/        # 管理流程测试
+        └── utils/
+            ├── test-helpers.ts       # Admin测试工具
+            ├── mock-data.ts          # Admin Mock数据
+            └── page-objects/         # Admin页面对象
+```
+
+## ✍️ 编写E2E测试
+
+### 基本测试结构
+
+```typescript
+import { test, expect } from '@playwright/test'
+import {
+  setupCompleteFrontMock,
+  mockFrontApi
+} from '../utils/test-helpers'
+
+test.describe('功能模块名称', () => {
+  test.beforeEach(async ({ page }) => {
+    // 设置测试环境
+    await setupCompleteFrontMock(page)
+  })
+
+  test('测试场景描述', async ({ page }) => {
+    // 1. 准备测试数据
+    // 2. 执行用户操作
+    // 3. 验证结果
+  })
+})
+```
+
+### 测试生命周期
+
+```typescript
+test.describe('测试套件', () => {
+  // 套件级别设置 - 所有测试前执行一次
+  test.beforeAll(async () => {
+    // 全局初始化
+  })
+
+  // 每个测试前执行
+  test.beforeEach(async ({ page }) => {
+    // 测试环境准备
+    await setupCompleteFrontMock(page)
+  })
+
+  // 每个测试后执行
+  test.afterEach(async ({ page }) => {
+    // 清理工作
+  })
+
+  // 套件级别清理 - 所有测试后执行一次
+  test.afterAll(async () => {
+    // 全局清理
+  })
+})
+```
+
+### 断言使用
+
+```typescript
+// 页面URL断言
+await expect(page).toHaveURL(/.*\/home/)
+
+// 元素可见性
+await expect(page.locator('.success-message')).toBeVisible()
+
+// 文本内容
+await expect(page.locator('.title')).toContainText('欢迎使用')
+
+// 元素属性
+await expect(page.locator('input[name="username"]')).toHaveValue('testuser')
+
+// 元素数量
+await expect(page.locator('.card')).toHaveCount(3)
+
+// 表单验证
+await expect(page.locator('.error-message')).toHaveText('请输入用户名')
+```
+
+## 📄 页面对象模式
+
+### 页面对象类结构
+
+```typescript
+import { Page } from '@playwright/test'
+import { BasePage } from './base-page'
+
+export class LoginPage extends BasePage {
+  constructor(page: Page, baseUrl?: string) {
+    super(page, baseUrl)
+  }
+
+  // 页面导航
+  async goto(): Promise<void> {
+    await this.page.goto(`${this.baseUrl}/#/login`)
+    await this.waitForPageLoad()
+  }
+
+  // 页面操作方法
+  async login(username: string, password: string): Promise<void> {
+    await this.fillInput('input[name="username"]', username)
+    await this.fillInput('input[name="password"]', password)
+    await this.clickButton('登录')
+    await this.page.waitForURL('**/#/index/home**')
+  }
+
+  // 页面状态检查
+  async getErrorMessage(): Promise<string> {
+    return await this.getElementText('.error-message')
+  }
+
+  // 业务逻辑方法
+  async loginWithValidCredentials(): Promise<void> {
+    await this.login('testuser', 'password123')
+  }
+}
+```
+
+### 使用页面对象
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { LoginPage, DashboardPage } from '../utils/page-objects'
+
+test('使用页面对象进行登录测试', async ({ page }) => {
+  const loginPage = new LoginPage(page)
+  const dashboardPage = new DashboardPage(page)
+
+  // 使用页面对象方法
+  await loginPage.goto()
+  await loginPage.login('admin', 'password')
+
+  // 验证结果
+  await expect(page).toHaveURL(/.*\/dashboard/)
+  await expect(dashboardPage.getWelcomeMessage()).toContain('欢迎')
+})
+```
+
+## 🎭 Mock数据使用
+
+### Front项目Mock数据
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { mockFrontApi, seedFrontSession } from '../utils/test-helpers'
+
+test('使用Mock数据测试', async ({ page }) => {
+  // 初始化用户会话
+  await seedFrontSession(page, {
+    frontToken: 'test-token',
+    UserTableName: 'yonghu'
+  })
+
+  // Mock API响应
+  await mockFrontApi(page, {
+    // 自定义Mock数据
+    users: [
+      { yonghuming: '测试用户', shouji: '13800138000' }
+    ],
+    courses: [
+      { kechengmingcheng: '测试课程', jiage: '100' }
+    ]
+  })
+
+  // 执行测试
+  await page.goto('/#/index/home')
+  await expect(page.locator('text=测试用户')).toBeVisible()
+})
+```
+
+### Admin项目Mock数据
+
+```typescript
+import { test, expect } from '@playwright/test'
+import { mockAdminApi, loginAsAdmin } from '../utils/test-helpers'
+
+test('管理员功能测试', async ({ page }) => {
+  // 设置Admin API Mock
+  await mockAdminApi(page)
+
+  // 管理员登录
+  await loginAsAdmin(page)
+
+  // 验证管理员界面
+  await expect(page.locator('.admin-panel')).toBeVisible()
+})
+```
+
+### 支付和第三方服务Mock
+
+```typescript
+import { mockPaymentFlow, mockThirdPartyLogin } from '../utils/test-helpers'
+
+test('支付流程测试', async ({ page }) => {
+  // Mock支付流程
+  await mockPaymentFlow(page)
+
+  // 执行支付操作
+  await page.click('button:has-text("支付宝支付")')
+
+  // 验证支付成功
+  await page.waitForSelector('text=支付成功')
+})
+```
+
+## 🛠️ 测试工具库
+
+### 共享工具使用
+
+```typescript
+import {
+  waitFor,
+  waitForPage,
+  takeScreenshot,
+  measurePerformance,
+  logStep,
+  assertElement
+} from '../utils/shared-helpers'
+
+test('使用共享工具', async ({ page }) => {
+  logStep('开始测试步骤')
+
+  await page.goto('/#/index/home')
+  await waitForPage(page)
+
+  // 截图记录
+  await takeScreenshot(page, 'homepage_loaded')
+
+  // 性能测量
+  const perfMetrics = await measurePerformance(page)
+  console.log('页面加载时间:', perfMetrics.domContentLoaded)
+
+  // 断言工具
+  await assertElement(page, '.main-content')
+
+  logStep('测试步骤完成')
+})
+```
+
+### 网络拦截和监控
+
+```typescript
+import { NetworkUtils } from '../utils/shared-helpers'
+
+test('网络请求监控', async ({ page }) => {
+  // 拦截API请求
+  await NetworkUtils.interceptRequests(page, '**/api/**')
+
+  // 执行操作
+  await page.click('button:has-text("加载数据")')
+
+  // 检查拦截的请求
+  const requests = NetworkUtils.getInterceptedRequests('**/api/**')
+  expect(requests.length).toBeGreaterThan(0)
+
+  // 验证请求内容
+  const firstRequest = requests[0]
+  expect(firstRequest.method).toBe('GET')
+})
+```
+
+### 测试数据生成
+
+```typescript
+import { TestDataUtils } from '../utils/shared-helpers'
+
+test('动态数据生成', async ({ page }) => {
+  // 生成测试用户
+  const testUser = TestDataUtils.generateRandomData('user')
+  const testCourse = TestDataUtils.generateRandomData('course')
+
+  // 使用生成的测试数据
+  await page.fill('input[name="username"]', testUser.yonghuming)
+  await page.fill('input[name="phone"]', testUser.shouji)
+
+  console.log('测试数据:', { testUser, testCourse })
+})
+```
+
+## 💡 最佳实践
+
+### 测试命名规范
+
+```typescript
+// ✅ 好的命名
+test('用户成功登录后应该跳转到首页')
+test('提交无效表单时应该显示错误信息')
+test('管理员可以创建新课程')
+
+// ❌ 不好的命名
+test('test login')
+test('check form')
+test('admin create')
+```
+
+### 测试组织结构
+
+```typescript
+test.describe('用户管理', () => {
+  test.describe('用户注册', () => {
+    test('成功注册新用户')
+    test('注册时验证必填字段')
+    test('注册失败时显示错误信息')
+  })
+
+  test.describe('用户登录', () => {
+    test('使用有效凭据登录')
+    test('使用无效凭据登录失败')
+    test('忘记密码功能')
+  })
+})
+```
+
+### 数据清理
+
+```typescript
+test('创建用户后清理数据', async ({ page }) => {
+  // 创建测试数据
+  const testUser = TestDataUtils.generateRandomData('user')
+
+  // 执行测试
+  await createUser(page, testUser)
+
+  // 验证结果
+  await expect(page.locator(`text=${testUser.yonghuming}`)).toBeVisible()
+
+  // 清理测试数据
+  await cleanupTestData(page, 'users', testUser.yonghuming)
+})
+```
+
+### 错误处理
+
+```typescript
+test('网络错误处理', async ({ page }) => {
+  // 模拟网络错误
+  await NetworkUtils.mockNetworkError(page, '**/api/**', 500)
+
+  // 执行需要网络的操作
+  await page.click('button:has-text("保存")')
+
+  // 验证错误处理
+  await expect(page.locator('text=网络错误')).toBeVisible()
+  await expect(page.locator('text=请重试')).toBeVisible()
+})
+```
+
+## 🐛 调试技巧
+
+### 使用Playwright UI模式
+
+```bash
+# 启动UI模式进行调试
+npm run test:e2e:ui
+
+# 或者指定项目
+npx playwright test --ui --project=chromium
+```
+
+### 添加调试断点
+
+```typescript
+test('调试测试', async ({ page }) => {
+  await page.goto('/#/login')
+
+  // 添加断点
+  await page.pause()
+
+  // 继续执行
+  await page.fill('input[name="username"]', 'test')
+  await page.click('button[type="submit"]')
+})
+```
+
+### 截图和视频录制
+
+```typescript
+test('故障排查测试', async ({ page }) => {
+  try {
+    await page.goto('/#/index/home')
+    await page.click('.non-existent-element')
+  } catch (error) {
+    // 自动截图
+    await page.screenshot({ path: 'error-screenshot.png' })
+
+    // 记录页面状态
+    console.log('页面URL:', page.url())
+    console.log('页面标题:', await page.title())
+
+    throw error
+  }
+})
+```
+
+### 控制执行速度
+
+```typescript
+// 在playwright.config.ts中配置
+export default defineConfig({
+  use: {
+    // 减慢执行速度便于观察
+    actionTimeout: 1000,
+    navigationTimeout: 30000,
+  },
+  // 或在测试中添加延迟
+  // await page.waitForTimeout(1000)
+})
+```
+
+## ❓ 常见问题
+
+### Q: 测试运行太慢怎么办？
+
+A: 优化建议：
+1. 使用并行执行：`--workers=4`
+2. 只运行需要的测试：`--grep "关键词"`
+3. 减少不必要的等待
+4. 使用更快的定位器
+
+### Q: 元素定位失败怎么办？
+
+A: 定位策略：
+1. 优先使用语义化的选择器
+2. 使用data-testid属性
+3. 避免依赖CSS类名
+4. 使用文本内容定位
+
+### Q: 如何处理异步操作？
+
+A: 处理方法：
+```typescript
+// 等待网络空闲
+await page.waitForLoadState('networkidle')
+
+// 等待特定元素
+await page.waitForSelector('.loading', { state: 'hidden' })
+
+// 使用Promise
+await Promise.all([
+  page.click('button'),
+  page.waitForSelector('.result')
+])
+```
+
+### Q: Mock数据不生效怎么办？
+
+A: 检查步骤：
+1. 确认Mock函数在页面操作前调用
+2. 检查URL模式匹配
+3. 验证Mock数据格式
+4. 使用`page.on('request')`监听实际请求
+
+### Q: 如何处理登录状态？
+
+A: 状态管理：
+```typescript
+// 使用storageState
+export default defineConfig({
+  use: {
+    storageState: 'tests/.auth/user.json'
+  }
+})
+
+// 或在测试中设置
+await page.addInitScript(() => {
+  localStorage.setItem('token', 'test-token')
+})
+```
+
+## 📚 相关资源
+
+- [Playwright官方文档](https://playwright.dev/)
+- [测试最佳实践](https://playwright.dev/docs/best-practices)
+- [API参考](https://playwright.dev/docs/api/class-playwright)
+
+## 🎯 测试策略建议
+
+1. **测试金字塔**: 单元测试 > 集成测试 > E2E测试
+2. **测试范围**: 核心用户旅程 > 边界情况 > 错误场景
+3. **测试频率**: 提交前 > 合并前 > 发布前
+4. **维护原则**: 保持测试简洁、独立、可维护
+
+---
+
+**最后更新**: 2025-11-16

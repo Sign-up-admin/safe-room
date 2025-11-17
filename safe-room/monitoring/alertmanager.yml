@@ -1,0 +1,290 @@
+# Alertmanager Configuration for Fitness Gym System
+# Version: 1.0.0
+# Updated: 2025-11-17
+
+global:
+  # SMTP configuration for email notifications
+  smtp_smarthost: '${SMTP_HOST:-smtp.gmail.com:587}'
+  smtp_from: '${SMTP_FROM:-alerts@fitness-gym.com}'
+  smtp_auth_username: '${SMTP_USERNAME}'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+
+  # Slack webhook URL for notifications
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+
+  # Resolve timeout - how long to wait before sending resolve notifications
+  resolve_timeout: 5m
+
+# Route configuration - how to handle incoming alerts
+route:
+  # Default route - catch all alerts
+  receiver: 'default-receiver'
+  group_by: ['alertname', 'service', 'severity']
+
+  # Group wait time - how long to wait before sending the first notification
+  group_wait: 10s
+
+  # Group interval - how long to wait before sending notifications for the same group
+  group_interval: 5m
+
+  # Repeat interval - how long to wait before re-sending notifications
+  repeat_interval: 4h
+
+  # Routes for specific alert types
+  routes:
+    # Critical alerts - immediate notification
+    - matchers:
+        - severity = "critical"
+      receiver: 'critical-receiver'
+      group_wait: 5s
+      group_interval: 1m
+      repeat_interval: 30m
+
+    # Platform team alerts
+    - matchers:
+        - team = "platform"
+      receiver: 'platform-team'
+      group_wait: 30s
+
+    # Infrastructure team alerts
+    - matchers:
+        - team = "infrastructure"
+      receiver: 'infrastructure-team'
+      group_wait: 30s
+
+    # Database team alerts
+    - matchers:
+        - team = "database"
+      receiver: 'database-team'
+      group_wait: 30s
+
+    # Security alerts - immediate attention
+    - matchers:
+        - team = "security"
+      receiver: 'security-team'
+      group_wait: 5s
+      repeat_interval: 1h
+
+    # Business alerts - less urgent
+    - matchers:
+        - team = "business"
+      receiver: 'business-team'
+      group_wait: 1m
+      repeat_interval: 6h
+
+# Receiver configurations
+receivers:
+  # Default receiver for unhandled alerts
+  - name: 'default-receiver'
+    slack_configs:
+      - channel: '#alerts-general'
+        username: 'AlertManager'
+        icon_emoji: ':warning:'
+        title: '{{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          *Started:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${DEFAULT_ALERT_EMAIL:-ops@fitness-gym.com}'
+        subject: '[ALERT] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+
+          {{ if .Annotations.runbook_url }}Runbook: {{ .Annotations.runbook_url }}{{ end }}
+          {{ if .Annotations.dashboard_url }}Dashboard: {{ .Annotations.dashboard_url }}{{ end }}
+
+          {{ end }}
+
+  # Critical alerts receiver
+  - name: 'critical-receiver'
+    slack_configs:
+      - channel: '#alerts-critical'
+        username: '🚨 Critical Alert'
+        icon_emoji: ':fire:'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *🚨 CRITICAL ALERT*
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Started:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          *Runbook:* {{ .Annotations.runbook_url }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${CRITICAL_ALERT_EMAIL:-critical@fitness-gym.com}'
+        subject: '[CRITICAL] {{ .GroupLabels.alertname }} - IMMEDIATE ACTION REQUIRED'
+        body: |
+          CRITICAL ALERT - IMMEDIATE ACTION REQUIRED
+
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+
+          Runbook: {{ .Annotations.runbook_url }}
+
+          {{ end }}
+
+    # PagerDuty integration for critical alerts
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        description: '{{ .GroupLabels.alertname }}'
+        details:
+          severity: '{{ .GroupLabels.severity }}'
+          service: '{{ .GroupLabels.service }}'
+          description: '{{ .CommonAnnotations.description }}'
+
+  # Platform team receiver
+  - name: 'platform-team'
+    slack_configs:
+      - channel: '#platform-alerts'
+        username: 'Platform Alert'
+        icon_emoji: ':computer:'
+        title: 'Platform: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Platform Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${PLATFORM_TEAM_EMAIL:-platform@fitness-gym.com}'
+        subject: '[Platform] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+
+  # Infrastructure team receiver
+  - name: 'infrastructure-team'
+    slack_configs:
+      - channel: '#infra-alerts'
+        username: 'Infra Alert'
+        icon_emoji: ':hammer_and_wrench:'
+        title: 'Infrastructure: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Infrastructure Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${INFRA_TEAM_EMAIL:-infra@fitness-gym.com}'
+        subject: '[Infrastructure] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+
+  # Database team receiver
+  - name: 'database-team'
+    slack_configs:
+      - channel: '#db-alerts'
+        username: 'DB Alert'
+        icon_emoji: ':floppy_disk:'
+        title: 'Database: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Database Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${DB_TEAM_EMAIL:-database@fitness-gym.com}'
+        subject: '[Database] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+
+  # Security team receiver
+  - name: 'security-team'
+    slack_configs:
+      - channel: '#security-alerts'
+        username: 'Security Alert'
+        icon_emoji: ':shield:'
+        title: '🚨 Security: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *🚨 SECURITY ALERT*
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          *Started:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${SECURITY_TEAM_EMAIL:-security@fitness-gym.com}'
+        subject: '[SECURITY] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+
+  # Business team receiver
+  - name: 'business-team'
+    slack_configs:
+      - channel: '#business-alerts'
+        username: 'Business Alert'
+        icon_emoji: ':chart_with_upwards_trend:'
+        title: 'Business: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Business Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+
+    email_configs:
+      - to: '${BUSINESS_TEAM_EMAIL:-business@fitness-gym.com}'
+        subject: '[Business] {{ .GroupLabels.alertname }} ({{ .GroupLabels.severity }})'
+
+# Inhibition rules - suppress less important alerts when critical ones are firing
+inhibit_rules:
+  # Suppress warning alerts when critical alerts are firing for the same service
+  - source_matchers:
+      - severity = "critical"
+    target_matchers:
+      - severity = "warning"
+    equal:
+      - service
+
+  # Suppress info alerts when warning or critical alerts are firing
+  - source_matchers:
+      - severity =~ "warning|critical"
+    target_matchers:
+      - severity = "info"
+    equal:
+      - service
+
+  # Suppress business alerts during system outages
+  - source_matchers:
+      - service = "backend"
+      - severity = "critical"
+    target_matchers:
+      - team = "business"
+    equal:
+      - service
+
+# Templates for custom notification formats
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'

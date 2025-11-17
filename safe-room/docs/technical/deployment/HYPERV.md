@@ -1,0 +1,1791 @@
+---
+title: HYPERV
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# Hyper-V 部署指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: 基础设施团队
+
+## 概述
+
+本文档详细介绍如何在Microsoft Hyper-V环境中部署健身房综合管理系统，包括Hyper-V角色安装、虚拟机创建和管理、虚拟网络配置、存储空间管理、PowerShell自动化脚本编写，以及故障转移集群的配置。
+
+## 目录
+
+- [1. Hyper-V 架构概述](#1-hyper-v-架构概述)
+- [2. Hyper-V 角色安装](#2-hyper-v-角色安装)
+- [3. 虚拟机创建和管理](#3-虚拟机创建和管理)
+- [4. 虚拟网络配置](#4-虚拟网络配置)
+- [5. 存储配置](#5-存储配置)
+- [6. PowerShell 自动化](#6-powershell-自动化)
+- [7. 故障转移集群](#7-故障转移集群)
+- [8. 监控和维护](#8-监控和维护)
+- [9. 备份和恢复](#9-备份和恢复)
+- [10. 故障排查](#10-故障排查)
+- [11. 最佳实践](#11-最佳实践)
+
+---
+
+## 1. Hyper-V 架构概述
+
+### 1.1 Hyper-V 组件架构
+
+```mermaid
+graph TB
+    subgraph "物理主机层"
+        HW[物理硬件<br/>CPU/内存/存储/网络]
+        HYPERV[Hyper-V Hypervisor<br/>虚拟化层]
+        WSV[Windows Server<br/>父分区]
+    end
+
+    subgraph "虚拟化管理层"
+        HVMM[Hyper-V 管理器<br/>MMC控制台]
+        PS[PowerShell<br/>命令行管理]
+        WMI[WMI<br/>Windows管理接口]
+        SCVMM[SCVMM<br/>System Center Virtual Machine Manager]
+    end
+
+    subgraph "虚拟机层"
+        VM1[VM 1<br/>健身房应用]
+        VM2[VM 2<br/>数据库]
+        VM3[VM 3<br/>缓存服务]
+        VM4[VM 4<br/>监控服务]
+    end
+
+    subgraph "存储层"
+        CSV[Cluster Shared Volumes<br/>集群共享卷]
+        SOFS[Scale-Out File Server<br/>横向扩展文件服务器]
+        S2D[Storage Spaces Direct<br/>存储空间直通]
+        SMB[SMB 3.0<br/>文件共享]
+    end
+
+    subgraph "网络层"
+        VSW[Virtual Switch<br/>虚拟交换机]
+        NVGRE[NVGRE<br/>网络虚拟化]
+        SET[Switch Embedded Teaming<br/>交换机嵌入式组合]
+        SDN[SDN<br/>软件定义网络]
+    end
+
+    HW --> HYPERV
+    HYPERV --> WSV
+    WSV --> VM1
+    WSV --> VM2
+    WSV --> VM3
+    WSV --> VM4
+
+    HVMM --> WSV
+    PS --> WSV
+    WMI --> WSV
+    SCVMM --> WSV
+
+    WSV --> CSV
+    WSV --> SOFS
+    WSV --> S2D
+    WSV --> SMB
+
+    WSV --> VSW
+    VSW --> NVGRE
+    VSW --> SET
+    VSW --> SDN
+```
+
+### 1.2 部署架构
+
+#### 健身房系统Hyper-V部署架构
+
+```mermaid
+graph TB
+    subgraph "Hyper-V主机集群"
+        HOST1[Host 1<br/>16CPU/128GB/4TB]
+        HOST2[Host 2<br/>16CPU/128GB/4TB]
+        HOST3[Host 3<br/>16CPU/128GB/4TB]
+    end
+
+    subgraph "虚拟机分布"
+        WEB1[Web VM1<br/>IIS + Frontend]
+        WEB2[Web VM2<br/>IIS + Frontend]
+        API1[API VM1<br/>ASP.NET Core]
+        API2[API VM2<br/>ASP.NET Core]
+        API3[API VM3<br/>ASP.NET Core]
+        DB1[DB VM1<br/>SQL Server Primary]
+        DB2[DB VM2<br/>SQL Server Secondary]
+        REDIS1[Redis VM1<br/>Redis Cluster]
+        REDIS2[Redis VM2<br/>Redis Cluster]
+    end
+
+    subgraph "存储架构"
+        S2D[Storage Spaces Direct<br/>分布式存储]
+        SOFS[Scale-Out File Server<br/>文件服务器]
+        BACKUP[备份存储<br/>Azure Backup]
+    end
+
+    subgraph "网络架构"
+        VSW[Virtual Switch<br/>SET配置]
+        VLAN[VLAN隔离<br/>业务/存储/管理]
+        LB[Software Load Balancer<br/>软件负载均衡]
+    end
+
+    HOST1 --> WEB1
+    HOST1 --> API1
+    HOST1 --> DB1
+
+    HOST2 --> WEB2
+    HOST2 --> API2
+    HOST2 --> REDIS1
+
+    HOST3 --> API3
+    HOST3 --> DB2
+    HOST3 --> REDIS2
+
+    S2D --> DB1
+    S2D --> DB2
+    SOFS --> WEB1
+    SOFS --> WEB2
+    BACKUP --> DB1
+
+    VSW --> WEB1
+    VSW --> API1
+    VLAN --> DB1
+    LB --> WEB1
+    LB --> API1
+```
+
+### 1.3 环境要求
+
+#### 硬件要求
+
+| 组件 | 最低配置 | 推荐配置 | 高可用配置 |
+|------|----------|----------|------------|
+| **Hyper-V主机** | 8CPU/32GB/500GB | 16CPU/128GB/1TB | 24CPU/256GB/2TB |
+| **存储** | 1TB SAS/SATA | 2TB SSD + 4TB HDD | S2D存储池 |
+| **网络** | 1Gbps × 2 | 10Gbps × 2 | 25Gbps × 2 + SET |
+| **虚拟机** | 2vCPU/4GB/100GB | 4vCPU/8GB/200GB | 8vCPU/16GB/500GB |
+
+#### 软件要求
+
+| 组件 | 版本要求 | 说明 |
+|------|----------|------|
+| **Windows Server** | 2019/2022 | 支持Hyper-V的服务器版本 |
+| **Hyper-V** | 内置组件 | Windows Server内置 |
+| **PowerShell** | 7.0+ | 自动化脚本执行 |
+| **SCVMM** | 2022 (可选) | 虚拟化管理平台 |
+
+---
+
+## 2. Hyper-V 角色安装
+
+### 2.1 服务器准备
+
+#### 安装Windows Server
+
+```powershell
+# Windows Server 2019/2022 安装步骤
+# 1. 下载ISO镜像
+# 2. 创建启动盘
+# 3. 引导安装
+# 4. 选择"Windows Server 2019 Standard"或"Datacenter"
+# 5. 配置管理员密码
+# 6. 完成安装
+```
+
+#### 配置服务器基础设置
+
+```powershell
+# 配置服务器名称和域
+Rename-Computer -NewName "HV-HOST-01" -Restart
+
+# 禁用防火墙（生产环境请谨慎）
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# 配置时区
+Set-TimeZone -Id "China Standard Time"
+
+# 配置远程桌面
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+# 启用PowerShell远程
+Enable-PSRemoting -Force
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value "*" -Force
+
+# 安装Windows更新
+Install-WindowsUpdate -AcceptAll -AutoReboot
+```
+
+### 2.2 Hyper-V 角色安装
+
+#### 图形界面安装
+
+```powershell
+# 使用服务器管理器安装Hyper-V
+# 1. 打开服务器管理器
+# 2. 选择"添加角色和功能"
+# 3. 选择"基于角色或功能安装"
+# 4. 选择目标服务器
+# 5. 选择"Hyper-V"角色
+# 6. 添加所需功能（如果提示）
+# 7. 完成安装
+# 8. 重启服务器
+```
+
+#### PowerShell安装
+
+```powershell
+# PowerShell安装Hyper-V角色
+Install-WindowsFeature -Name Hyper-V -IncludeManagementTools -Restart
+
+# 验证安装
+Get-WindowsFeature -Name Hyper-V
+
+# 检查Hyper-V服务状态
+Get-Service -Name vmms, vmcompute, vmicvss, vmicguestinterface, vmicheartbeat, vmickvpexchange, vmicrdv, vmicshutdown, vmictimesync, vmicvmsession
+
+# 启用Hyper-V PowerShell模块
+Get-Command -Module Hyper-V
+```
+
+#### Hyper-V配置
+
+```powershell
+# 配置Hyper-V设置
+Set-VMHost -VirtualMachineMigrationAuthenticationType Kerberos
+Set-VMHost -VirtualMachineMigrationPerformanceOption SMB
+Set-VMHost -VirtualHardDiskPath "D:\VMs\Virtual Hard Disks"
+Set-VMHost -VirtualMachinePath "D:\VMs"
+
+# 启用嵌套虚拟化（如果需要）
+Set-VMProcessor -VMName "NestedVM" -ExposeVirtualizationExtensions $true
+
+# 配置NUMA跨越
+Set-VMHost -NumaSpanningEnabled $true
+
+# 配置虚拟机队列（VMQ）
+Enable-NetAdapterVMQ -Name "Ethernet"
+Set-NetAdapterVmq -Name "Ethernet" -BaseProcessorNumber 0 -MaxProcessorNumber 8 -MaxQueues 8
+```
+
+---
+
+## 3. 虚拟机创建和管理
+
+### 3.1 虚拟机模板创建
+
+#### 创建基础虚拟机
+
+```powershell
+# 创建基础虚拟机
+New-VM -Name "WindowsServer2019-Template" -MemoryStartupBytes 4GB -Generation 2 -NewVHDPath "D:\VMs\Virtual Hard Disks\WindowsServer2019-Template.vhdx" -NewVHDSizeBytes 100GB -Path "D:\VMs" -SwitchName "ExternalSwitch"
+
+# 配置虚拟机硬件
+Set-VM -Name "WindowsServer2019-Template" -ProcessorCount 2 -DynamicMemory -MemoryMinimumBytes 1GB -MemoryMaximumBytes 8GB
+
+# 挂载ISO并安装操作系统
+Add-VMDvdDrive -VMName "WindowsServer2019-Template"
+Set-VMDvdDrive -VMName "WindowsServer2019-Template" -Path "C:\ISO\WindowsServer2019.iso"
+
+# 启动虚拟机进行安装
+Start-VM -Name "WindowsServer2019-Template"
+```
+
+#### 模板通用化
+
+```powershell
+# 在虚拟机内部运行sysprep
+# 1. 登录虚拟机
+# 2. 打开命令提示符
+# 3. 运行以下命令：
+# cd C:\Windows\System32\Sysprep
+# sysprep.exe /generalize /oobe /shutdown /unattend:C:\unattend.xml
+
+# 创建unattend.xml文件
+$unattendContent = @"
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ComputerName>*</ComputerName>
+        </component>
+    </settings>
+</unattend>
+"@
+
+$unattendContent | Out-File -FilePath "C:\unattend.xml" -Encoding UTF8
+
+# 转换为模板
+Stop-VM -Name "WindowsServer2019-Template" -Save
+Set-VM -Name "WindowsServer2019-Template" -IsTemplate $true
+```
+
+### 3.2 批量虚拟机部署
+
+#### PowerShell批量创建
+
+```powershell
+# 批量创建虚拟机脚本
+param(
+    [string]$TemplateName = "WindowsServer2019-Template",
+    [string]$BaseName = "Fitness-App",
+    [int]$Count = 3,
+    [string]$VMSwitch = "ExternalSwitch"
+)
+
+$template = Get-VM -Name $TemplateName
+
+for ($i = 1; $i -le $Count; $i++) {
+    $vmName = "$BaseName-0$i"
+    $vhdPath = "D:\VMs\Virtual Hard Disks\$vmName.vhdx"
+
+    # 从模板克隆虚拟机
+    New-VM -Name $vmName -VHDPath $template.VHDs[0].Path -Path "D:\VMs" -Generation 2
+
+    # 配置虚拟机
+    Set-VM -Name $vmName -MemoryStartupBytes 4GB -ProcessorCount 2
+    Connect-VMNetworkAdapter -VMName $vmName -SwitchName $VMSwitch
+
+    # 配置动态内存
+    Set-VMMemory -VMName $vmName -DynamicMemoryEnabled $true -MinimumBytes 1GB -MaximumBytes 8GB
+
+    Write-Host "Created VM: $vmName"
+}
+
+# 批量启动虚拟机
+Get-VM -Name "$BaseName-*" | Start-VM
+```
+
+#### 应用特定配置
+
+```powershell
+# 为不同应用配置虚拟机
+$vmConfigs = @(
+    @{
+        Name = "Fitness-Web-01"
+        Memory = 4GB
+        CPU = 2
+        DiskSize = 100GB
+        Role = "WebServer"
+    },
+    @{
+        Name = "Fitness-API-01"
+        Memory = 8GB
+        CPU = 4
+        DiskSize = 200GB
+        Role = "ApplicationServer"
+    },
+    @{
+        Name = "Fitness-DB-01"
+        Memory = 16GB
+        CPU = 4
+        DiskSize = 500GB
+        Role = "DatabaseServer"
+    }
+)
+
+foreach ($config in $vmConfigs) {
+    # 创建虚拟机
+    New-VM -Name $config.Name -MemoryStartupBytes $config.Memory -ProcessorCount $config.CPU -NewVHDPath "D:\VMs\Virtual Hard Disks\$($config.Name).vhdx" -NewVHDSizeBytes $config.DiskSize -Path "D:\VMs" -SwitchName "ExternalSwitch"
+
+    # 应用角色特定配置
+    switch ($config.Role) {
+        "WebServer" {
+            # Web服务器配置
+            Set-VM -Name $config.Name -AutomaticStartAction Start
+            Set-VM -Name $config.Name -AutomaticStopAction ShutDown
+        }
+        "ApplicationServer" {
+            # 应用服务器配置
+            Set-VMProcessor -VMName $config.Name -ExposeVirtualizationExtensions $true
+            Set-VMMemory -VMName $config.Name -DynamicMemoryEnabled $true
+        }
+        "DatabaseServer" {
+            # 数据库服务器配置
+            Set-VM -Name $config.Name -AutomaticStartAction Start
+            Set-VMProcessor -VMName $config.Name -MaximumCountPerNumaNode 4
+        }
+    }
+
+    Write-Host "Configured VM: $($config.Name) for role: $($config.Role)"
+}
+```
+
+### 3.3 虚拟机管理
+
+#### 基本管理操作
+
+```powershell
+# 虚拟机状态管理
+Start-VM -Name "Fitness-App-01"
+Stop-VM -Name "Fitness-App-01" -Force
+Restart-VM -Name "Fitness-App-01"
+Save-VM -Name "Fitness-App-01"
+Suspend-VM -Name "Fitness-App-01"
+
+# 查看虚拟机信息
+Get-VM | Select-Object Name, State, CPUUsage, MemoryAssigned, Uptime
+
+# 虚拟机配置修改
+Set-VM -Name "Fitness-App-01" -ProcessorCount 4
+Set-VMMemory -VMName "Fitness-App-01" -StartupBytes 8GB
+Set-VMNetworkAdapter -VMName "Fitness-App-01" -VlanId 100
+
+# 虚拟机重命名
+Rename-VM -Name "OldName" -NewName "NewName"
+```
+
+#### 资源动态调整
+
+```powershell
+# 热添加CPU和内存
+Set-VM -Name "Fitness-App-01" -ProcessorCount 4  # 需要虚拟机运行时支持
+Set-VMMemory -VMName "Fitness-App-01" -StartupBytes 8GB
+
+# 添加虚拟磁盘
+New-VHD -Path "D:\VMs\Virtual Hard Disks\Fitness-App-01-Data.vhdx" -SizeBytes 100GB -Dynamic
+Add-VMHardDiskDrive -VMName "Fitness-App-01" -Path "D:\VMs\Virtual Hard Disks\Fitness-App-01-Data.vhdx"
+
+# 添加网络适配器
+Add-VMNetworkAdapter -VMName "Fitness-App-01" -SwitchName "InternalSwitch" -Name "InternalNIC"
+
+# 配置IP地址（在虚拟机内部）
+# 在VM中运行：
+# New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.1.100" -PrefixLength 24 -DefaultGateway "192.168.1.1"
+```
+
+#### 快照管理
+
+```powershell
+# 创建快照
+Checkpoint-VM -Name "Fitness-App-01" -SnapshotName "Before-Update-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+
+# 查看快照
+Get-VMSnapshot -VMName "Fitness-App-01"
+
+# 恢复快照
+Restore-VMSnapshot -VMName "Fitness-App-01" -Name "Before-Update-20240101-120000" -Confirm:$false
+
+# 删除快照
+Remove-VMSnapshot -VMName "Fitness-App-01" -Name "Before-Update-20240101-120000"
+
+# 合并快照
+Merge-VHD -Path "D:\VMs\Virtual Hard Disks\Fitness-App-01.vhdx" -DestinationPath "D:\VMs\Virtual Hard Disks\Fitness-App-01_merged.vhdx"
+```
+
+---
+
+## 4. 虚拟网络配置
+
+### 4.1 虚拟交换机创建
+
+#### 外部虚拟交换机
+
+```powershell
+# 创建外部虚拟交换机
+New-VMSwitch -Name "ExternalSwitch" -NetAdapterName "Ethernet" -AllowManagementOS $true
+
+# 配置交换机属性
+Set-VMSwitch -Name "ExternalSwitch" -DefaultFlowMinimumBandwidthWeight 10
+
+# 启用带宽管理
+Enable-VMSwitchExtension -VMSwitchName "ExternalSwitch" -Name "Microsoft Windows Filtering Platform"
+```
+
+#### 内部虚拟交换机
+
+```powershell
+# 创建内部虚拟交换机
+New-VMSwitch -Name "InternalSwitch" -SwitchType Internal
+
+# 配置NAT（如果需要）
+New-NetNat -Name "InternalNAT" -InternalIPInterfaceAddressPrefix "192.168.100.0/24"
+
+# 配置DHCP（可选）
+Add-DhcpServerV4Scope -Name "Internal Network" -StartRange 192.168.100.100 -EndRange 192.168.100.200 -SubnetMask 255.255.255.0 -State Active
+Set-DhcpServerV4OptionValue -ScopeId 192.168.100.0 -DnsServer 8.8.8.8, 8.8.4.4
+```
+
+#### 专用虚拟交换机
+
+```powershell
+# 创建专用虚拟交换机（用于隔离网络）
+New-VMSwitch -Name "PrivateSwitch" -SwitchType Private
+
+# 配置VLAN
+Set-VMNetworkAdapterVlan -VMName "Fitness-DB-01" -Access -VlanId 200
+Set-VMNetworkAdapterVlan -VMName "Fitness-App-01" -Access -VlanId 100
+```
+
+### 4.2 网络安全配置
+
+#### VLAN配置
+
+```powershell
+# 配置端口ACL
+Add-VMNetworkAdapterAcl -VMName "Fitness-App-01" -Action Allow -Direction Both -LocalIPAddress 192.168.1.100 -RemoteIPAddress 192.168.1.0/24 -Protocol TCP -LocalPort 80,443
+
+# 配置网络隔离
+Set-VMSwitch -Name "ExternalSwitch" -DefaultFlowMinimumBandwidthWeight 0
+
+# 启用ARP欺骗保护
+Set-VMNetworkAdapter -VMName "Fitness-App-01" -PortMirroring Source
+```
+
+#### 防火墙配置
+
+```powershell
+# 在虚拟机内部配置Windows防火墙
+# 启用远程桌面
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+# 配置应用端口
+New-NetFirewallRule -Name "HTTP" -DisplayName "HTTP" -Protocol TCP -LocalPort 80 -Action Allow -Direction Inbound
+New-NetFirewallRule -Name "HTTPS" -DisplayName "HTTPS" -Protocol TCP -LocalPort 443 -Action Allow -Direction Inbound
+New-NetFirewallRule -Name "SQL" -DisplayName "SQL Server" -Protocol TCP -LocalPort 1433 -Action Allow -Direction Inbound
+
+# 配置网络安全
+Set-NetFirewallProfile -Profile Domain,Public,Private -DefaultInboundAction Block -DefaultOutboundAction Allow
+```
+
+### 4.3 高级网络功能
+
+#### Switch Embedded Teaming (SET)
+
+```powershell
+# 创建SET团队
+New-NetSwitchTeam -Name "SET-Team" -TeamMembers "Ethernet","Ethernet2"
+
+# 创建基于SET的虚拟交换机
+New-VMSwitch -Name "SET-Switch" -NetAdapterName "SET-Team" -EnableEmbeddedTeaming $true
+
+# 配置负载均衡
+Set-NetSwitchTeam -Name "SET-Team" -LoadBalancingAlgorithm Dynamic
+```
+
+#### Software Load Balancing
+
+```powershell
+# 配置软件负载均衡器
+# 1. 安装负载均衡功能
+Install-WindowsFeature -Name NLB
+
+# 2. 创建NLB集群
+New-NlbCluster -InterfaceName "Ethernet" -ClusterName "Fitness-Web-Cluster" -ClusterPrimaryIP "192.168.1.100" -SubnetMask "255.255.255.0"
+
+# 3. 添加主机到集群
+Get-NlbCluster -ClusterName "Fitness-Web-Cluster" | Add-NlbClusterNode -NewNodeName "HV-HOST-01" -NewNodeInterface "Ethernet"
+Get-NlbCluster -ClusterName "Fitness-Web-Cluster" | Add-NlbClusterNode -NewNodeName "HV-HOST-02" -NewNodeInterface "Ethernet"
+
+# 4. 配置端口规则
+Get-NlbCluster -ClusterName "Fitness-Web-Cluster" | Add-NlbClusterPortRule -StartPort 80 -EndPort 80 -Protocol TCP -Mode Multiple
+```
+
+---
+
+## 5. 存储配置
+
+### 5.1 存储池管理
+
+#### 创建存储池
+
+```powershell
+# 查看可用磁盘
+Get-PhysicalDisk | Where-Object { $_.CanPool -eq $true }
+
+# 创建存储池
+New-StoragePool -FriendlyName "FitnessStoragePool" -StorageSubsystemFriendlyName "Windows Storage*" -PhysicalDisks (Get-PhysicalDisk | Where-Object { $_.CanPool -eq $true })
+
+# 创建虚拟磁盘
+New-VirtualDisk -FriendlyName "FitnessData" -StoragePoolFriendlyName "FitnessStoragePool" -Size 2TB -ProvisioningType Thin -ResiliencySettingName "Mirror"
+
+# 初始化磁盘
+Initialize-Disk -FriendlyName "FitnessData"
+New-Partition -DiskId (Get-Disk -FriendlyName "FitnessData").Number -UseMaximumSize -AssignDriveLetter
+Format-Volume -DriveLetter (Get-Partition -DiskId (Get-Disk -FriendlyName "FitnessData").Number).DriveLetter -FileSystem NTFS -NewFileSystemLabel "FitnessData"
+```
+
+#### Storage Spaces Direct (S2D)
+
+```powershell
+# 启用S2D（需要至少3个节点）
+Enable-ClusterStorageSpacesDirect -PoolFriendlyName "S2D-Pool"
+
+# 创建卷
+New-Volume -FriendlyName "Fitness-Shared-Volume" -FileSystem CSVFS_ReFS -StoragePoolFriendlyName "S2D-Pool" -Size 1TB -ResiliencySettingName "Mirror" -PhysicalDiskRedundancy 2
+
+# 配置持续可用性
+Set-FileShare -Name "FitnessShare" -ContinuouslyAvailable $true
+```
+
+### 5.2 虚拟磁盘管理
+
+#### VHD/VHDX管理
+
+```powershell
+# 创建虚拟磁盘
+New-VHD -Path "D:\VMs\Virtual Hard Disks\Fitness-App-01.vhdx" -SizeBytes 100GB -Dynamic
+
+# 转换磁盘格式
+Convert-VHD -Path "D:\VMs\Virtual Hard Disks\old-disk.vhd" -DestinationPath "D:\VMs\Virtual Hard Disks\new-disk.vhdx" -VHDType Dynamic
+
+# 扩展虚拟磁盘
+Resize-VHD -Path "D:\VMs\Virtual Hard Disks\Fitness-App-01.vhdx" -SizeBytes 200GB
+
+# 在虚拟机内部扩展分区
+# 在VM中运行diskpart：
+# diskpart
+# select disk 0
+# select partition 1
+# extend size=51200  # 50GB in MB
+```
+
+#### 传递磁盘
+
+```powershell
+# 添加传递磁盘
+Add-VMHardDiskDrive -VMName "Fitness-DB-01" -Path "\\SOFS\SharedDisks\DB-Data.vhdx" -SupportPersistentReservations
+
+# 配置共享VHDX
+Set-VMHardDiskDrive -VMName "Fitness-DB-01" -Path "\\SOFS\SharedDisks\DB-Data.vhdx" -SupportPersistentReservations $true
+
+# 验证磁盘共享
+Get-VMHardDiskDrive -VMName "Fitness-DB-01" | Select-Object VMName, Path, SupportPersistentReservations
+```
+
+### 5.3 存储QoS
+
+#### 配置存储QoS
+
+```powershell
+# 创建存储QoS策略
+New-StorageQoSPolicy -Name "HighPriority" -MinimumIops 100 -MaximumIops 1000 -PolicyType Dedicated
+
+# 应用策略到虚拟机
+Get-VM -Name "Fitness-DB-01" | Get-VMHardDiskDrive | Set-VMHardDiskDrive -QoSPolicyID (Get-StorageQoSPolicy -Name "HighPriority").PolicyId
+
+# 监控存储性能
+Get-StorageQoSFlow | Select-Object InitiatorName, FilePath, MinimumIops, MaximumIops, IOPS
+```
+
+---
+
+## 6. PowerShell 自动化
+
+### 6.1 基础自动化脚本
+
+#### 虚拟机部署脚本
+
+```powershell
+<#
+.SYNOPSIS
+    健身房系统虚拟机部署脚本
+.DESCRIPTION
+    自动创建和配置健身房系统的虚拟机
+.PARAMETER Environment
+    部署环境 (Development/Staging/Production)
+.PARAMETER VMCount
+    要创建的虚拟机数量
+.EXAMPLE
+    .\Deploy-FitnessVMs.ps1 -Environment Production -VMCount 3
+#>
+
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("Development", "Staging", "Production")]
+    [string]$Environment,
+
+    [Parameter(Mandatory = $false)]
+    [int]$VMCount = 1
+)
+
+# 配置参数
+$configs = @{
+    Development = @{
+        Memory = 4GB
+        CPU = 2
+        DiskSize = 100GB
+        Network = "DevSwitch"
+    }
+    Staging = @{
+        Memory = 6GB
+        CPU = 4
+        DiskSize = 150GB
+        Network = "StagingSwitch"
+    }
+    Production = @{
+        Memory = 8GB
+        CPU = 4
+        DiskSize = 200GB
+        Network = "ProdSwitch"
+    }
+}
+
+$config = $configs[$Environment]
+
+# 创建虚拟机
+for ($i = 1; $i -le $VMCount; $i++) {
+    $vmName = "Fitness-$Environment-App-0$i"
+    $vhdPath = "D:\VMs\Virtual Hard Disks\$vmName.vhdx"
+
+    try {
+        # 创建虚拟机
+        New-VM -Name $vmName -MemoryStartupBytes $config.Memory -ProcessorCount $config.CPU -NewVHDPath $vhdPath -NewVHDSizeBytes $config.DiskSize -Path "D:\VMs" -SwitchName $config.Network -Generation 2
+
+        # 配置高级设置
+        Set-VMMemory -VMName $vmName -DynamicMemoryEnabled $true -MinimumBytes ($config.Memory / 4) -MaximumBytes ($config.Memory * 2)
+        Set-VM -Name $vmName -AutomaticStartAction Start -AutomaticStopAction ShutDown
+
+        # 配置网络适配器
+        Set-VMNetworkAdapter -VMName $vmName -DhcpGuard On -RouterGuard On -PortMirroring Source
+
+        Write-Host "Successfully created VM: $vmName" -ForegroundColor Green
+
+    } catch {
+        Write-Error "Failed to create VM $vmName : $_"
+    }
+}
+
+Write-Host "Deployment completed. Created $VMCount VMs for $Environment environment."
+```
+
+#### 配置管理脚本
+
+```powershell
+<#
+.SYNOPSIS
+    虚拟机配置管理脚本
+.DESCRIPTION
+    批量配置虚拟机的网络、存储和其他设置
+#>
+
+function Set-VMConfiguration {
+    param(
+        [string]$VMName,
+        [string]$IPAddress,
+        [string]$SubnetMask = "255.255.255.0",
+        [string]$Gateway,
+        [string]$DNS
+    )
+
+    # 配置网络
+    if ($IPAddress) {
+        Invoke-Command -VMName $VMName -ScriptBlock {
+            param($IP, $Mask, $GW, $DNS)
+            New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress $IP -PrefixLength 24 -DefaultGateway $GW
+            Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses $DNS
+        } -ArgumentList $IPAddress, $SubnetMask, $Gateway, $DNS
+    }
+
+    # 配置防火墙
+    Invoke-Command -VMName $VMName -ScriptBlock {
+        # 启用必要规则
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Enable-NetFirewallRule -DisplayGroup "File and Printer Sharing"
+
+        # 创建应用规则
+        New-NetFirewallRule -Name "FitnessApp" -DisplayName "Fitness Application" -Protocol TCP -LocalPort 8080 -Action Allow -Direction Inbound
+    }
+}
+
+# 批量配置示例
+$vmConfigs = @(
+    @{ Name = "Fitness-Prod-App-01"; IP = "192.168.1.101"; Gateway = "192.168.1.1"; DNS = "8.8.8.8" },
+    @{ Name = "Fitness-Prod-App-02"; IP = "192.168.1.102"; Gateway = "192.168.1.1"; DNS = "8.8.8.8" },
+    @{ Name = "Fitness-Prod-DB-01"; IP = "192.168.1.201"; Gateway = "192.168.1.1"; DNS = "8.8.8.8" }
+)
+
+foreach ($config in $vmConfigs) {
+    Set-VMConfiguration @config
+    Write-Host "Configured VM: $($config.Name)"
+}
+```
+
+### 6.2 高级自动化脚本
+
+#### 完整部署流水线
+
+```powershell
+<#
+.SYNOPSIS
+    完整健身房系统部署流水线
+.DESCRIPTION
+    从创建虚拟机到部署应用的完整自动化流程
+#>
+
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$Environment,
+    [switch]$IncludeDatabase,
+    [switch]$IncludeMonitoring
+)
+
+# 导入辅助函数
+. .\VM-Functions.ps1
+
+# 1. 创建虚拟机
+Write-Host "Step 1: Creating VMs..." -ForegroundColor Yellow
+$webVMs = New-FitnessVMs -Role "Web" -Environment $Environment -Count 2
+$appVMs = New-FitnessVMs -Role "App" -Environment $Environment -Count 3
+
+if ($IncludeDatabase) {
+    $dbVMs = New-FitnessVMs -Role "Database" -Environment $Environment -Count 2
+}
+
+if ($IncludeMonitoring) {
+    $monVMs = New-FitnessVMs -Role "Monitoring" -Environment $Environment -Count 1
+}
+
+# 2. 配置网络
+Write-Host "Step 2: Configuring network..." -ForegroundColor Yellow
+foreach ($vm in ($webVMs + $appVMs + $dbVMs + $monVMs)) {
+    Set-VMNetworkConfiguration -VMName $vm.Name -Environment $Environment
+}
+
+# 3. 等待虚拟机启动
+Write-Host "Step 3: Waiting for VMs to start..." -ForegroundColor Yellow
+foreach ($vm in ($webVMs + $appVMs + $dbVMs + $monVMs)) {
+    Wait-VMReady -VMName $vm.Name -Timeout 300
+}
+
+# 4. 配置应用
+Write-Host "Step 4: Configuring applications..." -ForegroundColor Yellow
+foreach ($vm in $webVMs) {
+    Install-WebServer -VMName $vm.Name
+}
+
+foreach ($vm in $appVMs) {
+    Install-ApplicationServer -VMName $vm.Name
+}
+
+if ($IncludeDatabase) {
+    foreach ($vm in $dbVMs) {
+        Install-DatabaseServer -VMName $vm.Name
+    }
+}
+
+if ($IncludeMonitoring) {
+    foreach ($vm in $monVMs) {
+        Install-MonitoringServer -VMName $vm.Name
+    }
+}
+
+# 5. 部署应用
+Write-Host "Step 5: Deploying applications..." -ForegroundColor Yellow
+Deploy-FitnessApplication -WebVMs $webVMs -AppVMs $appVMs -Environment $Environment
+
+# 6. 配置负载均衡
+Write-Host "Step 6: Configuring load balancing..." -ForegroundColor Yellow
+Configure-LoadBalancer -VMs $webVMs -Environment $Environment
+
+# 7. 验证部署
+Write-Host "Step 7: Validating deployment..." -ForegroundColor Yellow
+$results = Test-FitnessDeployment -WebVMs $webVMs -AppVMs $appVMs -Environment $Environment
+
+if ($results.AllTestsPassed) {
+    Write-Host "Deployment completed successfully!" -ForegroundColor Green
+} else {
+    Write-Error "Deployment validation failed. Check logs for details."
+    exit 1
+}
+
+# 输出部署摘要
+Write-Host "`nDeployment Summary:" -ForegroundColor Cyan
+Write-Host "Environment: $Environment"
+Write-Host "Web VMs: $($webVMs.Count)"
+Write-Host "App VMs: $($appVMs.Count)"
+if ($IncludeDatabase) { Write-Host "DB VMs: $($dbVMs.Count)" }
+if ($IncludeMonitoring) { Write-Host "Monitoring VMs: $($monVMs.Count)" }
+```
+
+#### 监控和报告脚本
+
+```powershell
+<#
+.SYNOPSIS
+    Hyper-V环境监控和报告脚本
+.DESCRIPTION
+    收集Hyper-V主机的性能指标和虚拟机状态
+#>
+
+function Get-HyperVReport {
+    param(
+        [string[]]$HostNames = $env:COMPUTERNAME,
+        [string]$OutputPath = ".\HyperV-Report-$(Get-Date -Format 'yyyyMMdd-HHmmss').html"
+    )
+
+    $reportData = @()
+
+    foreach ($hostName in $HostNames) {
+        try {
+            $session = New-PSSession -ComputerName $hostName
+
+            Invoke-Command -Session $session -ScriptBlock {
+                # 收集主机信息
+                $hostInfo = Get-ComputerInfo
+                $vmHost = Get-VMHost
+                $vms = Get-VM
+                $storage = Get-StoragePool
+                $networks = Get-VMSwitch
+
+                # 收集性能指标
+                $cpuUsage = Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 1
+                $memoryUsage = Get-Counter '\Memory\% Committed Bytes In Use' -SampleInterval 1 -MaxSamples 1
+                $diskUsage = Get-Counter '\LogicalDisk(C:)\% Free Space' -SampleInterval 1 -MaxSamples 1
+
+                @{
+                    HostName = $env:COMPUTERNAME
+                    HostInfo = $hostInfo
+                    VMHost = $vmHost
+                    VMs = $vms
+                    Storage = $storage
+                    Networks = $networks
+                    CPUUsage = $cpuUsage.CounterSamples.CookedValue
+                    MemoryUsage = $memoryUsage.CounterSamples.CookedValue
+                    DiskUsage = 100 - $diskUsage.CounterSamples.CookedValue
+                    Timestamp = Get-Date
+                }
+            }
+        } catch {
+            Write-Error "Failed to collect data from $hostName : $_"
+            continue
+        }
+    }
+
+    # 生成HTML报告
+    $html = @"
+    <html>
+    <head>
+        <title>Hyper-V Environment Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .warning { color: orange; }
+            .error { color: red; }
+            .success { color: green; }
+        </style>
+    </head>
+    <body>
+        <h1>Hyper-V Environment Report</h1>
+        <p>Generated on: $(Get-Date)</p>
+
+        <h2>Host Summary</h2>
+        <table>
+            <tr><th>Host Name</th><th>CPU Usage</th><th>Memory Usage</th><th>Disk Usage</th><th>VM Count</th></tr>
+            $($reportData | ForEach-Object {
+                $statusClass = if ($_.CPUUsage -gt 90 -or $_.MemoryUsage -gt 90) { "error" } elseif ($_.CPUUsage -gt 70 -or $_.MemoryUsage -gt 80) { "warning" } else { "success" }
+                "<tr class='$statusClass'><td>$($_.HostName)</td><td>$($_.CPUUsage.ToString('F1'))%</td><td>$($_.MemoryUsage.ToString('F1'))%</td><td>$($_.DiskUsage.ToString('F1'))%</td><td>$($_.VMs.Count)</td></tr>"
+            })
+        </table>
+
+        <h2>Virtual Machines</h2>
+        <table>
+            <tr><th>VM Name</th><th>State</th><th>CPU</th><th>Memory</th><th>Uptime</th></tr>
+            $($reportData.VMs | ForEach-Object {
+                "<tr><td>$($_.Name)</td><td>$($_.State)</td><td>$($_.ProcessorCount)</td><td>$($_.MemoryAssigned/1GB)GB</td><td>$($_.Uptime)</td></tr>"
+            })
+        </table>
+    </body>
+    </html>
+"@
+
+    $html | Out-File -FilePath $OutputPath -Encoding UTF8
+    Write-Host "Report generated: $OutputPath"
+}
+```
+
+---
+
+## 7. 故障转移集群
+
+### 7.1 集群创建
+
+#### 安装故障转移集群功能
+
+```powershell
+# 在所有节点上安装故障转移集群功能
+$nodes = "HV-HOST-01", "HV-HOST-02", "HV-HOST-03"
+Invoke-Command -ComputerName $nodes -ScriptBlock {
+    Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
+}
+
+# 验证集群准备情况
+Test-Cluster -Node $nodes
+
+# 创建集群
+New-Cluster -Name "Fitness-Cluster" -Node $nodes -StaticAddress "192.168.1.100"
+
+# 配置集群网络
+Get-ClusterNetwork | Set-ClusterNetwork -Role 1  # 0=None, 1=Cluster, 3=Both
+```
+
+#### 集群仲裁配置
+
+```powershell
+# 配置磁盘见证
+Get-ClusterAvailableDisk | Add-ClusterDisk
+Set-ClusterQuorum -NodeAndDiskMajority "Cluster Disk 1"
+
+# 或者配置文件共享见证
+Set-ClusterQuorum -NodeAndFileShareMajority "\\SOFS\ClusterWitness"
+```
+
+### 7.2 集群角色配置
+
+#### 配置虚拟机角色
+
+```powershell
+# 将虚拟机添加到集群
+Add-ClusterVirtualMachineRole -VirtualMachine "Fitness-App-01"
+
+# 配置首选所有者
+Set-ClusterOwnerNode -Group "Fitness-App-01" -Owners "HV-HOST-01", "HV-HOST-02"
+
+# 配置故障转移设置
+Set-ClusterGroup -Name "Fitness-App-01" -AutoFailbackType 1 -FailbackWindowStart 9:00 -FailbackWindowEnd 18:00
+```
+
+#### 配置文件服务器角色
+
+```powershell
+# 创建文件服务器集群角色
+Add-ClusterFileServerRole -Storage "Cluster Disk 2" -Name "Fitness-FileServer" -StaticAddress "192.168.1.101"
+
+# 配置共享文件夹
+New-SmbShare -Name "FitnessData" -Path "C:\ClusterStorage\Volume1\FitnessData" -FullAccess "Domain Admins" -ReadAccess "Authenticated Users"
+```
+
+### 7.3 高可用应用配置
+
+#### SQL Server Always On
+
+```powershell
+# 配置SQL Server Always On可用性组
+# 1. 在所有节点上安装SQL Server
+# 2. 配置Windows Server故障转移集群
+# 3. 启用Always On可用性组
+# 4. 创建可用性组
+
+# PowerShell配置示例
+Enable-SqlAlwaysOn -ServerInstance "HV-HOST-01\SQL2019" -Force
+Enable-SqlAlwaysOn -ServerInstance "HV-HOST-02\SQL2019" -Force
+
+New-SqlAvailabilityGroup -Name "Fitness-AG" -Path "SQLSERVER:\Sql\HV-HOST-01\SQL2019\AvailabilityGroups"
+```
+
+#### IIS应用程序池高可用
+
+```powershell
+# 配置IIS共享配置
+# 1. 设置共享配置位置
+# 2. 导出配置到共享存储
+# 3. 配置所有节点使用共享配置
+
+# PowerShell配置
+$sharePath = "\\Fitness-FileServer\IISConfig"
+Set-WebConfigurationProperty -pspath 'MACHINE/WEBROOT/APPHOST' -filter "system.applicationHost/config" -name "configPath" -value $sharePath
+```
+
+---
+
+## 8. 监控和维护
+
+### 8.1 Hyper-V 监控
+
+#### 性能监控
+
+```powershell
+# 配置性能计数器
+$counterList = @(
+    '\Hyper-V Hypervisor Logical Processor(_Total)\% Total Run Time',
+    '\Hyper-V Hypervisor Root Virtual Processor(_Total)\% Guest Run Time',
+    '\Hyper-V Dynamic Memory Balancer(_Total)\Available Memory',
+    '\Hyper-V Virtual Machine Health Summary\Health Critical',
+    '\Hyper-V Virtual Network Adapter(*)\Packets/sec'
+)
+
+# 创建数据收集器集
+New-DataCollectorSet -Name "Hyper-V Performance" -Counters $counterList -FileName "HyperV-Perf"
+
+# 启动监控
+Start-DataCollectorSet -Name "Hyper-V Performance"
+
+# 查看实时性能
+Get-Counter -Counter $counterList -SampleInterval 5 -MaxSamples 10
+```
+
+#### 事件日志监控
+
+```powershell
+# 监控Hyper-V事件日志
+Get-WinEvent -LogName "Microsoft-Windows-Hyper-V*" -MaxEvents 50 | Select-Object TimeCreated, Id, LevelDisplayName, Message
+
+# 配置事件转发
+wecutil qc  # 配置Windows事件收集器
+wecutil as  # 配置订阅
+
+# 创建自定义事件监控
+$action = {
+    $event = $EventArgs.NewEvent
+    if ($event.Id -eq 1069) {  # 集群故障转移事件
+        Send-MailMessage -To "admin@fitness-gym.com" -Subject "Cluster Failover Alert" -Body "Cluster failover detected on $($event.MachineName)"
+    }
+}
+
+Register-EngineEvent -SourceIdentifier "HyperV-Event" -Action $action
+```
+
+### 8.2 SCVMM 管理
+
+#### SCVMM 安装和配置
+
+```powershell
+# 安装SCVMM服务器
+Install-SCVMM -SQLServer "sql-server.fitness-gym.com" -UserName "DOMAIN\SCVMM-Service" -CompanyName "Fitness Gym"
+
+# 添加Hyper-V主机
+Add-SCVirtualizationManager -ComputerName "HV-HOST-01", "HV-HOST-02", "HV-HOST-03" -Credential $cred
+
+# 创建私有云
+New-SCCloud -Name "Fitness-PrivateCloud" -VMHostGroup "Fitness-HostGroup"
+
+# 配置存储分类
+New-SCStorageClassification -Name "Gold" -Description "High-performance storage"
+New-SCStorageClassification -Name "Silver" -Description "Standard storage"
+New-SCStorageClassification -Name "Bronze" -Description "Archive storage"
+```
+
+#### 自动化管理
+
+```powershell
+# SCVMM PowerShell管理示例
+# 创建虚拟机模板
+$template = New-SCVMTemplate -Name "Fitness-App-Template" -VM $vm -RunAsynchronously
+
+# 部署服务
+$service = New-SCService -ServiceConfig $config -Name "Fitness-WebService" -RunAsynchronously
+
+# 配置网络
+$logicalNetwork = New-SCLogicalNetwork -Name "Fitness-Network" -LogicalNetworkDefinitionIsolation $true
+$vmNetwork = New-SCVMNetwork -Name "Fitness-VMNetwork" -LogicalNetwork $logicalNetwork
+```
+
+### 8.3 补丁管理
+
+#### Windows Server更新管理
+
+```powershell
+# 配置自动更新
+# 1. 在组策略中配置
+# 计算机配置 -> 管理模板 -> Windows组件 -> Windows更新
+# 设置"配置自动更新"为"启用"
+# 设置"自动更新检测频率"为每日
+
+# PowerShell配置
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUOptions" -Value 4  # 自动下载并计划安装
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "ScheduledInstallDay" -Value 0  # 每天
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "ScheduledInstallTime" -Value 3  # 凌晨3点
+
+# 强制更新检查
+Start-Process -FilePath "C:\Windows\System32\UsoClient.exe" -ArgumentList "StartScan"
+
+# 查看更新历史
+Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 10
+```
+
+#### 虚拟机更新编排
+
+```powershell
+# 更新编排脚本
+$updateOrder = @(
+    "Fitness-Monitoring-01",  # 先更新监控
+    "Fitness-Backup-01",      # 然后备份
+    "Fitness-Web-02",         # Web服务器滚动更新
+    "Fitness-Web-01",
+    "Fitness-App-03",         # 应用服务器滚动更新
+    "Fitness-App-02",
+    "Fitness-App-01",
+    "Fitness-DB-02",          # 最后数据库（需要仔细规划）
+    "Fitness-DB-01"
+)
+
+foreach ($vmName in $updateOrder) {
+    Write-Host "Updating $vmName..."
+
+    # 创建快照
+    Checkpoint-VM -Name $vmName -SnapshotName "Pre-Update-$(Get-Date -Format 'yyyyMMdd-HHmm')"
+
+    # 停止虚拟机
+    Stop-VM -Name $vmName -Force
+
+    # 应用更新（在主机上）
+    # 这里可以调用 Windows Update 或其他更新机制
+
+    # 启动虚拟机
+    Start-VM -Name $vmName
+
+    # 验证更新
+    if (Test-VMConnection -VMName $vmName) {
+        Write-Host "$vmName updated successfully" -ForegroundColor Green
+
+        # 删除旧快照（保留一个）
+        Get-VMSnapshot -VMName $vmName | Where-Object { $_.Name -notlike "Pre-Update*" } | Remove-VMSnapshot
+    } else {
+        Write-Error "$vmName failed to start after update"
+        # 可以选择恢复快照
+        # Restore-VMSnapshot -VMName $vmName -Name "Pre-Update-*" -Confirm:$false
+    }
+}
+```
+
+---
+
+## 9. 备份和恢复
+
+### 9.1 Windows Server备份
+
+#### 配置备份策略
+
+```powershell
+# 安装Windows Server备份功能
+Install-WindowsFeature -Name Windows-Server-Backup
+
+# 创建备份策略
+$backupPolicy = New-WBPolicy
+
+# 添加系统状态备份
+Add-WBSystemState -Policy $backupPolicy
+
+# 添加裸金属恢复
+Add-WBBareMetalRecovery -Policy $backupPolicy
+
+# 添加虚拟机备份
+Get-VM | ForEach-Object { Add-WBVirtualMachine -Policy $backupPolicy -VirtualMachine $_ }
+
+# 设置备份目标
+$backupTarget = New-WBBackupTarget -VolumePath "E:"
+Add-WBBackupTarget -Policy $backupPolicy -Target $backupTarget
+
+# 设置备份时间
+Set-WBSchedule -Policy $backupPolicy -Schedule "03:00"
+
+# 保存策略
+Set-WBPolicy -Policy $backupPolicy
+```
+
+#### 执行备份
+
+```powershell
+# 手动备份
+Start-WBBackup -Policy (Get-WBPolicy)
+
+# 查看备份状态
+Get-WBJob
+
+# 查看备份历史
+Get-WBBackupSet
+```
+
+### 9.2 Azure Backup集成
+
+#### 配置Azure Backup
+
+```powershell
+# 安装Azure Backup代理
+# 1. 下载MARSAgentInstaller.exe
+# 2. 运行安装程序
+# 3. 注册到Azure Recovery Services vault
+
+# PowerShell配置Azure Backup
+Connect-AzAccount
+
+# 创建Recovery Services vault
+New-AzRecoveryServicesVault -Name "Fitness-Backup-Vault" -ResourceGroupName "Fitness-Backup-RG" -Location "East Asia"
+
+# 配置备份策略
+$vault = Get-AzRecoveryServicesVault -Name "Fitness-Backup-Vault"
+$policy = Get-AzRecoveryServicesBackupProtectionPolicy -Name "DefaultPolicy" -Vault $vault
+
+# 启用虚拟机备份
+$vm = Get-AzVM -Name "Fitness-App-01" -ResourceGroupName "Fitness-RG"
+Enable-AzRecoveryServicesBackupProtection -ResourceGroupName "Fitness-RG" -Name "Fitness-App-01" -Policy $policy -Vault $vault
+
+# 启动备份作业
+$backupJob = Backup-AzRecoveryServicesBackupItem -Item $vm -Vault $vault
+```
+
+### 9.3 灾难恢复
+
+#### 恢复计划
+
+```powershell
+# 灾难恢复脚本
+param(
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("Test", "Production")]
+    [string]$RecoveryMode,
+
+    [Parameter(Mandatory = $false)]
+    [string]$BackupDate = (Get-Date).AddDays(-1).ToString("yyyy-MM-dd")
+)
+
+Write-Host "Starting disaster recovery in $RecoveryMode mode..." -ForegroundColor Yellow
+
+# 1. 验证备份完整性
+$backupSets = Get-WBBackupSet | Where-Object { $_.BackupTime.Date -eq $BackupDate }
+if (-not $backupSets) {
+    throw "No backup found for date: $BackupDate"
+}
+
+# 2. 准备恢复环境
+if ($RecoveryMode -eq "Production") {
+    # 停止生产环境
+    Write-Host "Stopping production environment..."
+    Get-ClusterGroup | Stop-ClusterGroup
+
+    # 隔离故障主机
+    Get-ClusterNode | Where-Object { $_.State -eq "Down" } | Suspend-ClusterNode
+}
+
+# 3. 执行恢复
+foreach ($backupSet in $backupSets) {
+    Write-Host "Restoring from backup set: $($backupSet.BackupSetId)"
+
+    # 恢复系统状态
+    Start-WBSystemStateRecovery -BackupSet $backupSet -RecoveryTarget $env:COMPUTERNAME
+
+    # 恢复虚拟机
+    $vms = Get-WBVirtualMachine -BackupSet $backupSet
+    foreach ($vm in $vms) {
+        Start-WBVirtualMachineRecovery -BackupSet $backupSet -VM $vm -RecoveryTarget $env:COMPUTERNAME
+    }
+}
+
+# 4. 验证恢复
+Write-Host "Validating recovery..." -ForegroundColor Yellow
+$validationResults = Test-Cluster
+
+if ($validationResults) {
+    Write-Host "Recovery completed successfully!" -ForegroundColor Green
+
+    # 重新启动生产环境
+    if ($RecoveryMode -eq "Production") {
+        Get-ClusterGroup | Start-ClusterGroup
+    }
+} else {
+    Write-Error "Recovery validation failed!"
+    exit 1
+}
+
+# 5. 清理和报告
+Write-Host "Cleaning up temporary files..."
+# 清理临时恢复文件
+
+Write-Host "Generating recovery report..."
+# 生成恢复报告
+```
+
+---
+
+## 10. 故障排查
+
+### 10.1 虚拟机问题
+
+#### 虚拟机无法启动
+
+```powershell
+# 检查虚拟机配置
+Get-VM -Name "ProblemVM" | Select-Object Name, State, Status, CPUUsage, MemoryAssigned
+
+# 检查虚拟磁盘
+Get-VHD -Path "D:\VMs\Virtual Hard Disks\ProblemVM.vhdx" | Select-Object Path, VhdType, Size, FileSize
+
+# 检查网络配置
+Get-VMNetworkAdapter -VMName "ProblemVM" | Select-Object Name, SwitchName, MacAddress, Status
+
+# 查看事件日志
+Get-WinEvent -LogName "Microsoft-Windows-Hyper-V*" -MaxEvents 20 | Where-Object { $_.Message -like "*ProblemVM*" }
+
+# 尝试修复启动
+Start-VM -Name "ProblemVM" -Force
+```
+
+#### 性能问题
+
+```powershell
+# 收集性能数据
+$perfData = Get-Counter -Counter @(
+    '\Hyper-V Hypervisor Logical Processor(_Total)\% Total Run Time',
+    '\Hyper-V Dynamic Memory Balancer(*)\Average Pressure',
+    '\Hyper-V Virtual Storage Device(*)\Read Operations/sec',
+    '\Hyper-V Virtual Network Adapter(*)\Packets/sec'
+) -SampleInterval 5 -MaxSamples 12
+
+# 分析CPU争用
+$cpuContention = $perfData | Where-Object { $_.CounterSetName -like "*Processor*" -and $_.Counter -like "*% Total Run Time*" }
+
+# 分析内存压力
+$memoryPressure = $perfData | Where-Object { $_.CounterSetName -like "*Memory*" }
+
+# 生成性能报告
+$perfData | Export-Csv -Path "VM-Performance-$(Get-Date -Format 'yyyyMMdd-HHmm').csv" -NoTypeInformation
+```
+
+### 10.2 网络问题
+
+#### 虚拟网络故障
+
+```powershell
+# 检查虚拟交换机状态
+Get-VMSwitch | Select-Object Name, SwitchType, NetAdapterInterfaceDescription, AllowManagementOS
+
+# 检查虚拟网络适配器
+Get-VMNetworkAdapter -All | Select-Object VMName, Name, SwitchName, MacAddress, Status
+
+# 测试网络连通性
+Test-NetConnection -ComputerName "8.8.8.8" -InformationLevel Detailed
+
+# 检查防火墙规则
+Get-NetFirewallRule | Where-Object { $_.Enabled -eq $true } | Select-Object Name, DisplayName, Direction, Action
+
+# 重新配置网络
+Restart-NetAdapter -Name "Ethernet"
+Restart-Service -Name vmms -Force
+```
+
+#### VLAN配置问题
+
+```powershell
+# 检查VLAN配置
+Get-VMNetworkAdapterVlan | Select-Object VMName, ParentAdapter, AccessVlanId, TrunkVlanList
+
+# 验证VLAN连通性
+# 在虚拟机内部测试
+Test-NetConnection -ComputerName "vlan-gateway" -Port 80
+
+# 检查物理交换机配置
+# 确保物理交换机端口配置正确
+# - VLAN成员资格
+# - Trunk/Access模式
+# - VLAN允许列表
+```
+
+### 10.3 存储问题
+
+#### 存储访问问题
+
+```powershell
+# 检查存储池状态
+Get-StoragePool | Select-Object FriendlyName, OperationalStatus, HealthStatus, Size, AllocatedSize
+
+# 检查虚拟磁盘
+Get-VHD -VMId (Get-VM "ProblemVM").VMId | Select-Object Path, VhdType, Size, FileSize, Attached
+
+# 验证存储路径
+Test-Path "D:\VMs\Virtual Hard Disks\ProblemVM.vhdx"
+
+# 检查存储权限
+Get-Acl "D:\VMs\Virtual Hard Disks\ProblemVM.vhdx" | Format-List
+
+# 修复存储问题
+Repair-VHD -Path "D:\VMs\Virtual Hard Disks\ProblemVM.vhdx"
+```
+
+#### 存储性能问题
+
+```powershell
+# 监控存储I/O
+Get-Counter -Counter @(
+    '\LogicalDisk(*)\Disk Reads/sec',
+    '\LogicalDisk(*)\Disk Writes/sec',
+    '\LogicalDisk(*)\% Idle Time',
+    '\Hyper-V Virtual Storage Device(*)\Read Operations/sec',
+    '\Hyper-V Virtual Storage Device(*)\Write Operations/sec'
+) -SampleInterval 5 -MaxSamples 10
+
+# 检查存储队列深度
+$queueDepth = Get-Counter '\LogicalDisk(*)\Current Disk Queue Length' -SampleInterval 1 -MaxSamples 30
+
+# 优化存储设置
+# 1. 增加队列深度
+# 2. 启用写缓存
+# 3. 调整I/O大小
+```
+
+### 10.4 集群问题
+
+#### 集群通信故障
+
+```powershell
+# 检查集群状态
+Get-Cluster | Select-Object Name, State, WitnessType, WitnessState
+
+# 检查集群节点
+Get-ClusterNode | Select-Object Name, State, NodeWeight
+
+# 检查集群网络
+Get-ClusterNetwork | Select-Object Name, State, Role
+
+# 检查集群资源
+Get-ClusterResource | Select-Object Name, State, OwnerNode
+
+# 验证集群配置
+Test-Cluster -Verbose
+```
+
+#### 故障转移问题
+
+```powershell
+# 查看故障转移历史
+Get-ClusterLog -Destination "C:\ClusterLogs"
+
+# 检查故障转移事件
+Get-WinEvent -LogName "Microsoft-Windows-FailoverClustering*" -MaxEvents 50 | Select-Object TimeCreated, Id, LevelDisplayName, Message
+
+# 手动触发故障转移
+Move-ClusterGroup -Name "Fitness-App-01" -Node "HV-HOST-02"
+
+# 重置集群节点
+Reset-ClusterNode -Name "HV-HOST-01" -Force
+```
+
+---
+
+## 11. 最佳实践
+
+### 11.1 架构设计最佳实践
+
+#### 资源规划
+
+1. **计算资源**: 基于应用负载预留20-30%的buffer，考虑CPU超线程和NUMA架构
+2. **内存资源**: 启用动态内存，设置合理的最大/最小限制
+3. **存储资源**: 使用SSD存储关键应用，实施存储分层策略
+4. **网络资源**: 配置网络绑定，提高带宽和冗余性
+
+#### 高可用性设计
+
+```powershell
+# 配置多层高可用性
+# 1. 主机级别HA - 故障转移集群
+# 2. 虚拟机级别HA - 快速迁移
+# 3. 应用级别HA - 负载均衡和会话复制
+
+# 示例配置
+Set-VMHost -MaximumVirtualMachineMigrations 10
+Set-VMHost -VirtualMachineMigrationAuthenticationType Kerberos
+Set-VMHost -VirtualMachineMigrationPerformanceOption SMB
+```
+
+### 11.2 运维最佳实践
+
+#### 定期维护计划
+
+```powershell
+# 维护计划脚本
+$maintenanceTasks = @(
+    @{
+        Name = "Update Hyper-V Integration Services"
+        Action = { Update-VMVersion -Name * -Confirm:$false }
+        Schedule = "Monthly"
+    },
+    @{
+        Name = "Optimize VHDX files"
+        Action = { Get-VM | Get-VMHardDiskDrive | Optimize-VHD -Path {$_.Path} }
+        Schedule = "Weekly"
+    },
+    @{
+        Name = "Backup virtual machines"
+        Action = { Start-WBBackup -Policy (Get-WBPolicy) }
+        Schedule = "Daily"
+    },
+    @{
+        Name = "Monitor cluster health"
+        Action = { Test-Cluster | Out-File "C:\Logs\ClusterHealth-$(Get-Date -Format 'yyyyMMdd').log" }
+        Schedule = "Hourly"
+    }
+)
+
+# 执行维护任务
+foreach ($task in $maintenanceTasks) {
+    Write-Host "Executing: $($task.Name)" -ForegroundColor Yellow
+    try {
+        & $task.Action
+        Write-Host "✓ $($task.Name) completed successfully" -ForegroundColor Green
+    } catch {
+        Write-Error "✗ $($task.Name) failed: $_"
+    }
+}
+```
+
+#### 监控告警配置
+
+```powershell
+# 配置综合监控和告警
+# 1. Hyper-V性能监控
+# 2. 虚拟机健康监控
+# 3. 存储使用监控
+# 4. 网络流量监控
+# 5. 集群状态监控
+
+# 示例告警脚本
+$alertRules = @(
+    @{
+        Name = "High CPU Usage"
+        Condition = { (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue -gt 90 }
+        Action = { Send-Alert -Subject "High CPU Usage Alert" -Body "CPU usage is above 90%" }
+    },
+    @{
+        Name = "VM Down"
+        Condition = { (Get-VM | Where-Object { $_.State -ne "Running" }).Count -gt 0 }
+        Action = { Send-Alert -Subject "VM Down Alert" -Body "Some VMs are not running" }
+    },
+    @{
+        Name = "Low Disk Space"
+        Condition = { (Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.FreeSpace / $_.Size -lt 0.1 }).Count -gt 0 }
+        Action = { Send-Alert -Subject "Low Disk Space Alert" -Body "Disk space is below 10%" }
+    }
+)
+
+# 持续监控
+while ($true) {
+    foreach ($rule in $alertRules) {
+        if (& $rule.Condition) {
+            & $rule.Action
+        }
+    }
+    Start-Sleep -Seconds 300  # 检查间隔5分钟
+}
+```
+
+### 11.3 安全最佳实践
+
+#### Hyper-V安全配置
+
+```powershell
+# 配置Hyper-V安全
+# 1. 启用安全启动
+Set-VMFirmware -VMName "Fitness-VM" -EnableSecureBoot On -SecureBootTemplate "MicrosoftUEFICertificateAuthority"
+
+# 2. 配置虚拟TPM
+Set-VMKeyProtector -VMName "Fitness-VM" -NewLocalKeyProtector
+Enable-VMTPM -VMName "Fitness-VM"
+
+# 3. 配置BitLocker虚拟机
+Enable-BitLocker -MountPoint "C:" -EncryptionMethod "Aes256" -UsedSpaceOnly
+
+# 4. 配置网络安全
+Set-VMNetworkAdapter -VMName "Fitness-VM" -DhcpGuard On -RouterGuard On -MacAddressSpoofing Off -StormLimit 100
+```
+
+#### 访问控制
+
+```powershell
+# 配置基于角色的访问控制
+# 1. 创建安全组
+$vmAdmins = New-ADGroup -Name "VM-Administrators" -GroupScope Global -Path "OU=Groups,DC=fitness-gym,DC=com"
+$vmUsers = New-ADGroup -Name "VM-Users" -GroupScope Global -Path "OU=Groups,DC=fitness-gym,DC=com"
+
+# 2. 配置权限
+Grant-VMPermission -VMName "Fitness-Prod-*" -Principal "FITNESS\VM-Administrators" -RoleDefinitionName "Administrator"
+Grant-VMPermission -VMName "Fitness-Dev-*" -Principal "FITNESS\VM-Users" -RoleDefinitionName "Reader"
+
+# 3. 配置委派权限
+Set-VMSecurityPolicy -VMName "Fitness-VM" -AllowUnencryptedTraffic $false -BindToLocalTunnel $true
+```
+
+### 11.4 成本优化
+
+#### 资源利用率优化
+
+```powershell
+# 资源利用率分析和优化
+$optimizationRecommendations = @()
+
+# 分析CPU利用率
+$vmCpuStats = Get-VM | ForEach-Object {
+    $cpuUsage = (Get-Counter "\Hyper-V Hypervisor Virtual Processor($($_.VMId):*)\% Guest Run Time" -ErrorAction SilentlyContinue).CounterSamples.CookedValue
+    if ($cpuUsage -lt 20) {
+        $optimizationRecommendations += @{
+            VM = $_.Name
+            Type = "CPU"
+            CurrentUsage = $cpuUsage
+            Recommendation = "Consider reducing vCPU count from $($_.ProcessorCount) to $([math]::Max(1, $_.ProcessorCount - 1))"
+        }
+    }
+}
+
+# 分析内存利用率
+$vmMemoryStats = Get-VM | ForEach-Object {
+    $memoryPressure = (Get-Counter "\Hyper-V Dynamic Memory Balancer($($_.VMId))\Average Pressure" -ErrorAction SilentlyContinue).CounterSamples.CookedValue
+    if ($memoryPressure -lt 50) {
+        $optimizationRecommendations += @{
+            VM = $_.Name
+            Type = "Memory"
+            CurrentPressure = $memoryPressure
+            Recommendation = "Consider reducing memory allocation"
+        }
+    }
+}
+
+# 生成优化报告
+$optimizationRecommendations | Export-Csv -Path "VM-Optimization-$(Get-Date -Format 'yyyyMMdd').csv" -NoTypeInformation
+
+# 应用优化建议
+foreach ($rec in $optimizationRecommendations) {
+    Write-Host "Optimization for $($rec.VM): $($rec.Recommendation)" -ForegroundColor Yellow
+    # 可以选择自动应用优化
+    # Set-VM -Name $rec.VM -ProcessorCount ($rec.VM.ProcessorCount - 1)
+}
+```
+
+#### 自动扩缩容
+
+```powershell
+# 基于负载的自动扩缩容
+function Optimize-VMResources {
+    param(
+        [string]$VMName,
+        [double]$CpuThreshold = 80,
+        [double]$MemoryThreshold = 85
+    )
+
+    $vm = Get-VM -Name $VMName
+    $cpuUsage = (Get-Counter "\Hyper-V Hypervisor Virtual Processor($($vm.VMId):*)\% Guest Run Time").CounterSamples.CookedValue | Measure-Object -Average | Select-Object -ExpandProperty Average
+    $memoryPressure = (Get-Counter "\Hyper-V Dynamic Memory Balancer($($vm.VMId))\Average Pressure").CounterSamples.CookedValue
+
+    # CPU优化
+    if ($cpuUsage -gt $CpuThreshold -and $vm.ProcessorCount -lt 8) {
+        Write-Host "Increasing CPU for $VMName from $($vm.ProcessorCount) to $($vm.ProcessorCount + 1)"
+        Set-VM -Name $VMName -ProcessorCount ($vm.ProcessorCount + 1)
+    } elseif ($cpuUsage -lt 20 -and $vm.ProcessorCount -gt 1) {
+        Write-Host "Decreasing CPU for $VMName from $($vm.ProcessorCount) to $($vm.ProcessorCount - 1)"
+        Set-VM -Name $VMName -ProcessorCount ($vm.ProcessorCount - 1)
+    }
+
+    # 内存优化
+    if ($memoryPressure -gt $MemoryThreshold) {
+        $newMemory = [math]::Min($vm.MemoryMaximum / 1MB * 1.2, [long]32GB / 1MB)
+        Write-Host "Increasing memory for $VMName to ${newMemory}MB"
+        Set-VMMemory -VMName $VMName -StartupBytes (${newMemory}MB)
+    }
+}
+
+# 监控和优化循环
+while ($true) {
+    Get-VM | Where-Object { $_.State -eq "Running" } | ForEach-Object {
+        Optimize-VMResources -VMName $_.Name
+    }
+    Start-Sleep -Seconds 3600  # 每小时检查一次
+}
+```
+
+通过实施这些Hyper-V最佳实践，可以构建高可用、可扩展、安全可靠的虚拟化基础设施，为健身房综合管理系统提供稳定的运行环境。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: 基础设施团队*

@@ -1,0 +1,23 @@
+{
+  "components": {
+    "springboot1ngh61a2-src-main-resources-front-front-src-App": {
+      "id": "springboot1ngh61a2-src-main-resources-front-front-src-App",
+      "path": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\App.vue",
+      "framework": "vue",
+      "name": "App",
+      "metadata": {
+        "props": [],
+        "emits": [],
+        "slots": [],
+        "expose": []
+      },
+      "lastModified": "2025-11-16T16:53:34.154Z"
+    }
+  },
+  "frameworks": {
+    "vue": [
+      "springboot1ngh61a2-src-main-resources-front-front-src-App"
+    ]
+  },
+  "lastUpdated": "2025-11-17T00:46:49.706Z"
+}

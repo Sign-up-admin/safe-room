@@ -1,0 +1,529 @@
+---
+title: ERROR PAGES REQUIREMENTS
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: requirements
+---# 错误响应与非法访问拦截页面需求文档
+
+> 版本：v2.0
+> 更新日期：2025-11-16
+> 适用项目：
+> - 前台站点：`springboot1ngh61a2/src/main/resources/front/front`
+> - 管理后台：`springboot1ngh61a2/src/main/resources/admin/admin`
+
+---
+
+## 0. 设计关键词
+
+### 前台站点
+警示 · 科技感 · 友好引导 · 黑金风格 · 动效反馈
+
+### 管理后台
+专业 · 清晰 · 低噪蓝调 · 快速恢复 · 安全提示
+
+> 核心目标：错误发生时，用户能快速理解问题并找到解决方案，避免挫败感。
+
+---
+
+## 1. 页面分类与路由
+
+### 1.1 错误类型覆盖
+
+| 错误码 | 错误类型 | 触发场景 | 路由路径（前台/后台） |
+| --- | --- | --- | --- |
+| 401 | 未授权 | Token 失效、未登录访问受保护资源 | `/error/401` |
+| 403 | 禁止访问 | 权限不足、角色不匹配 | `/error/403` |
+| 404 | 页面不存在 | 路由不存在、资源已删除 | `/error/404` 或 `/:pathMatch(.*)*` |
+| 500 | 服务器错误 | 后端异常、数据库错误 | `/error/500` |
+| Network | 网络错误 | 连接超时、网络中断、CORS 错误 | `/error/network` |
+
+### 1.2 路由配置
+
+**前台站点**（`front/front/src/router/index.ts`）：
+```typescript
+{
+  path: '/error/:code',
+  name: 'ErrorPage',
+  component: () => import('@/pages/error/ErrorPage.vue'),
+  props: true,
+},
+{
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('@/pages/error/404.vue'),
+}
+```
+
+**管理后台**（`admin/admin/src/router/index.ts`）：
+```typescript
+{
+  path: '/error/:code',
+  name: 'ErrorPage',
+  component: () => import('@/views/error/ErrorPage.vue'),
+  props: true,
+},
+{
+  path: '/:pathMatch(.*)*',
+  name: 'NotFound',
+  component: () => import('@/views/error/404.vue'),
+}
+```
+
+---
+
+## 2. 视觉风格规范
+
+### 2.1 前台站点错误页面
+
+#### 颜色规范
+
+| 名称 | 颜色 | 用途 |
+| --- | --- | --- |
+| 深黑背景 | `#0A0A0A` | 页面主背景 |
+| 科技灰 | `#1A1A1A` | 卡片/分区背景 |
+| 科技黄 | `#FDD835` | 错误码数字、CTA 按钮、高光 |
+| 警示红 | `#FF5252` | 401/403 错误强调色 |
+| 纯白 | `#FFFFFF` | 主要文字 |
+| 冷灰 | `#9EA1A6` | 辅助说明文字 |
+
+#### 布局结构
+
+| 顺序 | 区块 | 说明 |
+| --- | --- | --- |
+| ① | 错误码展示区 | 大号数字（120-180px），科技黄发光效果 |
+| ② | 错误标题 | 24-32px，白色加粗 |
+| ③ | 错误描述 | 16-18px，冷灰色，2-3 行说明 |
+| ④ | 操作按钮组 | 返回首页、重新加载、返回上一页 |
+| ⑤ | 装饰动效（可选） | 粒子/线条流动，降低视觉冲击 |
+
+#### 卡片规范
+
+- 圆角：18px
+- 背景：黑色玻璃拟物，`backdrop-filter: blur(8-12px)`
+- 边框：金色微光 0.5~2px（401/403 为红色微光）
+- 阴影：`0 20px 40px rgba(0, 0, 0, 0.45)`
+- 内边距：48px（PC），32px（移动端）
+
+#### 动效规范
+
+- 错误码数字：GSAP 淡入 + 缩放（0.8 → 1.0），时长 0.6s
+- 卡片：从下方滑入（translateY: 40px → 0），时长 0.5s
+- 按钮 hover：上浮 4px，发光增强 8%
+- 粒子效果（可选）：Canvas 粒子系统，低密度，避免性能问题
+
+### 2.2 管理后台错误页面
+
+#### 颜色规范
+
+| 名称 | 颜色 | 用途 |
+| --- | --- | --- |
+| 渐变背景 | `linear-gradient(135deg, #091628, #101f3d)` | 页面主背景 |
+| 白色卡片 | `#FFFFFF` | 错误信息卡片 |
+| 主色蓝 | `#3A80FF` | CTA 按钮、链接 |
+| 警示红 | `#FF5252` | 401/403 错误强调色 |
+| 深灰文字 | `#333333` | 主要文字 |
+| 浅灰文字 | `#666666` | 辅助说明 |
+
+#### 布局结构
+
+| 顺序 | 区块 | 说明 |
+| --- | --- | --- |
+| ① | 错误图标 | 64-80px，SVG 图标（简洁线条风格） |
+| ② | 错误码 | 48-64px，加粗，主色蓝或警示红 |
+| ③ | 错误标题 | 20-24px，深灰色 |
+| ④ | 错误描述 | 14-16px，浅灰色，2-3 行说明 |
+| ⑤ | 操作按钮组 | 返回首页、重新加载、返回上一页 |
+
+#### 卡片规范
+
+- 宽度：`min(600px, 90%)`
+- 圆角：24px
+- 背景：`#FFFFFF`
+- 阴影：`0 30px 80px rgba(10, 24, 64, 0.45)`
+- 内边距：48px（PC），32px（移动端）
+
+#### 动效规范
+
+- 卡片：淡入 + 轻微上浮（translateY: 20px → 0），时长 0.4s
+- 按钮 hover：背景色加深 8%，阴影增强
+- 图标：轻微旋转（-5deg → 0deg），时长 0.5s
+
+---
+
+## 3. 功能需求
+
+### 3.1 错误码识别与路由映射
+
+| 功能 | 说明 | 实现方式 |
+| --- | --- | --- |
+| HTTP 拦截器识别 | 响应拦截器捕获 401/403/500 | `http.ts` 响应拦截器 |
+| 路由守卫识别 | 404 由路由守卫捕获 | Vue Router `/:pathMatch(.*)*` |
+| 网络错误识别 | Axios 错误对象 `error.code === 'ECONNABORTED'` 等 | `http.ts` 错误拦截器 |
+| 错误码传递 | 通过路由参数或 query 传递 | `router.push({ path: '/error/401', query: { from: route.path } })` |
+
+### 3.2 错误信息展示
+
+#### 前台站点错误文案
+
+| 错误码 | 标题 | 描述 | 按钮文案 |
+| --- | --- | --- | --- |
+| 401 | 身份验证失败 | 您的登录已过期，请重新登录以继续访问 | 前往登录 |
+| 403 | 访问被拒绝 | 抱歉，您没有权限访问此页面 | 返回首页 |
+| 404 | 页面不存在 | 您访问的页面可能已被移除或不存在 | 返回首页 |
+| 500 | 服务器错误 | 服务器遇到了问题，我们正在努力修复 | 重新加载 |
+| Network | 网络连接失败 | 无法连接到服务器，请检查网络设置 | 重试连接 |
+
+#### 管理后台错误文案
+
+| 错误码 | 标题 | 描述 | 按钮文案 |
+| --- | --- | --- | --- |
+| 401 | 登录已过期 | 您的会话已失效，请重新登录 | 前往登录 |
+| 403 | 权限不足 | 您没有权限访问此功能，请联系管理员 | 返回首页 |
+| 404 | 页面不存在 | 请求的页面不存在或已被移除 | 返回首页 |
+| 500 | 服务器异常 | 服务器处理请求时发生错误，请稍后重试 | 重新加载 |
+| Network | 网络异常 | 网络连接失败，请检查网络后重试 | 重试连接 |
+
+### 3.3 操作按钮
+
+#### 按钮配置
+
+| 按钮 | 功能 | 路由/方法 | 显示条件 |
+| --- | --- | --- | --- |
+| 返回首页 | 跳转到首页 | `/` 或 `/index/home` | 所有错误页 |
+| 重新加载 | 刷新当前页面 | `window.location.reload()` | 500、Network |
+| 返回上一页 | 浏览器历史返回 | `router.go(-1)` | 404、403（有历史记录时） |
+| 前往登录 | 跳转登录页 | `/login` | 401、403 |
+
+#### 按钮样式
+
+**前台站点**：
+- 主按钮：科技黄背景 `#FDD835`，黑色文字，圆角 8px
+- 次按钮：透明背景，科技黄边框，hover 填充背景
+- 尺寸：高度 48px，内边距 0 24px
+
+**管理后台**：
+- 主按钮：主色蓝背景 `#3A80FF`，白色文字，圆角 8px
+- 次按钮：白色背景，主色蓝边框
+- 尺寸：高度 40px，内边距 0 20px
+
+### 3.4 自动跳转逻辑
+
+| 错误码 | 自动跳转 | 延迟时间 | 说明 |
+| --- | --- | --- | --- |
+| 401 | 跳转登录页 | 3 秒 | 显示倒计时，用户可取消 |
+| 403 | 跳转首页 | 5 秒 | 显示倒计时，用户可取消 |
+| 500 | 不自动跳转 | - | 用户手动操作 |
+| Network | 不自动跳转 | - | 用户手动操作 |
+| 404 | 不自动跳转 | - | 用户手动操作 |
+
+### 3.5 错误上报机制（可选）
+
+- 开发环境：控制台输出详细错误信息
+- 生产环境：可选上报到后端 `/errorReport` 接口
+- 上报内容：错误码、错误信息、用户路径、时间戳、User-Agent
+
+---
+
+## 4. 技术实现
+
+### 4.1 HTTP 拦截器集成
+
+#### 前台站点（`front/front/src/common/http.ts`）
+
+```typescript
+// Response interceptor
+http.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => {
+    if (response.data) {
+      const code = response.data.code
+      if (code === 401 || code === 403) {
+        // 跳转到错误页，而非直接跳转登录
+        router.push({ 
+          path: `/error/${code}`, 
+          query: { from: router.currentRoute.value.path } 
+        }).catch(() => {})
+        localStorage.clear()
+        return Promise.reject(new Error('Unauthorized'))
+      }
+      if (code === 500) {
+        router.push({ 
+          path: '/error/500',
+          query: { from: router.currentRoute.value.path }
+        }).catch(() => {})
+        return Promise.reject(new Error('Server Error'))
+      }
+    }
+    return response
+  },
+  (error) => {
+    // 网络错误处理
+    if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
+      router.push({ 
+        path: '/error/network',
+        query: { from: router.currentRoute.value.path }
+      }).catch(() => {})
+    }
+    return Promise.reject(error)
+  },
+)
+```
+
+#### 管理后台（`admin/admin/src/utils/http.ts`）
+
+```typescript
+// Response interceptor
+http.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => {
+    if (response.data) {
+      const code = response.data.code
+      if (code === 401) {
+        router.push({ 
+          name: 'ErrorPage', 
+          params: { code: '401' },
+          query: { from: router.currentRoute.value.path }
+        })
+        storage.remove('Token')
+        return Promise.reject(new Error('Unauthorized'))
+      }
+      if (code === 403) {
+        router.push({ 
+          name: 'ErrorPage', 
+          params: { code: '403' },
+          query: { from: router.currentRoute.value.path }
+        })
+        return Promise.reject(new Error('Forbidden'))
+      }
+      if (code === 500) {
+        router.push({ 
+          name: 'ErrorPage', 
+          params: { code: '500' },
+          query: { from: router.currentRoute.value.path }
+        })
+        return Promise.reject(new Error('Server Error'))
+      }
+    }
+    return response
+  },
+  (error) => {
+    if (error.code === 'ECONNABORTED' || error.message === 'Network Error') {
+      router.push({ 
+        name: 'ErrorPage', 
+        params: { code: 'network' },
+        query: { from: router.currentRoute.value.path }
+      })
+    }
+    return Promise.reject(error)
+  },
+)
+```
+
+### 4.2 错误页面组件
+
+#### 前台站点组件结构
+
+```
+src/pages/error/
+├── ErrorPage.vue          # 通用错误页面组件（支持动态错误码）
+├── 401.vue                # 401 专用页面（可选）
+├── 403.vue                # 403 专用页面（可选）
+├── 404.vue                # 404 专用页面
+├── 500.vue                # 500 专用页面（可选）
+└── Network.vue            # 网络错误页面（可选）
+```
+
+#### 管理后台组件结构
+
+```
+src/views/error/
+├── ErrorPage.vue          # 通用错误页面组件
+├── 404.vue                # 404 专用页面（已存在，需重构）
+└── components/
+    └── ErrorCard.vue      # 错误卡片组件（可复用）
+```
+
+### 4.3 错误状态管理（Pinia Store）
+
+**前台站点**（`front/front/src/stores/error.ts`）：
+
+```typescript
+import { defineStore } from 'pinia'
+
+interface ErrorState {
+  lastError: {
+    code: string
+    message: string
+    timestamp: number
+    from: string
+  } | null
+}
+
+export const useErrorStore = defineStore('error', {
+  state: (): ErrorState => ({
+    lastError: null,
+  }),
+  actions: {
+    setError(code: string, message: string, from: string) {
+      this.lastError = {
+        code,
+        message,
+        timestamp: Date.now(),
+        from,
+      }
+    },
+    clearError() {
+      this.lastError = null
+    },
+  },
+})
+```
+
+**管理后台**（`admin/admin/src/stores/error.ts`）：同上结构。
+
+### 4.4 路由守卫增强
+
+**前台站点**（`front/front/src/router/index.ts`）：
+
+```typescript
+router.beforeEach((to, from, next) => {
+  // 404 处理已在路由配置中通过 catch-all 路由处理
+  next()
+})
+
+router.afterEach((to) => {
+  // 记录页面访问，用于错误追踪
+  if (to.path.startsWith('/error')) {
+    // 可选：上报错误页面访问
+  }
+})
+```
+
+---
+
+## 5. 交互细节
+
+### 5.1 页面加载动效
+
+| 元素 | 动效 | 时长 | 延迟 |
+| --- | --- | --- | --- |
+| 错误码数字 | 淡入 + 缩放 | 0.6s | 0s |
+| 错误标题 | 淡入 + 上移 | 0.5s | 0.2s |
+| 错误描述 | 淡入 | 0.4s | 0.4s |
+| 按钮组 | 淡入 + 上移 | 0.5s | 0.6s |
+
+### 5.2 自动跳转倒计时
+
+- 显示格式："3 秒后自动跳转到登录页 [取消]"
+- 倒计时数字：科技黄/主色蓝高亮
+- 取消按钮：点击后停止倒计时，隐藏提示
+
+### 5.3 键盘操作
+
+- `Esc`：关闭错误页（如有历史记录，返回上一页）
+- `Enter`：触发主按钮操作
+- `Tab`：在按钮间循环焦点
+
+### 5.4 无障碍支持
+
+- 错误码使用 `aria-label` 描述
+- 按钮使用语义化标签
+- 错误信息使用 `role="alert"` 标记
+- 支持屏幕阅读器朗读错误信息
+
+---
+
+## 6. 响应式策略
+
+### 6.1 前台站点
+
+| 终端 | 处理 |
+| --- | --- |
+| PC（>1200px） | 完整动效，错误码 180px，卡片宽度 600px |
+| Pad（768-1200px） | 简化动效，错误码 120px，卡片宽度 90% |
+| Mobile（<768px） | 禁用粒子效果，错误码 100px，卡片全宽，按钮堆叠 |
+
+### 6.2 管理后台
+
+| 终端 | 处理 |
+| --- | --- |
+| PC（>992px） | 卡片居中，宽度 600px |
+| Pad（768-992px） | 卡片宽度 90%，内边距 32px |
+| Mobile（<768px） | 卡片全宽，内边距 24px，按钮全宽堆叠 |
+
+---
+
+## 7. 开发交付件
+
+### 7.1 前台站点
+
+1. **错误页面组件**（`src/pages/error/ErrorPage.vue`）
+2. **404 页面组件**（`src/pages/error/404.vue`）
+3. **错误状态管理**（`src/stores/error.ts`）
+4. **HTTP 拦截器更新**（`src/common/http.ts`）
+5. **路由配置更新**（`src/router/index.ts`）
+6. **样式文件**（`src/styles/error-pages.scss`）
+
+### 7.2 管理后台
+
+1. **错误页面组件**（`src/views/error/ErrorPage.vue`）
+2. **404 页面重构**（`src/views/error/404.vue`）
+3. **错误卡片组件**（`src/views/error/components/ErrorCard.vue`）
+4. **错误状态管理**（`src/stores/error.ts`）
+5. **HTTP 拦截器更新**（`src/utils/http.ts`）
+6. **路由配置更新**（`src/router/index.ts`）
+
+---
+
+## 8. 验收标准
+
+| 维度 | 标准 |
+| --- | --- |
+| 功能 | 所有错误类型（401/403/404/500/Network）正确显示对应页面 |
+| 视觉 | 前台黑金科技风格，后台蓝调渐变风格，与现有页面一致 |
+| 交互 | 按钮操作正确，自动跳转倒计时工作正常，键盘操作支持 |
+| 响应式 | PC/Pad/Mobile 三端自测通过，无元素溢出 |
+| 性能 | 页面加载 ≤ 1s，动效 FPS ≥ 55 |
+| 无障碍 | 支持屏幕阅读器，ARIA 标签完整 |
+| 错误处理 | HTTP 拦截器正确捕获错误并跳转，路由守卫处理 404 |
+
+---
+
+## 9. 与现有系统的集成
+
+### 9.1 与登录页面的联动
+
+- 401/403 错误页提供"前往登录"按钮，跳转后携带 `redirect` 参数
+- 登录成功后，如有 `redirect` 参数，跳转回原页面
+
+### 9.2 与错误处理器的联动
+
+- 前端错误处理器（`errorHandler.ts`）捕获的运行时错误，可跳转到 500 页面
+- 错误上报接口（如存在）接收错误页面访问记录
+
+### 9.3 与路由守卫的联动
+
+- 路由守卫检查权限失败时，跳转到 403 页面
+- 路由守卫检查登录状态失败时，跳转到 401 页面
+
+---
+
+## 10. 待确认事项
+
+- [ ] 是否需要为每种错误类型设计专用图标？
+- [ ] 错误上报机制是否需要在生产环境启用？
+- [ ] 401/403 自动跳转的延迟时间是否需要可配置？
+- [ ] 是否需要支持错误页面的多语言（i18n）？
+- [ ] 前台站点是否需要粒子动效（可能影响性能）？
+
+---
+
+## 11. 参考文档
+
+- [前台首页需求文档](./HOMEPAGE_REQUIREMENTS.md)
+- [管理员登录页面需求文档](./ADMIN_LOGIN_REQUIREMENTS.md)
+- [设计系统概览](./DESIGN_SYSTEM_OVERVIEW.md)
+- [页面需求文档模板](./requirements\requirements\requirements\requirements\PAGE_REQUIREMENTS_TEMPLATE.md)
+- [安全文档](./SECURITY.md)
+
+---
+

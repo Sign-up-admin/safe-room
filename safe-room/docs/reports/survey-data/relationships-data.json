@@ -1,0 +1,570 @@
+{
+  "timestamp": "2025-11-16T17:08:14.429Z",
+  "links": {
+    "PERFORMANCE_ENGINEERING.md": [
+      {
+        "text": "部署文档",
+        "target": "../DEPLOYMENT.md"
+      },
+      {
+        "text": "测试文档",
+        "target": "../TESTING.md"
+      }
+    ],
+    "OPEN_SOURCE.md": [
+      {
+        "text": "LICENSE",
+        "target": "../LICENSE"
+      },
+      {
+        "text": "贡献指南",
+        "target": "../CONTRIBUTING.md"
+      },
+      {
+        "text": "Issue",
+        "target": "../../issues"
+      },
+      {
+        "text": "CHANGELOG.md",
+        "target": "../CHANGELOG.md"
+      },
+      {
+        "text": "CONTRIBUTORS.md",
+        "target": "../CONTRIBUTORS.md"
+      },
+      {
+        "text": "项目主页",
+        "target": "../../"
+      },
+      {
+        "text": "问题追踪",
+        "target": "../../issues"
+      },
+      {
+        "text": "Pull Requests",
+        "target": "../../pulls"
+      },
+      {
+        "text": "Wiki",
+        "target": "../../wiki"
+      }
+    ],
+    "FRONTEND_SECURITY_PRACTICES.md": [
+      {
+        "text": "安全最佳实践",
+        "target": "./SECURITY.md"
+      },
+      {
+        "text": "API安全文档",
+        "target": "./API_SECURITY.md"
+      },
+      {
+        "text": "架构文档",
+        "target": "./ARCHITECTURE.md"
+      }
+    ],
+    "DOCUMENTATION_GUIDE.md": [
+      {
+        "text": "相关文档",
+        "target": "../technical/api/API.md"
+      },
+      {
+        "text": "架构图",
+        "target": "../assets/architecture.png"
+      },
+      {
+        "text": "项目主文档",
+        "target": "../../README.md"
+      },
+      {
+        "text": "贡献指南",
+        "target": "../../CONTRIBUTING.md"
+      }
+    ],
+    "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md": [
+      {
+        "text": "项目概览",
+        "target": "./README.md"
+      },
+      {
+        "text": "架构文档",
+        "target": "./ARCHITECTURE.md"
+      },
+      {
+        "text": "前端代码资产清单",
+        "target": "./FRONTEND_CODE_ASSETS.md"
+      },
+      {
+        "text": "前端迁移状态",
+        "target": "./FRONTEND_MIGRATION_STATUS.md"
+      },
+      {
+        "text": "Admin 需求总览",
+        "target": "./ADMIN_OVERVIEW_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin 布局需求",
+        "target": "./requirements\\requirements\\ADMIN_LAYOUT_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin 登录需求",
+        "target": "./ADMIN_LOGIN_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin 注册需求",
+        "target": "./ADMIN_REGISTER_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin 系统管理需求",
+        "target": "./ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin CRUD 模块需求",
+        "target": "./ADMIN_MODULE_CRUD_REQUIREMENTS.md"
+      },
+      {
+        "text": "Admin 前端安全改进",
+        "target": "./ADMIN_FRONTEND_SECURITY_IMPROVEMENTS.md"
+      },
+      {
+        "text": "前端技术演进",
+        "target": "./FRONTEND_TECHNOLOGY_EVOLUTION.md"
+      },
+      {
+        "text": "前端安全实践",
+        "target": "./FRONTEND_SECURITY_PRACTICES.md"
+      }
+    ],
+    "ADMIN_FRONTEND_SECURITY_IMPROVEMENTS.md": [
+      {
+        "text": "安全最佳实践",
+        "target": "./SECURITY.md"
+      },
+      {
+        "text": "前端安全实践",
+        "target": "./FRONTEND_SECURITY_PRACTICES.md"
+      },
+      {
+        "text": "API安全文档",
+        "target": "./API_SECURITY.md"
+      }
+    ],
+    "templates\\TESTING_TEMPLATE.md": [
+      {
+        "text": "项目需求文档",
+        "target": "../requirements/REQUIREMENTS.md"
+      },
+      {
+        "text": "API文档",
+        "target": "../technical/api/API.md"
+      },
+      {
+        "text": "架构文档",
+        "target": "../technical/architecture/ARCHITECTURE.md"
+      },
+      {
+        "text": "部署文档",
+        "target": "../technical/deployment/DEPLOYMENT.md"
+      }
+    ],
+    "templates\\TECHNICAL_TEMPLATE.md": [
+      {
+        "text": "系统架构",
+        "target": "../architecture/ARCHITECTURE.md"
+      },
+      {
+        "text": "API文档",
+        "target": "../api/API.md"
+      },
+      {
+        "text": "部署指南",
+        "target": "../deployment/DEPLOYMENT.md"
+      }
+    ],
+    "templates\\REQUIREMENTS_TEMPLATE.md": [
+      {
+        "text": "系统架构文档",
+        "target": "../technical/architecture/ARCHITECTURE.md"
+      },
+      {
+        "text": "API文档",
+        "target": "../technical/api/API.md"
+      },
+      {
+        "text": "数据库设计",
+        "target": "../technical/database/DATABASE.md"
+      },
+      {
+        "text": "测试策略",
+        "target": "../development/testing/TESTING_STRATEGY.md"
+      }
+    ],
+    "templates\\INCIDENT_TEMPLATE.md": [
+      {
+        "text": "相关文档",
+        "target": "troubleshooting.md"
+      }
+    ],
+    "requirements\\ERROR_PAGES_REQUIREMENTS.md": [
+      {
+        "text": "前台首页需求文档",
+        "target": "./HOMEPAGE_REQUIREMENTS.md"
+      },
+      {
+        "text": "管理员登录页面需求文档",
+        "target": "./ADMIN_LOGIN_REQUIREMENTS.md"
+      },
+      {
+        "text": "设计系统概览",
+        "target": "./DESIGN_SYSTEM_OVERVIEW.md"
+      },
+      {
+        "text": "页面需求文档模板",
+        "target": "./requirements\\requirements\\requirements\\requirements\\PAGE_REQUIREMENTS_TEMPLATE.md"
+      },
+      {
+        "text": "安全文档",
+        "target": "./SECURITY.md"
+      }
+    ],
+    "requirements\\ADMIN_LOGIN_REQUIREMENTS.md": [
+      {
+        "text": "错误响应与非法访问拦截页面需求文档",
+        "target": "./requirements\\requirements\\ERROR_PAGES_REQUIREMENTS.md"
+      },
+      {
+        "text": "安全文档",
+        "target": "./SECURITY.md"
+      }
+    ],
+    "reports\\DOCUMENTATION_ENGINEERING_SURVEY_PLAN.md": [
+      {
+        "text": "文档工程问题辩证分析报告",
+        "target": "../reports/DOCUMENTATION_ENGINEERING_ANALYSIS.md"
+      },
+      {
+        "text": "文档编写指南",
+        "target": "../DOCUMENTATION_GUIDE.md"
+      },
+      {
+        "text": "文档分类标准",
+        "target": "../DOC_CLASSIFICATION_STANDARDS.md"
+      },
+      {
+        "text": "方法论指南",
+        "target": "../development/guides/METHODOLOGY_GUIDE.md"
+      }
+    ],
+    "reports\\DOCUMENTATION_ENGINEERING_ANALYSIS.md": [
+      {
+        "text": "矛盾论、实践论、辩证法方法论指南",
+        "target": "../guides/METHODOLOGY_GUIDE.md"
+      },
+      {
+        "text": "文档编写指南",
+        "target": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md"
+      },
+      {
+        "text": "技术文档模板",
+        "target": "../templates/TECHNICAL_TEMPLATE.md"
+      }
+    ],
+    "development\\TESTING_STRATEGY.md": [
+      {
+        "text": "前端测试指南",
+        "target": "../FRONTEND_TESTING_GUIDE.md"
+      }
+    ],
+    "development\\TESTING_IMPLEMENTATION.md": [
+      {
+        "text": "前端测试指南",
+        "target": "../FRONTEND_TESTING_GUIDE.md"
+      }
+    ],
+    "development\\TESTING_EXAMPLES.md": [
+      {
+        "text": "前端测试指南",
+        "target": "../FRONTEND_TESTING_GUIDE.md"
+      }
+    ],
+    "development\\TESTING_BEST_PRACTICES.md": [
+      {
+        "text": "前端测试指南",
+        "target": "../FRONTEND_TESTING_GUIDE.md"
+      }
+    ],
+    "development\\METHODOLOGY_GUIDE.md": [
+      {
+        "text": "开发指南",
+        "target": "../guides/DEVELOPMENT.md"
+      },
+      {
+        "text": "文档编写指南",
+        "target": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md"
+      },
+      {
+        "text": "技术文档模板",
+        "target": "../templates/TECHNICAL_TEMPLATE.md"
+      }
+    ],
+    "development\\DOC_TOOLS_GUIDE.md": [
+      {
+        "text": "文档编写指南",
+        "target": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md"
+      },
+      {
+        "text": "文档工程分析",
+        "target": "../DOCUMENTATION_ENGINEERING_ANALYSIS.md"
+      },
+      {
+        "text": "元数据标准配置",
+        "target": "../../.doc-metadata.json"
+      },
+      {
+        "text": "分类规则配置",
+        "target": "../../.doc-classification-rules.md"
+      }
+    ],
+    "development\\DOCUMENTATION_GUIDE.md": [
+      {
+        "text": "相关文档",
+        "target": "../technical/api/API.md"
+      },
+      {
+        "text": "架构图",
+        "target": "../assets/architecture.png"
+      },
+      {
+        "text": "项目主文档",
+        "target": "../../README.md"
+      },
+      {
+        "text": "贡献指南",
+        "target": "../../CONTRIBUTING.md"
+      }
+    ],
+    "technical\\deployment\\SCRIPTS_REFERENCE.md": [
+      {
+        "text": "README.md",
+        "target": "../../README.md"
+      }
+    ],
+    "technical\\deployment\\README.md": [
+      {
+        "text": "`DEPLOYMENT.md`",
+        "target": "../../DEPLOYMENT.md"
+      },
+      {
+        "text": "`DOCKER.md`",
+        "target": "../../DOCKER.md"
+      },
+      {
+        "text": "`../architecture/CLOUD_NATIVE.md`",
+        "target": "../architecture/CLOUD_NATIVE.md"
+      },
+      {
+        "text": "`../architecture/CLOUD_NATIVE.md`",
+        "target": "../architecture/CLOUD_NATIVE.md"
+      },
+      {
+        "text": "`DEPLOYMENT.md`",
+        "target": "../../DEPLOYMENT.md"
+      },
+      {
+        "text": "`DOCKER.md`",
+        "target": "../../DOCKER.md"
+      },
+      {
+        "text": "`../architecture/CLOUD_NATIVE.md`",
+        "target": "../architecture/CLOUD_NATIVE.md"
+      },
+      {
+        "text": "`../architecture/CLOUD_NATIVE.md`",
+        "target": "../architecture/CLOUD_NATIVE.md"
+      },
+      {
+        "text": "`DEPLOYMENT.md`",
+        "target": "../../DEPLOYMENT.md"
+      },
+      {
+        "text": "`DOCKER.md`",
+        "target": "../../DOCKER.md"
+      },
+      {
+        "text": "`../architecture/CLOUD_NATIVE.md`",
+        "target": "../architecture/CLOUD_NATIVE.md"
+      },
+      {
+        "text": "**项目主文档**",
+        "target": "../../README.md"
+      },
+      {
+        "text": "**测试文档**",
+        "target": "../../TESTING.md"
+      },
+      {
+        "text": "**架构文档**",
+        "target": "../architecture/ARCHITECTURE.md"
+      },
+      {
+        "text": "**API文档**",
+        "target": "../api/API.md"
+      },
+      {
+        "text": "MIT License",
+        "target": "../../LICENSE"
+      }
+    ],
+    "development\\guides\\DOC_TOOLS_GUIDE.md": [
+      {
+        "text": "文档编写指南",
+        "target": "../development\\development\\DOCUMENTATION_GUIDE.md"
+      },
+      {
+        "text": "文档工程分析",
+        "target": "../DOCUMENTATION_ENGINEERING_ANALYSIS.md"
+      },
+      {
+        "text": "元数据标准配置",
+        "target": "../../.doc-metadata.json"
+      },
+      {
+        "text": "分类规则配置",
+        "target": "../../.doc-classification-rules.md"
+      }
+    ]
+  },
+  "references": {
+    "PAGE_REQUIREMENTS_TEMPLATE.md": [
+      "[requirements",
+      "template",
+      "frontend]"
+    ],
+    "DOC_VERSION_CONTROL.md": [
+      "[documentation",
+      "version-control",
+      "versioning",
+      "process]"
+    ],
+    "DOC_MAINTAINER_RESPONSIBILITY.md": [
+      "[documentation",
+      "responsibility",
+      "maintainer",
+      "accountability]"
+    ],
+    "DOC_LIFECYCLE_MANAGEMENT.md": [
+      "[documentation",
+      "lifecycle",
+      "process",
+      "workflow]"
+    ],
+    "DOC_CLASSIFICATION_STANDARDS.md": [
+      "[documentation",
+      "classification",
+      "standards",
+      "organization]"
+    ],
+    "DOC_CHANGELOG.md": [
+      "[documentation",
+      "changelog",
+      "version-history]"
+    ],
+    "templates\\TESTING_TEMPLATE.md": [
+      "[testing",
+      "documentation",
+      "template]"
+    ],
+    "templates\\TECHNICAL_TEMPLATE.md": [
+      "[tag1",
+      "tag2]"
+    ],
+    "templates\\REQUIREMENTS_TEMPLATE.md": [
+      "[requirements",
+      "frontend",
+      "design]"
+    ],
+    "templates\\OPERATIONS_TEMPLATE.md": [
+      "[operations",
+      "maintenance",
+      "monitoring]"
+    ],
+    "templates\\MONITORING_TEMPLATE.md": [
+      "[monitoring",
+      "alerting",
+      "prometheus",
+      "grafana]"
+    ],
+    "templates\\INCIDENT_TEMPLATE.md": [
+      "[incident",
+      "troubleshooting",
+      "recovery]"
+    ],
+    "templates\\DEPLOYMENT_TEMPLATE.md": [
+      "[deployment",
+      "installation",
+      "configuration]"
+    ],
+    "templates\\CICD_TEMPLATE.md": [
+      "[ci-cd",
+      "pipeline",
+      "automation",
+      "deployment]"
+    ],
+    "templates\\CHANGELOG_TEMPLATE.md": [
+      "[changelog",
+      "release",
+      "history]"
+    ],
+    "templates\\API_TEMPLATE.md": [
+      "[api",
+      "rest",
+      "documentation]"
+    ],
+    "requirements\\PAGE_REQUIREMENTS_TEMPLATE.md": [
+      "[requirements",
+      "template",
+      "frontend]"
+    ],
+    "reports\\survey-timeline.md": [
+      "[survey",
+      "timeline",
+      "schedule]"
+    ],
+    "reports\\survey-team-structure.md": [
+      "[survey",
+      "team",
+      "organization]"
+    ],
+    "reports\\DOCUMENTATION_ENGINEERING_SURVEY_PLAN.md": [
+      "[documentation",
+      "survey",
+      "planning",
+      "methodology]"
+    ],
+    "reports\\DOCUMENTATION_ENGINEERING_ANALYSIS.md": [
+      "[documentation",
+      "methodology",
+      "analysis",
+      "dialectical-thinking]"
+    ],
+    "development\\METHODOLOGY_GUIDE.md": [
+      "[methodology",
+      "philosophy",
+      "thinking-tools",
+      "development-guide]"
+    ],
+    "development\\DOC_TOOLS_GUIDE.md": [
+      "[documentation",
+      "tools",
+      "guide",
+      "automation]"
+    ],
+    "development\\guides\\DOC_TOOLS_GUIDE.md": [
+      "[documentation",
+      "tools",
+      "guide",
+      "automation]"
+    ]
+  },
+  "dependencies": {}
+}

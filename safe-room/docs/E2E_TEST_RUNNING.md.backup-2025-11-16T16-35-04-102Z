@@ -1,0 +1,562 @@
+# 前端E2E测试运行指南
+
+本文档详细介绍如何本地运行、调试和故障排查前端项目的端到端测试。
+
+## 📋 目录
+
+- [快速开始](#快速开始)
+- [本地运行](#本地运行)
+- [CI/CD运行](#cicd运行)
+- [调试技巧](#调试技巧)
+- [故障排查](#故障排查)
+- [性能优化](#性能优化)
+- [报告查看](#报告查看)
+- [常见问题](#常见问题)
+
+## 🚀 快速开始
+
+### 环境要求
+
+- **Node.js**: 18.x 或更高版本
+- **npm**: 8.x 或更高版本
+- **Git**: 用于代码管理
+
+### 安装依赖
+
+```bash
+# 根目录安装根依赖
+npm install
+
+# 安装前端项目依赖
+cd springboot1ngh61a2/src/main/resources/front/front
+npm install
+
+# 安装管理端项目依赖
+cd springboot1ngh61a2/src/main/resources/admin/admin
+npm install
+
+# 安装Playwright浏览器（首次运行需要）
+cd springboot1ngh61a2/src/main/resources/front/front
+npx playwright install
+
+cd springboot1ngh61a2/src/main/resources/admin/admin
+npx playwright install
+```
+
+## 🏠 本地运行
+
+### 使用PowerShell脚本（推荐）
+
+```powershell
+# 运行所有测试（单元测试 + E2E测试）
+.\run-frontend-tests.ps1
+
+# 只运行E2E测试
+.\run-frontend-tests.ps1 -Type e2e
+
+# 只运行前端E2E测试
+.\run-frontend-tests.ps1 -Type e2e -App front
+
+# 只运行管理端E2E测试
+.\run-frontend-tests.ps1 -Type e2e -App admin
+
+# 指定浏览器运行
+.\run-frontend-tests.ps1 -Type e2e -Browser chromium
+
+# 调试模式运行
+.\run-frontend-tests.ps1 -Type e2e -Debug
+
+# UI模式运行（可视化界面）
+.\run-frontend-tests.ps1 -Type e2e -UI
+```
+
+### 使用npm脚本
+
+```bash
+# 根目录运行所有测试
+npm test
+
+# 运行E2E测试
+npm run test:e2e
+
+# 运行前端E2E测试
+npm run test:e2e:front
+
+# 运行管理端E2E测试
+npm run test:e2e:admin
+
+# UI模式运行
+npm run test:e2e:ui
+
+# 生成测试报告
+npm run aggregate:results
+```
+
+### 使用Playwright命令
+
+```bash
+# 前端项目
+cd springboot1ngh61a2/src/main/resources/front/front
+
+# 运行所有E2E测试
+npx playwright test
+
+# 指定浏览器运行
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+
+# 运行特定测试文件
+npx playwright test tests/e2e/auth.spec.ts
+
+# 运行包含关键词的测试
+npx playwright test -g "登录"
+
+# 调试模式
+npx playwright test --debug
+
+# UI模式
+npx playwright test --ui
+
+# 查看报告
+npx playwright show-report
+```
+
+## 🔄 CI/CD运行
+
+### GitHub Actions触发方式
+
+#### 手动触发
+
+1. 访问GitHub仓库的Actions标签页
+2. 选择"Frontend E2E Tests"工作流
+3. 点击"Run workflow"按钮
+4. 选择运行参数：
+   - **Project**: all, front, admin
+   - **Browser**: all, chromium, firefox, webkit
+   - **Test Suite**: all, user-journey, admin-journey, integration
+
+#### 自动触发
+
+- **推送**: main/master/develop分支代码变更时
+- **PR**: 创建或更新Pull Request时
+- **定时**: 每周一早上8点运行完整测试
+
+### 工作流配置
+
+```yaml
+# .github/workflows/frontend-e2e.yml
+name: Frontend E2E Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        default: 'all'
+      browser:
+        default: 'all'
+      test_suite:
+        default: 'all'
+  schedule:
+    - cron: '0 8 * * 1'  # 每周一早上8点
+```
+
+### 查看CI结果
+
+1. 访问GitHub Actions标签页
+2. 选择对应的工作流运行
+3. 查看测试执行日志
+4. 下载测试产物：
+   - 测试报告：`e2e-results-*-*.zip`
+   - 测试视频：`e2e-videos-*-*.zip`（失败时）
+   - 截图：`e2e-screenshots-*-*.zip`（失败时）
+
+## 🐛 调试技巧
+
+### Playwright UI模式
+
+```bash
+# 启动可视化调试界面
+cd springboot1ngh61a2/src/main/resources/front/front
+npx playwright test --ui
+```
+
+在UI界面中可以：
+- 选择要运行的测试
+- 查看测试执行过程
+- 检查DOM状态
+- 分析网络请求
+
+### 代码调试
+
+```typescript
+test('调试测试', async ({ page }) => {
+  // 设置较慢的执行速度
+  await page.emulateMedia({ media: 'screen' })
+
+  await page.goto('/#/login')
+
+  // 添加断点
+  await page.pause()
+
+  // 逐步执行
+  await page.fill('input[name="username"]', 'test')
+  await page.click('button[type="submit"]')
+
+  // 检查页面状态
+  console.log('当前URL:', page.url())
+  console.log('页面标题:', await page.title())
+})
+```
+
+### 网络监控
+
+```typescript
+test('网络请求调试', async ({ page }) => {
+  // 监听所有请求
+  page.on('request', request => {
+    console.log('Request:', request.url(), request.method())
+  })
+
+  // 监听所有响应
+  page.on('response', response => {
+    console.log('Response:', response.url(), response.status())
+  })
+
+  await page.goto('/#/index/home')
+})
+```
+
+### 截图和录屏
+
+```typescript
+test('详细调试', async ({ page }) => {
+  // 截图关键步骤
+  await page.goto('/#/login')
+  await page.screenshot({ path: 'debug-1-login-page.png' })
+
+  await page.fill('input[name="username"]', 'test')
+  await page.screenshot({ path: 'debug-2-filled-form.png' })
+
+  await page.click('button[type="submit"]')
+  await page.screenshot({ path: 'debug-3-after-submit.png' })
+})
+```
+
+## 🔧 故障排查
+
+### 常见错误及解决方案
+
+#### 1. 浏览器启动失败
+
+**错误信息**: `Executable doesn't exist`
+
+**解决方案**:
+```bash
+# 重新安装浏览器
+npx playwright install
+
+# 或安装特定浏览器
+npx playwright install chromium
+```
+
+#### 2. 端口冲突
+
+**错误信息**: `Port 8082 is already in use`
+
+**解决方案**:
+```bash
+# 杀死占用端口的进程
+netstat -ano | findstr :8082
+taskkill /PID <PID> /F
+
+# 或修改端口配置
+echo "E2E_PORT=8083" > .env.e2e
+```
+
+#### 3. 元素定位失败
+
+**错误信息**: `Element not found`
+
+**调试步骤**:
+```typescript
+// 1. 检查元素是否存在
+const element = await page.locator('.element').first()
+console.log('元素存在:', await element.isVisible())
+
+// 2. 打印页面HTML
+console.log(await page.content())
+
+// 3. 使用更宽松的选择器
+await page.locator('[data-testid="element"]').waitFor()
+```
+
+#### 4. 网络超时
+
+**错误信息**: `Timeout exceeded`
+
+**解决方案**:
+```typescript
+// 增加超时时间
+await page.waitForSelector('.element', { timeout: 10000 })
+
+// 或检查网络条件
+await page.waitForLoadState('networkidle', { timeout: 30000 })
+```
+
+#### 5. Mock数据不生效
+
+**调试步骤**:
+```typescript
+// 监听实际请求
+page.on('request', request => {
+  console.log('实际请求:', request.url())
+})
+
+// 检查Mock设置是否在页面操作前
+await mockFrontApi(page)  // 必须在goto之前
+await page.goto('/#/index/home')
+```
+
+### 环境问题排查
+
+#### 检查Node.js版本
+
+```bash
+node --version  # 应该 >= 18.0.0
+npm --version   # 应该 >= 8.0.0
+```
+
+#### 检查依赖安装
+
+```bash
+# 检查依赖是否正确安装
+cd springboot1ngh61a2/src/main/resources/front/front
+npm list playwright
+
+# 重新安装依赖
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### 检查网络连接
+
+```bash
+# 测试网络连接
+curl -I http://127.0.0.1:8082
+
+# 检查防火墙设置
+netstat -an | findstr :8082
+```
+
+### 测试稳定性问题
+
+#### 随机失败排查
+
+```typescript
+// 添加重试机制
+test.describe.configure({ retries: 3 })
+
+// 或在测试中添加稳定性检查
+test('稳定测试', async ({ page }) => {
+  await page.goto('/#/index/home')
+
+  // 等待页面稳定
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(1000)  // 额外等待
+
+  // 多次检查元素
+  for (let i = 0; i < 3; i++) {
+    const element = await page.locator('.element').isVisible()
+    if (element) break
+    await page.waitForTimeout(500)
+  }
+})
+```
+
+#### 竞态条件处理
+
+```typescript
+// 使用Promise.all处理并发操作
+await Promise.all([
+  page.click('button'),
+  page.waitForSelector('.result')
+])
+
+// 或顺序执行
+await page.click('button')
+await page.waitForSelector('.result')
+```
+
+## ⚡ 性能优化
+
+### 运行速度优化
+
+```bash
+# 并行运行测试
+npx playwright test --workers=4
+
+# 只运行失败的测试
+npx playwright test --last-failed
+
+# 跳过浏览器安装（如果已安装）
+npx playwright test --headed  # 使用已安装的浏览器
+```
+
+### 配置优化
+
+```typescript
+// playwright.config.ts 优化
+export default defineConfig({
+  // 增加并行度
+  workers: 4,
+
+  // 减少超时时间（如果测试稳定）
+  timeout: 20000,
+  expect: {
+    timeout: 3000,
+  },
+
+  // 优化浏览器启动
+  use: {
+    headless: true,
+    // 禁用不必要的特性
+    video: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+  },
+})
+```
+
+### 测试分组运行
+
+```bash
+# 分组运行减少资源占用
+npx playwright test tests/e2e/auth.spec.ts --workers=1
+npx playwright test tests/e2e/user-journey/ --workers=2
+npx playwright test tests/e2e/integration/ --workers=1
+```
+
+## 📊 报告查看
+
+### Playwright HTML报告
+
+```bash
+# 生成并查看HTML报告
+npx playwright show-report
+
+# 或直接打开文件
+# playwright-report/index.html
+```
+
+报告包含：
+- 测试执行概览
+- 详细的测试步骤
+- 截图和视频
+- 错误详情
+- 性能指标
+
+### 自定义聚合报告
+
+```bash
+# 生成聚合测试报告
+npm run aggregate:results
+
+# 查看生成的报告
+# test-reports/test-report-*.html
+```
+
+聚合报告包含：
+- 多项目测试汇总
+- 通过率统计
+- 覆盖率信息
+- 性能对比
+
+### CI/CD报告
+
+在GitHub Actions中：
+1. 访问Actions标签页
+2. 点击工作流运行
+3. 下载Artifacts：
+   - `e2e-results-*-*.zip`: 测试结果
+   - `e2e-videos-*-*.zip`: 失败视频
+   - `e2e-screenshots-*-*.zip`: 失败截图
+
+## ❓ 常见问题
+
+### Q: 测试运行太慢怎么办？
+
+A:
+1. 增加`--workers`参数
+2. 使用`--grep`只运行需要的测试
+3. 优化页面等待逻辑
+4. 使用更快的定位器
+
+### Q: 如何处理不稳定的测试？
+
+A:
+1. 添加适当的等待时间
+2. 使用更稳定的定位器
+3. 处理异步操作
+4. 添加重试机制
+
+### Q: 如何调试定位器问题？
+
+A:
+1. 使用`page.pause()`添加断点
+2. 在浏览器开发者工具中检查元素
+3. 使用`page.locator()`的`nth()`方法
+4. 添加`data-testid`属性
+
+### Q: 如何处理跨域问题？
+
+A:
+```typescript
+// 在playwright.config.ts中配置
+export default defineConfig({
+  use: {
+    bypassCSP: true,  // 绕过内容安全策略
+    ignoreHTTPSErrors: true,  // 忽略HTTPS错误
+  },
+})
+```
+
+### Q: 如何处理动态内容？
+
+A:
+```typescript
+// 等待动态内容加载
+await page.waitForFunction(() => {
+  return document.querySelectorAll('.dynamic-item').length > 0
+})
+
+// 或使用更稳定的选择器
+await page.locator('[data-testid^="item-"]').first().waitFor()
+```
+
+## 📞 获取帮助
+
+### 调试命令汇总
+
+```bash
+# 详细日志
+DEBUG=pw:api npx playwright test
+
+# 慢速执行
+npx playwright test --headed --slowMo=1000
+
+# 记录视频
+npx playwright test --video=retain-on-failure
+
+# 生成trace
+npx playwright test --trace=on
+```
+
+### 社区资源
+
+- [Playwright GitHub Issues](https://github.com/microsoft/playwright/issues)
+- [Playwright Discord](https://discord.gg/playwright)
+- [测试自动化最佳实践](https://playwright.dev/docs/best-practices)
+
+---
+
+**最后更新**: 2025-11-16

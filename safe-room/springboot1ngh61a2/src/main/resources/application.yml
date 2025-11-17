@@ -1,0 +1,118 @@
+# Tomcat
+server:
+    tomcat:
+        uri-encoding: UTF-8
+    port: 8080
+    servlet:
+        context-path: /springboot1ngh61a2
+
+
+spring:
+    datasource:
+        driverClassName: org.postgresql.Driver
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fitness_gym}
+        username: ${DB_USER:postgres}
+        password: ${DB_PASSWORD:postgres}
+        # HikariCP Connection Pool Configuration
+        hikari:
+            minimum-idle: 5
+            maximum-pool-size: 20
+            auto-commit: true
+            idle-timeout: 30000
+            pool-name: FitnessGymHikariCP
+            max-lifetime: 1800000
+            connection-timeout: 30000
+            connection-test-query: SELECT 1
+
+#        driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#        url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=springboot1ngh61a2
+#        username: sa
+#        password: 123456
+    sql:
+      init:
+        mode: never
+        # schema-locations: classpath:schema-postgresql.sql
+        # data-locations: classpath:data.sql
+
+    servlet:
+      multipart:
+        max-file-size: 300MB
+        max-request-size: 300MB
+    web:
+      resources:
+        static-locations: classpath:/static/,file:static/,classpath:/admin/,classpath:/front/,file:src/main/resources/admin/,file:src/main/resources/front/
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.entity
+  global-config:
+    db-config:
+      #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+      id-type: INPUT
+      #逻辑删除配置
+      logic-delete-value: -1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    #springboot 项目mybatis plus 设置 jdbcTypeForNull (oracle数据库需配置JdbcType.NULL, 默认是Other)
+    jdbc-type-for-null: 'null'
+
+# MinIO配置
+minio:
+  enabled: false  # 是否启用MinIO，false时使用本地文件系统
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket-name: fitness-gym
+  secure: false  # 是否使用HTTPS
+  presigned-url-expiry: 3600  # 预签名URL过期时间（秒），默认1小时
+
+# CORS安全配置
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173,http://localhost:8080
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true 
+
+# Actuator监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: fitness-gym
+      environment: ${SPRING_PROFILES_ACTIVE:dev}
+
+# 指标收集配置
+metrics:
+  fitness-gym:
+    enabled: true
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.controller.UsersController: DEBUG
+    com.service: INFO
+    com.config.MetricsConfig: DEBUG
+    com.interceptor.MetricsInterceptor: DEBUG
+    org.springframework: WARN
+    org.mybatis: INFO
+    io.micrometer: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

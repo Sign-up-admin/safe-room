@@ -1,0 +1,394 @@
+{
+  "timestamp": "2025-11-16T17:20:17.037Z",
+  "summary": {
+    "frontDocCount": 30,
+    "adminDocCount": 9,
+    "frontAvgScore": 0.726,
+    "adminAvgScore": 0.718,
+    "qualityGap": -0.008000000000000007
+  },
+  "frontAssessments": [
+    {
+      "file": "docs\\requirements\\COACHES_DETAIL_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.4
+      },
+      "content": {
+        "totalLength": 2443,
+        "wordCount": 417,
+        "lineCount": 151,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 41,
+        "headingCount": 17,
+        "listCount": 24,
+        "richnessScore": 0.6150000000000001,
+        "qualityScore": 0.6150000000000001
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:08.116Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.68
+    },
+    {
+      "file": "docs\\requirements\\FRONTEND_REQUIREMENTS_OVERVIEW.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": true,
+        "completeness": 0.6
+      },
+      "content": {
+        "totalLength": 8236,
+        "wordCount": 1723,
+        "lineCount": 373,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 141,
+        "headingCount": 52,
+        "listCount": 42,
+        "richnessScore": 1,
+        "qualityScore": 1
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:06.718Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.82
+    },
+    {
+      "file": "docs\\requirements\\CHAT_FEEDBACK_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.4
+      },
+      "content": {
+        "totalLength": 3024,
+        "wordCount": 554,
+        "lineCount": 159,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 58,
+        "headingCount": 16,
+        "listCount": 19,
+        "richnessScore": 0.7550000000000001,
+        "qualityScore": 0.7550000000000001
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:05.948Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.71
+    },
+    {
+      "file": "docs\\requirements\\PAYMENT_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": false,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.2
+      },
+      "content": {
+        "totalLength": 3710,
+        "wordCount": 573,
+        "lineCount": 182,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 42,
+        "headingCount": 19,
+        "listCount": 48,
+        "richnessScore": 0.7550000000000001,
+        "qualityScore": 0.7550000000000001
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:07.325Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.65
+    },
+    {
+      "file": "docs\\requirements\\ANIMATION_LIBRARY_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": true,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.6
+      },
+      "content": {
+        "totalLength": 9060,
+        "wordCount": 1139,
+        "lineCount": 474,
+        "codeBlockCount": 11,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 17,
+        "headingCount": 37,
+        "listCount": 32,
+        "richnessScore": 0.735,
+        "qualityScore": 0.735
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:05.841Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.77
+    }
+  ],
+  "adminAssessments": [
+    {
+      "file": "docs\\requirements\\ADMIN_CONFIG_CENTER_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.4
+      },
+      "content": {
+        "totalLength": 5985,
+        "wordCount": 1056,
+        "lineCount": 284,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 82,
+        "headingCount": 36,
+        "listCount": 48,
+        "richnessScore": 1,
+        "qualityScore": 1
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:05.549Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.76
+    },
+    {
+      "file": "docs\\requirements\\ADMIN_MODULE_CRUD_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": false,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.2
+      },
+      "content": {
+        "totalLength": 4809,
+        "wordCount": 734,
+        "lineCount": 195,
+        "codeBlockCount": 0,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 52,
+        "headingCount": 19,
+        "listCount": 43,
+        "richnessScore": 0.8300000000000001,
+        "qualityScore": 0.8300000000000001
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:07.915Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.67
+    },
+    {
+      "file": "docs\\requirements\\ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": false,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.2
+      },
+      "content": {
+        "totalLength": 5070,
+        "wordCount": 897,
+        "lineCount": 272,
+        "codeBlockCount": 1,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 82,
+        "headingCount": 32,
+        "listCount": 37,
+        "richnessScore": 1,
+        "qualityScore": 1
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:08.067Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.7
+    },
+    {
+      "file": "docs\\requirements\\ADMIN_FORGOT_PASSWORD_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.4
+      },
+      "content": {
+        "totalLength": 3847,
+        "wordCount": 654,
+        "lineCount": 223,
+        "codeBlockCount": 2,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 53,
+        "headingCount": 26,
+        "listCount": 44,
+        "richnessScore": 0.9200000000000002,
+        "qualityScore": 0.9200000000000002
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:05.627Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.74
+    },
+    {
+      "file": "docs\\requirements\\ADMIN_REGISTER_REQUIREMENTS.md",
+      "header": {
+        "hasTitle": false,
+        "hasVersion": true,
+        "hasLastUpdated": true,
+        "hasStatus": true,
+        "hasCategory": true,
+        "completeness": 0.8
+      },
+      "structure": {
+        "hasOverview": true,
+        "hasTableOfContents": false,
+        "hasMainContent": true,
+        "hasConclusion": false,
+        "hasUpdateRecord": false,
+        "completeness": 0.4
+      },
+      "content": {
+        "totalLength": 3512,
+        "wordCount": 645,
+        "lineCount": 180,
+        "codeBlockCount": 2,
+        "linkCount": 0,
+        "imageCount": 0,
+        "tableCount": 57,
+        "headingCount": 19,
+        "listCount": 21,
+        "richnessScore": 0.8100000000000002,
+        "qualityScore": 0.8100000000000002
+      },
+      "timeliness": {
+        "lastModified": "2025-11-16T16:37:08.015Z",
+        "daysSinceModified": 0,
+        "timelinessScore": 1
+      },
+      "overallScore": 0.72
+    }
+  ]
+}

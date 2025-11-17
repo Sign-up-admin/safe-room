@@ -1,0 +1,134 @@
+---
+title: ARCHITECTURE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+## 系统架构说明
+
+本系统采用"Spring Boot 后端 + Vue 3 前后端应用"的分层架构，通过 REST API 实现业务解耦，并结合 PostgreSQL、Docker、自动化测试与完善的文档工程体系保障交付质量。
+
+### 1. 总体架构
+
+```
+┌────────────┐     HTTPS      ┌───────────────────────┐
+│  前端站点   │  <──────────>  │                       │
+│  (front)   │                │                       │
+└────────────┘                │  Spring Boot 后端      │
+┌────────────┐     HTTPS      │  (springboot1ngh61a2)  │
+│ 管理后台    │  <──────────>  │                       │
+│ (admin)    │                │                       │
+└────────────┘                └────────────┬──────────┘
+                                           │ JDBC
+                                   ┌───────▼────────┐
+                                   │  PostgreSQL    │
+                                   └────────────────┘
+```
+
+- **前端站点**：对外展示课程/教练/会员服务，强调品牌与转化。
+- **管理后台**：面向内部运营，支持 CRUD、多维筛选与审核流程。
+- **后端**：统一暴露 `/springboot1ngh61a2/**` API，包含控制器、服务、DAO、实体、拦截器与工具模块。
+- **数据库**：PostgreSQL，提供课程、教练、会员、预约、支付等 25+ 张表。
+- **文档工程体系**：包含 80+ 份技术文档、需求文档、测试报告与开发指南，支持团队高效协同。
+
+### 2. 后端分层
+
+| 层级 | 说明 | 主要包 |
+| --- | --- | --- |
+| Controller | 处理 HTTP 请求、参数校验、统一响应 | `com.controller` |
+| Service | 业务逻辑与事务控制 | `com.service` |
+| DAO / Mapper | 数据访问层，MyBatis-Plus Mapper | `com.dao`, `mapper/*.xml` |
+| Entity / VO / Model | 数据模型与视图对象 | `com.entity` |
+| Utils / Config | 工具类与配置（安全、拦截器、分页、校验） | `com.utils`, `com.config`, `com.interceptor` |
+
+特性：
+
+- **拦截器**：`AuthorizationInterceptor` 负责 token 校验。
+- **自动化测试**：`AbstractControllerIntegrationTest` 统一管理 MockMvc、测试数据加载。
+- **配置文件**：`application.yml`（开发）、`application-prod.yml`（生产），并通过 `.env` 提供容器环境变量。
+
+### 3. 前端结构
+
+前台 / 后台均使用 Vite + Vue 3 + TypeScript，差异在于业务模块与 UI 布局：
+
+| 目录 | 说明 |
+| --- | --- |
+| `src/main.ts` | 入口文件，注册 Element Plus、Pinia、Router |
+| `src/router` | 路由配置，含守卫与懒加载 |
+| `src/store` | Pinia 状态管理 |
+| `src/pages` / `src/views` | 业务页面（前台为 pages，后台为 views） |
+| `src/components` | 可复用组件（含动态动效、卡片、表单、上传等） |
+| `src/common/http.ts` | axios 实例、请求拦截器、统一错误处理 |
+| `src/config/modules.ts` | 列表模块配置（字段、搜索项、权限等） |
+
+前台强调视觉动效（GSAP、D3、Three.js），后台聚焦数据管理（表格、表单、图表）。
+
+### 4. 数据流
+
+1. 前端通过 `http.ts` 发起带 `Token` 头的请求。
+2. 后端 `AuthorizationInterceptor` 校验 token → `Controller` 受理。
+3. `Service` 调用 `DAO` / `Mapper` 访问 PostgreSQL。
+4. 结果封装为统一响应 `{ code, msg, data }` 返回前端。
+5. 前端根据响应更新状态或界面，并在必要时触发通知/动效。
+
+### 5. 部署架构
+
+- **数据库**：通过 `docker-compose.yml` 部署 PostgreSQL，初始化脚本来自 `schema-postgresql.sql` & `data.sql`。
+- **后端**：`mvn package` 生成可执行 jar，使用 `SPRING_PROFILES_ACTIVE=prod` 连接生产库。
+- **前端**：`npm run build` 产出静态资源，可托管在 Nginx / CDN，也可继续嵌入 `springboot1ngh61a2/src/main/resources/...`。
+- **日志**：后端输出到控制台与 `logs/` 目录；前端依赖浏览器/监控平台。
+
+### 6. 技术栈细分
+
+| 领域 | 技术 |
+| --- | --- |
+| Web 框架 | Spring Boot 3.x、Vue 3 |
+| ORM | MyBatis-Plus |
+| 构建 | Maven、Vite |
+| 语言 | Java 21、TypeScript 5 |
+| 工具链 | ESLint、Prettier、Stylelint、Vitest、Playwright、JaCoCo |
+| 动效 | GSAP、D3.js、Three.js |
+| 安全 | AuthorizationInterceptor、TokenService、SQLFilter、GlobalExceptionHandler、前端 Token 拦截器 |
+
+#### 安全架构概览
+
+- **认证链路**：前端 `http.ts`/`main.ts` 在请求头附带 `Token`，后端 `AuthorizationInterceptor` 验证 token → `TokenService` 从数据库拉取会话 → 将 `userId/role/tableName` 写入 `HttpSession`，供控制器做数据隔离。
+- **输入与异常**：控制层通过 MyBatis-Plus 预编译语句与 `SQLFilter` 防 SQL 注入，`GlobalExceptionHandler` 将异常转换为统一响应并打日志。
+- **公共/匿名接口**：使用 `@IgnoreAuth` 标记，需在代码评审中确认仅暴露只读查询（详见 `docs/SECURITY.md` 的“API 安全”章节）。
+- **前端守卫**：管理后台使用路由守卫与 Axios 响应拦截器，在 `401` 时自动跳转登录并清理本地缓存。
+- **安全文档**：安全策略、风险与改进建议集中记录于 `docs/SECURITY.md`，是安全变更的单一事实来源。
+
+> 更多安全最佳实践与待办事项请参见 `docs/SECURITY.md`。
+
+### 7. 交付基线
+
+1. **功能**：课程/教练/预约/会员等 CRUD，含审核、收藏、讨论等扩展模块。
+2. **质量**：后端 `mvn test` + JaCoCo ≥40% 行覆盖率；前端 Vitest + Playwright；Husky 确保提交前 lint。
+3. **文档工程体系**：包含 80+ 份技术文档、需求文档、测试报告与开发指南，形成完整的文档导航与自动化维护体系。
+
+### 8. 文档工程架构
+
+#### 文档分类体系
+```
+docs/
+├── requirements/          # 需求文档（功能规格、交互设计）
+├── technical/            # 技术文档（架构、API、数据库）
+├── development/          # 开发文档（指南、测试、部署）
+├── reports/              # 报告文档（测试报告、代码审查）
+├── templates/            # 文档模板（标准化格式）
+└── scripts/              # 自动化脚本（生成、校验、索引）
+```
+
+#### 文档自动化流程
+- **生成**：从代码注释、Git提交、测试结果自动生成文档
+- **校验**：格式检查、链接验证、内容一致性校验
+- **索引**：自动维护文档导航和交叉引用
+- **版本**：文档版本控制和变更追踪
+
+#### 文档质量保障
+- **格式统一**：标准化元数据、命名规范、样式标准
+- **内容同步**：需求文档与代码实现自动同步
+- **CI/CD集成**：文档校验集成到持续集成流程
+- **导航优化**：建立完整的文档关系图和搜索索引
+

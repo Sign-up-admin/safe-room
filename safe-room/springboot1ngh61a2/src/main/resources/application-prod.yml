@@ -1,0 +1,73 @@
+# Production Environment Configuration
+server:
+    tomcat:
+        uri-encoding: UTF-8
+    port: ${SERVER_PORT:8080}
+    servlet:
+        context-path: /springboot1ngh61a2
+
+spring:
+    datasource:
+        driverClassName: org.postgresql.Driver
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fitness_gym}
+        username: ${DB_USER:postgres}
+        password: ${DB_PASSWORD:postgres}
+        # HikariCP Connection Pool Configuration for Production
+        hikari:
+            minimum-idle: ${DB_POOL_MIN_IDLE:10}
+            maximum-pool-size: ${DB_POOL_MAX_SIZE:50}
+            auto-commit: true
+            idle-timeout: 300000
+            pool-name: FitnessGymHikariCP-Prod
+            max-lifetime: 1800000
+            connection-timeout: 30000
+            connection-test-query: SELECT 1
+            leak-detection-threshold: 60000
+    sql:
+      init:
+        mode: never  # Disable auto initialization in production
+    servlet:
+      multipart:
+        max-file-size: 300MB
+        max-request-size: 300MB
+    web:
+      resources:
+        static-locations: classpath:/static/,file:static/,classpath:/admin/,classpath:/front/,file:src/main/resources/admin/,file:src/main/resources/front/
+
+#mybatis
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  typeAliasesPackage: com.entity
+  global-config:
+    db-config:
+      id-type: INPUT
+      logic-delete-value: -1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+
+# MinIO配置（生产环境）
+minio:
+  enabled: ${MINIO_ENABLED:false}
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket-name: ${MINIO_BUCKET_NAME:fitness-gym}
+  secure: ${MINIO_SECURE:false}
+  presigned-url-expiry: ${MINIO_PRESIGNED_URL_EXPIRY:3600}
+
+# Logging configuration for production
+logging:
+  level:
+    root: INFO
+    com: INFO
+    org.springframework: WARN
+    org.mybatis: DEBUG
+  file:
+    name: logs/springboot-schema.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+

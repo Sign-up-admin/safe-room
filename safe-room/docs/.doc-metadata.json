@@ -1,0 +1,139 @@
+{
+  "version": "1.0.0",
+  "description": "文档元数据标准配置",
+  "last_updated": "2025-11-16",
+
+  "required_fields": {
+    "title": {
+      "type": "string",
+      "description": "文档标题",
+      "validation": {
+        "min_length": 3,
+        "max_length": 100
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "文档版本号",
+      "validation": {
+        "pattern": "^v?\\d+\\.\\d+\\.\\d+$",
+        "example": "v1.0.0"
+      }
+    },
+    "last_updated": {
+      "type": "string",
+      "description": "最后更新日期",
+      "validation": {
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "example": "2025-11-16"
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "文档状态",
+      "validation": {
+        "enum": ["active", "deprecated", "draft"]
+      }
+    },
+    "category": {
+      "type": "string",
+      "description": "文档分类",
+      "validation": {
+        "enum": ["requirements", "technical", "development", "reports"]
+      }
+    }
+  },
+
+  "optional_fields": {
+    "tags": {
+      "type": "array",
+      "description": "文档标签",
+      "validation": {
+        "items": {
+          "type": "string",
+          "max_length": 50
+        },
+        "max_items": 10
+      }
+    },
+    "related_docs": {
+      "type": "array",
+      "description": "相关文档列表",
+      "validation": {
+        "items": {
+          "type": "string",
+          "pattern": "^[^\\s]+\\.[a-zA-Z]{2,4}$"
+        }
+      }
+    },
+    "keywords": {
+      "type": "array",
+      "description": "关键词列表",
+      "validation": {
+        "items": {
+          "type": "string",
+          "max_length": 30
+        },
+        "max_items": 5
+      }
+    },
+    "author": {
+      "type": "string",
+      "description": "文档作者",
+      "validation": {
+        "max_length": 50
+      }
+    },
+    "reviewer": {
+      "type": "string",
+      "description": "文档审核人",
+      "validation": {
+        "max_length": 50
+      }
+    }
+  },
+
+  "category_config": {
+    "requirements": {
+      "description": "需求文档，包括功能需求、用户界面需求等",
+      "directory": "requirements/",
+      "required_sections": ["概述", "功能需求", "验收标准"],
+      "expiry_days": 90
+    },
+    "technical": {
+      "description": "技术文档，包括架构、API、数据库等",
+      "directory": "technical/",
+      "required_sections": ["概述", "架构设计", "实现说明"],
+      "expiry_days": 180
+    },
+    "development": {
+      "description": "开发文档，包括指南、测试、部署等",
+      "directory": "development/",
+      "required_sections": ["概述", "环境要求", "使用指南"],
+      "expiry_days": 120
+    },
+    "reports": {
+      "description": "报告文档，包括测试报告、代码审查等",
+      "directory": "reports/",
+      "required_sections": ["概述", "测试结果", "结论"],
+      "expiry_days": 30
+    }
+  },
+
+  "validation_rules": {
+    "front_matter_format": "---\\n([\\s\\S]*?)\\n---",
+    "max_file_size": 1048576,
+    "allowed_extensions": [".md"],
+    "line_length_limit": 120,
+    "expiry_warning_days": 30,
+    "expiry_error_days": 90
+  },
+
+  "auto_fix_rules": {
+    "add_missing_version": true,
+    "add_missing_last_updated": true,
+    "add_missing_status": true,
+    "standardize_date_format": true,
+    "trim_whitespace": true
+  }
+}

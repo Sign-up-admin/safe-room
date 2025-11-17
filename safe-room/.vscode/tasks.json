@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: dev (front)",
+      "type": "npm",
+      "script": "dev",
+      "path": "springboot1ngh61a2/src/main/resources/front/front",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*)$",
+          "message": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "endsPattern": "ready in \\d+ ms"
+        }
+      },
+      "detail": "启动 front 端 Vite 开发服务器"
+    }
+  ]
+}
+

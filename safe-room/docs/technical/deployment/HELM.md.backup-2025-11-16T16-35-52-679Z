@@ -1,0 +1,1383 @@
+# Helm Chart 使用指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: DevOps团队
+
+## 概述
+
+本文档详细介绍如何使用Helm包管理器来部署和管理健身房综合管理系统，包括Chart结构设计、配置管理、多环境部署、版本控制等完整的工作流程。
+
+## 目录
+
+- [1. Helm 基础概念](#1-helm-基础概念)
+- [2. Chart 结构设计](#2-chart-结构设计)
+- [3. 配置管理](#3-配置管理)
+- [4. 模板编写](#4-模板编写)
+- [5. 多环境部署](#5-多环境部署)
+- [6. Chart 版本管理](#6-chart-版本管理)
+- [7. 依赖管理](#7-依赖管理)
+- [8. 最佳实践](#8-最佳实践)
+- [9. 故障排查](#9-故障排查)
+
+---
+
+## 1. Helm 基础概念
+
+### 1.1 Helm 是什么
+
+Helm 是 Kubernetes 的包管理器，可以：
+
+- 将复杂的Kubernetes应用打包为Chart
+- 简化应用部署和升级
+- 提供应用版本控制和回滚
+- 支持多环境配置管理
+- 管理应用间的依赖关系
+
+### 1.2 核心组件
+
+#### Chart
+- Kubernetes 资源的打包集合
+- 包含模板、配置、元数据
+- 可复用、可共享
+
+#### Release
+- Chart 的实例化部署
+- 在 Kubernetes 集群中运行的应用实例
+- 可独立升级、回滚
+
+#### Repository
+- Chart 的存储仓库
+- 支持本地和远程仓库
+- 类似 Docker Hub
+
+### 1.3 安装和配置
+
+#### 安装 Helm
+
+```bash
+# Linux
+curl https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz -o helm.tar.gz
+tar -zxvf helm.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+
+# macOS
+brew install helm
+
+# Windows
+choco install kubernetes-helm
+```
+
+#### 配置自动补全
+
+```bash
+# Bash
+helm completion bash >> ~/.bashrc
+source ~/.bashrc
+
+# Zsh
+helm completion zsh >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### 添加仓库
+
+```bash
+# 添加官方仓库
+helm repo add stable https://charts.helm.sh/stable
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+# 添加自定义仓库
+helm repo add fitness-gym https://charts.fitness-gym.com
+
+# 更新仓库
+helm repo update
+
+# 查看已添加仓库
+helm repo list
+```
+
+---
+
+## 2. Chart 结构设计
+
+### 2.1 Chart 目录结构
+
+```
+fitness-gym/
+├── Chart.yaml          # Chart 元数据
+├── values.yaml         # 默认配置值
+├── templates/          # Kubernetes 模板文件
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── _helpers.tpl
+│   └── NOTES.txt
+├── charts/             # 依赖的子 Chart
+│   ├── postgresql/
+│   └── redis/
+└── .helmignore        # 忽略文件列表
+```
+
+### 2.2 Chart.yaml 配置
+
+```yaml
+# Chart.yaml
+apiVersion: v2
+name: fitness-gym
+description: A Helm chart for Fitness Gym Management System
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - fitness
+  - gym
+  - management
+  - spring-boot
+home: https://github.com/fitness-gym/fitness-gym
+sources:
+  - https://github.com/fitness-gym/fitness-gym
+maintainers:
+  - name: DevOps Team
+    email: devops@fitness-gym.com
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+```
+
+### 2.3 模板文件结构
+
+#### _helpers.tpl
+
+```yaml
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "fitness-gym.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+*/}}
+{{- define "fitness-gym.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "fitness-gym.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "fitness-gym.labels" -}}
+helm.sh/chart: {{ include "fitness-gym.chart" . }}
+{{ include "fitness-gym.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "fitness-gym.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "fitness-gym.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "fitness-gym.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "fitness-gym.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+```
+
+---
+
+## 3. 配置管理
+
+### 3.1 values.yaml 设计
+
+```yaml
+# values.yaml
+# 全局配置
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+
+# 镜像配置
+image:
+  registry: docker.io
+  repository: fitness-gym/backend
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+# 应用配置
+app:
+  name: fitness-gym
+  port: 8080
+  replicas: 1
+  env: production
+
+# Spring Boot 配置
+spring:
+  profiles:
+    active: prod
+  datasource:
+    url: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/fitness_gym
+    username: fitness_user
+    password: ""  # 从 Secret 中获取
+  redis:
+    host: {{ .Release.Name }}-redis-master
+    port: 6379
+    password: ""  # 从 Secret 中获取
+
+# 服务配置
+service:
+  type: ClusterIP
+  port: 8080
+  annotations: {}
+
+# Ingress 配置
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: fitness-gym.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# 数据库配置
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres_password"
+    username: fitness_user
+    password: "db_password"
+    database: fitness_gym
+  architecture: standalone
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Redis 配置
+redis:
+  enabled: true
+  auth:
+    password: "redis_password"
+  architecture: standalone
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# MinIO 配置
+minio:
+  enabled: false
+  auth:
+    rootUser: admin
+    rootPassword: "minio_password"
+  defaultBuckets: "fitness-gym-files"
+  persistence:
+    enabled: true
+    size: 8Gi
+
+# 资源配置
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# 健康检查配置
+healthcheck:
+  enabled: true
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# 节点选择器
+nodeSelector: {}
+
+# 容忍度
+tolerations: []
+
+# 亲和性
+affinity: {}
+```
+
+### 3.2 环境特定配置
+
+#### 开发环境 (values-dev.yaml)
+
+```yaml
+# 开发环境配置
+app:
+  replicas: 1
+  env: development
+
+image:
+  tag: "dev"
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  hosts:
+    - host: dev.fitness-gym.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+postgresql:
+  primary:
+    persistence:
+      size: 1Gi
+
+redis:
+  master:
+    persistence:
+      size: 1Gi
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# 开发环境调试配置
+debug:
+  enabled: true
+  jvmOpts: "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005"
+```
+
+#### 生产环境 (values-prod.yaml)
+
+```yaml
+# 生产环境配置
+app:
+  replicas: 3
+  env: production
+
+image:
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.fitness-gym.com
+      paths:
+        - path: /springboot1ngh61a2
+          pathType: Prefix
+  tls:
+    - secretName: fitness-gym-tls
+      hosts:
+        - api.fitness-gym.com
+
+postgresql:
+  primary:
+    persistence:
+      size: 50Gi
+
+redis:
+  master:
+    persistence:
+      size: 16Gi
+
+minio:
+  enabled: true
+  persistence:
+    size: 100Gi
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2048Mi
+  requests:
+    cpu: 1000m
+    memory: 1024Mi
+
+# 生产环境安全配置
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+
+# 高可用配置
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - fitness-gym
+        topologyKey: kubernetes.io/hostname
+```
+
+---
+
+## 4. 模板编写
+
+### 4.1 Deployment 模板
+
+```yaml
+# templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}
+  labels:
+    {{- include "fitness-gym.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.app.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "fitness-gym.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      labels:
+        {{- include "fitness-gym.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/version: {{ .Values.image.tag | quote }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "fitness-gym.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.app.port }}
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.spring.profiles.active }}
+            - name: SERVER_PORT
+              value: {{ .Values.app.port | quote }}
+            - name: DB_HOST
+              value: {{ include "fitness-gym.postgresql.host" . }}
+            - name: DB_PORT
+              value: {{ include "fitness-gym.postgresql.port" . | quote }}
+            - name: DB_NAME
+              value: {{ include "fitness-gym.postgresql.database" . }}
+            - name: DB_USER
+              value: {{ include "fitness-gym.postgresql.username" . }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fitness-gym.fullname" . }}
+                  key: postgresql-password
+            - name: REDIS_HOST
+              value: {{ include "fitness-gym.redis.host" . }}
+            - name: REDIS_PORT
+              value: {{ include "fitness-gym.redis.port" . | quote }}
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fitness-gym.fullname" . }}
+                  key: redis-password
+            {{- if .Values.minio.enabled }}
+            - name: MINIO_ENDPOINT
+              value: {{ printf "http://%s-minio:9000" .Release.Name }}
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fitness-gym.fullname" . }}
+                  key: minio-access-key
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "fitness-gym.fullname" . }}
+                  key: minio-secret-key
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /springboot1ngh61a2/health
+              port: http
+            initialDelaySeconds: {{ .Values.healthcheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthcheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthcheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthcheck.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /springboot1ngh61a2/health
+              port: http
+            initialDelaySeconds: {{ .Values.healthcheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthcheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthcheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthcheck.readinessProbe.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: /app/data
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: logs
+          emptyDir: {}
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "fitness-gym.fullname" . }}
+        {{- end }}
+```
+
+### 4.2 Service 模板
+
+```yaml
+# templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}
+  labels:
+    {{- include "fitness-gym.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "fitness-gym.selectorLabels" . | nindent 4 }}
+```
+
+### 4.3 ConfigMap 模板
+
+```yaml
+# templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}
+  labels:
+    {{- include "fitness-gym.labels" . | nindent 4 }}
+data:
+  application.yml: |
+    server:
+      port: {{ .Values.app.port }}
+
+    spring:
+      profiles:
+        active: {{ .Values.spring.profiles.active }}
+      datasource:
+        url: jdbc:postgresql://{{ include "fitness-gym.postgresql.host" . }}:{{ include "fitness-gym.postgresql.port" . }}/{{ include "fitness-gym.postgresql.database" . }}
+        username: {{ include "fitness-gym.postgresql.username" . }}
+        driver-class-name: org.postgresql.Driver
+      redis:
+        host: {{ include "fitness-gym.redis.host" . }}
+        port: {{ include "fitness-gym.redis.port" . }}
+        timeout: 2000ms
+        database: 0
+
+    logging:
+      level:
+        com.fitness.gym: {{ .Values.logging.level }}
+      file:
+        name: /app/logs/springboot-schema.log
+
+    {{- if .Values.minio.enabled }}
+    minio:
+      enabled: true
+      endpoint: http://{{ .Release.Name }}-minio:9000
+      access-key: ${MINIO_ACCESS_KEY}
+      secret-key: ${MINIO_SECRET_KEY}
+      bucket-name: {{ .Values.minio.defaultBuckets }}
+      secure: false
+      presigned-url-expiry: {{ .Values.minio.presignedUrlExpiry }}
+    {{- end }}
+
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+
+        location /springboot1ngh61a2/ {
+            proxy_pass http://localhost:{{ .Values.app.port }}/springboot1ngh61a2/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+
+        location / {
+            proxy_pass http://localhost:{{ .Values.app.port }};
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+```
+
+### 4.4 Secret 模板
+
+```yaml
+# templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}
+  labels:
+    {{- include "fitness-gym.labels" . | nindent 4 }}
+type: Opaque
+data:
+  {{- if .Values.postgresql.enabled }}
+  postgresql-password: {{ .Values.postgresql.auth.password | b64enc | quote }}
+  {{- end }}
+  {{- if .Values.redis.enabled }}
+  redis-password: {{ .Values.redis.auth.password | b64enc | quote }}
+  {{- end }}
+  {{- if .Values.minio.enabled }}
+  minio-access-key: {{ .Values.minio.auth.rootUser | b64enc | quote }}
+  minio-secret-key: {{ .Values.minio.auth.rootPassword | b64enc | quote }}
+  {{- end }}
+  # JWT 密钥
+  jwt-secret: {{ .Values.jwt.secret | default (randAlphaNum 32) | b64enc | quote }}
+```
+
+### 4.5 Ingress 模板
+
+```yaml
+# templates/ingress.yaml
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "fitness-gym.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.ingress.className (not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class")) }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "fitness-gym.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- range .Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        {{- range .paths }}
+        - path: {{ .path }}
+          {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+          pathType: {{ .pathType }}
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: {{ $fullName }}
+              port:
+                number: {{ $svcPort }}
+            {{- else }}
+            serviceName: {{ $fullName }}
+            servicePort: {{ $svcPort }}
+            {{- end }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+```
+
+---
+
+## 5. 多环境部署
+
+### 5.1 环境配置管理
+
+#### 使用多个 values 文件
+
+```bash
+# 开发环境部署
+helm upgrade --install fitness-gym-dev ./fitness-gym \
+  --namespace fitness-dev \
+  --create-namespace \
+  --values fitness-gym/values-dev.yaml \
+  --set image.tag="dev-$(git rev-parse --short HEAD)"
+
+# 测试环境部署
+helm upgrade --install fitness-gym-test ./fitness-gym \
+  --namespace fitness-test \
+  --create-namespace \
+  --values fitness-gym/values-test.yaml \
+  --set image.tag="test-$(git rev-parse --short HEAD)"
+
+# 生产环境部署
+helm upgrade --install fitness-gym-prod ./fitness-gym \
+  --namespace fitness-prod \
+  --create-namespace \
+  --values fitness-gym/values-prod.yaml \
+  --set image.tag="$(git describe --tags --abbrev=0)"
+```
+
+#### 环境特定的 Chart 值
+
+```yaml
+# values-test.yaml
+app:
+  replicas: 2
+  env: test
+
+ingress:
+  enabled: true
+  hosts:
+    - host: test.fitness-gym.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+postgresql:
+  primary:
+    persistence:
+      size: 16Gi
+
+redis:
+  master:
+    persistence:
+      size: 8Gi
+
+# 测试环境专用配置
+test:
+  enabled: true
+  database:
+    # 使用测试数据
+    seedData: true
+  monitoring:
+    # 启用详细监控
+    detailedMetrics: true
+```
+
+### 5.2 命名空间隔离
+
+```bash
+# 为每个环境创建独立的命名空间
+kubectl create namespace fitness-dev
+kubectl create namespace fitness-test
+kubectl create namespace fitness-prod
+
+# 设置命名空间的资源配额
+kubectl apply -f namespace-quotas/
+
+# 为每个命名空间设置 RBAC
+kubectl apply -f namespace-rbac/
+```
+
+### 5.3 环境间依赖管理
+
+```yaml
+# Chart.yaml 中的条件依赖
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+    tags:
+      - database
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+    tags:
+      - cache
+  - name: minio
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: minio.enabled
+    tags:
+      - storage
+      - production  # 只在生产环境启用
+```
+
+---
+
+## 6. Chart 版本管理
+
+### 6.1 版本号规范
+
+```yaml
+# Chart.yaml
+apiVersion: v2
+name: fitness-gym
+version: 1.2.3          # Chart 版本
+appVersion: "2.1.0"     # 应用版本
+```
+
+#### 版本号说明
+
+- **Chart 版本**: Helm Chart 本身的版本
+- **App 版本**: 应用代码的版本
+- **语义化版本**: 主版本.次版本.补丁版本
+
+### 6.2 版本发布流程
+
+```bash
+# 1. 更新 Chart 版本
+sed -i 's/version: .*/version: 1.2.4/' fitness-gym/Chart.yaml
+
+# 2. 更新应用版本
+sed -i 's/appVersion: .*/appVersion: "2.1.1"/' fitness-gym/Chart.yaml
+
+# 3. 提交更改
+git add fitness-gym/Chart.yaml
+git commit -m "Bump chart version to 1.2.4"
+
+# 4. 创建标签
+git tag v1.2.4
+
+# 5. 推送标签
+git push origin main --tags
+
+# 6. 打包 Chart
+helm package fitness-gym
+
+# 7. 上传到仓库
+helm push fitness-gym-1.2.4.tgz oci://registry.fitness-gym.com/charts
+```
+
+### 6.3 版本回滚
+
+```bash
+# 查看发布历史
+helm history fitness-gym -n fitness-prod
+
+# 回滚到指定版本
+helm rollback fitness-gym 2 -n fitness-prod
+
+# 回滚到上一个版本
+helm rollback fitness-gym -n fitness-prod
+
+# 查看回滚状态
+helm status fitness-gym -n fitness-prod
+```
+
+### 6.4 Chart 仓库管理
+
+#### 本地仓库
+
+```bash
+# 创建本地仓库
+helm serve
+
+# 添加本地仓库
+helm repo add local http://localhost:8879
+
+# 推送 Chart 到本地仓库
+helm push fitness-gym-1.2.4.tgz oci://localhost:5000/fitness-gym
+```
+
+#### 远程仓库
+
+```bash
+# 添加远程仓库
+helm repo add fitness-gym https://charts.fitness-gym.com
+
+# 搜索 Chart
+helm search repo fitness-gym
+
+# 安装指定版本
+helm install fitness-gym fitness-gym/fitness-gym --version 1.2.3
+
+# 更新仓库索引
+helm repo update
+```
+
+---
+
+## 7. 依赖管理
+
+### 7.1 子 Chart 配置
+
+#### PostgreSQL 子 Chart
+
+```yaml
+# charts/postgresql/Chart.yaml
+apiVersion: v2
+name: postgresql
+description: A Helm chart for PostgreSQL
+type: application
+version: 0.1.0
+appVersion: "14.7"
+
+dependencies: []
+```
+
+```yaml
+# charts/postgresql/values.yaml
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: "14.7"
+
+auth:
+  postgresPassword: "postgres_password"
+  username: fitness_user
+  password: "db_password"
+  database: fitness_gym
+
+primary:
+  persistence:
+    enabled: true
+    size: 8Gi
+  initdb:
+    scripts:
+      init.sql: |
+        CREATE DATABASE fitness_gym;
+        CREATE USER fitness_user WITH PASSWORD 'db_password';
+        GRANT ALL PRIVILEGES ON DATABASE fitness_gym TO fitness_user;
+```
+
+#### Redis 子 Chart
+
+```yaml
+# charts/redis/Chart.yaml
+apiVersion: v2
+name: redis
+description: A Helm chart for Redis
+type: application
+version: 0.1.0
+appVersion: "7.0"
+
+dependencies: []
+```
+
+```yaml
+# charts/redis/values.yaml
+image:
+  registry: docker.io
+  repository: bitnami/redis
+  tag: "7.0"
+
+auth:
+  password: "redis_password"
+
+master:
+  persistence:
+    enabled: true
+    size: 8Gi
+
+replica:
+  replicaCount: 1
+```
+
+### 7.2 依赖关系管理
+
+```bash
+# 更新依赖
+helm dependency update fitness-gym/
+
+# 查看依赖树
+helm dependency tree fitness-gym/
+
+# 构建依赖
+helm dependency build fitness-gym/
+```
+
+### 7.3 条件依赖
+
+```yaml
+# values.yaml 中的条件控制
+postgresql:
+  enabled: true
+
+redis:
+  enabled: true
+
+minio:
+  enabled: false  # 默认不启用，只在生产环境启用
+
+# 生产环境覆盖
+# values-prod.yaml
+minio:
+  enabled: true
+```
+
+---
+
+## 8. 最佳实践
+
+### 8.1 Chart 开发最佳实践
+
+#### 模板编写规范
+
+```yaml
+# 使用模板函数简化复杂逻辑
+{{- define "fitness-gym.database.url" -}}
+{{- if .Values.postgresql.enabled -}}
+{{- printf "jdbc:postgresql://%s-postgresql:5432/%s" .Release.Name .Values.postgresql.auth.database -}}
+{{- else -}}
+{{- .Values.externalDatabase.url -}}
+{{- end -}}
+{{- end -}}
+
+# 在模板中使用
+env:
+  - name: DATABASE_URL
+    value: {{ include "fitness-gym.database.url" . }}
+```
+
+#### 配置验证
+
+```yaml
+# 使用模板验证配置
+{{- if and .Values.ingress.enabled (not .Values.ingress.hosts) -}}
+{{- fail "ingress.hosts must be set when ingress is enabled" -}}
+{{- end -}}
+
+{{- if and .Values.postgresql.enabled (not .Values.postgresql.auth.password) -}}
+{{- fail "postgresql.auth.password must be set when postgresql is enabled" -}}
+{{- end -}}
+```
+
+### 8.2 安全最佳实践
+
+#### Secret 管理
+
+```yaml
+# 使用外部 Secret 管理
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: fitness-gym-secrets
+spec:
+  refreshInterval: 15s
+  secretStoreRef:
+    name: aws-secretsmanager
+    kind: SecretStore
+  target:
+    name: fitness-gym-secret
+    creationPolicy: Owner
+  data:
+  - secretKey: db-password
+    remoteRef:
+      key: prod/fitness-gym/database
+      property: password
+```
+
+#### 镜像安全
+
+```yaml
+# 使用签名镜像
+image:
+  registry: registry.fitness-gym.com
+  repository: fitness-gym/backend
+  tag: "v1.2.3@sha256:abc123..."
+
+# 安全上下文
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+```
+
+### 8.3 性能优化
+
+#### 资源管理
+
+```yaml
+# 合理的资源配置
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# 垂直 Pod 自动伸缩
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: fitness-gym-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: fitness-gym
+  updatePolicy:
+    updateMode: "Auto"
+```
+
+#### 缓存优化
+
+```bash
+# Chart 缓存
+helm repo update
+helm dependency update
+
+# 模板缓存（开发环境）
+helm template fitness-gym ./fitness-gym --dry-run
+```
+
+### 8.4 可观测性
+
+#### 监控集成
+
+```yaml
+# ServiceMonitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "fitness-gym.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: http
+    path: /springboot1ngh61a2/actuator/prometheus
+    interval: 30s
+```
+
+#### 日志配置
+
+```yaml
+# Fluent Bit 配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "fitness-gym.fullname" . }}-fluent-bit
+data:
+  fluent-bit.conf: |
+    [INPUT]
+        Name tail
+        Path /var/log/containers/*{{ include "fitness-gym.fullname" . }}*.log
+        Parser docker
+
+    [OUTPUT]
+        Name elasticsearch
+        Host elasticsearch-master
+        Port 9200
+        Index fitness-gym
+```
+
+---
+
+## 9. 故障排查
+
+### 9.1 常见问题
+
+#### Chart 安装失败
+
+```bash
+# 检查 Chart 语法
+helm lint ./fitness-gym
+
+# 验证模板渲染
+helm template fitness-gym ./fitness-gym --dry-run
+
+# 检查依赖
+helm dependency list ./fitness-gym
+```
+
+#### Release 状态异常
+
+```bash
+# 查看 Release 状态
+helm list -n fitness-prod
+helm status fitness-gym -n fitness-prod
+
+# 查看 Release 历史
+helm history fitness-gym -n fitness-prod
+
+# 调试模板渲染
+helm install fitness-gym ./fitness-gym --dry-run --debug
+```
+
+#### 升级失败
+
+```bash
+# 检查升级前后的差异
+helm diff upgrade fitness-gym ./fitness-gym --namespace fitness-prod
+
+# 强制升级
+helm upgrade fitness-gym ./fitness-gym --namespace fitness-prod --force
+
+# 清理失败的 Release
+helm delete fitness-gym --namespace fitness-prod
+```
+
+### 9.2 调试技巧
+
+#### 模板调试
+
+```bash
+# 渲染特定模板
+helm template fitness-gym ./fitness-gym --show-only templates/deployment.yaml
+
+# 使用调试模式
+helm install fitness-gym ./fitness-gym --dry-run --debug
+
+# 查看渲染后的值
+helm template fitness-gym ./fitness-gym --set app.replicas=5
+```
+
+#### Release 调试
+
+```bash
+# 查看 Release 清单
+helm get manifest fitness-gym -n fitness-prod
+
+# 查看 Release 值
+helm get values fitness-gym -n fitness-prod
+
+# 查看 Release 钩子
+helm get hooks fitness-gym -n fitness-prod
+```
+
+### 9.3 日志分析
+
+#### Helm 日志
+
+```bash
+# 启用详细日志
+export HELM_DEBUG=1
+
+# 查看 Tiller 日志（Helm 2）
+kubectl logs -n kube-system deployment/tiller-deploy
+
+# 查看 Helm 插件日志
+helm plugin list
+```
+
+#### 应用日志
+
+```bash
+# 查看 Pod 日志
+kubectl logs -l app.kubernetes.io/name=fitness-gym -n fitness-prod
+
+# 实时日志
+kubectl logs -f deployment/fitness-gym -n fitness-prod
+
+# 之前的日志
+kubectl logs -p deployment/fitness-gym -n fitness-prod
+```
+
+---
+
+## 总结
+
+本文档提供了使用Helm管理健身房综合管理系统Chart的完整指南，包括：
+
+1. **Chart 结构设计**：标准的目录结构和文件组织
+2. **配置管理**：values.yaml设计和多环境配置
+3. **模板编写**：Kubernetes资源模板的最佳实践
+4. **多环境部署**：开发、测试、生产环境的差异化配置
+5. **版本管理**：Chart版本控制和发布流程
+6. **依赖管理**：子Chart和外部依赖的管理
+7. **最佳实践**：安全、性能、可观测性等方面的建议
+8. **故障排查**：常见问题诊断和解决方法
+
+通过遵循这些指南，可以构建可维护、可扩展、可复用的Helm Chart，实现应用的高效部署和管理。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: DevOps团队*

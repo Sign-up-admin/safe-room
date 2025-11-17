@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npx lint-staged
+
+# 可选的覆盖率检查（默认关闭，通过环境变量启用）
+# 取消下面的注释以启用覆盖率检查
+# if [ "$ENABLE_COVERAGE_CHECK" = "true" ]; then
+#   echo "🔍 运行覆盖率检查..."
+#   npm run test:coverage || exit 1
+# fi
+
+
+
+

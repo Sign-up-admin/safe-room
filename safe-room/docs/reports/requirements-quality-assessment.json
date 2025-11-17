@@ -1,0 +1,1388 @@
+{
+  "summary": {
+    "totalDocuments": 42,
+    "highQuality": 0,
+    "mediumQuality": 0,
+    "lowQuality": 42,
+    "averageScore": 50.80158730158731
+  },
+  "formatCompliance": {
+    "headerCompleteness": 0,
+    "structureCompliance": 0,
+    "markdownSyntax": 0
+  },
+  "contentCompleteness": {
+    "functionalDescription": 0,
+    "acceptanceCriteria": 0,
+    "technicalImplementation": 0,
+    "visualDesign": 0
+  },
+  "consistency": {
+    "terminology": 0,
+    "formatting": 0,
+    "naming": 0
+  },
+  "readability": {
+    "structureClarity": 0,
+    "languageQuality": 0,
+    "documentationLinks": 0
+  },
+  "detailedAssessment": [
+    {
+      "file": "ADMIN_CONFIG_CENTER_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 66.66666666666666,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 64.33333333333333,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_FORGOT_PASSWORD_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 62.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_HOME_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 100,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 66,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_LAYOUT_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 57.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_LOGIN_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 62.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_MODULE_CRUD_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 52.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_OVERVIEW_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 41,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_REGISTER_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 62.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 52.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ALL_PAGES_REQUIREMENTS_REVIEW.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 0,
+        "functionalDescription": 66.66666666666666,
+        "acceptanceCriteria": 0,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 41.83333333333333,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 验收标准, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ANIMATION_LIBRARY_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 0,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 0,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 23.5,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 验收标准, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ASSETS_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 36,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "CHAT_FEEDBACK_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COACHES_DETAIL_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 51,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COACHES_LIST_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COURSES_DETAIL_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COURSES_LIST_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COURSE_BOOKING_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 51,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COURSE_DISCUSSION_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "COURSE_REFUND_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "EQUIPMENT_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ERROR_HANDLING_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 36,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "ERROR_PAGES_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 57.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "FAVORITES_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "FRONTEND_MISSING_FEATURES_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 47.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "FRONTEND_REQUIREMENTS_INDEX.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 80
+      },
+      "totalScore": 58.166666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理"
+      ]
+    },
+    {
+      "file": "FRONTEND_REQUIREMENTS_OVERVIEW.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 0,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 0,
+        "technicalImplementation": 0,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 40.166666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 验收标准, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "FRONTEND_REQUIREMENTS_VERIFICATION_REPORT.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 66.66666666666666,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 49.33333333333333,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "HOMEPAGE_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 57.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "INDEX.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 36,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "MEMBERSHIP_CARDS_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "MEMBERSHIP_EXPIRY_REMINDER_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 80
+      },
+      "totalScore": 46.5,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略"
+      ]
+    },
+    {
+      "file": "MEMBERSHIP_PURCHASE_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "MEMBERSHIP_RENEWAL_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 0,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "NEWS_DETAIL_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "NEWS_LIST_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 62.666666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "NOTIFICATION_SYSTEM_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 33.33333333333333,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 0,
+        "consistency": 100,
+        "readability": 80
+      },
+      "totalScore": 48.166666666666664,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略"
+      ]
+    },
+    {
+      "file": "PAGE_REQUIREMENTS_TEMPLATE.md",
+      "scores": {
+        "headerCompleteness": 60,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 47,
+      "quality": "low",
+      "issues": [
+        "缺少头部字段: title, status",
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "完善文档头部信息，添加所有必需字段",
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "PAYMENT_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "PRIVATE_COACH_BOOKING_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 51,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "RESPONSIVE_STRATEGY_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 33.33333333333333,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 50,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 46,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 设计关键词, 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "视觉设计规范缺失",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "补充视觉规范和响应式策略",
+        "添加相关文档链接"
+      ]
+    },
+    {
+      "file": "USER_CENTER_REQUIREMENTS.md",
+      "scores": {
+        "headerCompleteness": 100,
+        "structureCompliance": 66.66666666666666,
+        "functionalDescription": 0,
+        "acceptanceCriteria": 50,
+        "technicalImplementation": 33.33333333333333,
+        "visualDesign": 100,
+        "consistency": 100,
+        "readability": 70
+      },
+      "totalScore": 56,
+      "quality": "low",
+      "issues": [
+        "缺少标准章节: 相关文档",
+        "功能描述不够完整",
+        "验收标准不完整",
+        "技术实现说明不足",
+        "缺少相关文档引用",
+        "章节结构不清晰"
+      ],
+      "suggestions": [
+        "按照模板添加缺失的标准章节",
+        "补充功能需求描述、交互流程和数据结构",
+        "添加详细的验收标准和测试策略",
+        "补充技术实现方案、API规范和边界场景处理",
+        "添加相关文档链接"
+      ]
+    }
+  ],
+  "improvementSuggestions": [
+    {
+      "issue": "验收标准不完整",
+      "frequency": 42,
+      "percentage": "100.0%"
+    },
+    {
+      "issue": "技术实现说明不足",
+      "frequency": 42,
+      "percentage": "100.0%"
+    },
+    {
+      "issue": "章节结构不清晰",
+      "frequency": 42,
+      "percentage": "100.0%"
+    },
+    {
+      "issue": "功能描述不够完整",
+      "frequency": 41,
+      "percentage": "97.6%"
+    },
+    {
+      "issue": "缺少相关文档引用",
+      "frequency": 39,
+      "percentage": "92.9%"
+    },
+    {
+      "issue": "缺少标准章节: 相关文档",
+      "frequency": 31,
+      "percentage": "73.8%"
+    },
+    {
+      "issue": "视觉设计规范缺失",
+      "frequency": 25,
+      "percentage": "59.5%"
+    },
+    {
+      "issue": "缺少标准章节: 设计关键词, 相关文档",
+      "frequency": 7,
+      "percentage": "16.7%"
+    },
+    {
+      "issue": "缺少标准章节: 设计关键词, 验收标准, 相关文档",
+      "frequency": 3,
+      "percentage": "7.1%"
+    },
+    {
+      "issue": "缺少标准章节: 设计关键词",
+      "frequency": 1,
+      "percentage": "2.4%"
+    }
+  ]
+}

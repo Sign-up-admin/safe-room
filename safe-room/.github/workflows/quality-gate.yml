@@ -1,0 +1,83 @@
+name: Quality Gate
+
+on: [push, pull_request]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Code quality checks
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint code
+        run: |
+          # 后端代码检查
+          mvn spotless:check -q
+
+          # 前端代码检查
+          if [ -d "springboot1ngh61a2/src/main/resources/front/front" ]; then
+            cd springboot1ngh61a2/src/main/resources/front/front
+            npm run lint
+          fi
+
+          if [ -d "springboot1ngh61a2/src/main/resources/admin/admin" ]; then
+            cd springboot1ngh61a2/src/main/resources/admin/admin
+            npm run lint
+          fi
+
+      - name: Run unit tests
+        run: |
+          # 后端单元测试
+          mvn test -Dspring.profiles.active=test -q
+
+          # 前端单元测试
+          if [ -d "springboot1ngh61a2/src/main/resources/front/front" ]; then
+            cd springboot1ngh61a2/src/main/resources/front/front
+            npm run test:unit
+          fi
+
+          if [ -d "springboot1ngh61a2/src/main/resources/admin/admin" ]; then
+            cd springboot1ngh61a2/src/main/resources/admin/admin
+            npm run test:unit
+          fi
+
+      - name: Security audit
+        run: |
+          npm audit --audit-level high
+          mvn dependency-check:check -q
+
+      - name: Test coverage
+        run: |
+          # 后端覆盖率
+          mvn test jacoco:report -q
+          # 检查最低覆盖率 (80%)
+          mvn jacoco:check -q
+
+          # 前端覆盖率
+          if [ -d "springboot1ngh61a2/src/main/resources/front/front" ]; then
+            cd springboot1ngh61a2/src/main/resources/front/front
+            npm run test:coverage
+            # 检查覆盖率阈值
+            npx istanbul check-coverage --statements 80 --branches 75 --functions 80 --lines 80
+          fi

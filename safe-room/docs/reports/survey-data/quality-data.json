@@ -1,0 +1,268 @@
+{
+  "timestamp": "2025-11-16T17:08:10.615Z",
+  "formatIssues": [
+    {
+      "file": "DOC_RELATIONSHIPS.md",
+      "issue": "缺少文档头部元数据"
+    }
+  ],
+  "contentIssues": [],
+  "linkIssues": [
+    {
+      "file": "OPEN_SOURCE.md",
+      "link": "../../issues",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "OPEN_SOURCE.md",
+      "link": "../../issues",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "OPEN_SOURCE.md",
+      "link": "../../pulls",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "OPEN_SOURCE.md",
+      "link": "../../wiki",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "FRONTEND_SECURITY_PRACTICES.md",
+      "link": "./API_SECURITY.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "DOCUMENTATION_GUIDE.md",
+      "link": "../technical/api/API.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "DOCUMENTATION_GUIDE.md",
+      "link": "../assets/architecture.png",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "DOCUMENTATION_GUIDE.md",
+      "link": "../../README.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "DOCUMENTATION_GUIDE.md",
+      "link": "../../CONTRIBUTING.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./ADMIN_OVERVIEW_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./requirements\\requirements\\ADMIN_LAYOUT_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./ADMIN_LOGIN_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./ADMIN_REGISTER_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./ADMIN_SYSTEM_MANAGEMENT_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_TECHNICAL_DOCUMENTATION.md",
+      "link": "./ADMIN_MODULE_CRUD_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "ADMIN_FRONTEND_SECURITY_IMPROVEMENTS.md",
+      "link": "./API_SECURITY.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\TESTING_TEMPLATE.md",
+      "link": "../requirements/REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\TESTING_TEMPLATE.md",
+      "link": "../technical/deployment/DEPLOYMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\TECHNICAL_TEMPLATE.md",
+      "link": "../architecture/ARCHITECTURE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\TECHNICAL_TEMPLATE.md",
+      "link": "../api/API.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\TECHNICAL_TEMPLATE.md",
+      "link": "../deployment/DEPLOYMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "templates\\REQUIREMENTS_TEMPLATE.md",
+      "link": "../development/testing/TESTING_STRATEGY.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "requirements\\ERROR_PAGES_REQUIREMENTS.md",
+      "link": "./DESIGN_SYSTEM_OVERVIEW.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "requirements\\ERROR_PAGES_REQUIREMENTS.md",
+      "link": "./requirements\\requirements\\requirements\\requirements\\PAGE_REQUIREMENTS_TEMPLATE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "requirements\\ERROR_PAGES_REQUIREMENTS.md",
+      "link": "./SECURITY.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "requirements\\ADMIN_LOGIN_REQUIREMENTS.md",
+      "link": "./requirements\\requirements\\ERROR_PAGES_REQUIREMENTS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "requirements\\ADMIN_LOGIN_REQUIREMENTS.md",
+      "link": "./SECURITY.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "reports\\DOCUMENTATION_ENGINEERING_SURVEY_PLAN.md",
+      "link": "../development/guides/METHODOLOGY_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "reports\\DOCUMENTATION_ENGINEERING_ANALYSIS.md",
+      "link": "../guides/METHODOLOGY_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "reports\\DOCUMENTATION_ENGINEERING_ANALYSIS.md",
+      "link": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\TESTING_STRATEGY.md",
+      "link": "../FRONTEND_TESTING_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\TESTING_IMPLEMENTATION.md",
+      "link": "../FRONTEND_TESTING_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\TESTING_EXAMPLES.md",
+      "link": "../FRONTEND_TESTING_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\TESTING_BEST_PRACTICES.md",
+      "link": "../FRONTEND_TESTING_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\METHODOLOGY_GUIDE.md",
+      "link": "../guides/DEVELOPMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\METHODOLOGY_GUIDE.md",
+      "link": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\DOC_TOOLS_GUIDE.md",
+      "link": "../development\\development\\development\\development\\DOCUMENTATION_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\DOC_TOOLS_GUIDE.md",
+      "link": "../DOCUMENTATION_ENGINEERING_ANALYSIS.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\DOC_TOOLS_GUIDE.md",
+      "link": "../../.doc-metadata.json",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\DOC_TOOLS_GUIDE.md",
+      "link": "../../.doc-classification-rules.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\DOCUMENTATION_GUIDE.md",
+      "link": "../assets/architecture.png",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DEPLOYMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DOCKER.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DEPLOYMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DOCKER.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DEPLOYMENT.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../DOCKER.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../TESTING.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "technical\\deployment\\README.md",
+      "link": "../../LICENSE",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\guides\\DOC_TOOLS_GUIDE.md",
+      "link": "../development\\development\\DOCUMENTATION_GUIDE.md",
+      "issue": "内部链接指向不存在的文件"
+    },
+    {
+      "file": "development\\guides\\DOC_TOOLS_GUIDE.md",
+      "link": "../DOCUMENTATION_ENGINEERING_ANALYSIS.md",
+      "issue": "内部链接指向不存在的文件"
+    }
+  ],
+  "metadataCompleteness": {}
+}

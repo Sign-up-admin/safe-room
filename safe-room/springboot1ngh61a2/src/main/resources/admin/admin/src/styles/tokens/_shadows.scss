@@ -1,0 +1,23 @@
+// Admin 阴影设计令牌
+
+:root {
+  --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --admin-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --admin-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --admin-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --admin-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --admin-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --admin-shadow-glow: 0 0 16px rgba(58, 128, 255, 0.2);
+
+  /* Legacy aliases */
+  --shadow-soft: var(--admin-shadow-soft);
+}
+
+// SCSS 变量
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05) !default;
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06) !default;
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08) !default;
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1) !default;
+$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.12) !default;
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08) !default;
+$shadow-glow: 0 0 16px rgba(58, 128, 255, 0.2) !default;

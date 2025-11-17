@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist
+build
+*.min.js
+*.min.css
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Generated files
+coverage
+.nyc_output
+*.tsbuildinfo
+
+# Config files that shouldn't be formatted
+*.config.js
+*.config.cjs
+*.config.mjs
+

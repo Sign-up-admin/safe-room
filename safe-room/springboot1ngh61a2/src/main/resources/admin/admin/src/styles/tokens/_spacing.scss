@@ -1,0 +1,32 @@
+// Admin 间距设计令牌
+@use 'sass:map';
+
+:root {
+  --admin-spacing-xs: 8px;
+  --admin-spacing-sm: 12px;
+  --admin-spacing-md: 16px;
+  --admin-spacing-lg: 24px;
+  --admin-spacing-xl: 32px;
+  --admin-spacing-xxl: 48px;
+
+  /* Legacy aliases */
+  --spacing-xs: var(--admin-spacing-xs);
+  --spacing-sm: var(--admin-spacing-sm);
+  --spacing-md: var(--admin-spacing-md);
+  --spacing-lg: var(--admin-spacing-lg);
+  --spacing-xl: var(--admin-spacing-xl);
+}
+
+// SCSS 变量和函数
+$spacing-map: (
+  xs: 8px,
+  sm: 12px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px,
+  xxl: 48px,
+) !default;
+
+@function spacing($size) {
+  @return map.get($spacing-map, $size);
+}

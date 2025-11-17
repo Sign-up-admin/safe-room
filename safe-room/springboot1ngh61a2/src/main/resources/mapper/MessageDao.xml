@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.MessageDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.MessageEntity" id="messageMap">
+        <result property="userid" column="userid"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="type" column="type"/>
+        <result property="isread" column="isread"/>
+        <result property="relatedType" column="related_type"/>
+        <result property="relatedId" column="related_id"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.MessageVO" >
+		SELECT * FROM messages  messages
+		<if test="ew != null and ew.sqlSegment != null and ew.sqlSegment.trim() != ''">
+            <choose>
+                <when test="ew.sqlSegment.trim().matches('(?i)^\\s*(ORDER|GROUP|HAVING|LIMIT)\\s+.*')">
+                    ${ew.sqlSegment}
+                </when>
+                <otherwise>
+                    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                        ${ew.sqlSegment}
+                    </trim>
+                </otherwise>
+            </choose>
+        </if>
+	</select>
+
+	<select id="selectVO"
+		resultType="com.entity.vo.MessageVO" >
+		SELECT  messages.* FROM messages  messages
+ 		<if test="ew != null and ew.sqlSegment != null and ew.sqlSegment.trim() != ''">
+            <choose>
+                <when test="ew.sqlSegment.trim().matches('(?i)^\\s*(ORDER|GROUP|HAVING|LIMIT)\\s+.*')">
+                    ${ew.sqlSegment}
+                </when>
+                <otherwise>
+                    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                        ${ew.sqlSegment}
+                    </trim>
+                </otherwise>
+            </choose>
+        </if>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.MessageView" >
+
+		SELECT  messages.* FROM messages  messages
+		<if test="ew != null and ew.sqlSegment != null and ew.sqlSegment.trim() != ''">
+            <choose>
+                <when test="ew.sqlSegment.trim().matches('(?i)^\\s*(ORDER|GROUP|HAVING|LIMIT)\\s+.*')">
+                    ${ew.sqlSegment}
+                </when>
+                <otherwise>
+                    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                        ${ew.sqlSegment}
+                    </trim>
+                </otherwise>
+            </choose>
+        </if>
+	</select>
+
+	<select id="selectView"
+		resultType="com.entity.view.MessageView" >
+		SELECT * FROM messages  messages <if test="ew != null and ew.sqlSegment != null and ew.sqlSegment.trim() != ''">
+            <choose>
+                <when test="ew.sqlSegment.trim().matches('(?i)^\\s*(ORDER|GROUP|HAVING|LIMIT)\\s+.*')">
+                    ${ew.sqlSegment}
+                </when>
+                <otherwise>
+                    <trim prefix="WHERE" prefixOverrides="AND |OR ">
+                        ${ew.sqlSegment}
+                    </trim>
+                </otherwise>
+            </choose>
+        </if>
+	</select>
+
+
+</mapper>

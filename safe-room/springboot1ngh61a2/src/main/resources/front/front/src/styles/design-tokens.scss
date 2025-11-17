@@ -1,0 +1,217 @@
+// =================================
+// Design Token System - Legacy Support
+// =================================
+
+// Import the new token system
+@import 'tokens/index';
+
+// Legacy theme variables (for backward compatibility)
+:root {
+  /* Legacy Theme Variables */
+  --tech-color-bg-deep: var(--color-bg-deep);
+  --tech-color-bg-dark: var(--color-bg-dark);
+  --tech-color-panel: var(--color-bg-card);
+  --tech-color-panel-strong: var(--color-bg-panel);
+  --tech-color-panel-ghost: var(--color-bg-ghost);
+  --tech-color-yellow: var(--color-primary);
+  --tech-color-yellow-soft: var(--color-primary-soft);
+  --tech-color-yellow-glow: var(--color-primary-glow);
+  --tech-color-text-primary: var(--color-text-primary);
+  --tech-color-text-secondary: var(--color-text-secondary);
+  --tech-color-text-muted: var(--color-text-muted);
+  --tech-color-border: var(--color-border-light);
+  --tech-color-divider: var(--color-divider);
+
+  /* Legacy aliases to avoid regressions */
+  --color-bg-deep: var(--tech-color-bg-deep);
+  --color-bg-dark: var(--tech-color-bg-dark);
+  --color-bg-panel: var(--tech-color-panel);
+  --color-yellow: var(--tech-color-yellow);
+  --color-yellow-soft: var(--tech-color-yellow-soft);
+  --color-yellow-glow: var(--tech-color-yellow-glow);
+  --color-text-primary: var(--tech-color-text-primary);
+  --color-text-secondary: var(--tech-color-text-secondary);
+  --color-text-muted: var(--tech-color-text-muted);
+  --color-border: var(--tech-color-border);
+  --color-divider: var(--tech-color-divider);
+  --card-radius: var(--border-radius-2xl);
+  --transition-base: var(--transition-normal);
+  --shadow-soft: var(--shadow-xl);
+  --spacing-xs: var(--spacing-6);
+  --spacing-sm: var(--spacing-8);
+  --spacing-md: var(--spacing-12);
+  --spacing-lg: var(--spacing-16);
+  --spacing-xl: var(--spacing-24);
+
+  /* Element Plus overrides */
+  --el-color-primary: var(--color-primary);
+  --el-color-primary-light-3: #ffe766;
+  --el-color-primary-light-5: #ffef99;
+  --el-color-primary-light-7: #fff6cc;
+  --el-color-primary-light-8: rgba(253, 216, 53, 0.4);
+  --el-color-primary-light-9: rgba(253, 216, 53, 0.2);
+  --el-color-primary-dark-2: #c4a900;
+  --el-text-color-primary: var(--color-text-primary);
+  --el-text-color-regular: #d5d8de;
+  --el-text-color-secondary: var(--color-text-secondary);
+  --el-bg-color: var(--color-bg-dark);
+  --el-fill-color-blank: var(--color-bg-ghost);
+  --el-border-color: var(--color-border-medium);
+}
+
+$color-bg-deep: #020202 !default;
+$color-bg-dark: #0a0a0a !default;
+$color-bg-primary: #0a0a0a !default;
+$color-panel: rgba(10, 10, 10, 0.78) !default;
+$color-panel-primary: rgba(10, 10, 10, 0.78) !default;
+$color-panel-strong: rgba(8, 8, 8, 0.92) !default;
+$color-panel-ghost: rgba(255, 255, 255, 0.04) !default;
+$color-yellow: #fdd835 !default;
+$color-yellow-soft: rgba(253, 216, 53, 0.2) !default;
+$color-yellow-glow: rgba(253, 216, 53, 0.35) !default;
+$color-text-primary: #f7fbea !default;
+$color-text-secondary: #9ea1a6 !default;
+$color-text-tertiary: #6f737c !default;
+$color-text-muted: #6f737c !default;
+$color-border: rgba(253, 216, 53, 0.22) !default;
+$color-divider: rgba(255, 255, 255, 0.08) !default;
+$shadow-soft: 0 25px 80px rgba(0, 0, 0, 0.45) !default;
+$shadow-glow: 0 0 32px rgba(253, 216, 53, 0.35) !default;
+$card-radius: 22px !default;
+$spacing-map: (
+  xs: 8px,
+  sm: 12px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px,
+) !default;
+$transition-base: 0.35s cubic-bezier(0.4, 0, 0.2, 1) !default;
+$font-family-base: 'Montserrat', 'Segoe UI', 'PingFang SC', 'HarmonyOS Sans', 'Roboto', sans-serif !default;
+
+@mixin glass-card($background: $color-panel, $radius: $card-radius) {
+  background: $background;
+  border-radius: $radius;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-soft;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+  }
+}
+
+@mixin yellow-button($isOutline: false, $height: 52px) {
+  border-radius: 999px;
+  height: $height;
+  padding: 0 28px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  transition: $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  @if $isOutline {
+    background: transparent;
+    color: $color-yellow;
+    border: 1px solid $color-yellow;
+  } @else {
+    background: linear-gradient(120deg, #fdd835, #f6c300);
+    color: #0a0a0a;
+    border: none;
+    box-shadow: 0 12px 35px rgba(253, 216, 53, 0.35);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(253, 216, 53, 0.45);
+  }
+}
+
+@mixin section-eyebrow {
+  color: $color-yellow;
+  letter-spacing: 0.35em;
+  font-size: 0.85rem;
+}
+
+@mixin form-field-dark {
+  .el-input,
+  .el-select,
+  .el-date-editor {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper),
+  :deep(.el-select__wrapper),
+  :deep(.el-date-editor.el-input__wrapper) {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  :deep(.el-input__inner),
+  :deep(.el-select__placeholder),
+  :deep(.el-input__placeholder) {
+    color: $color-text-secondary;
+  }
+
+  :deep(.is-focus .el-input__wrapper),
+  :deep(.is-focus .el-select__wrapper),
+  :deep(.is-active .el-input__wrapper) {
+    border-color: $color-yellow;
+    box-shadow: 0 0 24px rgba(253, 216, 53, 0.2);
+  }
+}
+
+@mixin hover-glow($scale: 1.02, $glow: $shadow-glow) {
+  transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+
+  &:hover {
+    transform: translateY(-4px) scale($scale);
+    box-shadow: $glow;
+    border-color: $color-yellow;
+  }
+}
+
+@mixin pill {
+  border-radius: 999px;
+  padding: 4px 14px;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+}
+
+@mixin card-heading($eyebrow: true) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  @if $eyebrow {
+    .section-eyebrow {
+      @include section-eyebrow;
+    }
+  }
+
+  h2,
+  h3 {
+    margin: 0;
+    letter-spacing: 0.12em;
+  }
+
+  p {
+    margin: 0;
+    color: $color-text-secondary;
+  }
+}
+
+@function spacing($size) {
+  @return map-get($spacing-map, $size);
+}
+
+

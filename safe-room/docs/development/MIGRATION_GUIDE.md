@@ -1,0 +1,2290 @@
+---
+title: MIGRATION GUIDE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: development
+---# 迁移指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: DevOps团队
+
+## 概述
+
+本文档详细介绍健身房综合管理系统从传统部署方式向现代化云原生架构的迁移策略，包括Docker Compose到Kubernetes的迁移、数据迁移、应用重构等完整的迁移方案，确保业务连续性和系统稳定性。
+
+## 目录
+
+- [1. 迁移规划](#1-迁移规划)
+- [2. Docker Compose 到 Kubernetes 迁移](#2-docker-compose-到-kubernetes-迁移)
+- [3. 数据迁移策略](#3-数据迁移策略)
+- [4. 应用现代化改造](#4-应用现代化改造)
+- [5. 零停机迁移方案](#5-零停机迁移方案)
+- [6. 混合运行期管理](#6-混合运行期管理)
+- [7. 回滚策略](#7-回滚策略)
+- [8. 性能优化](#8-性能优化)
+- [9. 监控和验证](#9-监控和验证)
+- [10. 迁移后的运维](#10-迁移后的运维)
+
+---
+
+## 1. 迁移规划
+
+### 1.1 迁移评估
+
+#### 当前架构分析
+
+```bash
+# 分析当前Docker Compose环境
+cd /path/to/current/docker-compose
+docker-compose ps
+docker stats
+docker system df
+
+# 收集应用依赖关系
+docker-compose config > docker-compose-resolved.yaml
+
+# 分析网络流量
+docker network ls
+docker network inspect fitness-network
+
+# 分析数据卷使用情况
+docker volume ls
+docker volume inspect fitness_db_data
+```
+
+#### 迁移复杂度评估
+
+```yaml
+# 迁移评估清单
+migration_assessment:
+  applications:
+    - name: fitness-api
+      complexity: medium
+      dependencies: [postgresql, redis]
+      stateful: false
+      external_services: [payment-gateway]
+    
+    - name: fitness-frontend
+      complexity: low
+      dependencies: [fitness-api]
+      stateful: false
+      static_assets: true
+    
+    - name: fitness-db
+      complexity: high
+      dependencies: []
+      stateful: true
+      data_size: 50GB
+    
+    - name: fitness-cache
+      complexity: low
+      dependencies: []
+      stateful: false
+      persistence: false
+
+  infrastructure:
+    networking: docker-networks
+    storage: docker-volumes
+    secrets: environment-variables
+    config: docker-compose.yml
+    
+  risks:
+    - data_loss: medium
+    - downtime: high
+    - performance_degradation: low
+    - compatibility_issues: medium
+
+  timeline: 4-6 weeks
+  team_resources: 3-4 engineers
+```
+
+### 1.2 迁移策略选择
+
+#### 迁移策略对比
+
+| 策略 | 优点 | 缺点 | 适用场景 |
+|------|------|------|----------|
+| **大爆炸迁移** | 快速、一致性好 | 高风险、长停机时间 | 小型应用、测试环境 |
+| **蓝绿部署** | 零停机、可快速回滚 | 需要双倍资源 | 关键业务系统 |
+| **金丝雀发布** | 渐进式、低风险 | 复杂、需要监控 | 大型复杂系统 |
+| **混合运行** | 平滑过渡、最小风险 | 维护成本高 | 长期迁移策略 |
+
+#### 推荐迁移路径
+
+```mermaid
+graph TD
+    A[评估当前环境] --> B[选择迁移策略]
+    B --> C{策略类型}
+    
+    C --> D[蓝绿部署]
+    C --> E[金丝雀发布]
+    C --> F[混合运行]
+    
+    D --> G[准备新环境]
+    E --> G
+    F --> H[配置服务网格]
+    
+    G --> I[数据同步]
+    H --> I
+    
+    I --> J[流量切换]
+    J --> K[验证迁移]
+    K --> L{验证通过?}
+    
+    L --> M[清理旧环境]
+    L --> N[回滚]
+    
+    N --> O[问题修复]
+    O --> J
+    
+    M --> P[迁移完成]
+```
+
+### 1.3 迁移团队组建
+
+#### 团队角色定义
+
+```yaml
+migration_team:
+  project_manager:
+    responsibilities:
+      - 制定迁移计划
+      - 协调各方资源
+      - 风险管理
+      - 进度跟踪
+    
+  platform_engineer:
+    responsibilities:
+      - Kubernetes集群搭建
+      - 基础设施即代码
+      - CI/CD流水线
+      - 监控告警配置
+    
+  application_developer:
+    responsibilities:
+      - 应用容器化改造
+      - 配置外部化
+      - 健康检查实现
+      - 性能调优
+    
+  database_administrator:
+    responsibilities:
+      - 数据迁移设计
+      - 数据库高可用配置
+      - 备份恢复策略
+      - 性能监控
+    
+  qa_engineer:
+    responsibilities:
+      - 自动化测试
+      - 性能测试
+      - 兼容性测试
+      - 回归测试
+    
+  security_engineer:
+    responsibilities:
+      - 安全评估
+      - 合规检查
+      - 访问控制
+      - 加密配置
+```
+
+---
+
+## 2. Docker Compose 到 Kubernetes 迁移
+
+### 2.1 分析现有配置
+
+#### Docker Compose 配置解析
+
+```yaml
+# docker-compose.yml 分析
+version: '3.8'
+services:
+  fitness-api:
+    image: fitness-gym/backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=fitness-db
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - fitness-db
+      - fitness-redis
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - fitness-network
+
+  fitness-db:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=fitness_gym
+      - POSTGRES_USER=fitness_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - fitness_db_data:/var/lib/postgresql/data
+    networks:
+      - fitness-network
+
+  fitness-redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - fitness_redis_data:/data
+    networks:
+      - fitness-network
+
+volumes:
+  fitness_db_data:
+  fitness_redis_data:
+
+networks:
+  fitness-network:
+    driver: bridge
+```
+
+#### 服务依赖关系图
+
+```mermaid
+graph TD
+    A[fitness-api] --> B[fitness-db]
+    A --> C[fitness-redis]
+    A --> D[fitness-frontend]
+    
+    D --> A
+    
+    B --> E[(PostgreSQL Data)]
+    C --> F[(Redis Data)]
+    
+    A --> G[External Services]
+    G --> H[Payment Gateway]
+    G --> I[Email Service]
+```
+
+### 2.2 创建 Kubernetes 资源
+
+#### Namespace 创建
+
+```yaml
+# fitness-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fitness-prod
+  labels:
+    name: fitness-prod
+    environment: production
+    team: fitness-gym
+spec: {}
+---
+# 资源配额
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: fitness-prod-quota
+  namespace: fitness-prod
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+    persistentvolumeclaims: "10"
+    pods: "50"
+    services: "20"
+```
+
+#### ConfigMap 迁移
+
+```yaml
+# fitness-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fitness-config
+  namespace: fitness-prod
+data:
+  # 从 environment 变量迁移
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_HOST: "fitness-db-service"  # 服务名称变化
+  DB_PORT: "5432"
+  DB_NAME: "fitness_gym"
+  REDIS_HOST: "fitness-redis-service"
+  REDIS_PORT: "6379"
+  
+  # 新增配置
+  JAVA_OPTS: "-Xmx1g -Xms512m"
+  LOG_LEVEL: "INFO"
+  HEALTH_CHECK_PATH: "/actuator/health"
+```
+
+#### Secret 迁移
+
+```yaml
+# fitness-secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fitness-secrets
+  namespace: fitness-prod
+type: Opaque
+data:
+  # 从环境变量迁移，base64编码
+  db-password: cG9zdGdyZXNfcGFzc3dvcmQ=  # postgres_password
+  redis-password: cmVkaXNfcGFzc3dvcmQ=    # redis_password
+  jwt-secret: eW91cl9qd3Rfc2VjcmV0X2tleQ==  # your_jwt_secret_key
+```
+
+#### Deployment 转换
+
+```yaml
+# fitness-api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api
+  namespace: fitness-prod
+  labels:
+    app: fitness-api
+    version: v1.0.0
+spec:
+  replicas: 3  # 从单个容器扩展为3个副本
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: fitness-api
+  template:
+    metadata:
+      labels:
+        app: fitness-api
+        version: v1.0.0
+    spec:
+      containers:
+      - name: fitness-api
+        image: fitness-gym/backend:latest
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: fitness-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fitness-secrets
+              key: db-password
+        envFrom:
+        - configMapRef:
+            name: fitness-config
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      - name: logs
+        emptyDir: {}
+```
+
+#### Service 创建
+
+```yaml
+# fitness-api-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-api-service
+  namespace: fitness-prod
+  labels:
+    app: fitness-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: fitness-api
+---
+# fitness-db-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-db-service
+  namespace: fitness-prod
+  labels:
+    app: fitness-db
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgresql
+  selector:
+    app: fitness-db
+```
+
+#### PersistentVolumeClaim 转换
+
+```yaml
+# fitness-db-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fitness-db-pvc
+  namespace: fitness-prod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard  # 指定存储类
+  resources:
+    requests:
+      storage: 50Gi  # 从 docker volume 大小映射
+
+---
+# fitness-redis-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fitness-redis-pvc
+  namespace: fitness-prod
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 8Gi
+```
+
+### 2.3 数据库迁移
+
+#### PostgreSQL StatefulSet
+
+```yaml
+# fitness-db-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fitness-db
+  namespace: fitness-prod
+spec:
+  serviceName: fitness-db-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fitness-db
+  template:
+    metadata:
+      labels:
+        app: fitness-db
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:14
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: fitness-config
+              key: DB_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: fitness-config
+              key: DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fitness-secrets
+              key: db-password
+        volumeMounts:
+        - name: fitness-db-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - fitness_user
+            - -d
+            - fitness_gym
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - fitness_user
+            - -d
+            - fitness_gym
+          initialDelaySeconds: 5
+          periodSeconds: 5
+  volumeClaimTemplates:
+  - metadata:
+      name: fitness-db-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 50Gi
+```
+
+#### Redis Deployment
+
+```yaml
+# fitness-redis-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-redis
+  namespace: fitness-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fitness-redis
+  template:
+    metadata:
+      labels:
+        app: fitness-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        command: ["redis-server", "--appendonly", "yes"]
+        volumeMounts:
+        - name: fitness-redis-data
+          mountPath: /data
+        livenessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: fitness-redis-data
+        persistentVolumeClaim:
+          claimName: fitness-redis-pvc
+```
+
+### 2.4 Ingress 配置
+
+```yaml
+# fitness-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fitness-ingress
+  namespace: fitness-prod
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api.fitness-gym.com
+    - www.fitness-gym.com
+    secretName: fitness-gym-tls
+  rules:
+  - host: api.fitness-gym.com
+    http:
+      paths:
+      - path: /springboot1ngh61a2
+        pathType: Prefix
+        backend:
+          service:
+            name: fitness-api-service
+            port:
+              number: 8080
+  - host: www.fitness-gym.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: fitness-frontend-service
+            port:
+              number: 80
+```
+
+### 2.5 迁移执行脚本
+
+```bash
+#!/bin/bash
+# Docker Compose 到 Kubernetes 迁移脚本
+
+set -e
+
+echo "开始迁移健身房管理系统..."
+
+# 1. 验证当前环境
+echo "步骤1: 验证当前Docker Compose环境"
+docker-compose ps
+if [ $? -ne 0 ]; then
+    echo "错误: Docker Compose环境异常"
+    exit 1
+fi
+
+# 2. 创建Kubernetes资源
+echo "步骤2: 创建Kubernetes命名空间和配置"
+kubectl apply -f fitness-namespace.yaml
+kubectl apply -f fitness-configmap.yaml
+kubectl apply -f fitness-secrets.yaml
+
+# 3. 部署数据库（先部署有状态服务）
+echo "步骤3: 部署PostgreSQL数据库"
+kubectl apply -f fitness-db-pvc.yaml
+kubectl apply -f fitness-db-service.yaml
+kubectl apply -f fitness-db-statefulset.yaml
+
+# 等待数据库就绪
+echo "等待数据库启动..."
+kubectl wait --for=condition=ready pod -l app=fitness-db --timeout=300s -n fitness-prod
+
+# 4. 迁移数据
+echo "步骤4: 执行数据迁移"
+./migrate-database.sh
+
+# 5. 部署Redis缓存
+echo "步骤5: 部署Redis缓存"
+kubectl apply -f fitness-redis-pvc.yaml
+kubectl apply -f fitness-redis-deployment.yaml
+kubectl apply -f fitness-redis-service.yaml
+
+# 等待Redis就绪
+kubectl wait --for=condition=ready pod -l app=fitness-redis --timeout=180s -n fitness-prod
+
+# 6. 部署应用服务
+echo "步骤6: 部署应用服务"
+kubectl apply -f fitness-api-deployment.yaml
+kubectl apply -f fitness-api-service.yaml
+
+# 等待应用就绪
+kubectl wait --for=condition=ready pod -l app=fitness-api --timeout=300s -n fitness-prod
+
+# 7. 部署Ingress
+echo "步骤7: 配置Ingress"
+kubectl apply -f fitness-ingress.yaml
+
+# 8. 验证迁移
+echo "步骤8: 验证迁移结果"
+./validate-migration.sh
+
+echo "迁移完成！"
+echo "旧环境仍在运行，可以进行流量切换测试"
+```
+
+---
+
+## 3. 数据迁移策略
+
+### 3.1 数据库迁移
+
+#### 逻辑备份和恢复
+
+```bash
+#!/bin/bash
+# PostgreSQL 数据迁移脚本
+
+# 源数据库信息
+SOURCE_HOST="localhost"
+SOURCE_DB="fitness_gym"
+SOURCE_USER="fitness_user"
+
+# 目标数据库信息
+TARGET_HOST="fitness-db-service"
+TARGET_DB="fitness_gym"
+TARGET_USER="fitness_user"
+
+# 1. 创建源数据库备份
+echo "创建源数据库备份..."
+docker exec fitness-db pg_dump -h $SOURCE_HOST -U $SOURCE_USER -d $SOURCE_DB --no-owner --no-acl > fitness_backup.sql
+
+# 2. 迁移数据到目标数据库
+echo "迁移数据到目标数据库..."
+kubectl exec -n fitness-prod deployment/fitness-db -- bash -c "
+psql -U $TARGET_USER -d $TARGET_DB -f - < /dev/stdin
+" < fitness_backup.sql
+
+# 3. 验证数据完整性
+echo "验证数据迁移..."
+SOURCE_COUNT=$(docker exec fitness-db psql -h $SOURCE_HOST -U $SOURCE_USER -d $SOURCE_DB -t -c "SELECT COUNT(*) FROM users;")
+TARGET_COUNT=$(kubectl exec -n fitness-prod deployment/fitness-db -- psql -U $TARGET_USER -d $TARGET_DB -t -c "SELECT COUNT(*) FROM users;")
+
+if [ "$SOURCE_COUNT" -eq "$TARGET_COUNT" ]; then
+    echo "数据迁移验证通过"
+else
+    echo "数据迁移验证失败"
+    exit 1
+fi
+```
+
+#### 持续数据同步
+
+```bash
+#!/bin/bash
+# 使用pglogical进行持续同步
+
+# 在源数据库上安装pglogical
+docker exec fitness-db psql -U postgres -d fitness_gym -c "
+CREATE EXTENSION pglogical;
+SELECT pglogical.create_node(node_name := 'source_node', dsn := 'host=localhost port=5432 user=postgres dbname=fitness_gym');
+SELECT pglogical.replication_set_add_table(set_name := 'default', relation := 'users', synchronize_data := true);
+SELECT pglogical.replication_set_add_table(set_name := 'default', relation := 'courses', synchronize_data := true);
+SELECT pglogical.replication_set_add_table(set_name := 'default', relation := 'bookings', synchronize_data := true);
+"
+
+# 在目标数据库上配置订阅
+kubectl exec -n fitness-prod deployment/fitness-db -- psql -U postgres -d fitness_gym -c "
+CREATE EXTENSION pglogical;
+SELECT pglogical.create_node(node_name := 'target_node', dsn := 'host=localhost port=5432 user=postgres dbname=fitness_gym');
+SELECT pglogical.create_subscription(subscription_name := 'fitness_sync', provider_dsn := 'host=docker-host port=5432 user=postgres dbname=fitness_gym');
+"
+
+# 监控同步状态
+kubectl exec -n fitness-prod deployment/fitness-db -- psql -U postgres -d fitness_gym -c "
+SELECT * FROM pglogical.show_subscription_status();
+"
+```
+
+### 3.2 文件和配置迁移
+
+#### 静态文件迁移
+
+```bash
+#!/bin/bash
+# 静态文件迁移脚本
+
+# 1. 打包静态文件
+docker exec fitness-app tar czf /tmp/static-files.tar.gz -C /app static/
+
+# 2. 复制到本地
+docker cp fitness-app:/tmp/static-files.tar.gz .
+
+# 3. 上传到Kubernetes持久卷或对象存储
+# 选项1: 复制到PV
+kubectl cp static-files.tar.gz fitness-prod/fitness-api-pod:/tmp/
+kubectl exec -n fitness-prod fitness-api-pod -- tar xzf /tmp/static-files.tar.gz -C /app/static/
+
+# 选项2: 上传到MinIO对象存储
+mc cp static-files.tar.gz myminio/fitness-files/
+
+# 4. 验证文件完整性
+SOURCE_MD5=$(docker exec fitness-app find /app/static -type f -exec md5sum {} \; | sort | md5sum)
+TARGET_MD5=$(kubectl exec -n fitness-prod fitness-api-pod -- find /app/static -type f -exec md5sum {} \; | sort | md5sum)
+
+if [ "$SOURCE_MD5" == "$TARGET_MD5" ]; then
+    echo "静态文件迁移验证通过"
+else
+    echo "静态文件迁移验证失败"
+    exit 1
+fi
+```
+
+#### 配置迁移
+
+```bash
+#!/bin/bash
+# 配置迁移脚本
+
+# 1. 提取Docker Compose配置
+docker-compose config > docker-compose-resolved.yml
+
+# 2. 转换环境变量
+# 提取环境变量
+grep -o '\${[^}]*}' docker-compose-resolved.yml | sort | uniq > env_vars.txt
+
+# 3. 创建Kubernetes ConfigMap和Secret
+# 从环境变量文件生成
+kubectl create configmap fitness-config --from-env-file=env.list -n fitness-prod
+kubectl create secret generic fitness-secrets --from-env-file=secrets.list -n fitness-prod
+
+# 4. 验证配置
+kubectl get configmap fitness-config -o yaml -n fitness-prod
+kubectl get secret fitness-secrets -o yaml -n fitness-prod
+```
+
+### 3.3 大数据量迁移
+
+#### 分批迁移策略
+
+```bash
+#!/bin/bash
+# 大数据量分批迁移脚本
+
+BATCH_SIZE=10000
+TABLES=("users" "courses" "bookings" "payments")
+
+for table in "${TABLES[@]}"; do
+    echo "迁移表: $table"
+    
+    # 获取总记录数
+    TOTAL_COUNT=$(docker exec fitness-db psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM $table;")
+    
+    # 计算批次数
+    BATCH_COUNT=$(( (TOTAL_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
+    
+    for ((batch=0; batch<BATCH_COUNT; batch++)); do
+        OFFSET=$((batch * BATCH_SIZE))
+        
+        echo "迁移批次 $((batch+1))/$BATCH_COUNT (偏移: $OFFSET)"
+        
+        # 导出批次数据
+        docker exec fitness-db psql -U fitness_user -d fitness_gym -c "
+        \COPY (SELECT * FROM $table ORDER BY id LIMIT $BATCH_SIZE OFFSET $OFFSET) TO '/tmp/${table}_batch_${batch}.csv' WITH CSV HEADER;
+        "
+        
+        # 导入到目标数据库
+        docker cp fitness-db:/tmp/${table}_batch_${batch}.csv .
+        kubectl cp ${table}_batch_${batch}.csv fitness-prod/fitness-db-pod:/tmp/
+        
+        kubectl exec -n fitness-prod fitness-db-pod -- psql -U fitness_user -d fitness_gym -c "
+        \COPY $table FROM '/tmp/${table}_batch_${batch}.csv' WITH CSV HEADER;
+        "
+        
+        # 清理临时文件
+        rm ${table}_batch_${batch}.csv
+        
+        # 验证批次完整性
+        BATCH_TARGET_COUNT=$(kubectl exec -n fitness-prod fitness-db-pod -- psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM $table;")
+        echo "目标数据库记录数: $BATCH_TARGET_COUNT"
+    done
+done
+
+echo "分批迁移完成"
+```
+
+---
+
+## 4. 应用现代化改造
+
+### 4.1 容器化改造
+
+#### Dockerfile 优化
+
+```dockerfile
+# 优化后的生产级Dockerfile
+FROM eclipse-temurin:21-jre-jammy AS runtime
+
+# 创建非root用户
+RUN groupadd -r fitness && useradd -r -g fitness fitness
+
+# 设置工作目录
+WORKDIR /app
+
+# 创建日志目录
+RUN mkdir -p /app/logs && chown -R fitness:fitness /app
+
+# 复制应用JAR包
+COPY --chown=fitness:fitness target/fitness-gym-*.jar app.jar
+
+# 配置JVM参数
+ENV JAVA_OPTS="-Xmx1g -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# 切换到非root用户
+USER fitness
+
+# 暴露端口
+EXPOSE 8080
+
+# 启动命令
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+```
+
+#### 多阶段构建优化
+
+```dockerfile
+# 多阶段构建优化
+FROM maven:3.9.4-eclipse-temurin-21-alpine AS builder
+
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+COPY src ./src
+RUN mvn clean package -DskipTests -Dmaven.test.skip=true
+
+# 生产镜像
+FROM eclipse-temurin:21-jre-alpine AS production
+
+RUN addgroup -g 1001 -S fitness && \
+    adduser -u 1001 -S fitness -G fitness
+
+WORKDIR /app
+
+# 从构建阶段复制JAR
+COPY --from=builder --chown=fitness:fitness /app/target/*.jar app.jar
+
+# 安全配置
+RUN apk add --no-cache curl && \
+    rm -rf /var/cache/apk/*
+
+USER fitness
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+### 4.2 配置外部化
+
+#### Spring Boot 配置现代化
+
+```yaml
+# application.yml - 外部化配置
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: fitness-gym-api
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
+  
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fitness_gym}
+    username: ${DB_USER:fitness_user}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:20000}
+  
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    timeout: 2000ms
+    database: ${REDIS_DB:0}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: ${SHOW_SQL:false}
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080}
+
+logging:
+  level:
+    com.fitness.gym: ${LOG_LEVEL:INFO}
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /app/logs/fitness-gym.log
+    max-size: 100MB
+    max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# 应用特定配置
+fitness:
+  gym:
+    name: ${GYM_NAME:"Fitness Gym"}
+    max-members: ${MAX_MEMBERS:1000}
+    features:
+      online-booking: ${ENABLE_ONLINE_BOOKING:true}
+      payment-integration: ${ENABLE_PAYMENT:true}
+```
+
+### 4.3 健康检查和监控
+
+#### Spring Boot Actuator 配置
+
+```java
+@Configuration
+public class MonitoringConfig {
+
+    @Bean
+    public MeterRegistry meterRegistry() {
+        return new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    }
+
+    @Bean
+    public HealthIndicator dbHealthIndicator(DataSource dataSource) {
+        return new DataSourceHealthIndicator(dataSource);
+    }
+
+    @Bean
+    public HealthIndicator redisHealthIndicator(RedisConnectionFactory redisConnectionFactory) {
+        return new RedisHealthIndicator(redisConnectionFactory);
+    }
+}
+```
+
+#### 自定义健康检查
+
+```java
+@Component
+public class BusinessHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @Override
+    public Health health() {
+        try {
+            // 检查业务逻辑健康状态
+            long recentBookings = bookingRepository.countBookingsLastHour();
+            
+            if (recentBookings >= 0) {
+                return Health.up()
+                    .withDetail("recentBookings", recentBookings)
+                    .build();
+            } else {
+                return Health.down()
+                    .withDetail("error", "Unable to query recent bookings")
+                    .build();
+            }
+        } catch (Exception e) {
+            return Health.down(e)
+                .withDetail("error", "Database connection failed")
+                .build();
+        }
+    }
+}
+```
+
+### 4.4 应用性能优化
+
+#### JVM调优
+
+```yaml
+# Kubernetes中的JVM配置
+env:
+- name: JAVA_OPTS
+  value: |
+    -Xmx1024m
+    -Xms512m
+    -XX:+UseG1GC
+    -XX:MaxGCPauseMillis=200
+    -XX:+PrintGCDetails
+    -XX:+PrintGCTimeStamps
+    -XX:+PrintGCApplicationStoppedTime
+    -Xloggc:/app/logs/gc.log
+    -XX:+UseGCLogFileRotation
+    -XX:NumberOfGCLogFiles=5
+    -XX:GCLogFileSize=10m
+    -Djava.security.egd=file:/dev/./urandom
+```
+
+#### 连接池优化
+
+```yaml
+# HikariCP连接池配置
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+      validation-timeout: 5000
+      keepalive-time: 0
+```
+
+---
+
+## 5. 零停机迁移方案
+
+### 5.1 蓝绿部署迁移
+
+#### 蓝绿环境准备
+
+```yaml
+# 蓝色环境（当前生产环境）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api-blue
+  namespace: fitness-prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fitness-api
+      color: blue
+  template:
+    metadata:
+      labels:
+        app: fitness-api
+        color: blue
+        version: v1.0.0
+    spec:
+      containers:
+      - name: fitness-api
+        image: fitness-gym/api:v1.0.0
+        # ... 其他配置
+
+---
+# 绿色环境（新Kubernetes环境）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api-green
+  namespace: fitness-prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fitness-api
+      color: green
+  template:
+    metadata:
+      labels:
+        app: fitness-api
+        color: green
+        version: v2.0.0
+    spec:
+      containers:
+      - name: fitness-api
+        image: fitness-gym/api:v2.0.0
+        # ... 其他配置
+```
+
+#### 服务切换配置
+
+```yaml
+# 蓝色服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-api-blue
+  namespace: fitness-prod
+spec:
+  selector:
+    app: fitness-api
+    color: blue
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+---
+# 绿色服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-api-green
+  namespace: fitness-prod
+spec:
+  selector:
+    app: fitness-api
+    color: green
+  ports:
+  - port: 8080
+    targetPort: 8080
+
+---
+# 主服务（可切换选择器）
+apiVersion: v1
+kind: Service
+metadata:
+  name: fitness-api-service
+  namespace: fitness-prod
+spec:
+  selector:
+    app: fitness-api
+    color: blue  # 初始指向蓝色环境
+  ports:
+  - port: 8080
+    targetPort: 8080
+```
+
+#### 流量切换脚本
+
+```bash
+#!/bin/bash
+# 蓝绿部署流量切换脚本
+
+ENVIRONMENT=$1  # "blue" 或 "green"
+
+if [ "$ENVIRONMENT" != "blue" ] && [ "$ENVIRONMENT" != "green" ]; then
+    echo "无效的环境参数。使用: blue 或 green"
+    exit 1
+fi
+
+echo "切换到 $ENVIRONMENT 环境..."
+
+# 更新服务选择器
+kubectl patch service fitness-api-service -n fitness-prod --type='json' -p="[
+  {
+    'op': 'replace',
+    'path': '/spec/selector/color',
+    'value': '$ENVIRONMENT'
+  }
+]"
+
+# 验证切换
+echo "验证服务切换..."
+kubectl get service fitness-api-service -n fitness-prod -o jsonpath='{.spec.selector}'
+
+# 检查Pod状态
+echo "检查 $ENVIRONMENT 环境Pod状态..."
+kubectl get pods -l app=fitness-api,color=$ENVIRONMENT -n fitness-prod
+
+# 执行冒烟测试
+echo "执行冒烟测试..."
+if smoke_test $ENVIRONMENT; then
+    echo "✅ 切换成功，$ENVIRONMENT 环境运行正常"
+else
+    echo "❌ 冒烟测试失败，正在回滚..."
+    
+    # 自动回滚
+    if [ "$ENVIRONMENT" = "green" ]; then
+        kubectl patch service fitness-api-service -n fitness-prod --type='json' -p="[
+          {
+            'op': 'replace',
+            'path': '/spec/selector/color',
+            'value': 'blue'
+          }
+        ]"
+        echo "已回滚到蓝色环境"
+    fi
+fi
+```
+
+### 5.2 金丝雀发布迁移
+
+#### 金丝雀部署配置
+
+```yaml
+# 主部署（生产版本）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api-primary
+  namespace: fitness-prod
+spec:
+  replicas: 9  # 90% 流量
+  selector:
+    matchLabels:
+      app: fitness-api
+  template:
+    metadata:
+      labels:
+        app: fitness-api
+        version: v1.0.0
+    spec:
+      containers:
+      - name: fitness-api
+        image: fitness-gym/api:v1.0.0
+
+---
+# 金丝雀部署（新版本）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api-canary
+  namespace: fitness-prod
+spec:
+  replicas: 1  # 10% 流量
+  selector:
+    matchLabels:
+      app: fitness-api
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: fitness-api
+        track: canary
+        version: v2.0.0
+    spec:
+      containers:
+      - name: fitness-api
+        image: fitness-gym/api:v2.0.0
+```
+
+#### Istio流量路由
+
+```yaml
+# Istio VirtualService for 金丝雀发布
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fitness-api-canary
+  namespace: fitness-prod
+spec:
+  hosts:
+  - api.fitness-gym.com
+  http:
+  - match:
+    - headers:
+        user-agent:
+          regex: ".*Chrome.*"  # 基于用户代理的金丝雀
+    route:
+    - destination:
+        host: fitness-api-service
+        subset: canary
+      weight: 10
+    - destination:
+        host: fitness-api-service
+        subset: stable
+      weight: 90
+  - route:
+    - destination:
+        host: fitness-api-service
+        subset: stable
+
+---
+# DestinationRule
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: fitness-api-destinationrule
+  namespace: fitness-prod
+spec:
+  host: fitness-api-service
+  subsets:
+  - name: stable
+    labels:
+      version: v1.0.0
+  - name: canary
+    labels:
+      version: v2.0.0
+      track: canary
+```
+
+### 5.3 混合运行策略
+
+#### 服务网格配置
+
+```yaml
+# Istio Gateway 配置
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: fitness-gateway
+  namespace: fitness-prod
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - api.fitness-gym.com
+
+---
+# VirtualService 路由配置
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fitness-api-routing
+  namespace: fitness-prod
+spec:
+  hosts:
+  - api.fitness-gym.com
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v2"  # 新API版本路由到Kubernetes
+    route:
+    - destination:
+        host: fitness-api-service
+        port:
+          number: 8080
+  - route:  # 默认路由到Docker Compose
+    - destination:
+        host: docker-compose-service
+        port:
+          number: 8080
+```
+
+---
+
+## 6. 混合运行期管理
+
+### 6.1 双环境监控
+
+#### 综合监控配置
+
+```yaml
+# Prometheus 配置同时监控两个环境
+scrape_configs:
+  - job_name: 'docker-compose-apps'
+    static_configs:
+      - targets: ['docker-host:9090']  # Docker Compose环境中的应用
+    metrics_path: '/springboot1ngh61a2/actuator/prometheus'
+    
+  - job_name: 'kubernetes-apps'
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+      action: keep
+      regex: true
+    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+      action: keep
+      regex: /actuator/prometheus
+
+  - job_name: 'kubernetes-services'
+    kubernetes_sd_configs:
+      - role: service
+    metrics_path: '/springboot1ngh61a2/actuator/prometheus'
+```
+
+#### 数据一致性监控
+
+```bash
+#!/bin/bash
+# 数据一致性检查脚本
+
+echo "检查数据一致性..."
+
+# 检查用户表
+DOCKER_USER_COUNT=$(docker exec fitness-db psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM users;")
+K8S_USER_COUNT=$(kubectl exec -n fitness-prod deployment/fitness-db -- psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM users;")
+
+if [ "$DOCKER_USER_COUNT" -ne "$K8S_USER_COUNT" ]; then
+    echo "警告: 用户表数据不一致 (Docker: $DOCKER_USER_COUNT, K8s: $K8S_USER_COUNT)"
+    # 发送告警
+else
+    echo "用户表数据一致: $DOCKER_USER_COUNT 记录"
+fi
+
+# 检查预订表（关键业务数据）
+DOCKER_BOOKING_COUNT=$(docker exec fitness-db psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM bookings WHERE created_at >= CURRENT_DATE;")
+K8S_BOOKING_COUNT=$(kubectl exec -n fitness-prod deployment/fitness-db -- psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM bookings WHERE created_at >= CURRENT_DATE;")
+
+if [ "$DOCKER_BOOKING_COUNT" -ne "$K8S_BOOKING_COUNT" ]; then
+    echo "错误: 当日预订数据不一致 (Docker: $DOCKER_BOOKING_COUNT, K8s: $K8S_BOOKING_COUNT)"
+    # 触发同步或告警
+else
+    echo "当日预订数据一致: $DOCKER_BOOKING_COUNT 记录"
+fi
+```
+
+### 6.2 流量管理
+
+#### 基于权重的流量分配
+
+```yaml
+# Istio DestinationRule with 权重
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fitness-api-traffic-split
+  namespace: fitness-prod
+spec:
+  hosts:
+  - api.fitness-gym.com
+  http:
+  - route:
+    - destination:
+        host: docker-compose-service
+      weight: 70  # 70% 流量到旧环境
+    - destination:
+        host: kubernetes-service
+      weight: 30  # 30% 流量到新环境
+```
+
+#### 基于内容的路由
+
+```yaml
+# 基于请求内容的路由
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fitness-api-content-routing
+  namespace: fitness-prod
+spec:
+  hosts:
+  - api.fitness-gym.com
+  http:
+  - match:
+    - headers:
+        x-api-version:
+          exact: "v2"  # 新API版本路由到Kubernetes
+    route:
+    - destination:
+        host: kubernetes-service
+  - match:
+    - uri:
+        prefix: "/api/v2"  # v2 API路由到Kubernetes
+    route:
+    - destination:
+        host: kubernetes-service
+  - route:  # 默认路由到Docker Compose
+    - destination:
+        host: docker-compose-service
+```
+
+### 6.3 同步机制
+
+#### 数据库双写
+
+```java
+@Service
+public class DualWriteBookingService {
+
+    @Autowired
+    private BookingService dockerComposeService;
+    
+    @Autowired
+    private BookingService kubernetesService;
+
+    @Transactional
+    public Booking createBooking(CreateBookingRequest request) {
+        Booking booking = null;
+        
+        try {
+            // 同时写入两个环境
+            booking = dockerComposeService.createBooking(request);
+            
+            // 异步写入Kubernetes环境
+            CompletableFuture.runAsync(() -> {
+                try {
+                    kubernetesService.createBooking(request);
+                } catch (Exception e) {
+                    log.error("Failed to write to Kubernetes environment", e);
+                    // 记录错误，稍后重试
+                }
+            });
+            
+        } catch (Exception e) {
+            log.error("Failed to create booking", e);
+            throw e;
+        }
+        
+        return booking;
+    }
+}
+```
+
+#### 缓存同步
+
+```java
+@Configuration
+public class DualCacheConfig {
+
+    @Bean
+    public CacheManager dualCacheManager(
+            @Qualifier("dockerRedisTemplate") RedisTemplate dockerRedis,
+            @Qualifier("k8sRedisTemplate") RedisTemplate k8sRedis) {
+        
+        return new DualRedisCacheManager(dockerRedis, k8sRedis);
+    }
+}
+
+public class DualRedisCacheManager implements CacheManager {
+
+    @Override
+    public Cache getCache(String name) {
+        return new DualRedisCache(name, dockerRedis, k8sRedis);
+    }
+}
+
+public class DualRedisCache implements Cache {
+
+    @Override
+    public void put(Object key, Object value) {
+        // 同时写入两个Redis实例
+        dockerRedis.opsForValue().set(key, value);
+        k8sRedis.opsForValue().set(key, value);
+    }
+
+    @Override
+    public ValueWrapper get(Object key) {
+        // 从任一实例读取
+        ValueWrapper value = dockerRedis.opsForValue().get(key);
+        if (value == null) {
+            value = k8sRedis.opsForValue().get(key);
+        }
+        return value;
+    }
+}
+```
+
+---
+
+## 7. 回滚策略
+
+### 7.1 自动回滚
+
+#### 基于监控的回滚
+
+```yaml
+# Prometheus告警规则
+groups:
+  - name: migration-rollback
+    rules:
+      - alert: MigrationErrorRateHigh
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate after migration"
+          description: "Error rate is {{ $value }}% after migration to Kubernetes"
+
+      - alert: MigrationLatencyHigh
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency after migration"
+          description: "95th percentile latency is {{ $value }}s after migration"
+```
+
+#### 自动回滚脚本
+
+```bash
+#!/bin/bash
+# 自动回滚脚本
+
+# 检查关键指标
+ERROR_RATE=$(curl -s "http://prometheus:9090/api/v1/query?query=http_error_rate" | jq -r '.data.result[0].value[1]')
+LATENCY=$(curl -s "http://prometheus:9090/api/v1/query?query=http_latency_95p" | jq -r '.data.result[0].value[1]')
+
+ERROR_THRESHOLD=0.05
+LATENCY_THRESHOLD=2.0
+
+if (( $(echo "$ERROR_RATE > $ERROR_THRESHOLD" | bc -l) )) || (( $(echo "$LATENCY > $LATENCY_THRESHOLD" | bc -l) )); then
+    echo "检测到性能问题，开始回滚..."
+    
+    # 切换回Docker Compose环境
+    kubectl patch service fitness-api-service -n fitness-prod --type='json' -p='[
+      {
+        "op": "replace",
+        "path": "/spec/selector/color",
+        "value": "blue"
+      }
+    ]'
+    
+    # 通知团队
+    curl -X POST $SLACK_WEBHOOK \
+      -H 'Content-type: application/json' \
+      -d "{\"text\":\"🚨 自动回滚触发！错误率: ${ERROR_RATE}, 延迟: ${LATENCY}s\"}"
+    
+    # 记录回滚事件
+    echo "$(date): Automatic rollback triggered - Error Rate: $ERROR_RATE, Latency: $LATENCY" >> /var/log/migration-rollback.log
+    
+else
+    echo "系统运行正常"
+fi
+```
+
+### 7.2 手动回滚
+
+#### 快速回滚脚本
+
+```bash
+#!/bin/bash
+# 快速回滚脚本
+
+echo "开始手动回滚到Docker Compose环境..."
+
+# 1. 切换流量回Docker Compose
+echo "切换流量..."
+kubectl patch service fitness-api-service -n fitness-prod --type='json' -p='[
+  {
+    "op": "replace",
+    "path": "/spec/selector/color",
+    "value": "blue"
+  }
+]'
+
+# 2. 停止Kubernetes服务（可选）
+echo "停止Kubernetes服务..."
+kubectl scale deployment fitness-api-green --replicas=0 -n fitness-prod
+
+# 3. 验证Docker Compose环境
+echo "验证Docker Compose环境..."
+docker-compose ps
+
+# 4. 检查应用健康状态
+echo "检查应用健康状态..."
+curl -f http://localhost:8080/health || echo "警告: 应用健康检查失败"
+
+# 5. 通知相关人员
+echo "发送回滚通知..."
+curl -X POST $SLACK_WEBHOOK \
+  -H 'Content-type: application/json' \
+  -d "{\"text\":\"🔄 手动回滚完成！系统已切换回Docker Compose环境\"}"
+
+echo "回滚完成"
+```
+
+### 7.3 渐进式回滚
+
+#### 分阶段回滚
+
+```bash
+#!/bin/bash
+# 渐进式回滚脚本
+
+TOTAL_REPLICAS=10
+ROLLBACK_BATCH=2
+
+echo "开始渐进式回滚..."
+
+# 逐步增加Docker Compose实例
+for ((i=ROLLBACK_BATCH; i<=TOTAL_REPLICAS; i+=ROLLBACK_BATCH)); do
+    echo "增加Docker Compose实例到 $i..."
+    
+    # 调整Docker Compose实例数
+    sed -i "s/replicas: [0-9]*/replicas: $i/" docker-compose.yml
+    
+    # 重新部署
+    docker-compose up -d --scale fitness-api=$i
+    
+    # 减少Kubernetes实例
+    K8S_REPLICAS=$((TOTAL_REPLICAS - i))
+    kubectl scale deployment fitness-api-green --replicas=$K8S_REPLICAS -n fitness-prod
+    
+    # 等待稳定
+    echo "等待系统稳定..."
+    sleep 60
+    
+    # 运行测试
+    if ! run_health_checks; then
+        echo "健康检查失败，停止回滚"
+        exit 1
+    fi
+done
+
+echo "渐进式回滚完成"
+```
+
+---
+
+## 8. 性能优化
+
+### 8.1 迁移后性能调优
+
+#### 资源配置优化
+
+```yaml
+# 优化后的Kubernetes资源配置
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api-optimized
+  namespace: fitness-prod
+spec:
+  replicas: 5  # 基于负载测试结果调整
+  template:
+    spec:
+      containers:
+      - name: fitness-api
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        env:
+        - name: JAVA_OPTS
+          value: "-Xmx1536m -Xms768m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+```
+
+#### 数据库连接池优化
+
+```yaml
+# 优化后的数据库配置
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 30  # 增加连接池大小
+      minimum-idle: 10
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+      leak-detection-threshold: 60000
+
+# PostgreSQL配置优化
+postgresql:
+  primary:
+    persistence:
+      size: 100Gi  # 增加存储空间
+    podSecurityContext:
+      fsGroup: 1001
+    containerSecurityContext:
+      runAsUser: 1001
+    initdb:
+      scripts:
+        init.sql: |
+          ALTER SYSTEM SET max_connections = '200';
+          ALTER SYSTEM SET shared_buffers = '256MB';
+          ALTER SYSTEM SET effective_cache_size = '1GB';
+          ALTER SYSTEM SET work_mem = '4MB';
+```
+
+### 8.2 缓存策略优化
+
+#### 多级缓存配置
+
+```yaml
+# 应用层缓存
+spring:
+  cache:
+    type: redis
+    redis:
+      cache-null-values: false
+      time-to-live: 3600000  # 1小时
+
+# CDN配置
+# 在迁移完成后配置CloudFront或Cloudflare
+
+# 数据库查询缓存
+@Cacheable(value = "courses", key = "#courseId")
+public Course getCourse(Long courseId) {
+    return courseRepository.findById(courseId).orElse(null);
+}
+
+@Cacheable(value = "userBookings", key = "#userId")
+public List<Booking> getUserBookings(Long userId) {
+    return bookingRepository.findByUserIdOrderByCreatedAtDesc(userId);
+}
+```
+
+### 8.3 网络优化
+
+#### 服务网格优化
+
+```yaml
+# Istio性能优化配置
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: fitness-api-optimization
+  namespace: fitness-prod
+spec:
+  host: fitness-api-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 10s
+      baseEjectionTime: 30s
+```
+
+---
+
+## 9. 监控和验证
+
+### 9.1 迁移监控
+
+#### 综合监控仪表板
+
+```yaml
+# Grafana仪表板配置
+dashboard:
+  title: "Migration Monitoring Dashboard"
+  panels:
+    - title: "Request Rate Comparison"
+      type: graph
+      targets:
+        - expr: 'rate(http_requests_total{environment="docker"}[5m])'
+          legendFormat: "Docker Compose"
+        - expr: 'rate(http_requests_total{environment="kubernetes"}[5m])'
+          legendFormat: "Kubernetes"
+    
+    - title: "Error Rate Comparison"
+      type: graph
+      targets:
+        - expr: 'rate(http_requests_total{status=~"5..",environment="docker"}[5m]) / rate(http_requests_total{environment="docker"}[5m]) * 100'
+          legendFormat: "Docker Error Rate"
+        - expr: 'rate(http_requests_total{status=~"5..",environment="kubernetes"}[5m]) / rate(http_requests_total{environment="kubernetes"}[5m]) * 100'
+          legendFormat: "K8s Error Rate"
+    
+    - title: "Response Time Comparison"
+      type: graph
+      targets:
+        - expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{environment="docker"}[5m]))'
+          legendFormat: "Docker P95"
+        - expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{environment="kubernetes"}[5m]))'
+          legendFormat: "K8s P95"
+```
+
+#### 自动化验证脚本
+
+```bash
+#!/bin/bash
+# 迁移验证脚本
+
+echo "=== 迁移验证开始 ==="
+
+# 1. 应用健康检查
+echo "1. 检查应用健康状态..."
+if ! curl -f --max-time 10 http://api.fitness-gym.com/health; then
+    echo "❌ 应用健康检查失败"
+    exit 1
+fi
+echo "✅ 应用健康检查通过"
+
+# 2. 数据库连接检查
+echo "2. 检查数据库连接..."
+if ! kubectl exec -n fitness-prod deployment/fitness-db -- pg_isready -U fitness_user -d fitness_gym; then
+    echo "❌ 数据库连接检查失败"
+    exit 1
+fi
+echo "✅ 数据库连接检查通过"
+
+# 3. 数据一致性检查
+echo "3. 检查数据一致性..."
+SOURCE_COUNT=$(docker exec fitness-db psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM users;")
+TARGET_COUNT=$(kubectl exec -n fitness-prod deployment/fitness-db -- psql -U fitness_user -d fitness_gym -t -c "SELECT COUNT(*) FROM users;")
+
+if [ "$SOURCE_COUNT" -ne "$TARGET_COUNT" ]; then
+    echo "❌ 数据一致性检查失败 (源: $SOURCE_COUNT, 目标: $TARGET_COUNT)"
+    exit 1
+fi
+echo "✅ 数据一致性检查通过"
+
+# 4. 性能基准测试
+echo "4. 执行性能基准测试..."
+ab -n 1000 -c 10 http://api.fitness-gym.com/api/courses > perf_test.log
+
+if grep -q "Failed requests:\s*[1-9]" perf_test.log; then
+    echo "❌ 性能测试失败"
+    cat perf_test.log
+    exit 1
+fi
+echo "✅ 性能测试通过"
+
+# 5. 业务功能测试
+echo "5. 执行业务功能测试..."
+# 这里可以集成更复杂的业务逻辑测试
+if ! run_business_tests; then
+    echo "❌ 业务功能测试失败"
+    exit 1
+fi
+echo "✅ 业务功能测试通过"
+
+echo "=== 迁移验证完成 ==="
+echo "🎉 所有验证项目通过！"
+```
+
+### 9.2 性能基准测试
+
+#### 负载测试配置
+
+```bash
+# 使用k6进行负载测试
+cat > migration-load-test.js << 'EOF'
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export let options = {
+  stages: [
+    { duration: '2m', target: 100 },  // 逐步增加到100用户
+    { duration: '5m', target: 100 },  // 稳定运行5分钟
+    { duration: '2m', target: 200 },  // 增加到200用户
+    { duration: '5m', target: 200 },  // 稳定运行5分钟
+    { duration: '2m', target: 0 },    // 逐步减少用户
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'], // 95%的请求在500ms以内
+    http_req_failed: ['rate<0.1'],    // 错误率小于10%
+  },
+};
+
+export default function () {
+  let response = http.get('http://api.fitness-gym.com/api/courses');
+  
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+  });
+  
+  sleep(1);
+}
+EOF
+
+# 运行负载测试
+k6 run migration-load-test.js
+```
+
+---
+
+## 10. 迁移后的运维
+
+### 10.1 备份策略更新
+
+#### Kubernetes原生备份
+
+```yaml
+# Velero备份配置
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: fitness-daily-backup
+  namespace: velero
+spec:
+  includedNamespaces:
+  - fitness-prod
+  includedResources:
+  - '*'
+  excludedResources:
+  - events
+  - pods
+  storageLocation: aws-s3-backup
+  ttl: 720h0m0s
+  schedule: "0 2 * * *"  # 每日凌晨2点
+```
+
+#### 数据库备份优化
+
+```yaml
+# PostgreSQL备份Job
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fitness-db-backup
+  namespace: fitness-prod
+spec:
+  schedule: "0 */6 * * *"  # 每6小时备份
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:14
+            env:
+            - name: PGHOST
+              value: "fitness-db-service"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: fitness-secrets
+                  key: db-user
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fitness-secrets
+                  key: db-password
+            command:
+            - /bin/bash
+            - -c
+            - |
+              pg_dump -d fitness_gym > /backup/fitness-$(date +%Y%m%d-%H%M%S).sql
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          restartPolicy: OnFailure
+```
+
+### 10.2 监控体系完善
+
+#### 可观测性栈
+
+```yaml
+# 完整的可观测性配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitoring-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    
+    rule_files:
+      - /etc/prometheus/alert_rules.yml
+    
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+    
+    scrape_configs:
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+      
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+      
+      - job_name: 'fitness-services'
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+```
+
+### 10.3 自动化运维
+
+#### GitOps工作流
+
+```yaml
+# ArgoCD应用配置
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-prod
+  namespace: argocd
+spec:
+  project: fitness
+  source:
+    repoURL: https://github.com/fitness-gym/fitness-gitops
+    targetRevision: HEAD
+    path: apps/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fitness-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - PrunePropagationPolicy=foreground
+```
+
+#### 自动扩缩容
+
+```yaml
+# HPA配置
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fitness-api-hpa
+  namespace: fitness-prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fitness-api
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 3
+        periodSeconds: 60
+```
+
+通过实施这些迁移策略和运维优化，可以确保健身房综合管理系统平稳、安全、高效地从传统部署方式迁移到现代化的云原生架构。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: DevOps团队*

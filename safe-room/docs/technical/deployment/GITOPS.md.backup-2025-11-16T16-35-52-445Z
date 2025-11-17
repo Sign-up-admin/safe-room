@@ -1,0 +1,1438 @@
+# GitOps 实践指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: DevOps团队
+
+## 概述
+
+本文档详细介绍GitOps在健身房综合管理系统中的实践，包括ArgoCD的安装配置、多环境管理、自动同步策略、回滚机制等，实现基础设施和应用的声明式持续部署。
+
+## 目录
+
+- [1. GitOps 核心概念](#1-gitops-核心概念)
+- [2. ArgoCD 安装和配置](#2-argocd-安装和配置)
+- [3. Application 定义](#3-application-定义)
+- [4. 多环境管理](#4-多环境管理)
+- [5. 自动同步策略](#5-自动同步策略)
+- [6. 回滚机制](#6-回滚机制)
+- [7. 安全和权限](#7-安全和权限)
+- [8. 监控和告警](#8-监控和告警)
+- [9. 最佳实践](#9-最佳实践)
+- [10. 故障排查](#10-故障排查)
+
+---
+
+## 1. GitOps 核心概念
+
+### 1.1 GitOps 原则
+
+GitOps 是一种实现持续部署的模式，具有以下核心原则：
+
+#### 声明式配置
+- **基础设施即代码**: 所有配置以声明式方式存储在Git中
+- **版本控制**: 基础设施和应用配置纳入版本控制
+- **可审计性**: 所有变更都有完整的审计记录
+
+#### 自动化部署
+- **持续同步**: 自动检测Git变更并同步到集群
+- **渐进式部署**: 支持金丝雀、蓝绿等部署策略
+- **自动回滚**: 检测到问题时自动回滚到稳定状态
+
+#### 可观测性
+- **状态监控**: 实时监控期望状态与实际状态的差异
+- **变更追踪**: 完整的部署历史和变更追踪
+- **健康检查**: 应用和基础设施的健康状态监控
+
+### 1.2 GitOps 工作流
+
+```mermaid
+graph LR
+    subgraph "开发阶段"
+        DEV[开发者] -->|提交代码| GIT[Git 仓库]
+        DEV -->|提交配置| GIT
+    end
+
+    subgraph "CI/CD 阶段"
+        GIT -->|触发| CI[CI Pipeline]
+        CI -->|构建镜像| REG[容器仓库]
+        CI -->|更新配置| GIT
+    end
+
+    subgraph "GitOps 阶段"
+        GIT -->|检测变更| ARGOCD[ArgoCD]
+        ARGOCD -->|部署应用| K8S[Kubernetes]
+        ARGOCD -->|部署基础设施| K8S
+    end
+
+    subgraph "监控阶段"
+        K8S -->|状态监控| PROM[Prometheus]
+        PROM -->|告警通知| TEAM[开发团队]
+        ARGOCD -->|同步状态| PROM
+    end
+
+    subgraph "反馈阶段"
+        PROM -->|指标数据| GIT
+        TEAM -->|问题修复| GIT
+    end
+```
+
+### 1.3 Git 仓库结构
+
+```
+fitness-gym-gitops/
+├── apps/                          # 应用配置
+│   ├── base/                      # 基础配置
+│   │   ├── fitness-api/           # API服务
+│   │   ├── fitness-frontend/      # 前端服务
+│   │   ├── fitness-postgres/      # 数据库
+│   │   └── fitness-redis/         # 缓存
+│   ├── overlays/                  # 环境特定配置
+│   │   ├── development/           # 开发环境
+│   │   ├── staging/               # 测试环境
+│   │   └── production/            # 生产环境
+│   └── fitness-gym-app.yaml       # 主应用配置
+├── infrastructure/                # 基础设施配置
+│   ├── base/                      # 基础基础设施
+│   │   ├── cert-manager/          # 证书管理
+│   │   ├── ingress-nginx/         # 入口控制器
+│   │   ├── prometheus/            # 监控
+│   │   └── argocd/                # ArgoCD自身
+│   └── overlays/                  # 环境特定基础设施
+│       ├── development/
+│       ├── staging/
+│       └── production/
+├── clusters/                      # 集群配置
+│   ├── development/               # 开发集群配置
+│   ├── staging/                   # 测试集群配置
+│   └── production/                # 生产集群配置
+├── .github/                       # GitHub Actions
+│   └── workflows/
+└── docs/                          # 文档
+```
+
+---
+
+## 2. ArgoCD 安装和配置
+
+### 2.1 ArgoCD 架构
+
+```mermaid
+graph TB
+    subgraph "ArgoCD 组件"
+        API[ArgoCD API Server<br/>Web UI & REST API]
+        REPO[Repository Server<br/>Git 仓库管理]
+        APP[Application Controller<br/>应用状态管理]
+        DEX[Dex<br/>身份认证]
+    end
+
+    subgraph "外部系统"
+        GIT[Git 仓库<br/>应用配置]
+        K8S[Kubernetes 集群<br/>部署目标]
+        REG[容器仓库<br/>镜像存储]
+    end
+
+    subgraph "用户"
+        CLI[ArgoCD CLI<br/>命令行工具]
+        UI[Web UI<br/>图形界面]
+    end
+
+    CLI --> API
+    UI --> API
+    API --> REPO
+    API --> DEX
+    REPO --> GIT
+    APP --> K8S
+    APP --> REG
+```
+
+### 2.2 ArgoCD 安装
+
+#### 使用 Helm 安装
+
+```bash
+# 添加 ArgoCD Helm 仓库
+helm repo add argocd https://argoproj.github.io/argo-helm
+helm repo update
+
+# 创建命名空间
+kubectl create namespace argocd
+
+# 安装 ArgoCD
+helm install argocd argocd/argo-cd \
+  --namespace argocd \
+  --version 5.46.0 \
+  --set server.service.type=LoadBalancer \
+  --set server.service.loadBalancerIP=10.0.0.100 \
+  --set server.ingress.enabled=true \
+  --set server.ingress.hosts[0]=argocd.fitness-gym.com \
+  --set configs.secret.argocdServerAdminPassword='$2a$10$...' \
+  --wait
+```
+
+#### 验证安装
+
+```bash
+# 检查 ArgoCD Pod 状态
+kubectl get pods -n argocd
+
+# 获取 ArgoCD 初始密码
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+# 访问 ArgoCD UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# 或者使用 LoadBalancer IP
+echo "ArgoCD UI: https://$(kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+```
+
+### 2.3 ArgoCD 配置
+
+#### CLI 登录
+
+```bash
+# 使用 CLI 登录
+argocd login argocd.fitness-gym.com --username admin --password <password>
+
+# 更新密码
+argocd account update-password --current-password <current> --new-password <new>
+
+# 配置上下文
+kubectl config set-context --current --namespace=argocd
+```
+
+#### RBAC 配置
+
+```yaml
+# argocd-rbac-cm.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+data:
+  policy.default: role:readonly
+  policy.csv: |
+    p, role:org-admin, applications, *, */*, allow
+    p, role:org-admin, clusters, get, *, allow
+    p, role:org-admin, repositories, get, *, allow
+    p, role:org-admin, repositories, create, *, allow
+    p, role:org-admin, repositories, update, *, allow
+    p, role:org-admin, repositories, delete, *, allow
+
+    g, fitness-gym-admins, role:org-admin
+
+    p, role:developer, applications, get, fitness-gym-*, allow
+    p, role:developer, applications, sync, fitness-gym-*, allow
+    p, role:developer, applications, update, fitness-gym-*, allow
+    p, role:developer, projects, get, fitness-gym, allow
+
+    g, fitness-gym-devs, role:developer
+```
+
+#### 项目配置
+
+```yaml
+# argocd-project.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: fitness-gym
+  namespace: argocd
+spec:
+  description: Fitness Gym Management System
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: fitness-*
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+  orphanedResources:
+    warn: false
+  roles:
+    - name: developer
+      description: Developer access to fitness-gym applications
+      policies:
+        - p, proj:fitness-gym:developer, applications, get, fitness-gym/*, allow
+        - p, proj:fitness-gym:developer, applications, sync, fitness-gym/*, allow
+      groups:
+        - fitness-gym-devs
+```
+
+---
+
+## 3. Application 定义
+
+### 3.1 Application 结构
+
+```yaml
+# fitness-gym-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: fitness-gym
+  source:
+    repoURL: https://github.com/fitness-gym/fitness-gym-gitops
+    path: apps
+    targetRevision: HEAD
+    kustomize:
+      version: v5.0.1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fitness-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+### 3.2 多源 Application
+
+```yaml
+# multi-source-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym-multi
+  namespace: argocd
+spec:
+  project: fitness-gym
+  sources:
+    # Helm Chart 源
+    - repoURL: https://github.com/fitness-gym/fitness-gym-helm
+      path: .
+      targetRevision: HEAD
+      helm:
+        version: v3
+        valuesFiles:
+          - values-prod.yaml
+        parameters:
+          - name: image.tag
+            value: $ARGOCD_APP_REVISION
+    # Kustomize 配置源
+    - repoURL: https://github.com/fitness-gym/fitness-gym-gitops
+      path: infrastructure/overlays/production
+      targetRevision: HEAD
+      kustomize:
+        version: v5.0.1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fitness-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
+### 3.3 ApplicationSet
+
+ApplicationSet 用于根据模板批量创建 Application。
+
+```yaml
+# applicationset.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: fitness-gym-appset
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: development
+            namespace: fitness-dev
+            cluster: dev-cluster
+          - env: staging
+            namespace: fitness-staging
+            cluster: staging-cluster
+          - env: production
+            namespace: fitness-prod
+            cluster: prod-cluster
+  template:
+    metadata:
+      name: 'fitness-gym-{{env}}'
+    spec:
+      project: fitness-gym
+      source:
+        repoURL: https://github.com/fitness-gym/fitness-gym-gitops
+        targetRevision: HEAD
+        path: apps/overlays/{{env}}
+      destination:
+        server: '{{cluster}}'
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+```
+
+### 3.4 应用依赖管理
+
+```yaml
+# 应用依赖顺序
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym-infra
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  # 基础设施应用（数据库、缓存等）
+  # sync-wave: -2 表示最先部署
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym-backend
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  # 后端服务
+  # sync-wave: -1 表示在基础设施之后部署
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym-frontend
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  # 前端服务
+  # sync-wave: 0 表示最后部署
+```
+
+---
+
+## 4. 多环境管理
+
+### 4.1 环境隔离策略
+
+#### 命名空间隔离
+
+```yaml
+# 环境命名空间配置
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fitness-dev
+  labels:
+    environment: development
+    team: fitness-gym
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fitness-staging
+  labels:
+    environment: staging
+    team: fitness-gym
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fitness-prod
+  labels:
+    environment: production
+    team: fitness-gym
+```
+
+#### 资源配额管理
+
+```yaml
+# 环境资源配额
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: fitness-dev-quota
+  namespace: fitness-dev
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "5"
+    pods: "20"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: fitness-prod-quota
+  namespace: fitness-prod
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    persistentvolumeclaims: "20"
+    pods: "100"
+```
+
+### 4.2 环境特定配置
+
+#### Kustomize 环境覆盖
+
+```
+apps/
+├── base/
+│   ├── fitness-api/
+│   │   ├── deployment.yaml
+│   │   ├── service.yaml
+│   │   └── kustomization.yaml
+│   └── kustomization.yaml
+└── overlays/
+    ├── development/
+    │   ├── fitness-api/
+    │   │   ├── deployment-patch.yaml
+    │   │   └── kustomization.yaml
+    │   └── kustomization.yaml
+    ├── staging/
+    │   ├── fitness-api/
+    │   │   ├── deployment-patch.yaml
+    │   │   └── kustomization.yaml
+    │   └── kustomization.yaml
+    └── production/
+        ├── fitness-api/
+        │   ├── deployment-patch.yaml
+        │   └── kustomization.yaml
+        └── kustomization.yaml
+```
+
+```yaml
+# overlays/development/fitness-api/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../base/fitness-api
+
+patchesStrategicMerge:
+  - deployment-patch.yaml
+
+images:
+  - name: fitness-gym/api
+    newTag: dev-latest
+
+replicas:
+  - name: fitness-api
+    count: 1
+```
+
+```yaml
+# overlays/development/fitness-api/deployment-patch.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitness-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: fitness-api
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "dev"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+```
+
+#### Helm 环境配置
+
+```yaml
+# values-dev.yaml
+app:
+  replicas: 1
+  env: development
+
+image:
+  tag: "dev"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+postgresql:
+  enabled: true
+  auth:
+    database: fitness_gym_dev
+  primary:
+    persistence:
+      size: 5Gi
+
+redis:
+  enabled: true
+  master:
+    persistence:
+      size: 1Gi
+```
+
+### 4.3 环境间同步
+
+#### 手动同步策略
+
+```bash
+# 开发环境到测试环境同步
+argocd app sync fitness-gym-dev
+
+# 测试环境验证
+argocd app wait fitness-gym-staging --health
+
+# 测试环境到生产环境同步
+argocd app sync fitness-gym-prod
+```
+
+#### 自动同步策略
+
+```yaml
+# 自动同步配置
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym-prod
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ApplyOutOfSyncOnly=true  # 只同步不同步的应用
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+---
+
+## 5. 自动同步策略
+
+### 5.1 同步模式
+
+#### 自动同步
+
+```yaml
+# 自动同步配置
+syncPolicy:
+  automated:
+    prune: true          # 删除不再需要的资源
+    selfHeal: true       # 自动修复偏离期望状态的资源
+    allowEmpty: false    # 不允许空的应用
+```
+
+#### 手动同步
+
+```yaml
+# 手动同步配置
+syncPolicy:
+  automated: null  # 禁用自动同步
+```
+
+#### 半自动同步
+
+```yaml
+# 半自动同步（只同步，不删除）
+syncPolicy:
+  automated:
+    prune: false
+    selfHeal: false
+    allowEmpty: false
+```
+
+### 5.2 同步选项
+
+```yaml
+syncOptions:
+  - CreateNamespace=true                    # 自动创建命名空间
+  - PrunePropagationPolicy=foreground      # 前台删除策略
+  - PruneLast=true                          # 最后删除资源
+  - ApplyOutOfSyncOnly=true                 # 只同步不同步的应用
+  - ServerSideApply=true                    # 使用服务端应用
+  - RespectIgnoreDifferences=true           # 尊重差异忽略
+```
+
+### 5.3 同步钩子
+
+```yaml
+# 同步钩子配置
+syncPolicy:
+  syncOptions:
+    - Hook=true
+  hooks:
+    # Pre-sync 钩子：在同步前执行
+    - hook: PreSync
+      manifest: |
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: pre-sync-job
+        spec:
+          template:
+            spec:
+              containers:
+              - name: pre-sync
+                image: busybox
+                command: ["/bin/sh", "-c", "echo 'Running pre-sync hook'"]
+              restartPolicy: Never
+
+    # Post-sync 钩子：在同步后执行
+    - hook: PostSync
+      manifest: |
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: post-sync-job
+        spec:
+          template:
+            spec:
+              containers:
+              - name: post-sync
+                image: curlimages/curl
+                command: ["/bin/sh", "-c", "curl -f http://fitness-api/health"]
+              restartPolicy: Never
+```
+
+### 5.4 渐进式部署
+
+#### 金丝雀同步
+
+```yaml
+# 金丝雀同步配置
+resourceActions:
+  - action: patch
+    kind: Deployment
+    name: fitness-api
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: fitness-api
+      spec:
+        replicas: 1  # 先部署1个副本进行测试
+        strategy:
+          rollingUpdate:
+            maxUnavailable: 0
+            maxSurge: 1
+```
+
+#### 蓝绿同步
+
+```yaml
+# 蓝绿同步策略
+resourceActions:
+  - action: patch
+    kind: Service
+    name: fitness-api
+    patch: |
+      apiVersion: v1
+      kind: Service
+      spec:
+        selector:
+          app: fitness-api
+          color: green  # 切换到绿色版本
+```
+
+---
+
+## 6. 回滚机制
+
+### 6.1 自动回滚
+
+#### 基于健康的回滚
+
+```yaml
+# 健康检查配置
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+    allowEmpty: false
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
+```
+
+#### 基于指标的回滚
+
+```yaml
+# 基于 Prometheus 指标的回滚
+resourceHealthChecks:
+  - check:
+      name: api-health
+      type: prometheus
+      query: up{job="fitness-api"}
+      timeout: 30s
+    action:
+      type: rollback
+      targetRevision: HEAD~1
+```
+
+### 6.2 手动回滚
+
+```bash
+# 回滚到上一版本
+argocd app rollback fitness-gym HEAD~1
+
+# 回滚到指定版本
+argocd app rollback fitness-gym abc123
+
+# 查看回滚历史
+argocd app history fitness-gym
+
+# 确认回滚状态
+argocd app wait fitness-gym
+```
+
+### 6.3 回滚策略
+
+#### 渐进式回滚
+
+```yaml
+# 渐进式回滚配置
+resourceActions:
+  - action: patch
+    kind: Deployment
+    name: fitness-api
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      spec:
+        strategy:
+          rollingUpdate:
+            maxUnavailable: 1
+            maxSurge: 1
+```
+
+#### 立即回滚
+
+```bash
+# 立即回滚（强制替换）
+argocd app sync fitness-gym --force --replace
+```
+
+### 6.4 回滚验证
+
+#### 自动化验证
+
+```yaml
+# 回滚后验证
+resourceHealthChecks:
+  - check:
+      name: api-response
+      type: httpGet
+      url: http://fitness-api/health
+      timeout: 10s
+    action:
+      type: alert
+      message: "API health check failed after rollback"
+```
+
+#### 手动验证
+
+```bash
+# 验证回滚结果
+kubectl get pods -n fitness-prod
+kubectl get svc -n fitness-prod
+curl http://fitness-api/health
+
+# 检查应用日志
+kubectl logs -f deployment/fitness-api -n fitness-prod
+```
+
+---
+
+## 7. 安全和权限
+
+### 7.1 ArgoCD 安全配置
+
+#### TLS 配置
+
+```yaml
+# ArgoCD TLS 配置
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-tls-certs
+  namespace: argocd
+type: kubernetes.io/tls
+data:
+  tls.crt: <base64-encoded-cert>
+  tls.key: <base64-encoded-key>
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server-ingress
+  namespace: argocd
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - argocd.fitness-gym.com
+    secretName: argocd-tls
+  rules:
+  - host: argocd.fitness-gym.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 443
+```
+
+#### SSO 集成
+
+```yaml
+# ArgoCD SSO 配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  oidc.config: |
+    name: Azure AD
+    issuer: https://login.microsoftonline.com/<tenant-id>/v2.0
+    clientId: <client-id>
+    clientSecret: $oidc.azure.clientSecret
+    requestedScopes: ["openid", "profile", "email", "groups"]
+```
+
+### 7.2 仓库访问控制
+
+#### Git 仓库权限
+
+```yaml
+# ArgoCD 仓库配置
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fitness-gym-repo
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+data:
+  type: git
+  url: https://github.com/fitness-gym/fitness-gym-gitops
+  username: fitness-gym-bot
+  password: <github-token>
+  insecure: "false"
+  enableLfs: "false"
+```
+
+#### SSH 密钥配置
+
+```bash
+# 生成 SSH 密钥
+ssh-keygen -t rsa -b 4096 -C "argocd@fitness-gym.com" -f argocd-ssh-key
+
+# 创建 SSH Secret
+kubectl create secret generic argocd-ssh-key \
+  --from-file=sshPrivateKey=argocd-ssh-key \
+  --namespace argocd
+
+# 配置仓库使用 SSH
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fitness-gym-ssh-repo
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+data:
+  type: git
+  url: git@github.com:fitness-gym/fitness-gym-gitops.git
+  sshPrivateKey: <base64-encoded-private-key>
+```
+
+### 7.3 应用权限控制
+
+#### 项目级权限
+
+```yaml
+# 应用项目权限
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: fitness-gym
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceBlacklist:
+    - group: ''
+      kind: ResourceQuota
+    - group: ''
+      kind: LimitRange
+    - group: ''
+      kind: NetworkPolicy
+  destinations:
+    - namespace: fitness-*
+      server: '*'
+  sourceRepos:
+    - https://github.com/fitness-gym/*
+```
+
+#### 环境级隔离
+
+```yaml
+# 环境隔离配置
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: fitness-gym-prod
+spec:
+  destinations:
+    - namespace: fitness-prod
+      server: https://production-cluster
+  sourceRepos:
+    - https://github.com/fitness-gym/fitness-gym-gitops
+  clusterResourceWhitelist:
+    - group: 'apps'
+      kind: 'Deployment'
+    - group: ''
+      kind: 'Service'
+    - group: ''
+      kind: 'ConfigMap'
+```
+
+---
+
+## 8. 监控和告警
+
+### 8.1 ArgoCD 监控
+
+#### Prometheus 指标
+
+```yaml
+# ArgoCD ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: argocd
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-server
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+```
+
+#### 关键指标监控
+
+```yaml
+# ArgoCD 告警规则
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: argocd-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: argocd
+    rules:
+    - alert: ArgoCDSyncFailed
+      expr: argocd_app_info{sync_status="OutOfSync"} > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "ArgoCD application sync failed"
+        description: "Application {{ $labels.name }} is out of sync"
+
+    - alert: ArgoCDAppUnhealthy
+      expr: argocd_app_info{health_status="Degraded"} > 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "ArgoCD application unhealthy"
+        description: "Application {{ $labels.name }} is in degraded state"
+```
+
+### 8.2 应用监控集成
+
+#### Application 健康监控
+
+```yaml
+# 应用健康监控
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fitness-gym
+spec:
+  source:
+    # ... 其他配置
+  destination:
+    # ... 其他配置
+  syncPolicy:
+    # ... 其他配置
+  health:
+    status: |
+      # 自定义健康检查逻辑
+      if [[ "${ARGOCD_APP_HEALTH_STATUS}" == "Degraded" ]]; then
+        exit 1
+      fi
+```
+
+#### 部署状态监控
+
+```bash
+# 部署状态监控脚本
+#!/bin/bash
+# monitor-argocd.sh
+
+# 检查应用同步状态
+SYNC_STATUS=$(argocd app get fitness-gym --status-only | grep "Sync Status" | awk '{print $3}')
+
+if [ "$SYNC_STATUS" != "Synced" ]; then
+    echo "Application is not synced: $SYNC_STATUS"
+    # 发送告警
+    curl -X POST $SLACK_WEBHOOK \
+      -H 'Content-type: application/json' \
+      -d "{\"text\":\"ArgoCD Application sync failed: $SYNC_STATUS\"}"
+fi
+
+# 检查应用健康状态
+HEALTH_STATUS=$(argocd app get fitness-gym --status-only | grep "Health Status" | awk '{print $3}')
+
+if [ "$HEALTH_STATUS" != "Healthy" ]; then
+    echo "Application is not healthy: $HEALTH_STATUS"
+    # 发送告警
+    curl -X POST $SLACK_WEBHOOK \
+      -H 'Content-type: application/json' \
+      -d "{\"text\":\"ArgoCD Application health degraded: $HEALTH_STATUS\"}"
+fi
+```
+
+### 8.3 审计和日志
+
+#### 操作审计
+
+```yaml
+# ArgoCD 审计日志
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+data:
+  server.rbac.log.enforce.enable: "true"
+  server.rbac.log.enforce.level: "debug"
+```
+
+#### 变更追踪
+
+```bash
+# 查看应用变更历史
+argocd app history fitness-gym
+
+# 查看特定版本的变更
+argocd app diff fitness-gym --revision abc123
+
+# 查看部署日志
+argocd app logs fitness-gym
+```
+
+---
+
+## 9. 最佳实践
+
+### 9.1 仓库管理
+
+#### 分支策略
+
+```
+main (生产分支)
+├── feature/*
+│   ├── feature/user-auth
+│   ├── feature/payment-integration
+│   └── feature/course-management
+├── release/*
+│   ├── release/v1.0.0
+│   ├── release/v1.1.0
+│   └── release/v2.0.0
+└── hotfix/*
+    ├── hotfix/security-patch
+    └── hotfix/bug-fix
+```
+
+#### PR 和审查
+
+```yaml
+# GitHub Actions PR 检查
+name: PR Checks
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate ArgoCD Application
+        run: |
+          argocd app validate apps/ --argocd-server $ARGOCD_SERVER
+
+      - name: Check Kustomize syntax
+        run: |
+          find apps/ -name "kustomization.yaml" -exec kubectl kustomize {} \;
+```
+
+### 9.2 部署策略
+
+#### 渐进式部署
+
+```yaml
+# 渐进式同步策略
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+  syncOptions:
+    - ApplyOutOfSyncOnly=true
+  wave:  # 部署波次
+    - resources:
+      - apiVersion: apps/v1
+        kind: Deployment
+        name: fitness-infra
+      wave: -2
+    - resources:
+      - apiVersion: apps/v1
+        kind: Deployment
+        name: fitness-backend
+      wave: -1
+    - resources:
+      - apiVersion: apps/v1
+        kind: Deployment
+        name: fitness-frontend
+      wave: 0
+```
+
+#### 部署验证
+
+```yaml
+# 部署后验证
+resourceHealthChecks:
+  - check:
+      name: api-readiness
+      type: httpGet
+      url: http://fitness-api/health/ready
+      timeout: 30s
+    action:
+      type: sync
+      delay: 10s
+
+  - check:
+      name: database-connection
+      type: exec
+      command: ["psql", "-h", "fitness-db", "-U", "fitness_user", "-d", "fitness_gym", "-c", "SELECT 1"]
+      timeout: 10s
+    action:
+      type: rollback
+      targetRevision: HEAD~1
+```
+
+### 9.3 灾难恢复
+
+#### 备份策略
+
+```bash
+# ArgoCD 配置备份
+argocd admin export > argocd-backup.yaml
+
+# 应用状态备份
+kubectl get applications -n argocd -o yaml > apps-backup.yaml
+
+# Git 仓库备份
+git clone --mirror https://github.com/fitness-gym/fitness-gym-gitops.git backup.git
+```
+
+#### 恢复流程
+
+```bash
+# ArgoCD 恢复
+kubectl apply -f argocd-backup.yaml
+
+# 应用恢复
+kubectl apply -f apps-backup.yaml
+
+# Git 仓库恢复
+git push --mirror https://github.com/fitness-gym/fitness-gym-gitops.git
+```
+
+---
+
+## 10. 故障排查
+
+### 10.1 同步问题
+
+#### 应用不同步
+
+```bash
+# 检查应用状态
+argocd app get fitness-gym
+
+# 查看同步详情
+argocd app sync fitness-gym --dry-run
+
+# 强制同步
+argocd app sync fitness-gym --force
+```
+
+#### 资源冲突
+
+```bash
+# 查看资源差异
+argocd app diff fitness-gym
+
+# 查看特定资源
+kubectl get deployment fitness-api -n fitness-prod -o yaml
+
+# 解决冲突
+kubectl delete deployment fitness-api -n fitness-prod --ignore-not-found
+argocd app sync fitness-gym
+```
+
+### 10.2 健康检查失败
+
+```bash
+# 检查健康状态
+argocd app get fitness-gym --show-health
+
+# 查看 Pod 状态
+kubectl get pods -n fitness-prod
+
+# 查看应用日志
+kubectl logs -f deployment/fitness-api -n fitness-prod
+
+# 检查健康检查配置
+kubectl describe deployment fitness-api -n fitness-prod
+```
+
+### 10.3 权限问题
+
+```bash
+# 检查 RBAC 配置
+argocd proj role list fitness-gym
+
+# 验证用户权限
+argocd login --username $USER
+argocd proj role get fitness-gym developer
+
+# 更新权限
+kubectl edit configmap argocd-rbac-cm -n argocd
+```
+
+### 10.4 网络问题
+
+```bash
+# 检查网络连接
+kubectl exec -it deployment/argocd-repo-server -n argocd -- curl -I https://github.com
+
+# 查看 DNS 解析
+kubectl exec -it deployment/argocd-repo-server -n argocd -- nslookup github.com
+
+# 检查代理配置
+kubectl get configmap argocd-cm -n argocd -o yaml
+```
+
+### 10.5 性能问题
+
+```bash
+# 查看 ArgoCD 性能指标
+kubectl top pods -n argocd
+
+# 检查应用控制器日志
+kubectl logs deployment/argocd-application-controller -n argocd
+
+# 优化配置
+kubectl patch configmap argocd-cm -n argocd --type merge -p '{
+  "data": {
+    "controller.repo.server.timeout.seconds": "60",
+    "controller.status.processors": "20"
+  }
+}'
+```
+
+---
+
+## 总结
+
+本文档提供了ArgoCD在健身房综合管理系统中的完整GitOps实践，包括：
+
+1. **GitOps 核心概念**：声明式配置、自动化部署、可观测性原则
+2. **ArgoCD 安装配置**：Helm安装、RBAC配置、项目管理
+3. **Application 定义**：单应用、多源应用、ApplicationSet
+4. **多环境管理**：环境隔离、配置覆盖、环境间同步
+5. **自动同步策略**：同步模式、同步选项、同步钩子
+6. **回滚机制**：自动回滚、手动回滚、回滚验证
+7. **安全和权限**：TLS配置、SSO集成、仓库访问控制
+8. **监控和告警**：Prometheus指标、告警规则、审计日志
+9. **最佳实践**：仓库管理、部署策略、灾难恢复
+10. **故障排查**：同步问题、健康检查、权限、网络、性能问题
+
+通过实施这些GitOps实践，可以实现基础设施和应用的声明式持续部署，确保部署的一致性、可重复性和可审计性。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: DevOps团队*

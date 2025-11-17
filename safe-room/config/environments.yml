@@ -1,0 +1,268 @@
+# Environment Configuration for Fitness Gym System
+# This file defines configuration for different deployment environments
+
+environments:
+  # Development environment
+  development:
+    name: "Development Environment"
+    description: "Local development and testing environment"
+    active: true
+
+    # Service replicas
+    replicas:
+      backend: 1
+      frontend: 1
+      postgres: 1
+      redis: 1
+      minio: 1
+
+    # Resource limits
+    resources:
+      backend:
+        cpu: "0.5"
+        memory: "512Mi"
+      postgres:
+        cpu: "0.25"
+        memory: "256Mi"
+      redis:
+        cpu: "0.25"
+        memory: "256Mi"
+      minio:
+        cpu: "0.25"
+        memory: "256Mi"
+
+    # Environment variables
+    environment:
+      SPRING_PROFILES_ACTIVE: "dev"
+      SERVER_PORT: 8080
+      LOG_LEVEL: "DEBUG"
+      DB_HOST: "postgres"
+      DB_PORT: 5432
+      DB_NAME: "fitness_gym_dev"
+      DB_USER: "postgres"
+      DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      MINIO_ENABLED: false
+      TZ: "Asia/Shanghai"
+
+    # Database configuration
+    database:
+      name: "fitness_gym_dev"
+      backup_schedule: "0 */6 * * *"  # Every 6 hours
+      retention_days: 7
+
+    # Monitoring
+    monitoring:
+      enabled: false
+      prometheus_port: 9090
+      grafana_port: 3000
+
+    # Security
+    security:
+      jwt_expiry: 86400  # 24 hours
+      rate_limit: 1000   # requests per minute
+
+  # Staging environment
+  staging:
+    name: "Staging Environment"
+    description: "Pre-production testing environment"
+    active: false
+
+    replicas:
+      backend: 2
+      frontend: 1
+      postgres: 1
+      redis: 1
+      minio: 1
+
+    resources:
+      backend:
+        cpu: "1"
+        memory: "1Gi"
+      postgres:
+        cpu: "0.5"
+        memory: "512Mi"
+      redis:
+        cpu: "0.5"
+        memory: "512Mi"
+      minio:
+        cpu: "0.5"
+        memory: "512Mi"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: "staging"
+      SERVER_PORT: 8080
+      LOG_LEVEL: "INFO"
+      DB_HOST: "postgres"
+      DB_PORT: 5432
+      DB_NAME: "fitness_gym_staging"
+      DB_USER: "postgres"
+      DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      MINIO_ENABLED: true
+      MINIO_ENDPOINT: "http://minio:9000"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      MINIO_BUCKET_NAME: "fitness-gym-staging"
+      TZ: "Asia/Shanghai"
+
+    database:
+      name: "fitness_gym_staging"
+      backup_schedule: "0 */4 * * *"  # Every 4 hours
+      retention_days: 14
+
+    monitoring:
+      enabled: true
+      prometheus_port: 9090
+      grafana_port: 3000
+
+    security:
+      jwt_expiry: 3600   # 1 hour
+      rate_limit: 5000   # requests per minute
+
+  # Production environment
+  production:
+    name: "Production Environment"
+    description: "Live production environment"
+    active: false
+
+    replicas:
+      backend: 3
+      frontend: 2
+      postgres: 1
+      redis: 1
+      minio: 1
+
+    resources:
+      backend:
+        cpu: "2"
+        memory: "2Gi"
+      postgres:
+        cpu: "1"
+        memory: "1Gi"
+      redis:
+        cpu: "1"
+        memory: "1Gi"
+      minio:
+        cpu: "1"
+        memory: "1Gi"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      SERVER_PORT: 8080
+      LOG_LEVEL: "WARN"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_NAME: "${DB_NAME:-fitness_gym_prod}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_POOL_MIN_IDLE: 10
+      DB_POOL_MAX_SIZE: 50
+      REDIS_HOST: "${REDIS_HOST}"
+      REDIS_PORT: "${REDIS_PORT:-6379}"
+      MINIO_ENABLED: true
+      MINIO_ENDPOINT: "${MINIO_ENDPOINT}"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      MINIO_BUCKET_NAME: "${MINIO_BUCKET_NAME:-fitness-gym-prod}"
+      MINIO_SECURE: "${MINIO_SECURE:-true}"
+      TZ: "Asia/Shanghai"
+
+    database:
+      name: "${DB_NAME:-fitness_gym_prod}"
+      backup_schedule: "0 */2 * * *"  # Every 2 hours
+      retention_days: 30
+
+    monitoring:
+      enabled: true
+      prometheus_port: 9090
+      grafana_port: 3000
+      alertmanager_enabled: true
+
+    security:
+      jwt_expiry: 1800   # 30 minutes
+      rate_limit: 10000  # requests per minute
+      cors_origins: "${CORS_ORIGINS:-https://yourdomain.com}"
+
+# Global configuration shared across environments
+global:
+  # Docker registry configuration
+  registry:
+    url: "ghcr.io"
+    namespace: "${GITHUB_REPOSITORY}"
+
+  # Backup configuration
+  backup:
+    s3_bucket: "${BACKUP_S3_BUCKET}"
+    s3_region: "${BACKUP_S3_REGION:-us-east-1}"
+    encryption_key: "${BACKUP_ENCRYPTION_KEY}"
+
+  # Monitoring configuration
+  monitoring:
+    slack_webhook: "${SLACK_WEBHOOK_URL}"
+    email_recipients: "${ALERT_EMAIL_RECIPIENTS}"
+
+  # Security configuration
+  security:
+    ssl_enabled: true
+    ssl_certificate: "${SSL_CERT_PATH}"
+    ssl_key: "${SSL_KEY_PATH}"
+
+  # Logging configuration
+  logging:
+    max_file_size: "100MB"
+    max_files: 30
+    compress_old_logs: true
+
+# Deployment strategies for different environments
+deployment_strategies:
+  development:
+    strategy: "recreate"
+    timeout: 300
+    retries: 1
+
+  staging:
+    strategy: "rolling"
+    timeout: 600
+    retries: 3
+    rollback_on_failure: true
+
+  production:
+    strategy: "blue-green"
+    timeout: 1200
+    retries: 0
+    health_check_timeout: 300
+    rollback_on_failure: true
+    canary_percentage: 20
+
+# Health check configuration
+health_checks:
+  backend:
+    endpoint: "/springboot1ngh61a2/actuator/health"
+    interval: 30
+    timeout: 10
+    retries: 3
+    start_period: 60
+
+  database:
+    command: "pg_isready -U ${DB_USER} -d ${DB_NAME}"
+    interval: 30
+    timeout: 10
+    retries: 3
+    start_period: 30
+
+  redis:
+    command: "redis-cli ping"
+    interval: 30
+    timeout: 10
+    retries: 3
+    start_period: 30
+
+  minio:
+    endpoint: "/minio/health/live"
+    interval: 30
+    timeout: 20
+    retries: 3
+    start_period: 30

@@ -1,0 +1,1086 @@
+# API 接口参考文档
+
+> **本文档基于前端实际使用的接口重构**  
+> 参考文件：`front/front/src/constants/apiEndpoints.ts`、`front/front/src/common/http.ts`、`front/front/src/services/crud.ts`
+
+## 概述
+
+健身房综合管理系统提供 RESTful API 接口，支持前端应用、移动端以及第三方系统集成。所有接口遵循统一的响应格式和错误处理规范。
+
+本文档根据前端实际代码中的接口调用情况整理，确保文档与实际实现完全一致。
+
+## 基础约定
+
+### 请求格式
+
+- **Base URL**: `http://<host>:8080/springboot1ngh61a2`
+- **HTTP 方法**: GET, POST
+- **Content-Type**: `application/json; charset=utf-8`
+- **字符编码**: UTF-8
+- **认证方式**: Token 头（`Token: <token>`）
+- **CSRF 保护**: 非 GET 请求需携带 CSRF Token（`X-CSRF-Token` 头）
+- **请求追踪**: 自动添加 `X-Request-ID` 头
+
+### 响应格式
+
+所有接口统一返回以下格式：
+
+```typescript
+interface ApiResponse<T = any> {
+  code: number    // 0 表示成功，非0表示失败
+  msg: string     // 响应消息
+  data: T         // 响应数据
+}
+```
+
+**分页响应格式**：
+
+```typescript
+interface PageResult<T> {
+  list: T[]       // 数据列表
+  total: number   // 总记录数
+  page: number    // 当前页码
+  limit: number   // 每页条数
+}
+```
+
+### 分页参数
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| page | number | 否 | 页码，从1开始，默认1 |
+| limit | number | 否 | 每页条数，默认10，最大100 |
+
+### 排序参数
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| sort | string | 否 | 排序字段 |
+| order | string | 否 | 排序方向: `asc`/`desc`，默认`desc` |
+
+## 错误码
+
+根据前端 `http.ts` 拦截器的处理逻辑，错误码定义如下：
+
+| 错误码 | 说明 | HTTP状态码 | 前端处理 |
+|--------|------|-------------|----------|
+| 0 | 成功 | 200 | 正常返回数据 |
+| 401 | 未授权访问 | 401 | 跳转 `/error/401`，清空 localStorage |
+| 403 | 禁止访问 | 403 | 跳转 `/error/403`，清空 localStorage |
+| 500 | 业务错误 | 200 | 业务请求（登录/注册/列表/详情）不跳转，其他跳转 `/error/500` |
+| 其他 | 业务错误 | 200 | 抛出错误消息 |
+
+**HTTP 状态码错误**：
+- `401/403`：跳转对应错误页
+- `500`：业务请求不跳转，其他请求跳转 `/error/500`
+- 网络错误：跳转 `/error/network`
+
+## 用户认证接口
+
+### 用户登录
+
+**接口地址**: `POST /{tableName}/login`
+
+**说明**: 支持多种角色登录，`tableName` 可以是 `yonghu`（会员）、`jianshenjiaolian`（教练）、`users`（管理员）等
+
+**前端实现**（参考 `login.vue`）:
+```typescript
+const response = await http.post<LoginResponse>(`/${loginForm.tableName}/login`, null, {
+  params: {
+    username: loginForm.username,
+    password: loginForm.password,
+  },
+})
+```
+
+**请求参数**（Query String）:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| username | string | 是 | 用户名/账号 |
+| password | string | 是 | 密码 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "登录成功",
+  "token": "a1b2c3d4e5f6",
+  "data": null
+}
+```
+
+**前端处理**:
+- 登录成功后，将 `token` 保存到 `localStorage`（key: `frontToken`）
+- 保存 `tableName` 到 `localStorage`（key: `UserTableName`）
+- 调用 `fetchProfile()` 获取用户信息
+
+### 用户注册
+
+**接口地址**: `POST /{tableName}/register`
+
+**说明**: 支持多种角色注册
+
+**请求参数**（Body JSON）:
+```json
+{
+  "yonghuzhanghao": "user001",
+  "mima": "password123",
+  "yonghuxingming": "张三",
+  "shoujihaoma": "13800000000"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "注册成功",
+  "data": {
+    "id": 1,
+    "yonghuzhanghao": "user001"
+  }
+}
+```
+
+### 获取用户信息（Session）
+
+**接口地址**: `GET /{tableName}/session`
+
+**说明**: 获取当前登录用户的会话信息
+
+**前端实现**（参考 `login.vue`）:
+```typescript
+const response = await http.get<ApiResponse<Record<string, any>>>(`/${loginForm.tableName}/session`)
+if (response.data.data) {
+  localStorage.setItem('userInfo', JSON.stringify(response.data.data))
+  if (response.data.data['id']) {
+    localStorage.setItem('userid', String(response.data.data['id']))
+  }
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "yonghuzhanghao": "user001",
+    "yonghuxingming": "张三",
+    "touxiang": "/upload/avatar.jpg",
+    "huiyuankahao": "VIP001",
+    "youxiaoqizhi": "2025-12-31"
+  }
+}
+```
+
+### 其他认证接口
+
+| 接口 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 重置密码 | POST | `/{tableName}/resetPass` | 将密码重置为 `123456` |
+| 退出登录 | GET/POST | `/{tableName}/logout` | 清除 Session |
+
+## CRUD 通用接口模式
+
+前端通过 `CrudService` 类统一封装所有模块的 CRUD 操作（参考 `services/crud.ts`）。所有模块遵循相同的接口模式：
+
+### 标准 CRUD 接口
+
+| 操作 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 列表查询 | GET | `/{module}/list` | 支持分页、排序、筛选 |
+| 详情查询 | GET | `/{module}/detail/{id}` | 获取单条记录详情 |
+| 新增 | POST | `/{module}/add` | 创建新记录 |
+| 更新 | POST | `/{module}/update` | 更新记录（需包含 `id`） |
+| 删除 | POST | `/{module}/delete` | 批量删除（Body: `number[]`） |
+
+### 前端使用示例
+
+```typescript
+import { getModuleService } from '@/services/crud'
+
+// 获取服务实例
+const courseService = getModuleService('jianshenkecheng')
+
+// 查询列表
+const { list, total } = await courseService.list({
+  page: 1,
+  limit: 10,
+  sort: 'clicknum',
+  order: 'desc',
+  kechengleixing: '瑜伽'  // 筛选条件
+})
+
+// 查询详情
+const detail = await courseService.detail(1)
+
+// 新增
+await courseService.create({
+  kechengmingcheng: '新课程',
+  kechengleixing: '力量训练',
+  kechengjiage: 128.00
+})
+
+// 更新
+await courseService.update({
+  id: 1,
+  kechengmingcheng: '更新后的课程名'
+})
+
+// 删除
+await courseService.remove([1, 2, 3])
+```
+
+### 特殊接口
+
+| 操作 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 点赞/点踩 | POST | `/{module}/thumbsup/{id}?type=1\|0` | `type=1` 点赞，`type=0` 点踩 |
+| 智能排序 | GET | `/{module}/autoSort` | 按点击量排序（热门推荐） |
+| 协同推荐 | GET | `/{module}/autoSort2` | 基于收藏/点赞的协同过滤 |
+| 批量审核 | POST | `/{module}/shBatch` | 批量审核（Query: `sfsh`, `shhf`；Body: `ids[]`） |
+
+**前端使用示例**：
+
+```typescript
+// 点赞
+await courseService.thumbsup(1, 1)  // type=1 点赞
+
+// 获取热门课程
+const hotCourses = await courseService.autoSort({
+  page: 1,
+  limit: 6
+})
+
+// 协同推荐
+const recommended = await courseService.autoSortCollaborative({
+  page: 1,
+  limit: 10
+})
+
+// 批量审核
+await courseService.shBatch([1, 2, 3], '已通过', '审核通过')
+```
+
+## 课程管理接口
+
+### 获取课程列表
+
+**接口地址**: `GET /jianshenkecheng/list`
+
+**前端实现**（参考 `home.vue`）:
+```typescript
+const courseService = getModuleService('jianshenkecheng')
+const { list } = await courseService.list({
+  page: 1,
+  limit: 6,
+  sort: 'clicknum',
+  order: 'desc'
+})
+```
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码，默认1 |
+| limit | number | 每页条数，默认10 |
+| sort | string | 排序字段（如 `clicknum`, `addtime`） |
+| order | string | 排序方向：`asc`/`desc` |
+| kechengleixing | string | 课程类型筛选 |
+| keyword | string | 关键词搜索（模糊匹配） |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "kechengmingcheng": "瑜伽基础课程",
+        "kechengleixing": "瑜伽",
+        "tupian": "/upload/course1.jpg",
+        "kechengjiage": 88.00,
+        "jiaolianxingming": "李教练",
+        "clicknum": 156
+      }
+    ],
+    "total": 25,
+    "page": 1,
+    "limit": 10
+  }
+}
+```
+
+### 获取课程详情
+
+**接口地址**: `GET /jianshenkecheng/detail/{id}`
+
+**前端实现**:
+```typescript
+const detail = await courseService.detail(id)
+```
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "kechengmingcheng": "瑜伽基础课程",
+    "kechengjianjie": "适合初学者的瑜伽课程...",
+    "shangkeshijian": "2024-12-15 10:00:00",
+    "shangkedidian": "1号教室",
+    "kechengjiage": 88.00,
+    "jiaoliangonghao": "coach001",
+    "jiaolianxingming": "李教练"
+  }
+}
+```
+
+### 其他课程接口
+
+- **新增**: `POST /jianshenkecheng/add`（Body: 课程对象）
+- **更新**: `POST /jianshenkecheng/update`（Body: 包含 `id` 的课程对象）
+- **删除**: `POST /jianshenkecheng/delete`（Body: `[1, 2, 3]`）
+- **热门排序**: `GET /jianshenkecheng/autoSort?page=1&limit=10`
+- **协同推荐**: `GET /jianshenkecheng/autoSort2?page=1&limit=10`
+
+## 预约管理接口
+
+### 课程预约
+
+**模块**: `kechengyuyue`
+
+**前端使用**（参考 `useBookingConflict.ts`）:
+```typescript
+const courseService = getModuleService('kechengyuyue')
+
+// 查询用户预约列表（用于冲突检测）
+const { list } = await courseService.list({
+  yonghuzhanghao: userAccount,
+  page: 1,
+  limit: 200
+})
+
+// 创建预约
+await courseService.create({
+  kechengmingcheng: "瑜伽基础课程",
+  yuyueshijian: "2024-12-15 10:00:00",
+  yonghuxingming: "张三",
+  shoujihaoma: "13800000000",
+  beizhu: "初次参加"
+})
+
+// 批量审核
+await courseService.shBatch([1, 2], '已通过', '预约已确认')
+```
+
+**接口列表**:
+- `GET /kechengyuyue/list` - 查询预约列表（自动过滤当前用户）
+- `GET /kechengyuyue/detail/{id}` - 查询预约详情
+- `POST /kechengyuyue/add` - 创建预约
+- `POST /kechengyuyue/update` - 更新预约
+- `POST /kechengyuyue/delete` - 删除预约
+- `POST /kechengyuyue/shBatch` - 批量审核（Query: `sfsh`, `shhf`；Body: `ids[]`）
+
+**关键字段**:
+- `yuyuebianhao`: 预约编号
+- `kechengmingcheng`: 课程名称
+- `yuyueshijian`: 预约时间（格式：`yyyy-MM-dd HH:mm:ss`）
+- `yonghuzhanghao`: 用户账号（自动注入）
+- `sfsh`: 审核状态（`待审核`/`已通过`/`已拒绝`）
+- `ispay`: 支付状态（`未支付`/`已支付`）
+
+### 私教预约
+
+**模块**: `sijiaoyuyue`
+
+**前端使用**:
+```typescript
+const coachService = getModuleService('sijiaoyuyue')
+
+// 查询私教预约列表
+const { list } = await coachService.list({
+  yonghuzhanghao: userAccount,
+  page: 1,
+  limit: 200
+})
+
+// 创建私教预约
+await coachService.create({
+  jiaoliangonghao: "coach001",
+  jiaolianxingming: "李教练",
+  yuyueshijian: "2024-12-15 14:00:00",
+  sijiaojiage: 200.00,
+  yonghuxingming: "张三",
+  shoujihaoma: "13800000000",
+  beizhu: "增肌训练"
+})
+```
+
+**接口列表**:
+- `GET /sijiaoyuyue/list` - 查询私教预约列表
+- `GET /sijiaoyuyue/detail/{id}` - 查询私教预约详情
+- `POST /sijiaoyuyue/add` - 创建私教预约
+- `POST /sijiaoyuyue/update` - 更新私教预约
+- `POST /sijiaoyuyue/delete` - 删除私教预约
+- `POST /sijiaoyuyue/shBatch` - 批量审核
+
+**关键字段**:
+- `yuyuebianhao`: 预约编号
+- `jiaoliangonghao`: 教练工号
+- `jiaolianxingming`: 教练姓名
+- `yuyueshijian`: 预约时间
+- `sijiaojiage`: 私教价格
+- `sfsh`: 审核状态
+- `ispay`: 支付状态
+
+### 预约冲突检测
+
+**前端实现**（参考 `useBookingConflict.ts`）:
+```typescript
+// 同时查询课程预约和私教预约
+const [courseBookings, coachBookings] = await Promise.all([
+  courseService.list({ yonghuzhanghao: userAccount, page: 1, limit: 200 }),
+  coachService.list({ yonghuzhanghao: userAccount, page: 1, limit: 200 })
+])
+
+// 前端解析预约时间，检查时间段冲突
+// 时间段格式：09:00, 14:00, 19:00 等
+```
+
+## 会员管理接口
+
+### 获取会员卡列表
+
+**接口地址**: `GET /huiyuanka/list`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "huiyuankamingcheng": "黑金尊享卡",
+        "jiage": 9999.00,
+        "youxiaoqi": "12 个月",
+        "huiyuantequan": "私教8折，预约优先，专属客服"
+      }
+    ],
+    "total": 3
+  }
+}
+```
+
+### 会员卡购买
+
+**接口地址**: `POST /huiyuankagoumai/add`
+
+**请求参数**:
+```json
+{
+  "huiyuankamingcheng": "黑金尊享卡",
+  "jiage": 9999.00,
+  "goumaishijian": "2024-12-01 10:00:00"
+}
+```
+
+### 续费记录
+
+**接口地址**: `POST /huiyuanxufei/add`
+
+**请求参数**:
+```json
+{
+  "huiyuankamingcheng": "黑金尊享卡",
+  "jiage": 9999.00,
+  "xufeishijian": "2024-12-01 10:00:00"
+}
+```
+
+## 支付接口
+
+### 支付状态查询
+
+**接口地址**: `GET /{tableName}/detail/{recordId}`
+
+**示例**: `GET /kechengyuyue/detail/1`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "id": 1,
+    "ispay": "已支付",
+    "paymethod": "wechat"
+  }
+}
+```
+
+### 更新支付状态
+
+**接口地址**: `POST /{tableName}/update`
+
+**请求参数**:
+```json
+{
+  "id": 1,
+  "ispay": "已支付",
+  "paymethod": "wechat"
+}
+```
+
+## 内容管理接口
+
+### 获取新闻列表
+
+**接口地址**: `GET /news/list`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| page | number | 页码 |
+| limit | number | 每页条数 |
+| newstype | string | 新闻类型 |
+| title | string | 标题关键词 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "title": "新课程上线通知",
+        "introduction": "我们即将推出...",
+        "addtime": "2024-12-01 09:00:00",
+        "clicknum": 256
+      }
+    ],
+    "total": 15
+  }
+}
+```
+
+### 获取新闻详情
+
+**接口地址**: `GET /news/detail/{id}`
+
+### 点赞/点踩新闻
+
+**接口地址**: `POST /news/thumbsup/{id}`
+
+**查询参数**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| type | number | 是 | 1: 点赞, 0: 点踩 |
+
+## 讨论互动接口
+
+### 获取课程讨论
+
+**接口地址**: `GET /discussjianshenkecheng/autoSort`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| refid | number | 关联课程ID |
+| sfsh | string | 审核状态 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "id": 1,
+      "refid": 1,
+      "nickname": "健身爱好者",
+      "content": "这个课程怎么样？",
+      "reply": "课程很不错，推荐参加",
+      "addtime": "2024-12-01 10:30:00"
+    }
+  ]
+}
+```
+
+### 发表讨论
+
+**接口地址**: `POST /discussjianshenkecheng/add`
+
+**请求参数**:
+```json
+{
+  "refid": 1,
+  "content": "课程内容很丰富",
+  "sfsh": "待审核"
+}
+```
+
+### 点赞讨论
+
+**接口地址**: `POST /discussjianshenkecheng/thumbsup/{id}`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| type | number | 点赞类型，固定为1 |
+
+## 收藏管理接口
+
+### 获取收藏列表
+
+**接口地址**: `GET /storeup/list`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| userid | number | 用户ID |
+| tablename | string | 资源表名 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "list": [
+      {
+        "id": 1,
+        "refid": 1,
+        "tablename": "jianshenkecheng",
+        "name": "瑜伽基础课程",
+        "picture": "/upload/course1.jpg",
+        "type": "1"
+      }
+    ],
+    "total": 5
+  }
+}
+```
+
+### 添加收藏
+
+**接口地址**: `POST /storeup/add`
+
+**请求参数**:
+```json
+{
+  "refid": 1,
+  "tablename": "jianshenkecheng",
+  "name": "瑜伽基础课程",
+  "picture": "/upload/course1.jpg",
+  "type": "1",
+  "userid": 1
+}
+```
+
+## 文件上传接口
+
+### 基础文件上传
+
+**接口地址**: `POST /file/upload`
+
+**前端实现**（参考 `img.vue`）:
+```typescript
+const param = new FormData()
+param.append('file', file)
+param.append('type', 'avatar')  // 可选
+
+const response = await http.post('file/upload', param, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+})
+```
+
+**请求方式**: FormData
+
+**参数**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| file | File | 是 | 上传的文件 |
+| type | string | 否 | 文件类型 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "file": "/upload/avatar_1234567890.jpg"
+}
+```
+
+### 素材上传（增强版）
+
+**接口地址**: `POST /file/uploadAsset`
+
+**请求方式**: FormData
+
+**参数**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| file | File | 是 | 素材文件 |
+| assetName | string | 否 | 素材名称 |
+| assetType | string | 否 | 素材类型（image/video/icon/model/lottie） |
+| module | string | 否 | 所属模块 |
+| usage | string | 否 | 使用场景 |
+| tags | string | 否 | 标签（逗号分隔） |
+| category | string | 否 | 分类 |
+| description | string | 否 | 描述 |
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "file": "upload/assets/course/image/course-hero_v1_1234567890.jpg",
+  "assetId": 123,
+  "width": 1920,
+  "height": 1080,
+  "dimensions": "1920x1080"
+}
+```
+
+### 其他文件接口
+
+| 接口 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 文件下载 | GET | `/file/download?fileName=xxx.jpg` | 下载文件 |
+| 文件删除 | POST | `/file/delete?fileName=xxx.jpg` | 删除文件 |
+| 视频播放 | GET | `/file/video/{fileName}` | 视频流式播放（支持 Range 请求） |
+| 视频信息 | GET | `/file/video/info/{fileName}` | 获取视频元数据 |
+| 文件列表 | GET | `/file/list?prefix=upload/&page=1&limit=20` | 列出文件（需启用 MinIO） |
+| 文件预览 | GET | `/file/preview/{fileName}` | 获取预览 URL |
+| 预签名 URL | GET | `/file/presigned/{fileName}?expiry=3600` | 生成预签名 URL（需启用 MinIO） |
+
+## 统计分析接口
+
+### 数据分组统计
+
+**接口地址**: `GET /{tableName}/group/{columnName}`
+
+**示例**: `GET /kechengyuyue/group/kechengleixing`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "kechengleixing": "瑜伽",
+      "value": 25
+    },
+    {
+      "kechengleixing": "力量训练",
+      "value": 18
+    }
+  ]
+}
+```
+
+### 数据值统计
+
+**接口地址**: `GET /{tableName}/value/{xColumn}/{yColumn}`
+
+**示例**: `GET /kechengyuyue/value/yuyueshijian/kechengjiage/day`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    {
+      "yuyueshijian": "2024-12-01",
+      "kechengjiage": 1280.00
+    },
+    {
+      "yuyueshijian": "2024-12-02",
+      "kechengjiage": 2560.00
+    }
+  ]
+}
+```
+
+### 时间维度统计
+
+**接口地址**: `GET /{tableName}/value/{xColumn}/{yColumn}/{timeStatType}`
+
+**timeStatType**: `day` | `week` | `month`
+
+### 计数统计
+
+**接口地址**: `GET /{tableName}/count`
+
+**查询参数**: 支持所有字段作为筛选条件
+
+**示例**: `GET /kechengyuyue/count?sfsh=已通过`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "count": 15
+  }
+}
+```
+
+## 系统工具接口
+
+### 级联下拉数据
+
+**接口地址**: `GET /common/option/{table}/{column}`
+
+**示例**: `GET /common/option/jianshenkecheng/kechengleixing`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": [
+    { "label": "瑜伽", "value": "瑜伽" },
+    { "label": "力量训练", "value": "力量训练" }
+  ]
+}
+```
+
+### 关联数据查询
+
+**接口地址**: `GET /common/follow/{table}/{column}`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| conditionColumn | string | 条件字段名 |
+| conditionValue | string | 条件字段值 |
+
+### 审核状态更新
+
+**接口地址**: `POST /common/sh/{table}`
+
+**请求参数**:
+```json
+{
+  "id": 1,
+  "sfsh": "已通过",
+  "shhf": "审核通过"
+}
+```
+
+### 到期提醒查询
+
+**接口地址**: `GET /common/remind/{table}/{column}/{type}`
+
+**查询参数**:
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| remindstart | number | 提醒开始天数 |
+| remindend | number | 提醒结束天数 |
+
+**示例**: `GET /yonghu/remind/youxiaoqizhi/2?remindstart=0&remindend=30`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "count": 5
+  }
+}
+```
+
+### 单列求和
+
+**接口地址**: `GET /common/cal/{table}/{column}`
+
+**示例**: `GET /kechengyuyue/cal/kechengjiage`
+
+**响应示例**:
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "sum": 2560.00
+  }
+}
+```
+
+## 前端使用指南
+
+### 基础配置
+
+前端使用 Axios 作为 HTTP 客户端，配置在 `common/http.ts` 中：
+
+```typescript
+import http from '@/common/http'
+
+// http 实例已配置：
+// - baseURL: 从 config.name 读取
+// - timeout: 86400秒
+// - withCredentials: true
+// - 自动添加 Token 头
+// - 自动添加 CSRF Token（非GET请求）
+// - 自动添加 X-Request-ID
+```
+
+### 使用 CrudService
+
+推荐使用 `CrudService` 进行 CRUD 操作：
+
+```typescript
+import { getModuleService } from '@/services/crud'
+
+// 获取服务实例
+const courseService = getModuleService('jianshenkecheng')
+
+// 查询列表
+const { list, total } = await courseService.list({
+  page: 1,
+  limit: 10,
+  sort: 'clicknum',
+  order: 'desc'
+})
+
+// 查询详情
+const detail = await courseService.detail(1)
+
+// 新增
+await courseService.create({ ... })
+
+// 更新
+await courseService.update({ id: 1, ... })
+
+// 删除
+await courseService.remove([1, 2, 3])
+```
+
+### 直接使用 http
+
+对于特殊接口，可以直接使用 `http`：
+
+```typescript
+import http from '@/common/http'
+
+// GET 请求
+const response = await http.get<ApiResponse<PageResult<NewsItem>>>('/news/list', {
+  params: { page: 1, limit: 4, sort: 'addtime', order: 'desc' }
+})
+
+// POST 请求
+const response = await http.post<ApiResponse>('/kechengyuyue/add', {
+  kechengmingcheng: '瑜伽基础课程',
+  yuyueshijian: '2024-12-15 10:00:00'
+})
+
+// 文件上传
+const formData = new FormData()
+formData.append('file', file)
+const response = await http.post('/file/upload', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+})
+```
+
+### 错误处理
+
+前端 `http.ts` 拦截器已自动处理常见错误：
+
+- **401/403**: 自动跳转错误页，清空 localStorage
+- **500（业务错误）**: 业务请求（登录/注册/列表/详情）不跳转，其他请求跳转错误页
+- **网络错误**: 自动跳转 `/error/network`
+
+在组件中只需处理业务逻辑错误：
+
+```typescript
+try {
+  const { list } = await courseService.list()
+  // 处理成功情况
+} catch (error) {
+  // error.message 包含错误信息
+  ElMessage.error(error.message || '操作失败')
+}
+```
+
+### 完整示例
+
+```typescript
+// 登录并获取用户信息
+async function loginAndGetProfile() {
+  try {
+    // 登录
+    const loginResponse = await http.post(`/${tableName}/login`, null, {
+      params: { username, password }
+    })
+    
+    if (loginResponse.data.code !== 0 || !loginResponse.data.token) {
+      throw new Error(loginResponse.data.msg || '登录失败')
+    }
+    
+    // 保存 token
+    storage.set('frontToken', loginResponse.data.token)
+    localStorage.setItem('UserTableName', tableName)
+    
+    // 获取用户信息
+    const profileResponse = await http.get(`/${tableName}/session`)
+    if (profileResponse.data.data) {
+      localStorage.setItem('userInfo', JSON.stringify(profileResponse.data.data))
+    }
+    
+    return true
+  } catch (error) {
+    console.error('登录失败:', error)
+    ElMessage.error(error.message || '登录失败，请稍后重试')
+    return false
+  }
+}
+
+// 查询热门课程
+async function loadHotCourses() {
+  try {
+    const courseService = getModuleService('jianshenkecheng')
+    const { list } = await courseService.list({
+      page: 1,
+      limit: 6,
+      sort: 'clicknum',
+      order: 'desc'
+    })
+    return list
+  } catch (error) {
+    console.error('加载课程失败:', error)
+    ElMessage.error('无法获取热门课程')
+    return []
+  }
+}
+```
+
+## 总结
+
+API 接口设计遵循以下原则：
+
+1. **RESTful 设计**: 使用标准的 HTTP 方法和状态码
+2. **统一响应格式**: 所有接口返回统一的 JSON 结构
+3. **完善的分页**: 支持灵活的分页和排序参数
+4. **详细的错误处理**: 提供明确的错误码和错误信息
+5. **安全性**: 支持 JWT 认证和权限控制
+6. **可扩展性**: 支持自定义查询和统计接口
+
+通过这些接口，前端应用可以实现完整的业务功能，包括用户管理、课程预约、支付流程、内容管理等核心业务场景。

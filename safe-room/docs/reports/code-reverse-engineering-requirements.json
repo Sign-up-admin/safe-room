@@ -1,0 +1,4421 @@
+{
+  "frontend": {
+    "components": [
+      {
+        "name": "BookingCalendar",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\BookingCalendar.vue",
+        "props": [],
+        "functionality": [
+          "isActiveSlot",
+          "resolveTooltip",
+          "if",
+          "media"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供课程预约和预订功能"
+      },
+      {
+        "name": "BookingSummary",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\BookingSummary.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "element-plus",
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "提供课程预约和预订功能"
+      },
+      {
+        "name": "CoachRecommend",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\CoachRecommend.vue",
+        "props": [],
+        "functionality": [
+          "deriveRating",
+          "resolveAssetUrl",
+          "handleCardHover",
+          "handleCardLeave",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@element-plus/icons-vue",
+          "gsap",
+          "@/types/modules",
+          "@/components/common"
+        ],
+        "businessPurpose": "管理教练信息和私教服务"
+      },
+      {
+        "name": "CoursePicker",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\CoursePicker.vue",
+        "props": [],
+        "functionality": [
+          "resolveAssetUrl",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@element-plus/icons-vue",
+          "@/types/modules",
+          "@/utils/formatters",
+          "@/components/common"
+        ],
+        "businessPurpose": "展示和管理系统课程信息"
+      },
+      {
+        "name": "GoalSelector",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\GoalSelector.vue",
+        "props": [],
+        "functionality": [
+          "for",
+          "toggleGoal",
+          "highlightPoint",
+          "unhighlightPoint",
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "支持课程预约和时间安排"
+      },
+      {
+        "name": "SchedulePlanner",
+        "category": "booking",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\booking\\SchedulePlanner.vue",
+        "props": [],
+        "functionality": [],
+        "dependencies": [
+          "vue",
+          "./BookingCalendar.vue"
+        ],
+        "businessPurpose": "支持课程预约和时间安排"
+      },
+      {
+        "name": "Equipment3DViewer",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\Equipment3DViewer.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "init3DViewer",
+          "createModel",
+          "addControls",
+          "animate",
+          "fitCameraToModel",
+          "resetCamera",
+          "toggleAutoRotate",
+          "updateModel",
+          "deriveDifficulty",
+          "handleResize",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "three",
+          "@/components/common",
+          "@/types/modules"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "MobileForm",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\MobileForm.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "deep",
+          "and",
+          "media"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "RecommendationCard",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\RecommendationCard.vue",
+        "props": [],
+        "functionality": [
+          "switch",
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "element-plus"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "RotateVerify",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\RotateVerify.vue",
+        "props": [],
+        "functionality": [
+          "injectStyles",
+          "if",
+          "catch",
+          "getInlineCss",
+          "initDom",
+          "initCanvasImg",
+          "initImgSrc",
+          "drawImgCan",
+          "initMouse",
+          "initTouch",
+          "refreshSlide",
+          "resetSlide"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "SafeHtml",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\SafeHtml.vue",
+        "props": [],
+        "functionality": [
+          "if"
+        ],
+        "dependencies": [
+          "vue",
+          "@/utils/security"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "Stepper",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\Stepper.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/composables/useStepTransition"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "TechButton",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\TechButton.vue",
+        "props": [],
+        "functionality": [],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "TechCard",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\TechCard.vue",
+        "props": [],
+        "functionality": [
+          "slotted"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "TechStepper",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\TechStepper.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "VerifyCode",
+        "category": "common",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\common\\VerifyCode.vue",
+        "props": [],
+        "functionality": [
+          "generateCode",
+          "for",
+          "generateDisplayCode",
+          "getCharStyle",
+          "if",
+          "refreshCode",
+          "checkCode"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "提供common相关的用户界面功能"
+      },
+      {
+        "name": "CourseBenefitsChart",
+        "category": "courses",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\courses\\CourseBenefitsChart.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "展示和管理系统课程信息"
+      },
+      {
+        "name": "CourseCard",
+        "category": "courses",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\courses\\CourseCard.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/types/modules",
+          "@/config/config",
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "展示和管理系统课程信息"
+      },
+      {
+        "name": "AdvancedFilters",
+        "category": "discussion",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\discussion\\AdvancedFilters.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "element-plus",
+          "@/components/common/TechButton.vue"
+        ],
+        "businessPurpose": "支持课程讨论和社区互动"
+      },
+      {
+        "name": "DiscussionComposer",
+        "category": "discussion",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\discussion\\DiscussionComposer.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "for",
+          "catch",
+          "forEach",
+          "not",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "element-plus",
+          "@/components/common",
+          "@/services/crud",
+          "@/types/modules"
+        ],
+        "businessPurpose": "支持课程讨论和社区互动"
+      },
+      {
+        "name": "DiscussionReplies",
+        "category": "discussion",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\discussion\\DiscussionReplies.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media",
+          "deep"
+        ],
+        "dependencies": [
+          "vue",
+          "@/components/common",
+          "@/composables/useDiscussionInteraction",
+          "@/assets/touxiang.png",
+          "@/config/config"
+        ],
+        "businessPurpose": "支持课程讨论和社区互动"
+      },
+      {
+        "name": "TopicCloud",
+        "category": "discussion",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\discussion\\TopicCloud.vue",
+        "props": [],
+        "functionality": [
+          "child",
+          "media"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "支持课程讨论和社区互动"
+      },
+      {
+        "name": "FavoritesOverview",
+        "category": "favorites",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\favorites\\FavoritesOverview.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/components/common"
+        ],
+        "businessPurpose": "提供favorites相关的用户界面功能"
+      },
+      {
+        "name": "CoachNetwork",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\CoachNetwork.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "disposeMaterials",
+          "createCoachRhombicDodecahedron",
+          "for",
+          "initThreeScene",
+          "setupMouseControls",
+          "animate",
+          "handleResize",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "three",
+          "@/composables/useParticleSystem",
+          "@/utils/animationConfig"
+        ],
+        "businessPurpose": "管理教练信息和私教服务"
+      },
+      {
+        "name": "FloatingServiceButton",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\FloatingServiceButton.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "Footer",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\Footer.vue",
+        "props": [],
+        "functionality": [
+          "media"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "HeroSection",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\HeroSection.vue",
+        "props": [],
+        "functionality": [
+          "init3DScene",
+          "createModel",
+          "if",
+          "animate",
+          "handleResize",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "three",
+          "@/composables/useParticleSystem",
+          "@/utils/animationConfig"
+        ],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "ServiceCards",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\ServiceCards.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "@/config/config"
+        ],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "SmartHeader",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\SmartHeader.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "child",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "gsap"
+        ],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "Testimonials",
+        "category": "home",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\home\\Testimonials.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/composables/useScrollAnimation"
+        ],
+        "businessPurpose": "提供home相关的用户界面功能"
+      },
+      {
+        "name": "MembershipBenefits",
+        "category": "membership",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\membership\\MembershipBenefits.vue",
+        "props": [],
+        "functionality": [
+          "drawRadarChart",
+          "for",
+          "drawBarChart",
+          "drawComparisonChart",
+          "if",
+          "handleResize",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "d3",
+          "d3-shape",
+          "@/types/modules"
+        ],
+        "businessPurpose": "管理会员卡和会员权益"
+      },
+      {
+        "name": "MembershipCard",
+        "category": "membership",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\membership\\MembershipCard.vue",
+        "props": [],
+        "functionality": [
+          "handleClick",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/components/common",
+          "@/types/modules",
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "管理会员卡和会员权益"
+      },
+      {
+        "name": "MembershipComparison",
+        "category": "membership",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\membership\\MembershipComparison.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/types/modules",
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "管理会员卡和会员权益"
+      },
+      {
+        "name": "ModuleDetail",
+        "category": "modules",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\modules\\ModuleDetail.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "formatFieldValue",
+          "switch",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/composables/useModuleCrud",
+          "@/types/modules",
+          "@/config/modules",
+          "@/utils/formatters",
+          "@/components/common/SafeHtml.vue"
+        ],
+        "businessPurpose": "提供modules相关的用户界面功能"
+      },
+      {
+        "name": "ModuleForm",
+        "category": "modules",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\modules\\ModuleForm.vue",
+        "props": [],
+        "functionality": [
+          "if",
+          "switch",
+          "handleSubmit",
+          "handleCancel",
+          "resetForm",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "element-plus",
+          "@/config/modules",
+          "@/composables/useModuleCrud",
+          "@/types/modules",
+          "@/components/FileUpload.vue",
+          "@/components/Editor.vue"
+        ],
+        "businessPurpose": "提供modules相关的用户界面功能"
+      },
+      {
+        "name": "ModuleList",
+        "category": "modules",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\modules\\ModuleList.vue",
+        "props": [],
+        "functionality": [
+          "formatFieldValue",
+          "if",
+          "switch",
+          "getSearchComponent",
+          "getSearchComponentProps",
+          "handleSelectionChange",
+          "deep",
+          "media"
+        ],
+        "dependencies": [
+          "vue",
+          "@/types/modules",
+          "@/config/modules",
+          "@/composables/useModuleCrud",
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "提供modules相关的用户界面功能"
+      },
+      {
+        "name": "MobilePaymentConfirm",
+        "category": "payment",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\payment\\MobilePaymentConfirm.vue",
+        "props": [],
+        "functionality": [
+          "not",
+          "media",
+          "and"
+        ],
+        "dependencies": [
+          "@/utils/formatters"
+        ],
+        "businessPurpose": "处理支付流程和支付状态管理"
+      },
+      {
+        "name": "PaymentMethodCard",
+        "category": "payment",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\payment\\PaymentMethodCard.vue",
+        "props": [],
+        "functionality": [],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "处理支付流程和支付状态管理"
+      },
+      {
+        "name": "PaymentResult",
+        "category": "payment",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\payment\\PaymentResult.vue",
+        "props": [],
+        "functionality": [
+          "startCountdown",
+          "if",
+          "stopCountdown",
+          "resetCountdown"
+        ],
+        "dependencies": [
+          "vue"
+        ],
+        "businessPurpose": "处理支付流程和支付状态管理"
+      },
+      {
+        "name": "PaymentStepper",
+        "category": "payment",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\components\\payment\\PaymentStepper.vue",
+        "props": [],
+        "functionality": [
+          "statusFor",
+          "media",
+          "and"
+        ],
+        "dependencies": [],
+        "businessPurpose": "处理支付流程和支付状态管理"
+      }
+    ],
+    "composables": [
+      {
+        "name": "useAdvancedSearch",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useAdvancedSearch.ts",
+        "exportedFunctions": [
+          "useAdvancedSearch"
+        ],
+        "functionality": [
+          "状态管理",
+          "响应式监听"
+        ],
+        "businessPurpose": "提供useAdvancedSearch相关的组合式功能"
+      },
+      {
+        "name": "useAnimations",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useAnimations.ts",
+        "exportedFunctions": [
+          "useAnimations",
+          "useHoverGlow",
+          "usePageTransition",
+          "useLoadingGlow",
+          "useCalendarAnimation",
+          "useStepperAnimation",
+          "useCardHoverAnimation"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供动画效果支持"
+      },
+      {
+        "name": "useBookingConflict",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useBookingConflict.ts",
+        "exportedFunctions": [
+          "useBookingConflict"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "处理课程预约业务逻辑"
+      },
+      {
+        "name": "useBookingRecommend",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useBookingRecommend.ts",
+        "exportedFunctions": [
+          "useBookingRecommend"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "处理课程预约业务逻辑"
+      },
+      {
+        "name": "useCoachRecommend",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useCoachRecommend.ts",
+        "exportedFunctions": [
+          "useCoachRecommend"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useCoachRecommend相关的组合式功能"
+      },
+      {
+        "name": "useDiscussionInteraction",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useDiscussionInteraction.ts",
+        "exportedFunctions": [
+          "useDiscussionInteraction"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useDiscussionInteraction相关的组合式功能"
+      },
+      {
+        "name": "useDiscussionManagement",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useDiscussionManagement.ts",
+        "exportedFunctions": [
+          "useDiscussionManagement"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useDiscussionManagement相关的组合式功能"
+      },
+      {
+        "name": "useFavoritesStore",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useFavoritesStore.ts",
+        "exportedFunctions": [
+          "useFavoritesStore"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useFavoritesStore相关的组合式功能"
+      },
+      {
+        "name": "useFocusManagement",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useFocusManagement.ts",
+        "exportedFunctions": [
+          "useFocusManagement",
+          "useScreenReaderAnnouncements",
+          "useAccessibleRouting"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useFocusManagement相关的组合式功能"
+      },
+      {
+        "name": "useHotTopics",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useHotTopics.ts",
+        "exportedFunctions": [
+          "useHotTopics"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useHotTopics相关的组合式功能"
+      },
+      {
+        "name": "useHoverGlow",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useHoverGlow.ts",
+        "exportedFunctions": [
+          "useHoverGlow"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useHoverGlow相关的组合式功能"
+      },
+      {
+        "name": "useKeyboardNavigation",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useKeyboardNavigation.ts",
+        "exportedFunctions": [
+          "useKeyboardNavigation",
+          "useCalendarKeyboardNavigation",
+          "useTableKeyboardNavigation",
+          "useStepperKeyboardNavigation",
+          "useKeyboardShortcuts"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useKeyboardNavigation相关的组合式功能"
+      },
+      {
+        "name": "useLoadingGlow",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useLoadingGlow.ts",
+        "exportedFunctions": [
+          "useLoadingGlow"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "提供useLoadingGlow相关的组合式功能"
+      },
+      {
+        "name": "useMembershipSelection",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useMembershipSelection.ts",
+        "exportedFunctions": [
+          "useMembershipSelection",
+          "useMembershipSelectionComposable"
+        ],
+        "functionality": [
+          "状态管理",
+          "响应式监听"
+        ],
+        "businessPurpose": "提供useMembershipSelection相关的组合式功能"
+      },
+      {
+        "name": "useMessageCenter",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useMessageCenter.ts",
+        "exportedFunctions": [
+          "useMessageCenter"
+        ],
+        "functionality": [
+          "状态管理",
+          "API调用"
+        ],
+        "businessPurpose": "提供useMessageCenter相关的组合式功能"
+      },
+      {
+        "name": "useModuleCrud",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useModuleCrud.ts",
+        "exportedFunctions": [
+          "useModuleList",
+          "useModuleDetail",
+          "useModuleForm"
+        ],
+        "functionality": [
+          "状态管理",
+          "响应式监听",
+          "API调用"
+        ],
+        "businessPurpose": "提供useModuleCrud相关的组合式功能"
+      },
+      {
+        "name": "useMotion",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useMotion.ts",
+        "exportedFunctions": [
+          "resolveElement",
+          "useHoverGlow",
+          "usePageTransition",
+          "useLoadingGlow"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useMotion相关的组合式功能"
+      },
+      {
+        "name": "useNotificationWebSocket",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useNotificationWebSocket.ts",
+        "exportedFunctions": [
+          "useNotificationWebSocket"
+        ],
+        "functionality": [
+          "状态管理"
+        ],
+        "businessPurpose": "处理消息通知功能"
+      },
+      {
+        "name": "usePageTransition",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\usePageTransition.ts",
+        "exportedFunctions": [
+          "usePageTransition"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供usePageTransition相关的组合式功能"
+      },
+      {
+        "name": "useParticleSystem",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useParticleSystem.ts",
+        "exportedFunctions": [
+          "useParticleSystem"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useParticleSystem相关的组合式功能"
+      },
+      {
+        "name": "usePaymentStatus",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\usePaymentStatus.ts",
+        "exportedFunctions": [
+          "usePaymentStatus"
+        ],
+        "functionality": [
+          "状态管理",
+          "API调用"
+        ],
+        "businessPurpose": "管理支付流程和状态"
+      },
+      {
+        "name": "usePricingEngine",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\usePricingEngine.ts",
+        "exportedFunctions": [
+          "usePricingEngine"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供usePricingEngine相关的组合式功能"
+      },
+      {
+        "name": "useRecommendation",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useRecommendation.ts",
+        "exportedFunctions": [
+          "useRecommendation"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useRecommendation相关的组合式功能"
+      },
+      {
+        "name": "useScrollAnimation",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useScrollAnimation.ts",
+        "exportedFunctions": [
+          "useScrollAnimation"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供动画效果支持"
+      },
+      {
+        "name": "useStepTransition",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useStepTransition.ts",
+        "exportedFunctions": [
+          "useStepTransition"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供useStepTransition相关的组合式功能"
+      },
+      {
+        "name": "useSuccessAnimation",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useSuccessAnimation.ts",
+        "exportedFunctions": [
+          "useSuccessAnimation"
+        ],
+        "functionality": [],
+        "businessPurpose": "提供动画效果支持"
+      },
+      {
+        "name": "useTheme",
+        "file": "springboot1ngh61a2\\src\\main\\resources\\front\\front\\src\\composables\\useTheme.ts",
+        "exportedFunctions": [
+          "useTheme"
+        ],
+        "functionality": [
+          "响应式监听"
+        ],
+        "businessPurpose": "提供useTheme相关的组合式功能"
+      }
+    ],
+    "pages": [
+      {
+        "name": "docs",
+        "module": "api",
+        "route": "/api/docs",
+        "functionality": [
+          "页面导航",
+          "数据分页"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton"
+        ],
+        "businessPurpose": "提供api模块的docs页面功能"
+      },
+      {
+        "name": "center",
+        "module": "center",
+        "route": "/center/center",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton",
+          "FormInstance",
+          "Profile",
+          "Array",
+          "ApiResponse"
+        ],
+        "businessPurpose": "提供center模块的center页面功能"
+      },
+      {
+        "name": "add",
+        "module": "chat",
+        "route": "/chat/add",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "TechCard",
+          "FormInstance",
+          "ChatForm",
+          "ApiResponse"
+        ],
+        "businessPurpose": "提供chat新增功能，支持数据录入"
+      },
+      {
+        "name": "list",
+        "module": "chat",
+        "route": "/chat/list",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "ChatMessage",
+          "ApiResponse",
+          "PageResult"
+        ],
+        "businessPurpose": "展示chat列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "daoqitixing",
+        "route": "/daoqitixing/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供daoqitixing新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "daoqitixing",
+        "route": "/daoqitixing/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示daoqitixing详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "daoqitixing",
+        "route": "/daoqitixing/list",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "Daoqitixing"
+        ],
+        "businessPurpose": "展示daoqitixing列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "discussjianshenkecheng",
+        "route": "/discussjianshenkecheng/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供discussjianshenkecheng新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "discussjianshenkecheng",
+        "route": "/discussjianshenkecheng/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示discussjianshenkecheng详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "discussjianshenkecheng",
+        "route": "/discussjianshenkecheng/list",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "TopicCloud",
+          "AdvancedFilters",
+          "DiscussionReplies",
+          "RecommendationCard",
+          "DiscussionComposer",
+          "Discussjianshenkecheng",
+          "Array",
+          "HTMLElement"
+        ],
+        "businessPurpose": "展示discussjianshenkecheng列表信息，支持查询和筛选"
+      },
+      {
+        "name": "404",
+        "module": "error",
+        "route": "/error/404",
+        "functionality": [],
+        "components": [
+          "ErrorPage"
+        ],
+        "businessPurpose": "提供error模块的404页面功能"
+      },
+      {
+        "name": "ErrorPage",
+        "module": "error",
+        "route": "/error/ErrorPage",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "HTMLElement"
+        ],
+        "businessPurpose": "提供error模块的ErrorPage页面功能"
+      },
+      {
+        "name": "home",
+        "module": "home",
+        "route": "/home/home",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "HeroSection",
+          "CoachNetwork",
+          "ServiceCards",
+          "Testimonials",
+          "TechCard",
+          "TechButton",
+          "TechFooter",
+          "FloatingServiceButton",
+          "Jianshenkecheng",
+          "NewsItem",
+          "CoachNodeView",
+          "CoachLink",
+          "ApiResponse",
+          "PageResult"
+        ],
+        "businessPurpose": "提供home模块的home页面功能"
+      },
+      {
+        "name": "add",
+        "module": "huiyuanka",
+        "route": "/huiyuanka/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供huiyuanka新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "huiyuanka",
+        "route": "/huiyuanka/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示huiyuanka详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "huiyuanka",
+        "route": "/huiyuanka/list",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "MembershipCard",
+          "TechCard",
+          "MembershipComparison",
+          "MembershipBenefits",
+          "Huiyuanka",
+          "HTMLElement",
+          "Record"
+        ],
+        "businessPurpose": "展示huiyuanka列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "huiyuankagoumai",
+        "route": "/huiyuankagoumai/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供huiyuankagoumai新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "huiyuankagoumai",
+        "route": "/huiyuankagoumai/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示huiyuankagoumai详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "huiyuankagoumai",
+        "route": "/huiyuankagoumai/list",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "PaymentStepper",
+          "TechCard",
+          "MembershipCard",
+          "TechButton",
+          "PaymentMethodCard",
+          "Huiyuanka",
+          "InstanceType",
+          "Huiyuankagoumai"
+        ],
+        "businessPurpose": "展示huiyuankagoumai列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "huiyuanxufei",
+        "route": "/huiyuanxufei/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供huiyuanxufei新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "huiyuanxufei",
+        "route": "/huiyuanxufei/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示huiyuanxufei详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "huiyuanxufei",
+        "route": "/huiyuanxufei/list",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "Huiyuanxufei",
+          "Daoqitixing"
+        ],
+        "businessPurpose": "展示huiyuanxufei列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "jianshenjiaolian",
+        "route": "/jianshenjiaolian/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供jianshenjiaolian新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "jianshenjiaolian",
+        "route": "/jianshenjiaolian/detail",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "CourseBenefitsChart",
+          "Stepper",
+          "Jianshenjiaolian",
+          "Jianshenkecheng"
+        ],
+        "businessPurpose": "显示jianshenjiaolian详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "jianshenjiaolian",
+        "route": "/jianshenjiaolian/list",
+        "functionality": [
+          "表单处理",
+          "页面导航",
+          "数据分页"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton",
+          "CoachNetwork",
+          "CoachView",
+          "CoachLink"
+        ],
+        "businessPurpose": "展示jianshenjiaolian列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "jianshenkecheng",
+        "route": "/jianshenkecheng/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供jianshenkecheng新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "jianshenkecheng",
+        "route": "/jianshenkecheng/detail",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "CourseBenefitsChart",
+          "Stepper",
+          "CourseCard",
+          "Jianshenkecheng",
+          "Jianshenjiaolian",
+          "ComponentPublicInstance"
+        ],
+        "businessPurpose": "显示jianshenkecheng详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "jianshenkecheng",
+        "route": "/jianshenkecheng/list",
+        "functionality": [
+          "表单处理",
+          "页面导航",
+          "数据分页"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton",
+          "CourseCard",
+          "Jianshenkecheng"
+        ],
+        "businessPurpose": "展示jianshenkecheng列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "jianshenqicai",
+        "route": "/jianshenqicai/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供jianshenqicai新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "jianshenqicai",
+        "route": "/jianshenqicai/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示jianshenqicai详细信息，支持查看和操作"
+      },
+      {
+        "name": "EquipmentDetail",
+        "module": "jianshenqicai",
+        "route": "/jianshenqicai/EquipmentDetail",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "Equipment3DViewer",
+          "SafeHtml",
+          "Emits",
+          "Jianshenqicai"
+        ],
+        "businessPurpose": "提供jianshenqicai模块的EquipmentDetail页面功能"
+      },
+      {
+        "name": "list",
+        "module": "jianshenqicai",
+        "route": "/jianshenqicai/list",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "Equipment3DViewer",
+          "Jianshenqicai"
+        ],
+        "businessPurpose": "展示jianshenqicai列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "kechengleixing",
+        "route": "/kechengleixing/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供kechengleixing新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "kechengleixing",
+        "route": "/kechengleixing/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示kechengleixing详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "kechengleixing",
+        "route": "/kechengleixing/list",
+        "functionality": [],
+        "components": [
+          "ModuleListPage"
+        ],
+        "businessPurpose": "展示kechengleixing列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "kechengtuike",
+        "route": "/kechengtuike/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供kechengtuike新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "kechengtuike",
+        "route": "/kechengtuike/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示kechengtuike详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "kechengtuike",
+        "route": "/kechengtuike/list",
+        "functionality": [],
+        "components": [
+          "ModuleListPage"
+        ],
+        "businessPurpose": "展示kechengtuike列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "kechengyuyue",
+        "route": "/kechengyuyue/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供kechengyuyue新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "kechengyuyue",
+        "route": "/kechengyuyue/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示kechengyuyue详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "kechengyuyue",
+        "route": "/kechengyuyue/list",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "Stepper",
+          "TechCard",
+          "CoursePicker",
+          "TechButton",
+          "BookingCalendar",
+          "BookingSummary",
+          "Jianshenkecheng",
+          "HTMLElement",
+          "HTMLCanvasElement",
+          "InstanceType",
+          "SelectedSlot",
+          "Kechengyuyue"
+        ],
+        "businessPurpose": "展示kechengyuyue列表信息，支持查询和筛选"
+      },
+      {
+        "name": "disclaimer",
+        "module": "legal",
+        "route": "/legal/disclaimer",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton"
+        ],
+        "businessPurpose": "提供legal模块的disclaimer页面功能"
+      },
+      {
+        "name": "privacy",
+        "module": "legal",
+        "route": "/legal/privacy",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [],
+        "businessPurpose": "提供legal模块的privacy页面功能"
+      },
+      {
+        "name": "requirements",
+        "module": "legal",
+        "route": "/legal/requirements",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechCard",
+          "TechButton"
+        ],
+        "businessPurpose": "提供legal模块的requirements页面功能"
+      },
+      {
+        "name": "terms",
+        "module": "legal",
+        "route": "/legal/terms",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [],
+        "businessPurpose": "提供legal模块的terms页面功能"
+      },
+      {
+        "name": "login",
+        "module": "login",
+        "route": "/login/login",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "FormInstance",
+          "LoginResponse",
+          "ApiResponse",
+          "Record"
+        ],
+        "businessPurpose": "提供login模块的login页面功能"
+      },
+      {
+        "name": "news-detail",
+        "module": "news",
+        "route": "/news/news-detail",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "SafeHtml",
+          "NewsItem",
+          "ApiResponse",
+          "PageResult"
+        ],
+        "businessPurpose": "提供news模块的news-detail页面功能"
+      },
+      {
+        "name": "news-list",
+        "module": "news",
+        "route": "/news/news-list",
+        "functionality": [
+          "表单处理",
+          "页面导航",
+          "数据分页"
+        ],
+        "components": [
+          "TechButton",
+          "TechCard",
+          "NewsItem",
+          "Array",
+          "ApiResponse",
+          "PageResult"
+        ],
+        "businessPurpose": "提供news模块的news-list页面功能"
+      },
+      {
+        "name": "add",
+        "module": "newstype",
+        "route": "/newstype/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供newstype新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "newstype",
+        "route": "/newstype/detail",
+        "functionality": [],
+        "components": [],
+        "businessPurpose": "显示newstype详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "newstype",
+        "route": "/newstype/list",
+        "functionality": [],
+        "components": [
+          "ModuleListPage"
+        ],
+        "businessPurpose": "展示newstype列表信息，支持查询和筛选"
+      },
+      {
+        "name": "index",
+        "module": "pay",
+        "route": "/pay/index",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "PaymentStepper",
+          "PaymentMethodCard",
+          "PaymentResult",
+          "ApiResponse"
+        ],
+        "businessPurpose": "提供pay模块的index页面功能"
+      },
+      {
+        "name": "register",
+        "module": "register",
+        "route": "/register/register",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "FormInstance",
+          "ApiResponse"
+        ],
+        "businessPurpose": "提供register模块的register页面功能"
+      },
+      {
+        "name": "ModuleDetailPage",
+        "module": "shared",
+        "route": "/shared/ModuleDetailPage",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "ModuleDetail",
+          "Record"
+        ],
+        "businessPurpose": "提供shared模块的ModuleDetailPage页面功能"
+      },
+      {
+        "name": "ModuleFormPage",
+        "module": "shared",
+        "route": "/shared/ModuleFormPage",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "ModuleForm",
+          "Record"
+        ],
+        "businessPurpose": "提供shared模块的ModuleFormPage页面功能"
+      },
+      {
+        "name": "ModuleListPage",
+        "module": "shared",
+        "route": "/shared/ModuleListPage",
+        "functionality": [
+          "页面导航"
+        ],
+        "components": [
+          "ModuleList",
+          "InstanceType",
+          "Record"
+        ],
+        "businessPurpose": "提供shared模块的ModuleListPage页面功能"
+      },
+      {
+        "name": "add",
+        "module": "sijiaoyuyue",
+        "route": "/sijiaoyuyue/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供sijiaoyuyue新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "sijiaoyuyue",
+        "route": "/sijiaoyuyue/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示sijiaoyuyue详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "sijiaoyuyue",
+        "route": "/sijiaoyuyue/list",
+        "functionality": [
+          "表单处理",
+          "页面导航"
+        ],
+        "components": [
+          "Stepper",
+          "TechCard",
+          "CoachRecommend",
+          "TechButton",
+          "GoalSelector",
+          "SchedulePlanner",
+          "BookingSummary",
+          "Jianshenjiaolian",
+          "PackageOption",
+          "SelectedSlot",
+          "InstanceType",
+          "Sijiaoyuyue"
+        ],
+        "businessPurpose": "展示sijiaoyuyue列表信息，支持查询和筛选"
+      },
+      {
+        "name": "list",
+        "module": "storeup",
+        "route": "/storeup/list",
+        "functionality": [
+          "表单处理",
+          "页面导航",
+          "数据分页"
+        ],
+        "components": [
+          "TechButton",
+          "FavoritesOverview",
+          "TechCard",
+          "StoreupItem",
+          "Record",
+          "ApiResponse",
+          "PageResult"
+        ],
+        "businessPurpose": "展示storeup列表信息，支持查询和筛选"
+      },
+      {
+        "name": "add",
+        "module": "yonghu",
+        "route": "/yonghu/add",
+        "functionality": [],
+        "components": [
+          "ModuleFormPage"
+        ],
+        "businessPurpose": "提供yonghu新增功能，支持数据录入"
+      },
+      {
+        "name": "detail",
+        "module": "yonghu",
+        "route": "/yonghu/detail",
+        "functionality": [],
+        "components": [
+          "ModuleDetailPage"
+        ],
+        "businessPurpose": "显示yonghu详细信息，支持查看和操作"
+      },
+      {
+        "name": "list",
+        "module": "yonghu",
+        "route": "/yonghu/list",
+        "functionality": [],
+        "components": [
+          "ModuleListPage"
+        ],
+        "businessPurpose": "展示yonghu列表信息，支持查询和筛选"
+      }
+    ]
+  },
+  "backend": {
+    "controllers": [
+      {
+        "name": "Admin",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\AdminController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供Admin模块的业务API接口"
+      },
+      {
+        "name": "Assets",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\AssetsController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "assetsService"
+        ],
+        "businessPurpose": "提供Assets模块的业务API接口"
+      },
+      {
+        "name": "Chat",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\ChatController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "chatService"
+        ],
+        "businessPurpose": "提供Chat模块的业务API接口"
+      },
+      {
+        "name": "Common",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\CommonController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入"
+        ],
+        "dependencies": [],
+        "businessPurpose": "提供Common模块的业务API接口"
+      },
+      {
+        "name": "Config",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\ConfigController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "configService"
+        ],
+        "businessPurpose": "提供Config模块的业务API接口"
+      },
+      {
+        "name": "Daoqitixing",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\DaoqitixingController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "daoqitixingService",
+          "messageService",
+          "yonghuService"
+        ],
+        "businessPurpose": "提供Daoqitixing模块的业务API接口"
+      },
+      {
+        "name": "Discussjianshenkecheng",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\DiscussjianshenkechengController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "discussjianshenkechengService"
+        ],
+        "businessPurpose": "提供健身课程相关的API接口，包括课程信息、预约管理等"
+      },
+      {
+        "name": "ErrorReport",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\ErrorReportController.java",
+        "endpoints": [],
+        "businessLogic": [],
+        "dependencies": [],
+        "businessPurpose": "提供ErrorReport模块的业务API接口"
+      },
+      {
+        "name": "File",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\FileController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "configService",
+          "assetsService"
+        ],
+        "businessPurpose": "提供File模块的业务API接口"
+      },
+      {
+        "name": "Huiyuanka",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\HuiyuankaController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "huiyuankaService"
+        ],
+        "businessPurpose": "提供会员服务相关的API接口，包括会员卡管理、续费等"
+      },
+      {
+        "name": "Huiyuankagoumai",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\HuiyuankagoumaiController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "huiyuankagoumaiService",
+          "huiyuankaService",
+          "yonghuService"
+        ],
+        "businessPurpose": "提供会员服务相关的API接口，包括会员卡管理、续费等"
+      },
+      {
+        "name": "Huiyuanxufei",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\HuiyuanxufeiController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "huiyuanxufeiService"
+        ],
+        "businessPurpose": "提供会员服务相关的API接口，包括会员卡管理、续费等"
+      },
+      {
+        "name": "Jianshenjiaolian",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\JianshenjiaolianController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "jianshenjiaolianService",
+          "tokenService",
+          "passwordService"
+        ],
+        "businessPurpose": "提供教练服务相关的API接口，包括教练信息、私教预约等"
+      },
+      {
+        "name": "Jianshenkecheng",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\JianshenkechengController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "jianshenkechengService",
+          "storeupService",
+          "kechengyuyueService",
+          "discussjianshenkechengService"
+        ],
+        "businessPurpose": "提供健身课程相关的API接口，包括课程信息、预约管理等"
+      },
+      {
+        "name": "Jianshenqicai",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\JianshenqicaiController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "jianshenqicaiService"
+        ],
+        "businessPurpose": "提供Jianshenqicai模块的业务API接口"
+      },
+      {
+        "name": "Kechengleixing",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\KechengleixingController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "kechengleixingService"
+        ],
+        "businessPurpose": "提供Kechengleixing模块的业务API接口"
+      },
+      {
+        "name": "Kechengtuike",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\KechengtuikeController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "kechengtuikeService"
+        ],
+        "businessPurpose": "提供Kechengtuike模块的业务API接口"
+      },
+      {
+        "name": "Kechengyuyue",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\KechengyuyueController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "kechengyuyueService"
+        ],
+        "businessPurpose": "提供Kechengyuyue模块的业务API接口"
+      },
+      {
+        "name": "LegalTerms",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\LegalTermsController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "legalTermsService"
+        ],
+        "businessPurpose": "提供LegalTerms模块的业务API接口"
+      },
+      {
+        "name": "Message",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\MessageController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "messageService"
+        ],
+        "businessPurpose": "提供Message模块的业务API接口"
+      },
+      {
+        "name": "News",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\NewsController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "newsService",
+          "storeupService"
+        ],
+        "businessPurpose": "提供新闻资讯相关的API接口，包括内容发布、展示等"
+      },
+      {
+        "name": "Newstype",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\NewstypeController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "newstypeService"
+        ],
+        "businessPurpose": "提供新闻资讯相关的API接口，包括内容发布、展示等"
+      },
+      {
+        "name": "OperationLog",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\OperationLogController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入"
+        ],
+        "dependencies": [
+          "operationLogService"
+        ],
+        "businessPurpose": "提供OperationLog模块的业务API接口"
+      },
+      {
+        "name": "Sijiaoyuyue",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\SijiaoyuyueController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "sijiaoyuyueService"
+        ],
+        "businessPurpose": "提供Sijiaoyuyue模块的业务API接口"
+      },
+      {
+        "name": "Storeup",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\StoreupController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "storeupService"
+        ],
+        "businessPurpose": "提供Storeup模块的业务API接口"
+      },
+      {
+        "name": "User",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\UserController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "passwordService",
+          "userService"
+        ],
+        "businessPurpose": "提供用户管理相关的API接口，包括注册、登录、信息管理等"
+      },
+      {
+        "name": "Users",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\UsersController.java",
+        "endpoints": [
+          {
+            "method": "Post",
+            "path": "/register"
+          },
+          {
+            "method": "Get",
+            "path": "logout"
+          }
+        ],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "userService",
+          "tokenService",
+          "passwordService",
+          "operationLogService"
+        ],
+        "businessPurpose": "提供用户管理相关的API接口，包括注册、登录、信息管理等"
+      },
+      {
+        "name": "Yonghu",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\controller\\YonghuController.java",
+        "endpoints": [],
+        "businessLogic": [
+          "依赖注入",
+          "数据保存",
+          "数据删除"
+        ],
+        "dependencies": [
+          "yonghuService",
+          "tokenService",
+          "passwordService"
+        ],
+        "businessPurpose": "提供用户管理相关的API接口，包括注册、登录、信息管理等"
+      }
+    ],
+    "services": [
+      {
+        "name": "AssetsService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\AssetsService.java",
+        "methods": [],
+        "businessLogic": [],
+        "businessPurpose": "处理Assets相关的业务逻辑"
+      },
+      {
+        "name": "ChatService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\ChatService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Chat相关的业务逻辑"
+      },
+      {
+        "name": "CommonService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\CommonService.java",
+        "methods": [],
+        "businessLogic": [],
+        "businessPurpose": "处理Common相关的业务逻辑"
+      },
+      {
+        "name": "ConfigService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\ConfigService.java",
+        "methods": [],
+        "businessLogic": [],
+        "businessPurpose": "处理Config相关的业务逻辑"
+      },
+      {
+        "name": "DaoqitixingService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\DaoqitixingService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Daoqitixing相关的业务逻辑"
+      },
+      {
+        "name": "DiscussjianshenkechengService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\DiscussjianshenkechengService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理健身课程相关的业务逻辑，包括课程管理、预约处理等"
+      },
+      {
+        "name": "HuiyuankagoumaiService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\HuiyuankagoumaiService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理会员服务相关的业务逻辑，包括会员卡管理、续费处理等"
+      },
+      {
+        "name": "HuiyuankaService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\HuiyuankaService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理会员服务相关的业务逻辑，包括会员卡管理、续费处理等"
+      },
+      {
+        "name": "HuiyuanxufeiService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\HuiyuanxufeiService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理会员服务相关的业务逻辑，包括会员卡管理、续费处理等"
+      },
+      {
+        "name": "JianshenjiaolianService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\JianshenjiaolianService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Jianshenjiaolian相关的业务逻辑"
+      },
+      {
+        "name": "JianshenkechengService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\JianshenkechengService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理健身课程相关的业务逻辑，包括课程管理、预约处理等"
+      },
+      {
+        "name": "JianshenqicaiService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\JianshenqicaiService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Jianshenqicai相关的业务逻辑"
+      },
+      {
+        "name": "KechengleixingService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\KechengleixingService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Kechengleixing相关的业务逻辑"
+      },
+      {
+        "name": "KechengtuikeService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\KechengtuikeService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Kechengtuike相关的业务逻辑"
+      },
+      {
+        "name": "KechengyuyueService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\KechengyuyueService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Kechengyuyue相关的业务逻辑"
+      },
+      {
+        "name": "LegalTermsService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\LegalTermsService.java",
+        "methods": [],
+        "businessLogic": [],
+        "businessPurpose": "处理LegalTerms相关的业务逻辑"
+      },
+      {
+        "name": "MembershipCardService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\MembershipCardService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理会员服务相关的业务逻辑，包括会员卡管理、续费处理等"
+      },
+      {
+        "name": "MessageService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\MessageService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Message相关的业务逻辑"
+      },
+      {
+        "name": "MinioService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\MinioService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据删除"
+        ],
+        "businessPurpose": "处理Minio相关的业务逻辑"
+      },
+      {
+        "name": "NewsService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\NewsService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理News相关的业务逻辑"
+      },
+      {
+        "name": "NewstypeService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\NewstypeService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Newstype相关的业务逻辑"
+      },
+      {
+        "name": "OperationLogService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\OperationLogService.java",
+        "methods": [],
+        "businessLogic": [],
+        "businessPurpose": "处理OperationLog相关的业务逻辑"
+      },
+      {
+        "name": "PasswordService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\PasswordService.java",
+        "methods": [
+          "verifyPassword",
+          "isAccountLocked",
+          "handleLoginFailure",
+          "calculateLockUntil",
+          "shouldLockAccount",
+          "resetFailedAttempts",
+          "validatePasswordStrength",
+          "generateRandomPassword"
+        ],
+        "businessLogic": [],
+        "businessPurpose": "处理Password相关的业务逻辑"
+      },
+      {
+        "name": "SijiaoyuyueService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\SijiaoyuyueService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Sijiaoyuyue相关的业务逻辑"
+      },
+      {
+        "name": "StoreupService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\StoreupService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Storeup相关的业务逻辑"
+      },
+      {
+        "name": "TokenService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\TokenService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理Token相关的业务逻辑"
+      },
+      {
+        "name": "UserService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\UserService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理用户相关的业务逻辑，包括用户注册、登录验证、信息管理等"
+      },
+      {
+        "name": "UsersService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\UsersService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理用户相关的业务逻辑，包括用户注册、登录验证、信息管理等"
+      },
+      {
+        "name": "YonghuService",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\service\\YonghuService.java",
+        "methods": [],
+        "businessLogic": [
+          "数据查询"
+        ],
+        "businessPurpose": "处理用户相关的业务逻辑，包括用户注册、登录验证、信息管理等"
+      }
+    ],
+    "entities": [
+      {
+        "name": "Assets",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\AssetsEntity.java",
+        "fields": [
+          "id",
+          "assetName",
+          "assetType",
+          "filePath",
+          "fileSize",
+          "fileFormat",
+          "module",
+          "usage",
+          "dimensions",
+          "width",
+          "height",
+          "version",
+          "description",
+          "tags",
+          "category",
+          "status",
+          "uploadUser",
+          "addtime",
+          "updatetime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Assets相关的数据信息"
+      },
+      {
+        "name": "Chat",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\ChatEntity.java",
+        "fields": [
+          "id",
+          "userid",
+          "adminid",
+          "ask",
+          "reply",
+          "isreply",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Chat相关的数据信息"
+      },
+      {
+        "name": "Config",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\ConfigEntity.java",
+        "fields": [
+          "id",
+          "name",
+          "configValue",
+          "url"
+        ],
+        "relationships": [
+          "存在关联关系"
+        ],
+        "businessPurpose": "存储Config相关的数据信息"
+      },
+      {
+        "name": "CourseReservation",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\CourseReservationEntity.java",
+        "fields": [
+          "id",
+          "reservationNumber",
+          "courseName",
+          "image",
+          "courseType",
+          "classTime",
+          "classLocation",
+          "coursePrice",
+          "coachId",
+          "coachName",
+          "reservationTime",
+          "membershipCardNumber",
+          "username",
+          "fullName",
+          "phoneNumber",
+          "crossUserId",
+          "crossRefId",
+          "auditStatus",
+          "auditContent",
+          "paymentStatus",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "CourseType",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\CourseTypeEntity.java",
+        "fields": [
+          "id",
+          "courseType",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "Daoqitixing",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\DaoqitixingEntity.java",
+        "fields": [
+          "id",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "touxiang",
+          "huiyuankahao",
+          "youxiaoqizhi",
+          "tixingshijian",
+          "beizhu",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Daoqitixing相关的数据信息"
+      },
+      {
+        "name": "Discussjianshenkecheng",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\DiscussjianshenkechengEntity.java",
+        "fields": [
+          "id",
+          "refid",
+          "userid",
+          "avatarurl",
+          "nickname",
+          "content",
+          "reply",
+          "sfsh",
+          "clicktime",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "FitnessCoach",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\FitnessCoachEntity.java",
+        "fields": [
+          "id",
+          "coachId",
+          "password",
+          "coachName",
+          "photo",
+          "gender",
+          "age",
+          "height",
+          "weight",
+          "contactPhone",
+          "privateCoachingPrice",
+          "personalIntroduction",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储教练信息，包括基本信息、专长、服务项目等"
+      },
+      {
+        "name": "FitnessCourseDiscussion",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\FitnessCourseDiscussionEntity.java",
+        "fields": [
+          "id",
+          "refId",
+          "userId",
+          "avatarUrl",
+          "nickname",
+          "content",
+          "reply",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "FitnessCourse",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\FitnessCourseEntity.java",
+        "fields": [
+          "id",
+          "courseName",
+          "courseType",
+          "image",
+          "classTime",
+          "classLocation",
+          "coursePrice",
+          "courseIntroduction",
+          "courseVideo",
+          "coachId",
+          "coachName",
+          "clicktime",
+          "clicknum",
+          "discussnum",
+          "storeupnum",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "FitnessEquipment",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\FitnessEquipmentEntity.java",
+        "fields": [
+          "id",
+          "equipmentName",
+          "image",
+          "brand",
+          "usageMethod",
+          "weightLossEffect",
+          "equipmentIntroduction",
+          "teachingVideo",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储FitnessEquipment相关的数据信息"
+      },
+      {
+        "name": "Huiyuanka",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\HuiyuankaEntity.java",
+        "fields": [
+          "id",
+          "huiyuankamingcheng",
+          "tupian",
+          "youxiaoqi",
+          "jiage",
+          "shiyongshuoming",
+          "huiyuankaxiangqing",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储会员信息，包括会员卡类型、有效期、权益等"
+      },
+      {
+        "name": "Huiyuankagoumai",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\HuiyuankagoumaiEntity.java",
+        "fields": [
+          "id",
+          "huiyuankahao",
+          "huiyuankamingcheng",
+          "tupian",
+          "youxiaoqi",
+          "jiage",
+          "goumairiqi",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "shoujihaoma",
+          "ispay",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储会员信息，包括会员卡类型、有效期、权益等"
+      },
+      {
+        "name": "Huiyuanxufei",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\HuiyuanxufeiEntity.java",
+        "fields": [
+          "id",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "touxiang",
+          "jiaofeibianhao",
+          "huiyuankamingcheng",
+          "youxiaoqi",
+          "jiage",
+          "xufeishijian",
+          "ispay",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储会员信息，包括会员卡类型、有效期、权益等"
+      },
+      {
+        "name": "Jianshenjiaolian",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\JianshenjiaolianEntity.java",
+        "fields": [
+          "id",
+          "jiaoliangonghao",
+          "mima",
+          "passwordHash",
+          "failedLoginAttempts",
+          "lockUntil",
+          "jiaolianxingming",
+          "zhaopian",
+          "xingbie",
+          "nianling",
+          "shengao",
+          "tizhong",
+          "lianxidianhua",
+          "sijiaojiage",
+          "gerenjianjie",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储教练信息，包括基本信息、专长、服务项目等"
+      },
+      {
+        "name": "Jianshenkecheng",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\JianshenkechengEntity.java",
+        "fields": [
+          "id",
+          "kechengmingcheng",
+          "kechengleixing",
+          "tupian",
+          "shangkeshijian",
+          "shangkedidian",
+          "kechengjiage",
+          "kechengjianjie",
+          "kechengshipin",
+          "jiaoliangonghao",
+          "jiaolianxingming",
+          "clicktime",
+          "clicknum",
+          "discussnum",
+          "storeupnum",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储课程信息，包括课程详情、时间安排、教练信息等"
+      },
+      {
+        "name": "Jianshenqicai",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\JianshenqicaiEntity.java",
+        "fields": [
+          "id",
+          "qicaimingcheng",
+          "tupian",
+          "pinpai",
+          "shiyongfangfa",
+          "shoushenxiaoguo",
+          "qicaijieshao",
+          "jiaoxueshipin",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Jianshenqicai相关的数据信息"
+      },
+      {
+        "name": "Kechengleixing",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\KechengleixingEntity.java",
+        "fields": [
+          "id",
+          "kechengleixing",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Kechengleixing相关的数据信息"
+      },
+      {
+        "name": "Kechengtuike",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\KechengtuikeEntity.java",
+        "fields": [
+          "id",
+          "yuyuebianhao",
+          "kechengmingcheng",
+          "tupian",
+          "kechengleixing",
+          "shangkeshijian",
+          "shangkedidian",
+          "kechengjiage",
+          "jiaoliangonghao",
+          "jiaolianxingming",
+          "shenqingshijian",
+          "huiyuankahao",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "shoujihaoma",
+          "tuikeyuanyin",
+          "crossuserid",
+          "crossrefid",
+          "sfsh",
+          "shhf",
+          "ispay",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Kechengtuike相关的数据信息"
+      },
+      {
+        "name": "Kechengyuyue",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\KechengyuyueEntity.java",
+        "fields": [
+          "id",
+          "yuyuebianhao",
+          "kechengmingcheng",
+          "tupian",
+          "kechengleixing",
+          "shangkeshijian",
+          "shangkedidian",
+          "kechengjiage",
+          "jiaoliangonghao",
+          "jiaolianxingming",
+          "yuyueshijian",
+          "huiyuankahao",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "shoujihaoma",
+          "crossuserid",
+          "crossrefid",
+          "sfsh",
+          "shhf",
+          "ispay",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Kechengyuyue相关的数据信息"
+      },
+      {
+        "name": "LegalTerms",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\LegalTermsEntity.java",
+        "fields": [
+          "id",
+          "type",
+          "title",
+          "version",
+          "content",
+          "status",
+          "effectiveDate",
+          "updateTime",
+          "createTime"
+        ],
+        "relationships": [
+          "存在关联关系"
+        ],
+        "businessPurpose": "存储LegalTerms相关的数据信息"
+      },
+      {
+        "name": "MembershipCard",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\MembershipCardEntity.java",
+        "fields": [
+          "id",
+          "membershipCardName",
+          "image",
+          "validityPeriod",
+          "price",
+          "usageInstructions",
+          "membershipCardDetails",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储会员信息，包括会员卡类型、有效期、权益等"
+      },
+      {
+        "name": "MembershipCardPurchase",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\MembershipCardPurchaseEntity.java",
+        "fields": [
+          "id",
+          "membershipCardNumber",
+          "membershipCardName",
+          "image",
+          "validityPeriod",
+          "price",
+          "purchaseDate",
+          "username",
+          "fullName",
+          "phoneNumber",
+          "paymentStatus",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储会员信息，包括会员卡类型、有效期、权益等"
+      },
+      {
+        "name": "Message",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\MessageEntity.java",
+        "fields": [
+          "id",
+          "userid",
+          "title",
+          "content",
+          "type",
+          "isread",
+          "relatedType",
+          "relatedId",
+          "addtime"
+        ],
+        "relationships": [
+          "存在关联关系"
+        ],
+        "businessPurpose": "存储Message相关的数据信息"
+      },
+      {
+        "name": "News",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\NewsEntity.java",
+        "fields": [
+          "id",
+          "title",
+          "introduction",
+          "typename",
+          "name",
+          "headportrait",
+          "clicknum",
+          "clicktime",
+          "thumbsupnum",
+          "crazilynum",
+          "storeupnum",
+          "picture",
+          "content",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储新闻资讯内容，包括标题、内容、发布时间等"
+      },
+      {
+        "name": "Newstype",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\NewstypeEntity.java",
+        "fields": [
+          "id",
+          "typename",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储新闻资讯内容，包括标题、内容、发布时间等"
+      },
+      {
+        "name": "OperationLog",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\OperationLogEntity.java",
+        "fields": [
+          "id",
+          "userid",
+          "username",
+          "tableName",
+          "operationType",
+          "content",
+          "ip",
+          "userAgent",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储OperationLog相关的数据信息"
+      },
+      {
+        "name": "Sijiaoyuyue",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\SijiaoyuyueEntity.java",
+        "fields": [
+          "id",
+          "yuyuebianhao",
+          "jiaoliangonghao",
+          "jiaolianxingming",
+          "zhaopian",
+          "sijiaojiage",
+          "yuyueshijian",
+          "yonghuzhanghao",
+          "yonghuxingming",
+          "shoujihaoma",
+          "huiyuankahao",
+          "beizhu",
+          "sfsh",
+          "shhf",
+          "ispay",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Sijiaoyuyue相关的数据信息"
+      },
+      {
+        "name": "Storeup",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\StoreupEntity.java",
+        "fields": [
+          "id",
+          "userid",
+          "refid",
+          "tablename",
+          "name",
+          "picture",
+          "type",
+          "inteltype",
+          "remark",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Storeup相关的数据信息"
+      },
+      {
+        "name": "Token",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\TokenEntity.java",
+        "fields": [
+          "id",
+          "userid",
+          "username",
+          "tablename",
+          "role",
+          "token",
+          "expiratedtime",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储Token相关的数据信息"
+      },
+      {
+        "name": "User",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\UserEntity.java",
+        "fields": [
+          "id",
+          "username",
+          "password",
+          "passwordHash",
+          "failedLoginAttempts",
+          "lockUntil",
+          "image",
+          "role",
+          "status",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储用户信息，包括基本信息、登录凭据、权限等"
+      },
+      {
+        "name": "Users",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\UsersEntity.java",
+        "fields": [
+          "id",
+          "username",
+          "password",
+          "passwordHash",
+          "failedLoginAttempts",
+          "lockUntil",
+          "image",
+          "role",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储用户信息，包括基本信息、登录凭据、权限等"
+      },
+      {
+        "name": "Yonghu",
+        "file": "springboot1ngh61a2\\src\\main\\java\\com\\entity\\YonghuEntity.java",
+        "fields": [
+          "id",
+          "yonghuzhanghao",
+          "mima",
+          "passwordHash",
+          "failedLoginAttempts",
+          "lockUntil",
+          "yonghuxingming",
+          "touxiang",
+          "xingbie",
+          "shengao",
+          "tizhong",
+          "shoujihaoma",
+          "huiyuankahao",
+          "huiyuankamingcheng",
+          "youxiaoqizhi",
+          "status",
+          "addtime"
+        ],
+        "relationships": [],
+        "businessPurpose": "存储用户信息，包括基本信息、登录凭据、权限等"
+      }
+    ]
+  },
+  "database": {
+    "tables": []
+  },
+  "businessRequirements": [
+    {
+      "type": "frontend_component",
+      "source": "BookingCalendar",
+      "requirement": "提供课程预约和预订功能",
+      "priority": "P0",
+      "technicalDependencies": []
+    },
+    {
+      "type": "frontend_component",
+      "source": "BookingSummary",
+      "requirement": "提供课程预约和预订功能",
+      "priority": "P0",
+      "technicalDependencies": [
+        "vue",
+        "element-plus",
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "CoachRecommend",
+      "requirement": "管理教练信息和私教服务",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "@element-plus/icons-vue",
+        "gsap",
+        "@/types/modules",
+        "@/components/common"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "CoursePicker",
+      "requirement": "展示和管理系统课程信息",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "@element-plus/icons-vue",
+        "@/types/modules",
+        "@/utils/formatters",
+        "@/components/common"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "GoalSelector",
+      "requirement": "支持课程预约和时间安排",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "SchedulePlanner",
+      "requirement": "支持课程预约和时间安排",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "./BookingCalendar.vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "Equipment3DViewer",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "three",
+        "@/components/common",
+        "@/types/modules"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "MobileForm",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": []
+    },
+    {
+      "type": "frontend_component",
+      "source": "RecommendationCard",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "element-plus"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "RotateVerify",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "SafeHtml",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/utils/security"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "Stepper",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/composables/useStepTransition"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "TechButton",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "TechCard",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "TechStepper",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": []
+    },
+    {
+      "type": "frontend_component",
+      "source": "VerifyCode",
+      "requirement": "提供common相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "CourseBenefitsChart",
+      "requirement": "展示和管理系统课程信息",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "CourseCard",
+      "requirement": "展示和管理系统课程信息",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "@/types/modules",
+        "@/config/config",
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "AdvancedFilters",
+      "requirement": "支持课程讨论和社区互动",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "element-plus",
+        "@/components/common/TechButton.vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "DiscussionComposer",
+      "requirement": "支持课程讨论和社区互动",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "element-plus",
+        "@/components/common",
+        "@/services/crud",
+        "@/types/modules"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "DiscussionReplies",
+      "requirement": "支持课程讨论和社区互动",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/components/common",
+        "@/composables/useDiscussionInteraction",
+        "@/assets/touxiang.png",
+        "@/config/config"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "TopicCloud",
+      "requirement": "支持课程讨论和社区互动",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "FavoritesOverview",
+      "requirement": "提供favorites相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/components/common"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "CoachNetwork",
+      "requirement": "管理教练信息和私教服务",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "three",
+        "@/composables/useParticleSystem",
+        "@/utils/animationConfig"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "FloatingServiceButton",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "Footer",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": []
+    },
+    {
+      "type": "frontend_component",
+      "source": "HeroSection",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "three",
+        "@/composables/useParticleSystem",
+        "@/utils/animationConfig"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "ServiceCards",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "@/config/config"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "SmartHeader",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "gsap"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "Testimonials",
+      "requirement": "提供home相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/composables/useScrollAnimation"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "MembershipBenefits",
+      "requirement": "管理会员卡和会员权益",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "d3",
+        "d3-shape",
+        "@/types/modules"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "MembershipCard",
+      "requirement": "管理会员卡和会员权益",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "@/components/common",
+        "@/types/modules",
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "MembershipComparison",
+      "requirement": "管理会员卡和会员权益",
+      "priority": "P1",
+      "technicalDependencies": [
+        "vue",
+        "@/types/modules",
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "ModuleDetail",
+      "requirement": "提供modules相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/composables/useModuleCrud",
+        "@/types/modules",
+        "@/config/modules",
+        "@/utils/formatters",
+        "@/components/common/SafeHtml.vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "ModuleForm",
+      "requirement": "提供modules相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "element-plus",
+        "@/config/modules",
+        "@/composables/useModuleCrud",
+        "@/types/modules",
+        "@/components/FileUpload.vue",
+        "@/components/Editor.vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "ModuleList",
+      "requirement": "提供modules相关的用户界面功能",
+      "priority": "P2",
+      "technicalDependencies": [
+        "vue",
+        "@/types/modules",
+        "@/config/modules",
+        "@/composables/useModuleCrud",
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "MobilePaymentConfirm",
+      "requirement": "处理支付流程和支付状态管理",
+      "priority": "P0",
+      "technicalDependencies": [
+        "@/utils/formatters"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "PaymentMethodCard",
+      "requirement": "处理支付流程和支付状态管理",
+      "priority": "P0",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "PaymentResult",
+      "requirement": "处理支付流程和支付状态管理",
+      "priority": "P0",
+      "technicalDependencies": [
+        "vue"
+      ]
+    },
+    {
+      "type": "frontend_component",
+      "source": "PaymentStepper",
+      "requirement": "处理支付流程和支付状态管理",
+      "priority": "P0",
+      "technicalDependencies": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Admin",
+      "requirement": "提供Admin模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Assets",
+      "requirement": "提供Assets模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Chat",
+      "requirement": "提供Chat模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Common",
+      "requirement": "提供Common模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Config",
+      "requirement": "提供Config模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Daoqitixing",
+      "requirement": "提供Daoqitixing模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Discussjianshenkecheng",
+      "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "ErrorReport",
+      "requirement": "提供ErrorReport模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "File",
+      "requirement": "提供File模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Huiyuanka",
+      "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Huiyuankagoumai",
+      "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Huiyuanxufei",
+      "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Jianshenjiaolian",
+      "requirement": "提供教练服务相关的API接口，包括教练信息、私教预约等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Jianshenkecheng",
+      "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Jianshenqicai",
+      "requirement": "提供Jianshenqicai模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Kechengleixing",
+      "requirement": "提供Kechengleixing模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Kechengtuike",
+      "requirement": "提供Kechengtuike模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Kechengyuyue",
+      "requirement": "提供Kechengyuyue模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "LegalTerms",
+      "requirement": "提供LegalTerms模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Message",
+      "requirement": "提供Message模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "News",
+      "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Newstype",
+      "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "OperationLog",
+      "requirement": "提供OperationLog模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Sijiaoyuyue",
+      "requirement": "提供Sijiaoyuyue模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Storeup",
+      "requirement": "提供Storeup模块的业务API接口",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "User",
+      "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+      "priority": "P1",
+      "endpoints": []
+    },
+    {
+      "type": "backend_api",
+      "source": "Users",
+      "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+      "priority": "P1",
+      "endpoints": [
+        {
+          "method": "Post",
+          "path": "/register"
+        },
+        {
+          "method": "Get",
+          "path": "logout"
+        }
+      ]
+    },
+    {
+      "type": "backend_api",
+      "source": "Yonghu",
+      "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+      "priority": "P2",
+      "endpoints": []
+    },
+    {
+      "type": "data_model",
+      "source": "Assets",
+      "requirement": "存储Assets相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "assetName",
+        "assetType",
+        "filePath",
+        "fileSize",
+        "fileFormat",
+        "module",
+        "usage",
+        "dimensions",
+        "width",
+        "height",
+        "version",
+        "description",
+        "tags",
+        "category",
+        "status",
+        "uploadUser",
+        "addtime",
+        "updatetime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Chat",
+      "requirement": "存储Chat相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "userid",
+        "adminid",
+        "ask",
+        "reply",
+        "isreply",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Config",
+      "requirement": "存储Config相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "name",
+        "configValue",
+        "url"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "CourseReservation",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "reservationNumber",
+        "courseName",
+        "image",
+        "courseType",
+        "classTime",
+        "classLocation",
+        "coursePrice",
+        "coachId",
+        "coachName",
+        "reservationTime",
+        "membershipCardNumber",
+        "username",
+        "fullName",
+        "phoneNumber",
+        "crossUserId",
+        "crossRefId",
+        "auditStatus",
+        "auditContent",
+        "paymentStatus",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "CourseType",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "courseType",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Daoqitixing",
+      "requirement": "存储Daoqitixing相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "touxiang",
+        "huiyuankahao",
+        "youxiaoqizhi",
+        "tixingshijian",
+        "beizhu",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Discussjianshenkecheng",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "refid",
+        "userid",
+        "avatarurl",
+        "nickname",
+        "content",
+        "reply",
+        "sfsh",
+        "clicktime",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "FitnessCoach",
+      "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "coachId",
+        "password",
+        "coachName",
+        "photo",
+        "gender",
+        "age",
+        "height",
+        "weight",
+        "contactPhone",
+        "privateCoachingPrice",
+        "personalIntroduction",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "FitnessCourseDiscussion",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "refId",
+        "userId",
+        "avatarUrl",
+        "nickname",
+        "content",
+        "reply",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "FitnessCourse",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "courseName",
+        "courseType",
+        "image",
+        "classTime",
+        "classLocation",
+        "coursePrice",
+        "courseIntroduction",
+        "courseVideo",
+        "coachId",
+        "coachName",
+        "clicktime",
+        "clicknum",
+        "discussnum",
+        "storeupnum",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "FitnessEquipment",
+      "requirement": "存储FitnessEquipment相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "equipmentName",
+        "image",
+        "brand",
+        "usageMethod",
+        "weightLossEffect",
+        "equipmentIntroduction",
+        "teachingVideo",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Huiyuanka",
+      "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "huiyuankamingcheng",
+        "tupian",
+        "youxiaoqi",
+        "jiage",
+        "shiyongshuoming",
+        "huiyuankaxiangqing",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Huiyuankagoumai",
+      "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "huiyuankahao",
+        "huiyuankamingcheng",
+        "tupian",
+        "youxiaoqi",
+        "jiage",
+        "goumairiqi",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "shoujihaoma",
+        "ispay",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Huiyuanxufei",
+      "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "touxiang",
+        "jiaofeibianhao",
+        "huiyuankamingcheng",
+        "youxiaoqi",
+        "jiage",
+        "xufeishijian",
+        "ispay",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Jianshenjiaolian",
+      "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "jiaoliangonghao",
+        "mima",
+        "passwordHash",
+        "failedLoginAttempts",
+        "lockUntil",
+        "jiaolianxingming",
+        "zhaopian",
+        "xingbie",
+        "nianling",
+        "shengao",
+        "tizhong",
+        "lianxidianhua",
+        "sijiaojiage",
+        "gerenjianjie",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Jianshenkecheng",
+      "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "kechengmingcheng",
+        "kechengleixing",
+        "tupian",
+        "shangkeshijian",
+        "shangkedidian",
+        "kechengjiage",
+        "kechengjianjie",
+        "kechengshipin",
+        "jiaoliangonghao",
+        "jiaolianxingming",
+        "clicktime",
+        "clicknum",
+        "discussnum",
+        "storeupnum",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Jianshenqicai",
+      "requirement": "存储Jianshenqicai相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "qicaimingcheng",
+        "tupian",
+        "pinpai",
+        "shiyongfangfa",
+        "shoushenxiaoguo",
+        "qicaijieshao",
+        "jiaoxueshipin",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Kechengleixing",
+      "requirement": "存储Kechengleixing相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "kechengleixing",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Kechengtuike",
+      "requirement": "存储Kechengtuike相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yuyuebianhao",
+        "kechengmingcheng",
+        "tupian",
+        "kechengleixing",
+        "shangkeshijian",
+        "shangkedidian",
+        "kechengjiage",
+        "jiaoliangonghao",
+        "jiaolianxingming",
+        "shenqingshijian",
+        "huiyuankahao",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "shoujihaoma",
+        "tuikeyuanyin",
+        "crossuserid",
+        "crossrefid",
+        "sfsh",
+        "shhf",
+        "ispay",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Kechengyuyue",
+      "requirement": "存储Kechengyuyue相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yuyuebianhao",
+        "kechengmingcheng",
+        "tupian",
+        "kechengleixing",
+        "shangkeshijian",
+        "shangkedidian",
+        "kechengjiage",
+        "jiaoliangonghao",
+        "jiaolianxingming",
+        "yuyueshijian",
+        "huiyuankahao",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "shoujihaoma",
+        "crossuserid",
+        "crossrefid",
+        "sfsh",
+        "shhf",
+        "ispay",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "LegalTerms",
+      "requirement": "存储LegalTerms相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "type",
+        "title",
+        "version",
+        "content",
+        "status",
+        "effectiveDate",
+        "updateTime",
+        "createTime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "MembershipCard",
+      "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "membershipCardName",
+        "image",
+        "validityPeriod",
+        "price",
+        "usageInstructions",
+        "membershipCardDetails",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "MembershipCardPurchase",
+      "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "membershipCardNumber",
+        "membershipCardName",
+        "image",
+        "validityPeriod",
+        "price",
+        "purchaseDate",
+        "username",
+        "fullName",
+        "phoneNumber",
+        "paymentStatus",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Message",
+      "requirement": "存储Message相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "userid",
+        "title",
+        "content",
+        "type",
+        "isread",
+        "relatedType",
+        "relatedId",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "News",
+      "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "title",
+        "introduction",
+        "typename",
+        "name",
+        "headportrait",
+        "clicknum",
+        "clicktime",
+        "thumbsupnum",
+        "crazilynum",
+        "storeupnum",
+        "picture",
+        "content",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Newstype",
+      "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "typename",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "OperationLog",
+      "requirement": "存储OperationLog相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "userid",
+        "username",
+        "tableName",
+        "operationType",
+        "content",
+        "ip",
+        "userAgent",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Sijiaoyuyue",
+      "requirement": "存储Sijiaoyuyue相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yuyuebianhao",
+        "jiaoliangonghao",
+        "jiaolianxingming",
+        "zhaopian",
+        "sijiaojiage",
+        "yuyueshijian",
+        "yonghuzhanghao",
+        "yonghuxingming",
+        "shoujihaoma",
+        "huiyuankahao",
+        "beizhu",
+        "sfsh",
+        "shhf",
+        "ispay",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Storeup",
+      "requirement": "存储Storeup相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "userid",
+        "refid",
+        "tablename",
+        "name",
+        "picture",
+        "type",
+        "inteltype",
+        "remark",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Token",
+      "requirement": "存储Token相关的数据信息",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "userid",
+        "username",
+        "tablename",
+        "role",
+        "token",
+        "expiratedtime",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "User",
+      "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "username",
+        "password",
+        "passwordHash",
+        "failedLoginAttempts",
+        "lockUntil",
+        "image",
+        "role",
+        "status",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Users",
+      "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+      "priority": "P1",
+      "fields": [
+        "id",
+        "username",
+        "password",
+        "passwordHash",
+        "failedLoginAttempts",
+        "lockUntil",
+        "image",
+        "role",
+        "addtime"
+      ]
+    },
+    {
+      "type": "data_model",
+      "source": "Yonghu",
+      "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+      "priority": "P2",
+      "fields": [
+        "id",
+        "yonghuzhanghao",
+        "mima",
+        "passwordHash",
+        "failedLoginAttempts",
+        "lockUntil",
+        "yonghuxingming",
+        "touxiang",
+        "xingbie",
+        "shengao",
+        "tizhong",
+        "shoujihaoma",
+        "huiyuankahao",
+        "huiyuankamingcheng",
+        "youxiaoqizhi",
+        "status",
+        "addtime"
+      ]
+    }
+  ],
+  "technicalRequirements": [
+    {
+      "type": "frontend_technology",
+      "requirements": [
+        "Vue 3 + TypeScript 前端框架",
+        "响应式设计和移动端适配",
+        "动画效果和用户体验优化",
+        "状态管理和数据流处理",
+        "组件化开发和代码复用"
+      ]
+    },
+    {
+      "type": "backend_technology",
+      "requirements": [
+        "Spring Boot 后端框架",
+        "RESTful API 设计",
+        "数据持久化和 ORM",
+        "事务管理和数据一致性",
+        "安全认证和权限控制"
+      ]
+    },
+    {
+      "type": "database_technology",
+      "requirements": [
+        "关系型数据库设计",
+        "数据完整性和约束",
+        "性能优化和索引设计",
+        "数据备份和恢复",
+        "并发访问控制"
+      ]
+    }
+  ],
+  "analysisTime": "2025-11-17T01:41:08.719Z"
+}

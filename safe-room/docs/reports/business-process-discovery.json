@@ -1,0 +1,858 @@
+{
+  "userFlows": [
+    {
+      "name": "用户认证流程",
+      "type": "user_authentication",
+      "steps": [
+        {
+          "step": 1,
+          "page": "register",
+          "action": "访问注册页面",
+          "validation": "表单验证（用户名、邮箱、密码）",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "register",
+          "action": "提交注册信息",
+          "api": "POST /api/register",
+          "validation": "服务器端验证",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "login",
+          "action": "注册成功跳转登录",
+          "validation": "邮箱验证码确认",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "login",
+          "action": "用户登录",
+          "api": "POST /api/login",
+          "validation": "用户名密码验证",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "center",
+          "action": "登录成功进入个人中心",
+          "validation": "会话建立",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "用户名已存在",
+        "邮箱格式错误",
+        "密码强度不足",
+        "验证码错误",
+        "账号被锁定"
+      ],
+      "businessRequirements": [
+        "安全的密码加密存储",
+        "邮箱验证机制",
+        "登录失败次数限制",
+        "会话管理与超时",
+        "密码重置功能"
+      ]
+    },
+    {
+      "name": "课程预约流程",
+      "type": "course_booking",
+      "steps": [
+        {
+          "step": 1,
+          "page": "jianshenkecheng/list",
+          "action": "浏览课程列表",
+          "api": "GET /api/jianshenkecheng",
+          "validation": "课程数据加载",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "jianshenkecheng/detail",
+          "action": "查看课程详情",
+          "api": "GET /api/jianshenkecheng/{id}",
+          "validation": "课程详细信息展示",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "kechengyuyue/add",
+          "action": "选择预约时间",
+          "validation": "时间冲突检查",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "kechengyuyue/add",
+          "action": "提交预约申请",
+          "api": "POST /api/kechengyuyue",
+          "validation": "预约信息验证",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "pay",
+          "action": "跳转支付页面",
+          "validation": "支付信息准备",
+          "nextStep": 6
+        },
+        {
+          "step": 6,
+          "page": "pay",
+          "action": "完成支付",
+          "api": "POST /api/pay",
+          "validation": "支付状态确认",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "课程已满员",
+        "时间段已被预约",
+        "用户余额不足",
+        "支付超时失败",
+        "重复预约检测"
+      ],
+      "businessRequirements": [
+        "实时库存检查",
+        "预约冲突检测算法",
+        "支付状态同步",
+        "预约取消机制",
+        "预约提醒通知"
+      ]
+    },
+    {
+      "name": "会员购买流程",
+      "type": "membership_purchase",
+      "steps": [
+        {
+          "step": 1,
+          "page": "huiyuanka/list",
+          "action": "浏览会员卡类型",
+          "api": "GET /api/huiyuanka",
+          "validation": "会员卡信息加载",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "huiyuanka/detail",
+          "action": "查看会员卡详情",
+          "api": "GET /api/huiyuanka/{id}",
+          "validation": "权益信息展示",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "huiyuankagoumai/add",
+          "action": "选择购买选项",
+          "validation": "购买参数验证",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "huiyuankagoumai/add",
+          "action": "提交购买申请",
+          "api": "POST /api/huiyuankagoumai",
+          "validation": "购买信息完整性",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "pay",
+          "action": "支付会员费用",
+          "api": "POST /api/pay",
+          "validation": "支付成功确认",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "会员卡类型不存在",
+        "用户已有有效会员卡",
+        "支付失败回滚",
+        "库存不足（限量卡）"
+      ],
+      "businessRequirements": [
+        "会员卡类型管理",
+        "购买记录追溯",
+        "有效期自动计算",
+        "会员权益自动激活",
+        "续费提醒机制"
+      ]
+    },
+    {
+      "name": "教练预约流程",
+      "type": "coach_booking",
+      "steps": [
+        {
+          "step": 1,
+          "page": "jianshenjiaolian/list",
+          "action": "浏览教练列表",
+          "api": "GET /api/jianshenjiaolian",
+          "validation": "教练信息加载",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "jianshenjiaolian/detail",
+          "action": "查看教练详情",
+          "api": "GET /api/jianshenjiaolian/{id}",
+          "validation": "教练资质展示",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "sijiaoyuyue/add",
+          "action": "选择预约时间和服务",
+          "validation": "教练排班检查",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "sijiaoyuyue/add",
+          "action": "提交预约申请",
+          "api": "POST /api/sijiaoyuyue",
+          "validation": "预约信息验证",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "pay",
+          "action": "完成支付",
+          "api": "POST /api/pay",
+          "validation": "服务费用支付",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "教练当前时间不可预约",
+        "用户会员等级不足",
+        "预约时间冲突",
+        "服务项目不可用"
+      ],
+      "businessRequirements": [
+        "教练排班管理系统",
+        "服务项目定价策略",
+        "预约确认机制",
+        "服务评价系统",
+        "教练收益结算"
+      ]
+    }
+  ],
+  "adminFlows": [
+    {
+      "name": "管理员登录流程",
+      "type": "admin_authentication",
+      "steps": [
+        {
+          "step": 1,
+          "page": "admin/login",
+          "action": "访问管理后台登录",
+          "validation": "页面访问权限",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "admin/login",
+          "action": "输入管理员凭据",
+          "validation": "表单验证",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "admin/login",
+          "action": "提交登录请求",
+          "api": "POST /api/admin/login",
+          "validation": "身份验证",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "admin/home",
+          "action": "登录成功进入管理首页",
+          "validation": "权限初始化",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "用户名或密码错误",
+        "账号被禁用",
+        "登录IP受限",
+        "权限不足"
+      ],
+      "businessRequirements": [
+        "管理员角色权限管理",
+        "登录日志记录",
+        "安全审计机制",
+        "会话超时管理"
+      ]
+    },
+    {
+      "name": "课程管理流程",
+      "type": "content_management",
+      "steps": [
+        {
+          "step": 1,
+          "page": "admin/jianshenkecheng/list",
+          "action": "查看课程列表",
+          "api": "GET /api/admin/jianshenkecheng",
+          "validation": "数据加载",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "admin/jianshenkecheng/add",
+          "action": "创建新课程",
+          "validation": "表单初始化",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "admin/jianshenkecheng/add",
+          "action": "填写课程信息",
+          "validation": "数据验证",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "admin/jianshenkecheng/add",
+          "action": "保存课程信息",
+          "api": "POST /api/admin/jianshenkecheng",
+          "validation": "保存成功",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "admin/jianshenkecheng/list",
+          "action": "返回课程列表",
+          "validation": "列表刷新",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "必填字段缺失",
+        "数据格式错误",
+        "权限不足",
+        "保存失败"
+      ],
+      "businessRequirements": [
+        "课程信息完整性校验",
+        "批量导入导出功能",
+        "课程状态管理",
+        "历史版本记录",
+        "内容审核机制"
+      ]
+    },
+    {
+      "name": "用户管理流程",
+      "type": "user_management",
+      "steps": [
+        {
+          "step": 1,
+          "page": "admin/yonghu/list",
+          "action": "查看用户列表",
+          "api": "GET /api/admin/yonghu",
+          "validation": "用户数据加载",
+          "nextStep": 2
+        },
+        {
+          "step": 2,
+          "page": "admin/yonghu/detail",
+          "action": "查看用户详情",
+          "api": "GET /api/admin/yonghu/{id}",
+          "validation": "详细信息展示",
+          "nextStep": 3
+        },
+        {
+          "step": 3,
+          "page": "admin/yonghu/detail",
+          "action": "编辑用户信息",
+          "validation": "编辑权限检查",
+          "nextStep": 4
+        },
+        {
+          "step": 4,
+          "page": "admin/yonghu/detail",
+          "action": "保存用户信息",
+          "api": "PUT /api/admin/yonghu/{id}",
+          "validation": "保存成功",
+          "nextStep": 5
+        },
+        {
+          "step": 5,
+          "page": "admin/yonghu/list",
+          "action": "返回用户列表",
+          "validation": "列表更新",
+          "complete": true
+        }
+      ],
+      "exceptionScenarios": [
+        "用户不存在",
+        "编辑权限不足",
+        "数据冲突",
+        "保存失败"
+      ],
+      "businessRequirements": [
+        "用户状态管理",
+        "批量操作支持",
+        "用户行为分析",
+        "数据导出功能",
+        "安全日志记录"
+      ]
+    }
+  ],
+  "businessRequirements": [
+    {
+      "source": "用户认证流程",
+      "type": "user_authentication",
+      "requirement": "安全的密码加密存储",
+      "priority": "P0",
+      "userFlow": "用户认证流程"
+    },
+    {
+      "source": "用户认证流程",
+      "type": "user_authentication",
+      "requirement": "邮箱验证机制",
+      "priority": "P0",
+      "userFlow": "用户认证流程"
+    },
+    {
+      "source": "用户认证流程",
+      "type": "user_authentication",
+      "requirement": "登录失败次数限制",
+      "priority": "P2",
+      "userFlow": "用户认证流程"
+    },
+    {
+      "source": "用户认证流程",
+      "type": "user_authentication",
+      "requirement": "会话管理与超时",
+      "priority": "P1",
+      "userFlow": "用户认证流程"
+    },
+    {
+      "source": "用户认证流程",
+      "type": "user_authentication",
+      "requirement": "密码重置功能",
+      "priority": "P2",
+      "userFlow": "用户认证流程"
+    },
+    {
+      "source": "课程预约流程",
+      "type": "course_booking",
+      "requirement": "实时库存检查",
+      "priority": "P2",
+      "userFlow": "课程预约流程"
+    },
+    {
+      "source": "课程预约流程",
+      "type": "course_booking",
+      "requirement": "预约冲突检测算法",
+      "priority": "P2",
+      "userFlow": "课程预约流程"
+    },
+    {
+      "source": "课程预约流程",
+      "type": "course_booking",
+      "requirement": "支付状态同步",
+      "priority": "P1",
+      "userFlow": "课程预约流程"
+    },
+    {
+      "source": "课程预约流程",
+      "type": "course_booking",
+      "requirement": "预约取消机制",
+      "priority": "P2",
+      "userFlow": "课程预约流程"
+    },
+    {
+      "source": "课程预约流程",
+      "type": "course_booking",
+      "requirement": "预约提醒通知",
+      "priority": "P1",
+      "userFlow": "课程预约流程"
+    },
+    {
+      "source": "会员购买流程",
+      "type": "membership_purchase",
+      "requirement": "会员卡类型管理",
+      "priority": "P1",
+      "userFlow": "会员购买流程"
+    },
+    {
+      "source": "会员购买流程",
+      "type": "membership_purchase",
+      "requirement": "购买记录追溯",
+      "priority": "P1",
+      "userFlow": "会员购买流程"
+    },
+    {
+      "source": "会员购买流程",
+      "type": "membership_purchase",
+      "requirement": "有效期自动计算",
+      "priority": "P2",
+      "userFlow": "会员购买流程"
+    },
+    {
+      "source": "会员购买流程",
+      "type": "membership_purchase",
+      "requirement": "会员权益自动激活",
+      "priority": "P2",
+      "userFlow": "会员购买流程"
+    },
+    {
+      "source": "会员购买流程",
+      "type": "membership_purchase",
+      "requirement": "续费提醒机制",
+      "priority": "P2",
+      "userFlow": "会员购买流程"
+    },
+    {
+      "source": "教练预约流程",
+      "type": "coach_booking",
+      "requirement": "教练排班管理系统",
+      "priority": "P1",
+      "userFlow": "教练预约流程"
+    },
+    {
+      "source": "教练预约流程",
+      "type": "coach_booking",
+      "requirement": "服务项目定价策略",
+      "priority": "P2",
+      "userFlow": "教练预约流程"
+    },
+    {
+      "source": "教练预约流程",
+      "type": "coach_booking",
+      "requirement": "预约确认机制",
+      "priority": "P2",
+      "userFlow": "教练预约流程"
+    },
+    {
+      "source": "教练预约流程",
+      "type": "coach_booking",
+      "requirement": "服务评价系统",
+      "priority": "P2",
+      "userFlow": "教练预约流程"
+    },
+    {
+      "source": "教练预约流程",
+      "type": "coach_booking",
+      "requirement": "教练收益结算",
+      "priority": "P2",
+      "userFlow": "教练预约流程"
+    },
+    {
+      "source": "管理员登录流程",
+      "type": "admin_authentication",
+      "requirement": "管理员角色权限管理",
+      "priority": "P0",
+      "adminFlow": "管理员登录流程"
+    },
+    {
+      "source": "管理员登录流程",
+      "type": "admin_authentication",
+      "requirement": "登录日志记录",
+      "priority": "P1",
+      "adminFlow": "管理员登录流程"
+    },
+    {
+      "source": "管理员登录流程",
+      "type": "admin_authentication",
+      "requirement": "安全审计机制",
+      "priority": "P0",
+      "adminFlow": "管理员登录流程"
+    },
+    {
+      "source": "管理员登录流程",
+      "type": "admin_authentication",
+      "requirement": "会话超时管理",
+      "priority": "P1",
+      "adminFlow": "管理员登录流程"
+    },
+    {
+      "source": "课程管理流程",
+      "type": "content_management",
+      "requirement": "课程信息完整性校验",
+      "priority": "P2",
+      "adminFlow": "课程管理流程"
+    },
+    {
+      "source": "课程管理流程",
+      "type": "content_management",
+      "requirement": "批量导入导出功能",
+      "priority": "P2",
+      "adminFlow": "课程管理流程"
+    },
+    {
+      "source": "课程管理流程",
+      "type": "content_management",
+      "requirement": "课程状态管理",
+      "priority": "P1",
+      "adminFlow": "课程管理流程"
+    },
+    {
+      "source": "课程管理流程",
+      "type": "content_management",
+      "requirement": "历史版本记录",
+      "priority": "P1",
+      "adminFlow": "课程管理流程"
+    },
+    {
+      "source": "课程管理流程",
+      "type": "content_management",
+      "requirement": "内容审核机制",
+      "priority": "P2",
+      "adminFlow": "课程管理流程"
+    },
+    {
+      "source": "用户管理流程",
+      "type": "user_management",
+      "requirement": "用户状态管理",
+      "priority": "P1",
+      "adminFlow": "用户管理流程"
+    },
+    {
+      "source": "用户管理流程",
+      "type": "user_management",
+      "requirement": "批量操作支持",
+      "priority": "P2",
+      "adminFlow": "用户管理流程"
+    },
+    {
+      "source": "用户管理流程",
+      "type": "user_management",
+      "requirement": "用户行为分析",
+      "priority": "P2",
+      "adminFlow": "用户管理流程"
+    },
+    {
+      "source": "用户管理流程",
+      "type": "user_management",
+      "requirement": "数据导出功能",
+      "priority": "P2",
+      "adminFlow": "用户管理流程"
+    },
+    {
+      "source": "用户管理流程",
+      "type": "user_management",
+      "requirement": "安全日志记录",
+      "priority": "P0",
+      "adminFlow": "用户管理流程"
+    }
+  ],
+  "exceptionScenarios": [
+    {
+      "source": "用户认证流程",
+      "scenario": "用户名已存在",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "提供用户名建议，允许修改"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "邮箱格式错误",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "实时格式验证，清晰错误提示"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "密码强度不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "密码强度指示器，生成强密码建议"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "验证码错误",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "验证码刷新，语音验证码选项"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "账号被锁定",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "锁定通知，解锁申请流程"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "课程已满员",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "等待队列，预约提醒通知"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "时间段已被预约",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "显示可用时间段，智能推荐"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "用户余额不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "余额充值引导，部分支付选项"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "支付超时失败",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "支付状态监控，自动重试机制"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "重复预约检测",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "预约历史展示，防止重复提交"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "会员卡类型不存在",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "用户已有有效会员卡",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "支付失败回滚",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "库存不足（限量卡）",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "教练当前时间不可预约",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "用户会员等级不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "预约时间冲突",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "服务项目不可用",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "用户名或密码错误",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "账号被禁用",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "登录IP受限",
+      "type": "admin_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "必填字段缺失",
+      "type": "admin_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "数据格式错误",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "保存失败",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "用户不存在",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "编辑权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "数据冲突",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "保存失败",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议"
+    }
+  ],
+  "analysisTime": "2025-11-17T01:43:03.158Z"
+}

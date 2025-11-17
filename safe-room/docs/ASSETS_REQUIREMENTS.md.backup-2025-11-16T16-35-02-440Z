@@ -1,0 +1,154 @@
+# 素材需求文档（Assets Requirements v1.0）
+
+> 版本：v1.0  
+> 更新时间：2025-11-15  
+> 适用范围：`springboot1ngh61a2/src/main/resources/front/front` 与 `src/main/resources/admin/admin`
+
+---
+
+## 0. 文档目的
+
+- 统一图片、视频、图标、SVG、3D 模型与动效素材的制作与交付标准。  
+- 保证素材在前后台、PC/Pad/Mobile 场景下具备一致的清晰度、体积控制与品牌调性。  
+- 明确素材目录、命名与版本管理，便于工程团队与设计/供应商协作。
+
+---
+
+## 1. 图片素材规范
+
+### 1.1 尺寸与用途
+
+| 用途 | 推荐尺寸（px） | 比例 | 描述 |
+| --- | --- | --- | --- |
+| 首页 Hero 背景 | 2560×1440 | 16:9 | 支持裁切到 1920×1080、1280×720 |
+| 模块大卡片（服务/课程） | 1440×810 | 16:9 | 兼容视频封面 |
+| 课程/教练缩略图 | 960×960 | 1:1 | 列表卡片，留 60px 安全边距 |
+| 资讯/新闻图 | 960×540 | 16:9 | 列表与详情共用 |
+| Icon 背景纹理 | 512×512 | 1:1 | 需半透明 PNG |
+
+### 1.2 格式与颜色
+
+- 首选 **WebP**（质量 80+）；次选 **JPG**（高质照片，质量 75）；透明图使用 **PNG-24**。  
+- 色彩空间统一 sRGB；禁止 AdobeRGB。  
+- 使用 16px 基线网格，确保 Hero/卡片主视觉与黑金主题一致（参考 `docs/HOMEPAGE_REQUIREMENTS.md`）。
+
+### 1.3 命名与压缩
+
+- 命名：`[模块]_[用途]_[版本].[ext]`，示例：`hero_home_v2.webp`。  
+- 所有原稿保存在设计仓库；提交前使用 `squoosh` 或 `tinypng` 压缩，单文件 ≤ 400 KB（Hero 静态图可放宽至 600 KB）。
+
+### 1.4 存储路径
+
+- 前台：`front/front/src/assets/images/<module>/`  
+- 后台：`admin/admin/src/assets/img/<module>/`  
+- 运行时上传：`static/upload/`（由 `FileController` 管理，限制 JPG/PNG/WebP）。
+
+---
+
+## 2. 视频素材规范
+
+| 项目 | 要求 |
+| --- | --- |
+| 分辨率 | 主推 1920×1080；Pad 1280×720；Mobile 720×1280（竖屏） |
+| 帧率 | 25fps 或 30fps；动效循环视频可 50fps 但需压缩 |
+| 编码 | `H.264 + AAC`（MP4），如需透明背景使用 `WebM (VP9 + Opus)` |
+| 码率 | 1080p ≤ 8 Mbps；720p ≤ 5 Mbps；使用 `ffmpeg -crf 23` 作为参考 |
+| 时长 | Hero/背景 ≤ 15s 循环；服务卡片 ≤ 8s |
+| 音频 | 默认静音；如需音频需提供静音版本并标明开关逻辑 |
+| 自动播放 | PC 可自动播放 + 静音；Mobile 默认封面图，点击播放 |
+| 封面图 | 提供同名 JPG/WebP（`video-name_poster.jpg`） |
+
+视频文件存放：`front/front/src/assets/videos/<module>/`，打包后由 Vite 处理或上传至 CDN（推荐配合 `ServiceCards` 中 `media.src`）。
+
+---
+
+## 3. 图标与 SVG 规范
+
+- 图标统一存放：`front/front/src/assets/icons/`（位图）或 `front/front/src/icons/svg/`（矢量）。  
+- 尺寸：基础网格 24×24px；多尺寸（32/48/64px）应保持线条粗细一致。  
+- 命名：`[语义]-[状态].svg`，例如 `coach-active.svg`，禁止空格与大写。  
+- 优化：提交前运行 `pnpm svgo` 或 `npm run svgo`，配置参见 `admin/admin/src/icons/svgo.yml`。  
+- 使用方式：  
+  - 通用 Icon 通过 `SvgIcon` 组件内联注入，保证可控颜色与动画。  
+  - 动画图标（如 hover 光晕）使用 CSS/GSAP，不直接将动画写入 SVG，以降低体积。  
+- 若需多色图标，请保持 `<symbol>` + `currentColor` 方案，便于主题切换。
+
+---
+
+## 4. 3D 模型与粒子/动画素材
+
+### 4.1 3D 模型
+
+| 项目 | 要求 |
+| --- | --- |
+| 格式 | `GLTF/GLB`（首选）或 `DRACO` 压缩版 |
+| 面数 | 单模型 ≤ 80k faces；Hero 场景总计 ≤ 300k faces |
+| 贴图 | PBR（BaseColor, Roughness, Metalness, Normal）；贴图最大 2K |
+| 动画 | 使用骨骼或 Morph Target；导出 Timeline 需与 Three.js 兼容 |
+| 尺寸 | `.glb` ≤ 10 MB，优先 5 MB 内 |
+
+模型存放：`front/front/src/assets/models/`，配套 JSON 描述材质/动画参数。若发布到 CDN，需在配置中写明 `publicPath`.
+
+### 4.2 动效 & 粒子素材
+
+- Lottie：`JSON` 文件 ≤ 400 KB，帧率 30fps，颜色与黑金主题一致。  
+- 粒子贴图：PNG（512×512），带透明通道。  
+- GSAP/Canvas 动效需提供配置文件（如 `particleSystemConfig.ts`）描述粒子数量、寿命、颜色。  
+- 所有动画需提供 fallback：  
+  - PC：完整动效  
+  - Pad：降低粒子数量 30%  
+  - Mobile：静态或简化动画
+
+---
+
+## 5. 素材管理与交付
+
+### 5.1 目录与版本
+
+```
+front/front/src/assets/
+  images/
+  videos/
+  icons/
+  svg/
+  models/
+  lottie/
+admin/admin/src/assets/
+  img/
+  svg/
+static/upload/
+```
+
+- 所有静态资源通过 Git 版本控制，上传文件夹仅存放动态内容。  
+- 每次素材调整需更新 `CHANGELOG.md` 或对应页面需求文档中的素材章节。  
+- 引入第三方 CDN 时，在 `.env`/`vite.config.ts` 中配置 `VITE_CDN_BASE`，并确保本地有占位备选。
+
+### 5.2 交付清单
+
+1. 素材索引表格（含用途、尺寸、格式、路径、版本号）。  
+2. 压缩包（原文件 + 发布文件），命名 `assets_release_YYYYMMDD.zip`。  
+3. Lottie/3D 模型附带预览截图或动图。  
+4. 使用说明：描述入口组件、交互要求、联动页面（如 `EquipmentHero.vue`、`ServiceCards.vue`）。  
+5. 风险/依赖：注明需预加载的资源与第三方授权许可证。
+
+---
+
+## 6. 验收标准
+
+| 维度 | 标准 |
+| --- | --- |
+| 视觉一致性 | 黑金科技风，色彩/对比度符合 `docs/HOMEPAGE_REQUIREMENTS.md` |
+| 体积控制 | 首屏静态资源 ≤ 1.5 MB，Lazy Load 素材在滚动触发前不加载 |
+| 清晰度 |  @2x 设备仍保持无明显像素化；SVG/3D 图形无锯齿 |
+| 性能 | 视频/动效对主线程阻塞 < 50 ms；Three.js 场景 FPS ≥ 55 |
+| 可维护性 | 所有素材有命名规范、存储路径、版本记录，可快速替换 |
+
+---
+
+## 7. 备注
+
+- 若后续引入 AI 生图或动态生成素材，仍需导出到上述格式后再入库。  
+- 建议每季度复审素材库，淘汰过期品牌资产、更新版权信息。  
+- 如需与市场团队共享，请生成 PDF 摘要版并同步到知识库。
+
+

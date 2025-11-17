@@ -1,0 +1,243 @@
+name: Frontend Test Automation
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/front/**'
+      - 'springboot1ngh61a2/src/main/resources/admin/**'
+      - '.github/workflows/frontend-test-coverage.yml'
+  pull_request:
+    branches: [main, master, develop]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/front/**'
+      - 'springboot1ngh61a2/src/main/resources/admin/**'
+      - '.github/workflows/frontend-test-coverage.yml'
+  workflow_dispatch:
+  schedule:
+    # 每天凌晨2点运行测试
+    - cron: '0 2 * * *'
+
+jobs:
+  unit-tests:
+    name: Unit Tests - ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: front
+            path: springboot1ngh61a2/src/main/resources/front/front
+          - name: admin
+            path: springboot1ngh61a2/src/main/resources/admin/admin
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.project.path }}/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ${{ matrix.project.path }}
+        run: npm ci
+      
+      - name: Run unit tests
+        working-directory: ${{ matrix.project.path }}
+        run: npm run test:unit
+        continue-on-error: false
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.project.name }}
+          path: ${{ matrix.project.path }}/test-results
+          retention-days: 7
+          if-no-files-found: ignore
+
+  test-coverage:
+    name: Test Coverage - ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: front
+            path: springboot1ngh61a2/src/main/resources/front/front
+          - name: admin
+            path: springboot1ngh61a2/src/main/resources/admin/admin
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.project.path }}/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ${{ matrix.project.path }}
+        run: npm ci
+      
+      - name: Run tests with coverage
+        working-directory: ${{ matrix.project.path }}
+        run: npm run test:coverage
+        continue-on-error: false
+      
+      - name: Parse coverage summary
+        id: coverage
+        working-directory: ${{ matrix.project.path }}
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            LINES=$(node -p "require('./coverage/coverage-summary.json').total.lines.pct")
+            FUNCTIONS=$(node -p "require('./coverage/coverage-summary.json').total.functions.pct")
+            BRANCHES=$(node -p "require('./coverage/coverage-summary.json').total.branches.pct")
+            STATEMENTS=$(node -p "require('./coverage/coverage-summary.json').total.statements.pct")
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+            echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+            echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+            echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+          else
+            echo "lines=0" >> $GITHUB_OUTPUT
+            echo "functions=0" >> $GITHUB_OUTPUT
+            echo "branches=0" >> $GITHUB_OUTPUT
+            echo "statements=0" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Coverage summary
+        working-directory: ${{ matrix.project.path }}
+        run: |
+          echo "## 📊 ${{ matrix.project.name }} Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "| Metric | Coverage | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|--------|" >> $GITHUB_STEP_SUMMARY
+            LINES=${{ steps.coverage.outputs.lines }}
+            FUNCTIONS=${{ steps.coverage.outputs.functions }}
+            BRANCHES=${{ steps.coverage.outputs.branches }}
+            STATEMENTS=${{ steps.coverage.outputs.statements }}
+            echo "| Lines | ${LINES}% | $([ $(echo ${LINES} | cut -d. -f1) -ge 30 ] && echo '✅' || echo '❌') |" >> $GITHUB_STEP_SUMMARY
+            echo "| Functions | ${FUNCTIONS}% | $([ $(echo ${FUNCTIONS} | cut -d. -f1) -ge 30 ] && echo '✅' || echo '❌') |" >> $GITHUB_STEP_SUMMARY
+            echo "| Branches | ${BRANCHES}% | $([ $(echo ${BRANCHES} | cut -d. -f1) -ge 25 ] && echo '✅' || echo '❌') |" >> $GITHUB_STEP_SUMMARY
+            echo "| Statements | ${STATEMENTS}% | $([ $(echo ${STATEMENTS} | cut -d. -f1) -ge 30 ] && echo '✅' || echo '❌') |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📁 View detailed report in the uploaded artifacts" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-${{ matrix.project.name }}
+          path: ${{ matrix.project.path }}/coverage
+          retention-days: 30
+          if-no-files-found: ignore
+      
+      - name: Upload lcov coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-lcov-${{ matrix.project.name }}
+          path: ${{ matrix.project.path }}/coverage/lcov.info
+          retention-days: 30
+          if-no-files-found: ignore
+
+  e2e-tests:
+    name: E2E Tests - ${{ matrix.project.name }} (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name != 'schedule'  # 跳过定时任务中的E2E测试
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: front
+            path: springboot1ngh61a2/src/main/resources/front/front
+          - name: admin
+            path: springboot1ngh61a2/src/main/resources/admin/admin
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ${{ matrix.project.path }}/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ${{ matrix.project.path }}
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: ${{ matrix.project.path }}
+        run: npx playwright install --with-deps
+      
+      - name: Run E2E tests
+        working-directory: ${{ matrix.project.path }}
+        run: npx playwright test --project=${{ matrix.browser }}
+        continue-on-error: true
+        env:
+          E2E_BROWSER: ${{ matrix.browser }}
+      
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results-${{ matrix.project.name }}-${{ matrix.browser }}
+          path: ${{ matrix.project.path }}/playwright-report
+          retention-days: 7
+          if-no-files-found: ignore
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, test-coverage, e2e-tests]
+    if: always()
+    
+    steps:
+      - name: Download all coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          path: coverage-reports
+          if-no-files-found: ignore
+      
+      - name: Generate test summary
+        run: |
+          echo "# 🧪 Frontend Test Automation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## ✅ Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Project | Unit Tests | Coverage | E2E Tests |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|------------|----------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Front | ${{ needs.unit-tests.result == 'success' && '✅' || '❌' }} | ${{ needs.test-coverage.result == 'success' && '✅' || '❌' }} | ${{ needs.e2e-tests.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Admin | ${{ needs.unit-tests.result == 'success' && '✅' || '❌' }} | ${{ needs.test-coverage.result == 'success' && '✅' || '❌' }} | ${{ needs.e2e-tests.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Coverage Thresholds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Lines**: 30% (Target: 80%)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Functions**: 30% (Target: 80%)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branches**: 25% (Target: 75%)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Statements**: 30% (Target: 80%)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📁 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage reports: Check artifacts for 'coverage-report-*'" >> $GITHUB_STEP_SUMMARY
+          echo "- Test results: Check artifacts for 'test-results-*'" >> $GITHUB_STEP_SUMMARY
+          echo "- E2E results: Check artifacts for 'e2e-results-*-*' (includes browser matrix)" >> $GITHUB_STEP_SUMMARY

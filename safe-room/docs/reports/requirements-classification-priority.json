@@ -1,0 +1,2941 @@
+{
+  "summary": {
+    "total": 205,
+    "functional": 135,
+    "nonFunctional": 40,
+    "exceptions": 30
+  },
+  "functionalRequirements": {
+    "P0": [
+      {
+        "module": "用户管理",
+        "source": "用户认证流程",
+        "requirement": "安全的密码加密存储",
+        "priority": "P0"
+      },
+      {
+        "module": "用户管理",
+        "source": "用户认证流程",
+        "requirement": "邮箱验证机制",
+        "priority": "P0"
+      },
+      {
+        "module": "管理后台",
+        "source": "管理员登录流程",
+        "requirement": "管理员角色权限管理",
+        "priority": "P0"
+      },
+      {
+        "module": "安全保障",
+        "source": "管理员登录流程",
+        "requirement": "安全审计机制",
+        "priority": "P0"
+      },
+      {
+        "module": "安全保障",
+        "source": "用户管理流程",
+        "requirement": "安全日志记录",
+        "priority": "P0"
+      },
+      {
+        "module": "课程预约",
+        "source": "BookingCalendar",
+        "requirement": "提供课程预约和预订功能",
+        "priority": "P0"
+      },
+      {
+        "module": "课程预约",
+        "source": "BookingSummary",
+        "requirement": "提供课程预约和预订功能",
+        "priority": "P0"
+      },
+      {
+        "module": "会员服务",
+        "source": "MobilePaymentConfirm",
+        "requirement": "处理支付流程和支付状态管理",
+        "priority": "P0"
+      },
+      {
+        "module": "会员服务",
+        "source": "PaymentMethodCard",
+        "requirement": "处理支付流程和支付状态管理",
+        "priority": "P0"
+      },
+      {
+        "module": "会员服务",
+        "source": "PaymentResult",
+        "requirement": "处理支付流程和支付状态管理",
+        "priority": "P0"
+      },
+      {
+        "module": "会员服务",
+        "source": "PaymentStepper",
+        "requirement": "处理支付流程和支付状态管理",
+        "priority": "P0"
+      }
+    ],
+    "P1": [
+      {
+        "module": "用户管理",
+        "source": "用户认证流程",
+        "requirement": "会话管理与超时",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程预约流程",
+        "requirement": "支付状态同步",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程预约流程",
+        "requirement": "预约提醒通知",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "会员购买流程",
+        "requirement": "会员卡类型管理",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "会员购买流程",
+        "requirement": "购买记录追溯",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "教练预约流程",
+        "requirement": "教练排班管理系统",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "管理员登录流程",
+        "requirement": "登录日志记录",
+        "priority": "P1"
+      },
+      {
+        "module": "管理后台",
+        "source": "管理员登录流程",
+        "requirement": "会话超时管理",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程管理流程",
+        "requirement": "课程状态管理",
+        "priority": "P1"
+      },
+      {
+        "module": "其他功能",
+        "source": "课程管理流程",
+        "requirement": "历史版本记录",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "用户管理流程",
+        "requirement": "用户状态管理",
+        "priority": "P1"
+      },
+      {
+        "module": "教练服务",
+        "source": "CoachRecommend",
+        "requirement": "管理教练信息和私教服务",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "CoursePicker",
+        "requirement": "展示和管理系统课程信息",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "CourseBenefitsChart",
+        "requirement": "展示和管理系统课程信息",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "CourseCard",
+        "requirement": "展示和管理系统课程信息",
+        "priority": "P1"
+      },
+      {
+        "module": "教练服务",
+        "source": "CoachNetwork",
+        "requirement": "管理教练信息和私教服务",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "MembershipBenefits",
+        "requirement": "管理会员卡和会员权益",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "MembershipCard",
+        "requirement": "管理会员卡和会员权益",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "MembershipComparison",
+        "requirement": "管理会员卡和会员权益",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "User",
+        "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "Users",
+        "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "CourseReservation",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "CourseType",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P1"
+      },
+      {
+        "module": "教练服务",
+        "source": "FitnessCoach",
+        "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "FitnessCourseDiscussion",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P1"
+      },
+      {
+        "module": "课程预约",
+        "source": "FitnessCourse",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "MembershipCard",
+        "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+        "priority": "P1"
+      },
+      {
+        "module": "会员服务",
+        "source": "MembershipCardPurchase",
+        "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "User",
+        "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+        "priority": "P1"
+      },
+      {
+        "module": "用户管理",
+        "source": "Users",
+        "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+        "priority": "P1"
+      }
+    ],
+    "P2": [
+      {
+        "module": "用户管理",
+        "source": "用户认证流程",
+        "requirement": "登录失败次数限制",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "用户认证流程",
+        "requirement": "密码重置功能",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程预约流程",
+        "requirement": "实时库存检查",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程预约流程",
+        "requirement": "预约冲突检测算法",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程预约流程",
+        "requirement": "预约取消机制",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "会员购买流程",
+        "requirement": "有效期自动计算",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "会员购买流程",
+        "requirement": "会员权益自动激活",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "会员购买流程",
+        "requirement": "续费提醒机制",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "教练预约流程",
+        "requirement": "服务项目定价策略",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "教练预约流程",
+        "requirement": "预约确认机制",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "教练预约流程",
+        "requirement": "服务评价系统",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "教练预约流程",
+        "requirement": "教练收益结算",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "课程管理流程",
+        "requirement": "课程信息完整性校验",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "课程管理流程",
+        "requirement": "批量导入导出功能",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "课程管理流程",
+        "requirement": "内容审核机制",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "用户管理流程",
+        "requirement": "批量操作支持",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "用户管理流程",
+        "requirement": "用户行为分析",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "用户管理流程",
+        "requirement": "数据导出功能",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "GoalSelector",
+        "requirement": "支持课程预约和时间安排",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "SchedulePlanner",
+        "requirement": "支持课程预约和时间安排",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Equipment3DViewer",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "MobileForm",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "RecommendationCard",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "RotateVerify",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "SafeHtml",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Stepper",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "TechButton",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "TechCard",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "TechStepper",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "VerifyCode",
+        "requirement": "提供common相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "AdvancedFilters",
+        "requirement": "支持课程讨论和社区互动",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "DiscussionComposer",
+        "requirement": "支持课程讨论和社区互动",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "DiscussionReplies",
+        "requirement": "支持课程讨论和社区互动",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "TopicCloud",
+        "requirement": "支持课程讨论和社区互动",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "FavoritesOverview",
+        "requirement": "提供favorites相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "FloatingServiceButton",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Footer",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "HeroSection",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "ServiceCards",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "SmartHeader",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Testimonials",
+        "requirement": "提供home相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "ModuleDetail",
+        "requirement": "提供modules相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "ModuleForm",
+        "requirement": "提供modules相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "ModuleList",
+        "requirement": "提供modules相关的用户界面功能",
+        "priority": "P2"
+      },
+      {
+        "module": "管理后台",
+        "source": "Admin",
+        "requirement": "提供Admin模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Assets",
+        "requirement": "提供Assets模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Chat",
+        "requirement": "提供Chat模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Common",
+        "requirement": "提供Common模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Config",
+        "requirement": "提供Config模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Daoqitixing",
+        "requirement": "提供Daoqitixing模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "Discussjianshenkecheng",
+        "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "ErrorReport",
+        "requirement": "提供ErrorReport模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "File",
+        "requirement": "提供File模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuanka",
+        "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuankagoumai",
+        "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuanxufei",
+        "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "Jianshenjiaolian",
+        "requirement": "提供教练服务相关的API接口，包括教练信息、私教预约等",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "Jianshenkecheng",
+        "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Jianshenqicai",
+        "requirement": "提供Jianshenqicai模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengleixing",
+        "requirement": "提供Kechengleixing模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengtuike",
+        "requirement": "提供Kechengtuike模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengyuyue",
+        "requirement": "提供Kechengyuyue模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "LegalTerms",
+        "requirement": "提供LegalTerms模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Message",
+        "requirement": "提供Message模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "News",
+        "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Newstype",
+        "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "OperationLog",
+        "requirement": "提供OperationLog模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Sijiaoyuyue",
+        "requirement": "提供Sijiaoyuyue模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Storeup",
+        "requirement": "提供Storeup模块的业务API接口",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Yonghu",
+        "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Assets",
+        "requirement": "存储Assets相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Chat",
+        "requirement": "存储Chat相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Config",
+        "requirement": "存储Config相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Daoqitixing",
+        "requirement": "存储Daoqitixing相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "Discussjianshenkecheng",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "FitnessEquipment",
+        "requirement": "存储FitnessEquipment相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuanka",
+        "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuankagoumai",
+        "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+        "priority": "P2"
+      },
+      {
+        "module": "会员服务",
+        "source": "Huiyuanxufei",
+        "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+        "priority": "P2"
+      },
+      {
+        "module": "教练服务",
+        "source": "Jianshenjiaolian",
+        "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+        "priority": "P2"
+      },
+      {
+        "module": "课程预约",
+        "source": "Jianshenkecheng",
+        "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Jianshenqicai",
+        "requirement": "存储Jianshenqicai相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengleixing",
+        "requirement": "存储Kechengleixing相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengtuike",
+        "requirement": "存储Kechengtuike相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Kechengyuyue",
+        "requirement": "存储Kechengyuyue相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "LegalTerms",
+        "requirement": "存储LegalTerms相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Message",
+        "requirement": "存储Message相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "News",
+        "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Newstype",
+        "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "OperationLog",
+        "requirement": "存储OperationLog相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Sijiaoyuyue",
+        "requirement": "存储Sijiaoyuyue相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Storeup",
+        "requirement": "存储Storeup相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "其他功能",
+        "source": "Token",
+        "requirement": "存储Token相关的数据信息",
+        "priority": "P2"
+      },
+      {
+        "module": "用户管理",
+        "source": "Yonghu",
+        "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+        "priority": "P2"
+      }
+    ]
+  },
+  "nonFunctionalRequirements": {
+    "P0": [
+      {
+        "type": "concurrency",
+        "context": "课程预约高峰期并发处理",
+        "requirement": "支持1000并发用户同时预约",
+        "priority": "P0",
+        "rationale": "高峰期课程预约需要高并发处理能力",
+        "measurement": "支持1000并发请求，响应时间 < 2秒"
+      },
+      {
+        "type": "authentication",
+        "context": "用户登录安全",
+        "requirement": "密码安全存储，使用bcrypt哈希算法，盐值随机生成",
+        "priority": "P0",
+        "rationale": "防止密码泄露和彩虹表攻击",
+        "implementation": "bcrypt.hash(password, 12)"
+      },
+      {
+        "type": "session_management",
+        "context": "会话安全管理",
+        "requirement": "会话超时30分钟，无操作自动登出",
+        "priority": "P0",
+        "rationale": "防止未授权访问和会话劫持",
+        "implementation": "JWT token with expiration"
+      },
+      {
+        "type": "data_transmission",
+        "context": "敏感数据传输加密",
+        "requirement": "所有API使用HTTPS协议，敏感数据加密传输",
+        "priority": "P0",
+        "rationale": "防止数据在传输过程中被窃取",
+        "implementation": "TLS 1.3, API Gateway with SSL termination"
+      },
+      {
+        "type": "input_validation",
+        "context": "用户输入安全过滤",
+        "requirement": "所有用户输入进行XSS和SQL注入过滤",
+        "priority": "P0",
+        "rationale": "防止跨站脚本攻击和SQL注入攻击",
+        "implementation": "DOMPurify for XSS, parameterized queries for SQL"
+      },
+      {
+        "type": "access_control",
+        "context": "基于角色的访问控制",
+        "requirement": "管理员功能需要角色验证，用户数据隔离",
+        "priority": "P0",
+        "rationale": "防止越权访问和数据泄露",
+        "implementation": "RBAC with role-based middleware"
+      },
+      {
+        "type": "payment_security",
+        "context": "支付数据保护",
+        "requirement": "支付信息不存储在本地，实时转发到支付网关",
+        "priority": "P0",
+        "rationale": "符合PCI DSS支付卡行业安全标准",
+        "implementation": "支付token化，不存储敏感支付信息"
+      }
+    ],
+    "P1": [
+      {
+        "type": "api_response_time",
+        "context": "用户认证流程 - 提交注册信息",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "用户认证流程 - 用户登录",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "课程预约流程 - 浏览课程列表",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "page_load_time",
+        "context": "课程预约流程 - jianshenkecheng/list页面加载",
+        "requirement": "列表页面首次加载时间 ≤ 2秒",
+        "priority": "P1",
+        "rationale": "列表页面需要快速展示数据",
+        "measurement": "First Contentful Paint < 2秒"
+      },
+      {
+        "type": "api_response_time",
+        "context": "课程预约流程 - 查看课程详情",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "课程预约流程 - 提交预约申请",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "课程预约流程 - 完成支付",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "会员购买流程 - 浏览会员卡类型",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "page_load_time",
+        "context": "会员购买流程 - huiyuanka/list页面加载",
+        "requirement": "列表页面首次加载时间 ≤ 2秒",
+        "priority": "P1",
+        "rationale": "列表页面需要快速展示数据",
+        "measurement": "First Contentful Paint < 2秒"
+      },
+      {
+        "type": "api_response_time",
+        "context": "会员购买流程 - 查看会员卡详情",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "会员购买流程 - 提交购买申请",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "会员购买流程 - 支付会员费用",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "教练预约流程 - 浏览教练列表",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "page_load_time",
+        "context": "教练预约流程 - jianshenjiaolian/list页面加载",
+        "requirement": "列表页面首次加载时间 ≤ 2秒",
+        "priority": "P1",
+        "rationale": "列表页面需要快速展示数据",
+        "measurement": "First Contentful Paint < 2秒"
+      },
+      {
+        "type": "api_response_time",
+        "context": "教练预约流程 - 查看教练详情",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "教练预约流程 - 提交预约申请",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "api_response_time",
+        "context": "教练预约流程 - 完成支付",
+        "requirement": "API响应时间 ≤ 500ms",
+        "priority": "P1",
+        "rationale": "良好的用户体验要求快速响应",
+        "measurement": "平均响应时间 < 500ms，95%请求 < 1000ms"
+      },
+      {
+        "type": "database_query",
+        "context": "复杂查询性能优化",
+        "requirement": "复杂查询响应时间 ≤ 1秒",
+        "priority": "P1",
+        "rationale": "搜索和筛选功能需要快速响应",
+        "measurement": "查询响应时间 < 1秒，索引命中率 > 95%"
+      },
+      {
+        "type": "audit_logging",
+        "context": "安全操作审计",
+        "requirement": "所有管理操作记录审计日志，包括操作人、时间、IP",
+        "priority": "P1",
+        "rationale": "追踪安全事件和异常操作",
+        "implementation": "操作日志记录，定期审计检查"
+      },
+      {
+        "type": "responsive_design",
+        "context": "多设备适配",
+        "requirement": "完美支持桌面、平板、手机等各种设备",
+        "priority": "P1",
+        "rationale": "用户可能在不同设备上使用系统",
+        "implementation": "CSS媒体查询，弹性布局，移动优先设计"
+      },
+      {
+        "type": "error_handling",
+        "context": "用户友好的错误提示",
+        "requirement": "错误信息清晰易懂，提供解决建议",
+        "priority": "P1",
+        "rationale": "帮助用户快速理解和解决问题",
+        "implementation": "本地化错误消息，操作指导，联系支持"
+      },
+      {
+        "type": "validation_feedback",
+        "context": "表单验证即时反馈",
+        "requirement": "输入错误立即显示，不需要提交后才知道",
+        "priority": "P1",
+        "rationale": "提升表单填写效率和用户体验",
+        "implementation": "实时验证，视觉反馈，错误消息定位"
+      },
+      {
+        "type": "code_quality",
+        "context": "代码规范和质量",
+        "requirement": "TypeScript严格模式，ESLint代码检查，单元测试覆盖率>80%",
+        "priority": "P1",
+        "rationale": "保证代码质量和可维护性",
+        "implementation": "Prettier格式化，ESLint规则，Jest测试框架"
+      },
+      {
+        "type": "component_design",
+        "context": "组件复用和解耦",
+        "requirement": "组件高内聚低耦合，可独立测试和维护",
+        "priority": "P1",
+        "rationale": "提高代码复用性和维护效率",
+        "implementation": "单一职责原则，依赖注入，组合式API"
+      },
+      {
+        "type": "api_design",
+        "context": "RESTful API设计",
+        "requirement": "遵循RESTful规范，版本控制，统一错误处理",
+        "priority": "P1",
+        "rationale": "API易于理解和维护",
+        "implementation": "标准HTTP状态码，一致的响应格式，API文档"
+      },
+      {
+        "type": "configuration_management",
+        "context": "环境配置分离",
+        "requirement": "开发、测试、生产环境配置分离，支持运行时配置",
+        "priority": "P1",
+        "rationale": "不同环境部署和维护的便利性",
+        "implementation": "环境变量，配置中心，配置验证"
+      },
+      {
+        "type": "logging",
+        "context": "结构化日志记录",
+        "requirement": "所有重要操作记录结构化日志，便于问题排查",
+        "priority": "P1",
+        "rationale": "快速定位和解决问题",
+        "implementation": "日志分级，上下文信息，集中日志管理"
+      },
+      {
+        "type": "documentation",
+        "context": "代码和API文档",
+        "requirement": "代码注释完整，API文档自动生成和同步",
+        "priority": "P1",
+        "rationale": "降低维护成本和学习成本",
+        "implementation": "JSDoc注释，Swagger文档，README更新"
+      },
+      {
+        "type": "error_monitoring",
+        "context": "生产环境错误监控",
+        "requirement": "实时错误监控，性能指标收集，告警机制",
+        "priority": "P1",
+        "rationale": "快速发现和解决问题",
+        "implementation": "错误追踪，性能监控，告警系统"
+      }
+    ],
+    "P2": [
+      {
+        "type": "frontend_rendering",
+        "context": "页面切换和组件渲染",
+        "requirement": "页面切换时间 ≤ 300ms，组件渲染 < 100ms",
+        "priority": "P2",
+        "rationale": "流畅的用户交互体验",
+        "measurement": "页面切换延迟 < 300ms，组件渲染时间 < 100ms"
+      },
+      {
+        "type": "accessibility",
+        "context": "无障碍访问支持",
+        "requirement": "支持WCAG 2.1 AA标准，键盘导航和屏幕阅读器",
+        "priority": "P2",
+        "rationale": "确保所有用户都能正常使用系统",
+        "implementation": "ARIA标签，键盘事件处理，颜色对比度检查"
+      },
+      {
+        "type": "loading_feedback",
+        "context": "操作进度反馈",
+        "requirement": "长时间操作显示进度条和状态信息",
+        "priority": "P2",
+        "rationale": "让用户了解操作进度，减少焦虑",
+        "implementation": "加载动画，进度指示器，状态消息"
+      },
+      {
+        "type": "undo_functionality",
+        "context": "重要操作可撤销",
+        "requirement": "删除、修改等重要操作提供撤销功能",
+        "priority": "P2",
+        "rationale": "减少用户误操作的影响",
+        "implementation": "操作历史，撤销按钮，确认对话框"
+      }
+    ]
+  },
+  "exceptions": [
+    {
+      "source": "用户认证流程",
+      "scenario": "用户名已存在",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "提供用户名建议，允许修改",
+      "priority": "P1"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "邮箱格式错误",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "实时格式验证，清晰错误提示",
+      "priority": "P1"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "密码强度不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "密码强度指示器，生成强密码建议",
+      "priority": "P1"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "验证码错误",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "验证码刷新，语音验证码选项",
+      "priority": "P1"
+    },
+    {
+      "source": "用户认证流程",
+      "scenario": "账号被锁定",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "锁定通知，解锁申请流程",
+      "priority": "P1"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "课程已满员",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "等待队列，预约提醒通知",
+      "priority": "P1"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "时间段已被预约",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "显示可用时间段，智能推荐",
+      "priority": "P1"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "用户余额不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "余额充值引导，部分支付选项",
+      "priority": "P1"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "支付超时失败",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "支付状态监控，自动重试机制",
+      "priority": "P1"
+    },
+    {
+      "source": "课程预约流程",
+      "scenario": "重复预约检测",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "预约历史展示，防止重复提交",
+      "priority": "P1"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "会员卡类型不存在",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "用户已有有效会员卡",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "支付失败回滚",
+      "type": "user_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "会员购买流程",
+      "scenario": "库存不足（限量卡）",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "教练当前时间不可预约",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "用户会员等级不足",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "预约时间冲突",
+      "type": "user_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "教练预约流程",
+      "scenario": "服务项目不可用",
+      "type": "user_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P1"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "用户名或密码错误",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "账号被禁用",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "登录IP受限",
+      "type": "admin_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "管理员登录流程",
+      "scenario": "权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "必填字段缺失",
+      "type": "admin_flow_exception",
+      "impact": "低 - 不影响核心功能",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "数据格式错误",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "课程管理流程",
+      "scenario": "保存失败",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "用户不存在",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "编辑权限不足",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "数据冲突",
+      "type": "admin_flow_exception",
+      "impact": "中 - 影响部分功能使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    },
+    {
+      "source": "用户管理流程",
+      "scenario": "保存失败",
+      "type": "admin_flow_exception",
+      "impact": "高 - 影响用户正常使用",
+      "mitigation": "完善错误提示，提供解决建议",
+      "priority": "P2"
+    }
+  ],
+  "moduleBreakdown": {
+    "用户管理": {
+      "P0": [
+        {
+          "source": "用户认证流程",
+          "type": "user_authentication",
+          "requirement": "安全的密码加密存储",
+          "priority": "P0",
+          "userFlow": "用户认证流程"
+        },
+        {
+          "source": "用户认证流程",
+          "type": "user_authentication",
+          "requirement": "邮箱验证机制",
+          "priority": "P0",
+          "userFlow": "用户认证流程"
+        }
+      ],
+      "P1": [
+        {
+          "source": "用户认证流程",
+          "type": "user_authentication",
+          "requirement": "会话管理与超时",
+          "priority": "P1",
+          "userFlow": "用户认证流程"
+        },
+        {
+          "source": "管理员登录流程",
+          "type": "admin_authentication",
+          "requirement": "登录日志记录",
+          "priority": "P1",
+          "adminFlow": "管理员登录流程"
+        },
+        {
+          "source": "用户管理流程",
+          "type": "user_management",
+          "requirement": "用户状态管理",
+          "priority": "P1",
+          "adminFlow": "用户管理流程"
+        },
+        {
+          "type": "backend_api",
+          "source": "User",
+          "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+          "priority": "P1",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Users",
+          "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+          "priority": "P1",
+          "endpoints": [
+            {
+              "method": "Post",
+              "path": "/register"
+            },
+            {
+              "method": "Get",
+              "path": "logout"
+            }
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "User",
+          "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "username",
+            "password",
+            "passwordHash",
+            "failedLoginAttempts",
+            "lockUntil",
+            "image",
+            "role",
+            "status",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Users",
+          "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "username",
+            "password",
+            "passwordHash",
+            "failedLoginAttempts",
+            "lockUntil",
+            "image",
+            "role",
+            "addtime"
+          ]
+        }
+      ],
+      "P2": [
+        {
+          "source": "用户认证流程",
+          "type": "user_authentication",
+          "requirement": "登录失败次数限制",
+          "priority": "P2",
+          "userFlow": "用户认证流程"
+        },
+        {
+          "source": "用户认证流程",
+          "type": "user_authentication",
+          "requirement": "密码重置功能",
+          "priority": "P2",
+          "userFlow": "用户认证流程"
+        },
+        {
+          "source": "用户管理流程",
+          "type": "user_management",
+          "requirement": "用户行为分析",
+          "priority": "P2",
+          "adminFlow": "用户管理流程"
+        },
+        {
+          "type": "frontend_component",
+          "source": "Equipment3DViewer",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "three",
+            "@/components/common",
+            "@/types/modules"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "MobileForm",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": []
+        },
+        {
+          "type": "frontend_component",
+          "source": "RecommendationCard",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "element-plus"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "RotateVerify",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "SafeHtml",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/utils/security"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "Stepper",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/composables/useStepTransition"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "TechButton",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "TechCard",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "TechStepper",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": []
+        },
+        {
+          "type": "frontend_component",
+          "source": "VerifyCode",
+          "requirement": "提供common相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "FavoritesOverview",
+          "requirement": "提供favorites相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/components/common"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "FloatingServiceButton",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "Footer",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": []
+        },
+        {
+          "type": "frontend_component",
+          "source": "HeroSection",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "three",
+            "@/composables/useParticleSystem",
+            "@/utils/animationConfig"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "ServiceCards",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "@/config/config"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "SmartHeader",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "gsap"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "Testimonials",
+          "requirement": "提供home相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/composables/useScrollAnimation"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "ModuleDetail",
+          "requirement": "提供modules相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/composables/useModuleCrud",
+            "@/types/modules",
+            "@/config/modules",
+            "@/utils/formatters",
+            "@/components/common/SafeHtml.vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "ModuleForm",
+          "requirement": "提供modules相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "element-plus",
+            "@/config/modules",
+            "@/composables/useModuleCrud",
+            "@/types/modules",
+            "@/components/FileUpload.vue",
+            "@/components/Editor.vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "ModuleList",
+          "requirement": "提供modules相关的用户界面功能",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/types/modules",
+            "@/config/modules",
+            "@/composables/useModuleCrud",
+            "@/utils/formatters"
+          ]
+        },
+        {
+          "type": "backend_api",
+          "source": "Yonghu",
+          "requirement": "提供用户管理相关的API接口，包括注册、登录、信息管理等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "data_model",
+          "source": "Yonghu",
+          "requirement": "存储用户信息，包括基本信息、登录凭据、权限等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yonghuzhanghao",
+            "mima",
+            "passwordHash",
+            "failedLoginAttempts",
+            "lockUntil",
+            "yonghuxingming",
+            "touxiang",
+            "xingbie",
+            "shengao",
+            "tizhong",
+            "shoujihaoma",
+            "huiyuankahao",
+            "huiyuankamingcheng",
+            "youxiaoqizhi",
+            "status",
+            "addtime"
+          ]
+        }
+      ]
+    },
+    "课程预约": {
+      "P0": [
+        {
+          "type": "frontend_component",
+          "source": "BookingCalendar",
+          "requirement": "提供课程预约和预订功能",
+          "priority": "P0",
+          "technicalDependencies": []
+        },
+        {
+          "type": "frontend_component",
+          "source": "BookingSummary",
+          "requirement": "提供课程预约和预订功能",
+          "priority": "P0",
+          "technicalDependencies": [
+            "vue",
+            "element-plus",
+            "@/utils/formatters"
+          ]
+        }
+      ],
+      "P1": [
+        {
+          "source": "课程预约流程",
+          "type": "course_booking",
+          "requirement": "支付状态同步",
+          "priority": "P1",
+          "userFlow": "课程预约流程"
+        },
+        {
+          "source": "课程预约流程",
+          "type": "course_booking",
+          "requirement": "预约提醒通知",
+          "priority": "P1",
+          "userFlow": "课程预约流程"
+        },
+        {
+          "source": "教练预约流程",
+          "type": "coach_booking",
+          "requirement": "教练排班管理系统",
+          "priority": "P1",
+          "userFlow": "教练预约流程"
+        },
+        {
+          "source": "课程管理流程",
+          "type": "content_management",
+          "requirement": "课程状态管理",
+          "priority": "P1",
+          "adminFlow": "课程管理流程"
+        },
+        {
+          "type": "frontend_component",
+          "source": "CoursePicker",
+          "requirement": "展示和管理系统课程信息",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "@element-plus/icons-vue",
+            "@/types/modules",
+            "@/utils/formatters",
+            "@/components/common"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "CourseBenefitsChart",
+          "requirement": "展示和管理系统课程信息",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "CourseCard",
+          "requirement": "展示和管理系统课程信息",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "@/types/modules",
+            "@/config/config",
+            "@/utils/formatters"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "CourseReservation",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "reservationNumber",
+            "courseName",
+            "image",
+            "courseType",
+            "classTime",
+            "classLocation",
+            "coursePrice",
+            "coachId",
+            "coachName",
+            "reservationTime",
+            "membershipCardNumber",
+            "username",
+            "fullName",
+            "phoneNumber",
+            "crossUserId",
+            "crossRefId",
+            "auditStatus",
+            "auditContent",
+            "paymentStatus",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "CourseType",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "courseType",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "FitnessCourseDiscussion",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "refId",
+            "userId",
+            "avatarUrl",
+            "nickname",
+            "content",
+            "reply",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "FitnessCourse",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "courseName",
+            "courseType",
+            "image",
+            "classTime",
+            "classLocation",
+            "coursePrice",
+            "courseIntroduction",
+            "courseVideo",
+            "coachId",
+            "coachName",
+            "clicktime",
+            "clicknum",
+            "discussnum",
+            "storeupnum",
+            "addtime"
+          ]
+        }
+      ],
+      "P2": [
+        {
+          "source": "课程预约流程",
+          "type": "course_booking",
+          "requirement": "实时库存检查",
+          "priority": "P2",
+          "userFlow": "课程预约流程"
+        },
+        {
+          "source": "课程预约流程",
+          "type": "course_booking",
+          "requirement": "预约冲突检测算法",
+          "priority": "P2",
+          "userFlow": "课程预约流程"
+        },
+        {
+          "source": "课程预约流程",
+          "type": "course_booking",
+          "requirement": "预约取消机制",
+          "priority": "P2",
+          "userFlow": "课程预约流程"
+        },
+        {
+          "source": "教练预约流程",
+          "type": "coach_booking",
+          "requirement": "服务项目定价策略",
+          "priority": "P2",
+          "userFlow": "教练预约流程"
+        },
+        {
+          "source": "教练预约流程",
+          "type": "coach_booking",
+          "requirement": "预约确认机制",
+          "priority": "P2",
+          "userFlow": "教练预约流程"
+        },
+        {
+          "source": "教练预约流程",
+          "type": "coach_booking",
+          "requirement": "服务评价系统",
+          "priority": "P2",
+          "userFlow": "教练预约流程"
+        },
+        {
+          "source": "教练预约流程",
+          "type": "coach_booking",
+          "requirement": "教练收益结算",
+          "priority": "P2",
+          "userFlow": "教练预约流程"
+        },
+        {
+          "source": "课程管理流程",
+          "type": "content_management",
+          "requirement": "课程信息完整性校验",
+          "priority": "P2",
+          "adminFlow": "课程管理流程"
+        },
+        {
+          "type": "frontend_component",
+          "source": "GoalSelector",
+          "requirement": "支持课程预约和时间安排",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "SchedulePlanner",
+          "requirement": "支持课程预约和时间安排",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "./BookingCalendar.vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "AdvancedFilters",
+          "requirement": "支持课程讨论和社区互动",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "element-plus",
+            "@/components/common/TechButton.vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "DiscussionComposer",
+          "requirement": "支持课程讨论和社区互动",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "element-plus",
+            "@/components/common",
+            "@/services/crud",
+            "@/types/modules"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "DiscussionReplies",
+          "requirement": "支持课程讨论和社区互动",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue",
+            "@/components/common",
+            "@/composables/useDiscussionInteraction",
+            "@/assets/touxiang.png",
+            "@/config/config"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "TopicCloud",
+          "requirement": "支持课程讨论和社区互动",
+          "priority": "P2",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "backend_api",
+          "source": "Discussjianshenkecheng",
+          "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Jianshenjiaolian",
+          "requirement": "提供教练服务相关的API接口，包括教练信息、私教预约等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Jianshenkecheng",
+          "requirement": "提供健身课程相关的API接口，包括课程信息、预约管理等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "data_model",
+          "source": "Discussjianshenkecheng",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "refid",
+            "userid",
+            "avatarurl",
+            "nickname",
+            "content",
+            "reply",
+            "sfsh",
+            "clicktime",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Jianshenkecheng",
+          "requirement": "存储课程信息，包括课程详情、时间安排、教练信息等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "kechengmingcheng",
+            "kechengleixing",
+            "tupian",
+            "shangkeshijian",
+            "shangkedidian",
+            "kechengjiage",
+            "kechengjianjie",
+            "kechengshipin",
+            "jiaoliangonghao",
+            "jiaolianxingming",
+            "clicktime",
+            "clicknum",
+            "discussnum",
+            "storeupnum",
+            "addtime"
+          ]
+        }
+      ]
+    },
+    "会员服务": {
+      "P0": [
+        {
+          "type": "frontend_component",
+          "source": "MobilePaymentConfirm",
+          "requirement": "处理支付流程和支付状态管理",
+          "priority": "P0",
+          "technicalDependencies": [
+            "@/utils/formatters"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "PaymentMethodCard",
+          "requirement": "处理支付流程和支付状态管理",
+          "priority": "P0",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "PaymentResult",
+          "requirement": "处理支付流程和支付状态管理",
+          "priority": "P0",
+          "technicalDependencies": [
+            "vue"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "PaymentStepper",
+          "requirement": "处理支付流程和支付状态管理",
+          "priority": "P0",
+          "technicalDependencies": []
+        }
+      ],
+      "P1": [
+        {
+          "source": "会员购买流程",
+          "type": "membership_purchase",
+          "requirement": "会员卡类型管理",
+          "priority": "P1",
+          "userFlow": "会员购买流程"
+        },
+        {
+          "source": "会员购买流程",
+          "type": "membership_purchase",
+          "requirement": "购买记录追溯",
+          "priority": "P1",
+          "userFlow": "会员购买流程"
+        },
+        {
+          "type": "frontend_component",
+          "source": "MembershipBenefits",
+          "requirement": "管理会员卡和会员权益",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "d3",
+            "d3-shape",
+            "@/types/modules"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "MembershipCard",
+          "requirement": "管理会员卡和会员权益",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "@/components/common",
+            "@/types/modules",
+            "@/utils/formatters"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "MembershipComparison",
+          "requirement": "管理会员卡和会员权益",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "@/types/modules",
+            "@/utils/formatters"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "MembershipCard",
+          "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "membershipCardName",
+            "image",
+            "validityPeriod",
+            "price",
+            "usageInstructions",
+            "membershipCardDetails",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "MembershipCardPurchase",
+          "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "membershipCardNumber",
+            "membershipCardName",
+            "image",
+            "validityPeriod",
+            "price",
+            "purchaseDate",
+            "username",
+            "fullName",
+            "phoneNumber",
+            "paymentStatus",
+            "addtime"
+          ]
+        }
+      ],
+      "P2": [
+        {
+          "source": "会员购买流程",
+          "type": "membership_purchase",
+          "requirement": "有效期自动计算",
+          "priority": "P2",
+          "userFlow": "会员购买流程"
+        },
+        {
+          "source": "会员购买流程",
+          "type": "membership_purchase",
+          "requirement": "会员权益自动激活",
+          "priority": "P2",
+          "userFlow": "会员购买流程"
+        },
+        {
+          "source": "会员购买流程",
+          "type": "membership_purchase",
+          "requirement": "续费提醒机制",
+          "priority": "P2",
+          "userFlow": "会员购买流程"
+        },
+        {
+          "type": "backend_api",
+          "source": "Huiyuanka",
+          "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Huiyuankagoumai",
+          "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Huiyuanxufei",
+          "requirement": "提供会员服务相关的API接口，包括会员卡管理、续费等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "data_model",
+          "source": "Huiyuanka",
+          "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "huiyuankamingcheng",
+            "tupian",
+            "youxiaoqi",
+            "jiage",
+            "shiyongshuoming",
+            "huiyuankaxiangqing",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Huiyuankagoumai",
+          "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "huiyuankahao",
+            "huiyuankamingcheng",
+            "tupian",
+            "youxiaoqi",
+            "jiage",
+            "goumairiqi",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "shoujihaoma",
+            "ispay",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Huiyuanxufei",
+          "requirement": "存储会员信息，包括会员卡类型、有效期、权益等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "touxiang",
+            "jiaofeibianhao",
+            "huiyuankamingcheng",
+            "youxiaoqi",
+            "jiage",
+            "xufeishijian",
+            "ispay",
+            "addtime"
+          ]
+        }
+      ]
+    },
+    "管理后台": {
+      "P0": [
+        {
+          "source": "管理员登录流程",
+          "type": "admin_authentication",
+          "requirement": "管理员角色权限管理",
+          "priority": "P0",
+          "adminFlow": "管理员登录流程"
+        }
+      ],
+      "P1": [
+        {
+          "source": "管理员登录流程",
+          "type": "admin_authentication",
+          "requirement": "会话超时管理",
+          "priority": "P1",
+          "adminFlow": "管理员登录流程"
+        }
+      ],
+      "P2": [
+        {
+          "type": "backend_api",
+          "source": "Admin",
+          "requirement": "提供Admin模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        }
+      ]
+    },
+    "安全保障": {
+      "P0": [
+        {
+          "source": "管理员登录流程",
+          "type": "admin_authentication",
+          "requirement": "安全审计机制",
+          "priority": "P0",
+          "adminFlow": "管理员登录流程"
+        },
+        {
+          "source": "用户管理流程",
+          "type": "user_management",
+          "requirement": "安全日志记录",
+          "priority": "P0",
+          "adminFlow": "用户管理流程"
+        }
+      ],
+      "P1": [],
+      "P2": []
+    },
+    "其他功能": {
+      "P0": [],
+      "P1": [
+        {
+          "source": "课程管理流程",
+          "type": "content_management",
+          "requirement": "历史版本记录",
+          "priority": "P1",
+          "adminFlow": "课程管理流程"
+        }
+      ],
+      "P2": [
+        {
+          "source": "课程管理流程",
+          "type": "content_management",
+          "requirement": "批量导入导出功能",
+          "priority": "P2",
+          "adminFlow": "课程管理流程"
+        },
+        {
+          "source": "课程管理流程",
+          "type": "content_management",
+          "requirement": "内容审核机制",
+          "priority": "P2",
+          "adminFlow": "课程管理流程"
+        },
+        {
+          "source": "用户管理流程",
+          "type": "user_management",
+          "requirement": "批量操作支持",
+          "priority": "P2",
+          "adminFlow": "用户管理流程"
+        },
+        {
+          "source": "用户管理流程",
+          "type": "user_management",
+          "requirement": "数据导出功能",
+          "priority": "P2",
+          "adminFlow": "用户管理流程"
+        },
+        {
+          "type": "backend_api",
+          "source": "Assets",
+          "requirement": "提供Assets模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Chat",
+          "requirement": "提供Chat模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Common",
+          "requirement": "提供Common模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Config",
+          "requirement": "提供Config模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Daoqitixing",
+          "requirement": "提供Daoqitixing模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "ErrorReport",
+          "requirement": "提供ErrorReport模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "File",
+          "requirement": "提供File模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Jianshenqicai",
+          "requirement": "提供Jianshenqicai模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Kechengleixing",
+          "requirement": "提供Kechengleixing模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Kechengtuike",
+          "requirement": "提供Kechengtuike模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Kechengyuyue",
+          "requirement": "提供Kechengyuyue模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "LegalTerms",
+          "requirement": "提供LegalTerms模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Message",
+          "requirement": "提供Message模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "News",
+          "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Newstype",
+          "requirement": "提供新闻资讯相关的API接口，包括内容发布、展示等",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "OperationLog",
+          "requirement": "提供OperationLog模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Sijiaoyuyue",
+          "requirement": "提供Sijiaoyuyue模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "backend_api",
+          "source": "Storeup",
+          "requirement": "提供Storeup模块的业务API接口",
+          "priority": "P2",
+          "endpoints": []
+        },
+        {
+          "type": "data_model",
+          "source": "Assets",
+          "requirement": "存储Assets相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "assetName",
+            "assetType",
+            "filePath",
+            "fileSize",
+            "fileFormat",
+            "module",
+            "usage",
+            "dimensions",
+            "width",
+            "height",
+            "version",
+            "description",
+            "tags",
+            "category",
+            "status",
+            "uploadUser",
+            "addtime",
+            "updatetime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Chat",
+          "requirement": "存储Chat相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "userid",
+            "adminid",
+            "ask",
+            "reply",
+            "isreply",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Config",
+          "requirement": "存储Config相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "name",
+            "configValue",
+            "url"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Daoqitixing",
+          "requirement": "存储Daoqitixing相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "touxiang",
+            "huiyuankahao",
+            "youxiaoqizhi",
+            "tixingshijian",
+            "beizhu",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "FitnessEquipment",
+          "requirement": "存储FitnessEquipment相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "equipmentName",
+            "image",
+            "brand",
+            "usageMethod",
+            "weightLossEffect",
+            "equipmentIntroduction",
+            "teachingVideo",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Jianshenqicai",
+          "requirement": "存储Jianshenqicai相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "qicaimingcheng",
+            "tupian",
+            "pinpai",
+            "shiyongfangfa",
+            "shoushenxiaoguo",
+            "qicaijieshao",
+            "jiaoxueshipin",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Kechengleixing",
+          "requirement": "存储Kechengleixing相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "kechengleixing",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Kechengtuike",
+          "requirement": "存储Kechengtuike相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yuyuebianhao",
+            "kechengmingcheng",
+            "tupian",
+            "kechengleixing",
+            "shangkeshijian",
+            "shangkedidian",
+            "kechengjiage",
+            "jiaoliangonghao",
+            "jiaolianxingming",
+            "shenqingshijian",
+            "huiyuankahao",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "shoujihaoma",
+            "tuikeyuanyin",
+            "crossuserid",
+            "crossrefid",
+            "sfsh",
+            "shhf",
+            "ispay",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Kechengyuyue",
+          "requirement": "存储Kechengyuyue相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yuyuebianhao",
+            "kechengmingcheng",
+            "tupian",
+            "kechengleixing",
+            "shangkeshijian",
+            "shangkedidian",
+            "kechengjiage",
+            "jiaoliangonghao",
+            "jiaolianxingming",
+            "yuyueshijian",
+            "huiyuankahao",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "shoujihaoma",
+            "crossuserid",
+            "crossrefid",
+            "sfsh",
+            "shhf",
+            "ispay",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "LegalTerms",
+          "requirement": "存储LegalTerms相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "type",
+            "title",
+            "version",
+            "content",
+            "status",
+            "effectiveDate",
+            "updateTime",
+            "createTime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Message",
+          "requirement": "存储Message相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "userid",
+            "title",
+            "content",
+            "type",
+            "isread",
+            "relatedType",
+            "relatedId",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "News",
+          "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "title",
+            "introduction",
+            "typename",
+            "name",
+            "headportrait",
+            "clicknum",
+            "clicktime",
+            "thumbsupnum",
+            "crazilynum",
+            "storeupnum",
+            "picture",
+            "content",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Newstype",
+          "requirement": "存储新闻资讯内容，包括标题、内容、发布时间等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "typename",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "OperationLog",
+          "requirement": "存储OperationLog相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "userid",
+            "username",
+            "tableName",
+            "operationType",
+            "content",
+            "ip",
+            "userAgent",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Sijiaoyuyue",
+          "requirement": "存储Sijiaoyuyue相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "yuyuebianhao",
+            "jiaoliangonghao",
+            "jiaolianxingming",
+            "zhaopian",
+            "sijiaojiage",
+            "yuyueshijian",
+            "yonghuzhanghao",
+            "yonghuxingming",
+            "shoujihaoma",
+            "huiyuankahao",
+            "beizhu",
+            "sfsh",
+            "shhf",
+            "ispay",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Storeup",
+          "requirement": "存储Storeup相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "userid",
+            "refid",
+            "tablename",
+            "name",
+            "picture",
+            "type",
+            "inteltype",
+            "remark",
+            "addtime"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "Token",
+          "requirement": "存储Token相关的数据信息",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "userid",
+            "username",
+            "tablename",
+            "role",
+            "token",
+            "expiratedtime",
+            "addtime"
+          ]
+        }
+      ]
+    },
+    "教练服务": {
+      "P0": [],
+      "P1": [
+        {
+          "type": "frontend_component",
+          "source": "CoachRecommend",
+          "requirement": "管理教练信息和私教服务",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "@element-plus/icons-vue",
+            "gsap",
+            "@/types/modules",
+            "@/components/common"
+          ]
+        },
+        {
+          "type": "frontend_component",
+          "source": "CoachNetwork",
+          "requirement": "管理教练信息和私教服务",
+          "priority": "P1",
+          "technicalDependencies": [
+            "vue",
+            "three",
+            "@/composables/useParticleSystem",
+            "@/utils/animationConfig"
+          ]
+        },
+        {
+          "type": "data_model",
+          "source": "FitnessCoach",
+          "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+          "priority": "P1",
+          "fields": [
+            "id",
+            "coachId",
+            "password",
+            "coachName",
+            "photo",
+            "gender",
+            "age",
+            "height",
+            "weight",
+            "contactPhone",
+            "privateCoachingPrice",
+            "personalIntroduction",
+            "addtime"
+          ]
+        }
+      ],
+      "P2": [
+        {
+          "type": "data_model",
+          "source": "Jianshenjiaolian",
+          "requirement": "存储教练信息，包括基本信息、专长、服务项目等",
+          "priority": "P2",
+          "fields": [
+            "id",
+            "jiaoliangonghao",
+            "mima",
+            "passwordHash",
+            "failedLoginAttempts",
+            "lockUntil",
+            "jiaolianxingming",
+            "zhaopian",
+            "xingbie",
+            "nianling",
+            "shengao",
+            "tizhong",
+            "lianxidianhua",
+            "sijiaojiage",
+            "gerenjianjie",
+            "addtime"
+          ]
+        }
+      ]
+    }
+  },
+  "analysisTime": "2025-11-17T01:46:33.216Z"
+}

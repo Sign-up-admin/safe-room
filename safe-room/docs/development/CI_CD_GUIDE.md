@@ -1,0 +1,1658 @@
+---
+title: CI CD GUIDE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: development
+---# CI/CD 流水线指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: DevOps团队
+
+## 概述
+
+本指南详细介绍健身房管理系统CI/CD流水线的完整配置，包括GitHub Actions工作流、自动化测试、部署策略、安全扫描等核心组件。
+
+## 目录
+
+- [1. CI/CD 架构](#1-cicd-架构)
+- [2. GitHub Actions 配置](#2-github-actions-配置)
+- [3. 流水线阶段详解](#3-流水线阶段详解)
+- [4. 环境管理](#4-环境管理)
+- [5. 部署策略](#5-部署策略)
+- [6. 监控与告警](#6-监控与告警)
+- [7. 故障排查](#7-故障排查)
+- [8. 最佳实践](#8-最佳实践)
+
+---
+
+## 1. CI/CD 架构
+
+### 流水线架构图
+
+```mermaid
+graph TD
+    subgraph "开发阶段"
+        A[代码提交] --> B[Git Push]
+        B --> C[Pull Request]
+    end
+
+    subgraph "CI阶段"
+        C --> D[代码质量检查]
+        D --> E[单元测试]
+        E --> F[集成测试]
+        F --> G[安全扫描]
+        G --> H[构建镜像]
+    end
+
+    subgraph "CD阶段"
+        H --> I{环境选择}
+        I -->|开发| J[部署到Dev]
+        I -->|测试| K[部署到Staging]
+        I -->|生产| L[部署到Prod]
+    end
+
+    subgraph "验证阶段"
+        J --> M[冒烟测试]
+        K --> N[回归测试]
+        L --> O[端到端测试]
+        M --> P[监控告警]
+        N --> P
+        O --> P
+    end
+
+    subgraph "反馈阶段"
+        P --> Q[通知团队]
+        Q --> R[生成报告]
+        R --> S[更新状态]
+    end
+```
+
+### 流水线组件
+
+| 组件 | 功能 | 工具 |
+|------|------|------|
+| **版本控制** | 代码托管和分支管理 | Git + GitHub |
+| **CI服务** | 自动化构建和测试 | GitHub Actions |
+| **容器化** | 应用打包和运行时 | Docker + Docker Compose |
+| **制品库** | 构建产物存储 | GitHub Packages / Docker Hub |
+| **部署工具** | 自动化部署 | Bash + PowerShell 脚本 |
+| **监控系统** | 运行时监控和告警 | Prometheus + Grafana |
+| **安全工具** | 代码和依赖安全扫描 | Trivy, Snyk, CodeQL |
+
+---
+
+## 2. GitHub Actions 配置
+
+### 2.1 主要工作流文件
+
+项目包含以下GitHub Actions工作流：
+
+#### 完整的CI/CD工作流 (`.github/workflows/ci-cd.yml`)
+
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # 代码质量检查
+  quality-check:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/main/resources/front/front/package-lock.json
+            src/main/resources/admin/admin/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Install frontend dependencies
+        run: |
+          cd src/main/resources/front/front
+          npm ci
+          cd ../admin
+          npm ci
+
+      - name: Run frontend linting
+        run: |
+          cd src/main/resources/front/front
+          npm run lint
+          cd ../admin
+          npm run lint
+
+      - name: Run backend compilation
+        run: mvn compile -q
+
+      - name: Check code formatting
+        run: |
+          cd src/main/resources/front/front
+          npm run format:check
+          cd ../admin
+          npm run format:check
+
+  # 单元测试
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality-check
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: fitness_gym_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install frontend dependencies
+        run: |
+          cd src/main/resources/front/front
+          npm ci
+          cd ../admin
+          npm ci
+
+      - name: Run frontend unit tests
+        run: |
+          cd src/main/resources/front/front
+          npm run test:unit -- --coverage --watchAll=false
+          cd ../admin
+          npm run test:unit -- --coverage --watchAll=false
+
+      - name: Run backend unit tests
+        run: mvn test -Dspring.profiles.active=test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: |
+            src/main/resources/front/front/coverage/lcov.info
+            src/main/resources/admin/admin/coverage/lcov.info
+            target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # 集成测试
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: unit-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run integration tests
+        run: mvn verify -Dspring.profiles.active=integration-test
+
+      - name: Generate test report
+        run: mvn surefire-report:report
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results
+          path: |
+            target/surefire-reports/
+            target/site/
+
+  # 端到端测试
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: integration-tests
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Playwright
+        run: |
+          cd src/main/resources/front/front
+          npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: |
+          cd src/main/resources/front/front
+          npm run test:e2e:ci
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            src/main/resources/front/front/test-results/
+            src/main/resources/front/front/playwright-report/
+
+  # 安全扫描
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=package.json
+
+      - name: Run Snyk on backend
+        uses: snyk/actions/java@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --file=pom.xml
+
+  # 构建和推送镜像
+  build-and-push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [unit-tests, integration-tests, e2e-tests, security-scan]
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-api
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src/main/resources/front/front
+          file: ./src/main/resources/front/front/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-frontend
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
+  # 部署到开发环境
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/develop'
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to development
+        run: |
+          echo "Deploying to development environment..."
+          # 这里添加具体的部署命令
+          # 例如：调用部署脚本或使用kubectl/helm等
+
+  # 部署到生产环境
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment..."
+          # 这里添加具体的部署命令
+```
+
+#### 文档发布工作流 (`.github/workflows/docs-publish.yml`)
+
+```yaml
+name: Publish Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - 'docker-compose.yml'
+  workflow_dispatch:
+
+jobs:
+  docs-validation:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate documentation
+        run: npm run validate-docs
+
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: docs-validation
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate API documentation
+        run: npm run generate-api-docs
+
+      - name: Generate deployment documentation
+        run: npm run generate-deployment-docs
+
+      - name: Update documentation index
+        run: npm run update-doc-index
+
+      - name: Build documentation site
+        run: |
+          cd docs
+          npm install
+          npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build
+          cname: docs.fitness-gym.com
+```
+
+### 2.2 环境配置
+
+#### 环境变量设置
+
+在GitHub仓库设置中配置以下环境变量：
+
+**Actions secrets and variables > Variables**
+
+| 变量名 | 说明 | 示例值 |
+|--------|------|--------|
+| `DOCKER_REGISTRY` | Docker镜像仓库 | `ghcr.io` |
+| `IMAGE_NAME` | 镜像名称 | `your-org/fitness-gym` |
+| `PROD_DEPLOY_HOST` | 生产环境主机 | `prod-server.fitness-gym.com` |
+| `STAGING_DEPLOY_HOST` | 测试环境主机 | `staging.fitness-gym.com` |
+
+**Actions secrets and variables > Secrets**
+
+| Secret名 | 说明 |
+|----------|------|
+| `DOCKER_PASSWORD` | Docker仓库密码 |
+| `DEPLOY_KEY` | SSH部署密钥 |
+| `PROD_DB_PASSWORD` | 生产数据库密码 |
+| `STAGING_DB_PASSWORD` | 测试数据库密码 |
+| `SLACK_WEBHOOK_URL` | Slack通知Webhook |
+| `SNYK_TOKEN` | Snyk安全扫描令牌 |
+
+#### 环境保护规则
+
+```yaml
+# .github/workflows/environments.yml
+environments:
+  development:
+    deployment_branch_policy:
+      protected_branches: false
+      custom_branch_policies: true
+    reviewers:
+      - type: User
+        id: devops-team
+    required_reviewers: 1
+
+  staging:
+    deployment_branch_policy:
+      protected_branches: false
+      custom_branch_policies: true
+    reviewers:
+      - type: User
+        id: qa-team
+      - type: User
+        id: devops-team
+    required_reviewers: 2
+
+  production:
+    deployment_branch_policy:
+      protected_branches: true
+      custom_branch_policies: false
+    reviewers:
+      - type: User
+        id: product-owner
+      - type: Team
+        id: engineering-lead
+      - type: Team
+        id: qa-team
+    required_reviewers: 3
+    wait_timer: 30  # 等待30分钟后自动部署
+```
+
+---
+
+## 3. 流水线阶段详解
+
+### 3.1 代码质量检查阶段
+
+#### Linting和格式化
+
+```yaml
+# 前端代码检查
+- name: Run ESLint
+  run: |
+    cd src/main/resources/front/front
+    npx eslint src/ --ext .ts,.tsx,.js,.jsx
+
+- name: Check Prettier formatting
+  run: |
+    cd src/main/resources/front/front
+    npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
+
+# 后端代码检查
+- name: Run Spotless (Java formatting)
+  run: mvn spotless:check
+
+- name: Run Checkstyle
+  run: mvn checkstyle:check
+```
+
+#### 静态类型检查
+
+```yaml
+# TypeScript类型检查
+- name: TypeScript check
+  run: |
+    cd src/main/resources/front/front
+    npx tsc --noEmit
+
+# Java编译检查
+- name: Java compilation
+  run: mvn compile -q
+```
+
+### 3.2 测试阶段
+
+#### 单元测试配置
+
+```xml
+<!-- pom.xml 测试配置 -->
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.1.2</version>
+  <configuration>
+    <includes>
+      <include>**/*Test.java</include>
+      <include>**/*Tests.java</include>
+    </includes>
+    <excludes>
+      <exclude>**/*IT.java</exclude>
+      <exclude>**/*IntegrationTest.java</exclude>
+    </excludes>
+    <systemPropertyVariables>
+      <spring.profiles.active>test</spring.profiles.active>
+    </systemPropertyVariables>
+  </configuration>
+</plugin>
+```
+
+#### 集成测试配置
+
+```xml
+<!-- 集成测试插件 -->
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-failsafe-plugin</artifactId>
+  <version>3.1.2</version>
+  <configuration>
+    <includes>
+      <include>**/*IT.java</include>
+      <include>**/*IntegrationTest.java</include>
+    </includes>
+    <systemPropertyVariables>
+      <spring.profiles.active>integration-test</spring.profiles.active>
+    </systemPropertyVariables>
+  </configuration>
+  <executions>
+    <execution>
+      <goals>
+        <goal>integration-test</goal>
+        <goal>verify</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+```
+
+#### E2E测试配置
+
+```javascript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests/e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: process.env.CI ? 'html' : 'list',
+
+  use: {
+    baseURL: process.env.BASE_URL || 'http://localhost:8080',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+  ],
+});
+```
+
+### 3.3 安全扫描阶段
+
+#### 容器镜像扫描
+
+```yaml
+- name: Scan container images
+  uses: aquasecurity/trivy-action@master
+  with:
+    scan-type: 'image'
+    scan-ref: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest'
+    format: 'sarif'
+    output: 'trivy-image-results.sarif'
+    severity: 'CRITICAL,HIGH'
+```
+
+#### 依赖漏洞扫描
+
+```yaml
+- name: Run Snyk dependency scan
+  uses: snyk/actions/java@master
+  env:
+    SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  with:
+    command: test
+    args: --file=pom.xml --sarif-file-output=snyk-java.sarif
+
+- name: Run Snyk on JavaScript
+  uses: snyk/actions/node@master
+  env:
+    SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  with:
+    args: --file=package.json --sarif-file-output=snyk-js.sarif
+```
+
+#### 代码安全分析
+
+```yaml
+- name: CodeQL Analysis
+  uses: github/codeql-action/init@v2
+  with:
+    languages: javascript, java
+    queries: security-and-quality
+
+- name: Perform CodeQL Analysis
+  uses: github/codeql-action/analyze@v2
+```
+
+### 3.4 构建和部署阶段
+
+#### 多架构镜像构建
+
+```yaml
+- name: Build multi-platform images
+  uses: docker/build-push-action@v5
+  with:
+    context: .
+    platforms: linux/amd64,linux/arm64
+    push: true
+    tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+    cache-from: type=gha
+    cache-to: type=gha,mode=max
+    provenance: true
+    sbom: true
+```
+
+#### 部署脚本
+
+```bash
+#!/bin/bash
+# scripts/deploy.sh
+
+set -e
+
+ENVIRONMENT=$1
+TAG=$2
+
+if [ -z "$ENVIRONMENT" ] || [ -z "$TAG" ]; then
+    echo "Usage: $0 <environment> <tag>"
+    exit 1
+fi
+
+echo "🚀 Deploying $TAG to $ENVIRONMENT environment"
+
+# 加载环境配置
+source "config/environments/$ENVIRONMENT.env"
+
+# 拉取最新镜像
+docker pull $REGISTRY/$IMAGE_NAME:$TAG-api
+docker pull $REGISTRY/$IMAGE_NAME:$TAG-frontend
+
+# 停止旧服务
+docker-compose -f docker-compose.$ENVIRONMENT.yml down
+
+# 更新镜像标签
+sed -i "s|image:.*api|image: $REGISTRY/$IMAGE_NAME:$TAG-api|" docker-compose.$ENVIRONMENT.yml
+sed -i "s|image:.*frontend|image: $REGISTRY/$IMAGE_NAME:$TAG-frontend|" docker-compose.$ENVIRONMENT.yml
+
+# 启动新服务
+docker-compose -f docker-compose.$ENVIRONMENT.yml up -d
+
+# 等待服务启动
+sleep 30
+
+# 运行健康检查
+./scripts/health-check.sh
+
+echo "✅ Deployment completed successfully"
+```
+
+---
+
+## 4. 环境管理
+
+### 4.1 环境配置
+
+#### 环境变量文件
+
+**config/environments/development.env**
+```bash
+# 开发环境配置
+ENVIRONMENT=development
+DOCKER_COMPOSE_FILE=docker-compose.dev.yml
+
+# 数据库配置
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=fitness_gym_dev
+DB_USER=fitness_user
+DB_PASSWORD=dev_password
+
+# 应用配置
+API_PORT=3000
+FRONTEND_PORT=8080
+NODE_ENV=development
+
+# 监控配置
+PROMETHEUS_ENABLED=false
+GRAFANA_ENABLED=false
+```
+
+**config/environments/production.env**
+```bash
+# 生产环境配置
+ENVIRONMENT=production
+DOCKER_COMPOSE_FILE=docker-compose.prod.yml
+
+# 数据库配置
+DB_HOST=prod-db.fitness-gym.com
+DB_PORT=5432
+DB_NAME=fitness_gym_prod
+DB_USER=fitness_user
+DB_PASSWORD=${PROD_DB_PASSWORD}
+
+# 应用配置
+API_PORT=80
+FRONTEND_PORT=443
+NODE_ENV=production
+
+# 监控配置
+PROMETHEUS_ENABLED=true
+GRAFANA_ENABLED=true
+SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+```
+
+### 4.2 Docker Compose配置
+
+#### 开发环境配置
+
+```yaml
+# docker-compose.dev.yml
+version: '3.8'
+
+services:
+  api:
+    image: ${REGISTRY}/${IMAGE_NAME}:dev-api
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=${DB_HOST}
+      - DB_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "${API_PORT}:3000"
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  frontend:
+    image: ${REGISTRY}/${IMAGE_NAME}:dev-frontend
+    ports:
+      - "${FRONTEND_PORT}:80"
+    restart: unless-stopped
+
+  database:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+```
+
+#### 生产环境配置
+
+```yaml
+# docker-compose.prod.yml
+version: '3.8'
+
+services:
+  api:
+    image: ${REGISTRY}/${IMAGE_NAME}:latest-api
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=${DB_HOST}
+      - DB_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: ${REGISTRY}/${IMAGE_NAME}:latest-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  database:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  postgres_prod_data:
+    driver: local
+```
+
+---
+
+## 5. 部署策略
+
+### 5.1 蓝绿部署
+
+#### 蓝绿部署脚本
+
+```bash
+#!/bin/bash
+# scripts/blue-green-deploy.sh
+
+ENVIRONMENT=$1
+NEW_TAG=$2
+
+if [ -z "$ENVIRONMENT" ] || [ -z "$NEW_TAG" ]; then
+    echo "Usage: $0 <environment> <new_tag>"
+    exit 1
+fi
+
+# 获取当前活跃环境
+CURRENT_COLOR=$(get_current_active_color $ENVIRONMENT)
+if [ "$CURRENT_COLOR" = "blue" ]; then
+    NEW_COLOR="green"
+else
+    NEW_COLOR="blue"
+fi
+
+echo "🚀 开始蓝绿部署: $CURRENT_COLOR -> $NEW_COLOR"
+
+# 启动新环境
+echo "启动 $NEW_COLOR 环境..."
+docker-compose -f docker-compose.$ENVIRONMENT.$NEW_COLOR.yml pull
+docker-compose -f docker-compose.$ENVIRONMENT.$NEW_COLOR.yml up -d
+
+# 等待新环境启动
+echo "等待新环境启动..."
+sleep 60
+
+# 运行冒烟测试
+echo "运行冒烟测试..."
+if run_smoke_tests $NEW_COLOR; then
+    echo "✅ 冒烟测试通过"
+
+    # 切换流量
+    echo "切换流量到 $NEW_COLOR 环境..."
+    switch_traffic $ENVIRONMENT $NEW_COLOR
+
+    # 更新当前环境标记
+    update_active_color $ENVIRONMENT $NEW_COLOR
+
+    # 停止旧环境
+    echo "停止 $CURRENT_COLOR 环境..."
+    docker-compose -f docker-compose.$ENVIRONMENT.$CURRENT_COLOR.yml down
+
+    echo "🎉 蓝绿部署成功完成"
+
+else
+    echo "❌ 冒烟测试失败"
+
+    # 回滚：停止新环境
+    docker-compose -f docker-compose.$ENVIRONMENT.$NEW_COLOR.yml down
+
+    echo "🔄 部署已回滚"
+    exit 1
+fi
+```
+
+#### 流量切换配置
+
+```bash
+#!/bin/bash
+# scripts/switch-traffic.sh
+
+ENVIRONMENT=$1
+TARGET_COLOR=$2
+
+case $ENVIRONMENT in
+    "production")
+        # 使用Nginx upstream切换
+        sed -i "s/server blue/api-$TARGET_COLOR/" /etc/nginx/sites-available/fitness-gym
+        sed -i "s/server green/api-$TARGET_COLOR/" /etc/nginx/sites-available/fitness-gym
+        systemctl reload nginx
+        ;;
+    "staging")
+        # 使用Docker service更新
+        docker service update --image $REGISTRY/$IMAGE_NAME:$TAG api_$TARGET_COLOR
+        ;;
+    *)
+        echo "不支持的环境: $ENVIRONMENT"
+        exit 1
+        ;;
+esac
+
+echo "✅ 流量已切换到 $TARGET_COLOR 环境"
+```
+
+### 5.2 金丝雀部署
+
+#### 金丝雀部署策略
+
+```bash
+#!/bin/bash
+# scripts/canary-deploy.sh
+
+ENVIRONMENT=$1
+NEW_TAG=$2
+CANARY_PERCENTAGE=${3:-10}  # 默认10%
+
+echo "🐦 开始金丝雀部署: $NEW_TAG ($CANARY_PERCENTAGE%)"
+
+# 启动金丝雀实例
+echo "启动金丝雀实例..."
+docker run -d --name api-canary \
+  -e SPRING_PROFILES_ACTIVE=$ENVIRONMENT \
+  -e DB_HOST=$DB_HOST \
+  -e DB_PASSWORD=$DB_PASSWORD \
+  $REGISTRY/$IMAGE_NAME:$NEW_TAG-api
+
+# 等待金丝雀启动
+sleep 30
+
+# 运行金丝雀测试
+echo "运行金丝雀测试..."
+if run_canary_tests; then
+    echo "✅ 金丝雀测试通过"
+
+    # 逐渐增加流量
+    echo "逐渐增加流量到 $CANARY_PERCENTAGE%..."
+    update_load_balancer_weights $CANARY_PERCENTAGE
+
+    # 监控金丝雀表现
+    echo "监控金丝雀表现 (5分钟)..."
+    monitor_canary_performance 300
+
+    # 如果表现良好，完全切换
+    echo "金丝雀表现良好，开始完全部署..."
+    full_rollout $NEW_TAG
+
+else
+    echo "❌ 金丝雀测试失败"
+
+    # 停止金丝雀实例
+    docker stop api-canary
+    docker rm api-canary
+
+    echo "🔄 金丝雀部署已中止"
+    exit 1
+fi
+```
+
+### 5.3 回滚策略
+
+#### 自动回滚机制
+
+```bash
+#!/bin/bash
+# scripts/rollback.sh
+
+ENVIRONMENT=$1
+REASON=$2
+
+echo "⏪ 开始回滚环境: $ENVIRONMENT"
+echo "原因: $REASON"
+
+# 获取上一个稳定版本
+PREVIOUS_TAG=$(get_previous_stable_tag $ENVIRONMENT)
+
+if [ -z "$PREVIOUS_TAG" ]; then
+    echo "❌ 未找到可回滚的版本"
+    exit 1
+fi
+
+echo "回滚到版本: $PREVIOUS_TAG"
+
+# 执行回滚部署
+if [ "$DEPLOYMENT_STRATEGY" = "blue-green" ]; then
+    blue_green_rollback $ENVIRONMENT $PREVIOUS_TAG
+elif [ "$DEPLOYMENT_STRATEGY" = "rolling" ]; then
+    rolling_rollback $ENVIRONMENT $PREVIOUS_TAG
+else
+    echo "❌ 不支持的部署策略: $DEPLOYMENT_STRATEGY"
+    exit 1
+fi
+
+# 验证回滚结果
+if verify_rollback $ENVIRONMENT; then
+    echo "✅ 回滚成功完成"
+
+    # 发送回滚通知
+    send_rollback_notification "$ENVIRONMENT" "$PREVIOUS_TAG" "$REASON"
+
+else
+    echo "❌ 回滚验证失败"
+    exit 1
+fi
+```
+
+---
+
+## 6. 监控与告警
+
+### 6.1 流水线监控
+
+#### 构建状态监控
+
+```yaml
+- name: Notify build status
+  uses: 8398a7/action-slack@v3
+  if: always()
+  with:
+    status: ${{ job.status }}
+    channel: '#builds'
+    webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+  env:
+    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```
+
+#### 性能指标收集
+
+```yaml
+- name: Collect deployment metrics
+  run: |
+    echo "DEPLOYMENT_DURATION=$(( $(date +%s) - $(cat .deploy_start) ))" >> $GITHUB_ENV
+    echo "BUILD_SIZE=$(du -sh . | cut -f1)" >> $GITHUB_ENV
+
+- name: Send metrics to monitoring
+  run: |
+    curl -X POST ${{ secrets.METRICS_ENDPOINT }} \
+      -H "Content-Type: application/json" \
+      -d "{
+        \"build_id\": \"${{ github.run_id }}\",
+        \"duration\": \"${{ env.DEPLOYMENT_DURATION }}\",
+        \"size\": \"${{ env.BUILD_SIZE }}\",
+        \"status\": \"${{ job.status }}\",
+        \"environment\": \"${{ github.ref }}\"
+      }"
+```
+
+### 6.2 告警配置
+
+#### 失败通知
+
+```yaml
+- name: Notify on failure
+  if: failure()
+  run: |
+    curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+      -H 'Content-type: application/json' \
+      --data "{
+        \"channel\": \"#alerts\",
+        \"attachments\": [
+          {
+            \"color\": \"danger\",
+            \"title\": \"CI/CD Pipeline Failed\",
+            \"text\": \"Workflow: ${{ github.workflow }}\\nBranch: ${{ github.ref }}\\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",
+            \"fields\": [
+              {
+                \"title\": \"Triggered by\",
+                \"value\": \"${{ github.actor }}\",
+                \"short\": true
+              },
+              {
+                \"title\": \"Commit\",
+                \"value\": \"${{ github.sha }}\",
+                \"short\": true
+              }
+            ]
+          }
+        ]
+      }"
+```
+
+#### 成功部署通知
+
+```yaml
+- name: Notify successful deployment
+  if: success()
+  run: |
+    curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+      -H 'Content-type: application/json' \
+      --data "{
+        \"channel\": \"#deployments\",
+        \"attachments\": [
+          {
+            \"color\": \"good\",
+            \"title\": \"Deployment Successful\",
+            \"text\": \"Environment: ${{ inputs.environment }}\\nVersion: ${{ github.sha }}\\nDuration: ${{ env.DEPLOYMENT_DURATION }}s\",
+            \"fields\": [
+              {
+                \"title\": \"Deployed by\",
+                \"value\": \"${{ github.actor }}\",
+                \"short\": true
+              },
+              {
+                \"title\": \"Build Size\",
+                \"value\": \"${{ env.BUILD_SIZE }}\",
+                \"short\": true
+              }
+            ]
+          }
+        ]
+      }"
+```
+
+---
+
+## 7. 故障排查
+
+### 7.1 常见CI/CD问题
+
+#### 构建失败排查
+
+```bash
+# 检查构建日志
+gh run view <run-id> --log
+
+# 检查缓存问题
+docker system df
+docker system prune -f
+
+# 验证环境变量
+env | grep -E "(NODE|JAVA|MAVEN|DOCKER)_"
+
+# 检查网络连接
+curl -I https://registry.npmjs.org/
+curl -I https://repo.maven.apache.org/
+```
+
+#### 部署失败排查
+
+```bash
+# 检查部署日志
+docker-compose logs <service-name>
+
+# 验证镜像拉取
+docker pull <image-name>
+
+# 检查环境变量
+docker-compose exec <service> env
+
+# 验证健康检查
+curl http://localhost:<port>/health
+
+# 检查磁盘空间
+df -h
+```
+
+#### 测试失败排查
+
+```bash
+# 重新运行失败的测试
+npm run test:unit -- --testNamePattern="<test-name>" --verbose
+
+# 检查测试数据库状态
+docker-compose exec database pg_isready
+
+# 查看测试覆盖率
+open target/site/jacoco/index.html
+
+# 调试E2E测试
+npx playwright test --headed --debug
+```
+
+### 7.2 调试技巧
+
+#### 本地流水线调试
+
+```bash
+# 使用act运行GitHub Actions本地化
+act -v --artifact-server-path /tmp/artifacts
+
+# 特定工作流调试
+act pull_request -v --artifact-server-path /tmp/artifacts
+
+# 使用特定事件
+act push --artifact-server-path /tmp/artifacts
+```
+
+#### 远程调试
+
+```bash
+# SSH到运行器
+ssh -i ~/.ssh/github_actions user@runner-host
+
+# 查看运行器状态
+docker ps
+docker logs <container-id>
+
+# 检查磁盘使用
+df -h
+du -sh /home/runner/work/
+```
+
+### 7.3 日志分析
+
+#### 流水线日志分析
+
+```bash
+# 提取错误信息
+gh run view <run-id> --log | grep -i error
+
+# 分析构建时间
+gh run view <run-id> --log | grep -E "(time|duration)"
+
+# 检查警告信息
+gh run view <run-id> --log | grep -i warn
+```
+
+#### 应用日志分析
+
+```bash
+# 查看应用启动日志
+docker-compose logs --tail=100 api
+
+# 实时日志监控
+docker-compose logs -f api
+
+# 按时间范围过滤日志
+docker-compose logs --since "2024-01-01T00:00:00" --until "2024-01-01T23:59:59" api
+```
+
+---
+
+## 8. 最佳实践
+
+### 8.1 流水线优化
+
+#### 并行执行优化
+
+```yaml
+# 优化作业依赖关系
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+  test-backend:
+    runs-on: ubuntu-latest
+  test-integration:
+    needs: [test-frontend, test-backend]
+    runs-on: ubuntu-latest
+
+# 使用矩阵策略并行测试
+test-matrix:
+  strategy:
+    matrix:
+      node-version: [16, 18, 20]
+      os: [ubuntu-latest, windows-latest]
+  runs-on: ${{ matrix.os }}
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+```
+
+#### 缓存策略
+
+```yaml
+# 多层缓存策略
+- name: Cache multiple paths
+  uses: actions/cache@v3
+  with:
+    path: |
+      ~/.npm
+      ~/.m2/repository
+      ~/.cache/pip
+      /tmp/.buildx-cache
+    key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json', '**/pom.xml') }}
+    restore-keys: |
+      ${{ runner.os }}-build-
+      ${{ runner.os }}-
+```
+
+#### 条件执行优化
+
+```yaml
+# 基于文件变化的条件执行
+on:
+  push:
+    paths:
+      - 'src/main/resources/front/**'
+      - '.github/workflows/frontend.yml'
+
+# 跳过未更改的作业
+jobs:
+  frontend-tests:
+    if: contains(github.event.head_commit.modified, 'src/main/resources/front/')
+    steps: [...]
+
+  backend-tests:
+    if: contains(github.event.head_commit.modified, 'src/main/java/')
+    steps: [...]
+```
+
+### 8.2 安全最佳实践
+
+#### 密钥管理
+
+```yaml
+# 使用环境特定的密钥
+- name: Deploy to production
+  environment: production
+  env:
+    API_KEY: ${{ secrets.PROD_API_KEY }}
+    DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+
+# 密钥轮换
+- name: Rotate secrets
+  run: |
+    # 生成新密钥
+    NEW_SECRET=$(openssl rand -hex 32)
+    # 更新密钥存储
+    # 重新部署服务
+```
+
+#### 镜像安全
+
+```yaml
+# 使用官方基础镜像
+FROM node:18-alpine
+FROM openjdk:21-slim
+
+# 多阶段构建
+FROM node:18-alpine AS builder
+# 构建阶段
+
+FROM nginx:alpine AS production
+# 生产镜像
+```
+
+### 8.3 可观测性
+
+#### 流水线指标
+
+```yaml
+- name: Collect pipeline metrics
+  run: |
+    echo "PIPELINE_METRICS={\"run_id\":\"${{ github.run_id }}\",\"duration\":$(( $(date +%s) - $(cat .pipeline_start) )),\"status\":\"${{ job.status }}\",\"jobs\":${{ toJSON(job.status) }}}" >> $GITHUB_OUTPUT
+
+- name: Send to monitoring
+  run: |
+    curl -X POST ${{ secrets.METRICS_ENDPOINT }} \
+      -H "Authorization: Bearer ${{ secrets.METRICS_TOKEN }}" \
+      -H "Content-Type: application/json" \
+      -d "${{ steps.metrics.outputs.PIPELINE_METRICS }}"
+```
+
+#### 性能监控
+
+```yaml
+# 流水线性能监控
+- name: Performance monitoring
+  run: |
+    # 记录关键时间点
+    echo "BUILD_START=$(date +%s)" >> $GITHUB_ENV
+
+- name: Report performance
+  if: always()
+  run: |
+    BUILD_DURATION=$(( $(date +%s) - ${{ env.BUILD_START }} ))
+    echo "Build duration: ${BUILD_DURATION}s"
+
+    # 发送到监控系统
+    curl -X POST ${{ secrets.METRICS_ENDPOINT }}/performance \
+      -H "Content-Type: application/json" \
+      -d "{\"build_duration\":${BUILD_DURATION},\"job\":\"${{ github.job }}\"}"
+```
+
+### 8.4 维护与更新
+
+#### 流水线维护
+
+```yaml
+# 定期更新依赖
+- name: Update dependencies
+  run: |
+    npm update
+    mvn versions:use-latest-releases
+
+# 流水线健康检查
+- name: Pipeline health check
+  run: |
+    # 检查工作流语法
+    actionlint
+
+    # 验证配置文件
+    yamllint .github/workflows/*.yml
+```
+
+#### 版本管理
+
+```yaml
+# 自动版本号生成
+- name: Generate version
+  run: |
+    if [[ $GITHUB_REF == refs/tags/* ]]; then
+        VERSION=${GITHUB_REF#refs/tags/}
+    else
+        VERSION="${GITHUB_SHA:0:8}"
+    fi
+    echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+# 版本标签管理
+- name: Create release tag
+  if: github.ref == 'refs/heads/main'
+  run: |
+    git tag "v$(date +%Y%m%d.%H%M%S)"
+    git push origin --tags
+```
+
+通过实施这些CI/CD最佳实践，可以确保：
+
+- **高质量代码交付**: 自动化测试和代码检查
+- **快速反馈**: 并行执行和缓存优化
+- **安全可靠**: 安全扫描和密钥管理
+- **可观测性**: 全面的监控和告警
+- **持续改进**: 性能监控和定期维护
+
+这套CI/CD系统为健身房管理系统提供了企业级的DevOps能力，支持从开发到生产的完整软件交付流程。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: DevOps团队*

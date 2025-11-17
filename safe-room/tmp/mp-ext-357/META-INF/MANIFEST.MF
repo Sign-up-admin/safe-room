@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: mybatis-plus-extension
+Implementation-Version: 3.5.7
+Built-Gradle: 8.7
+Bundle-DocURL: https://baomidou.com/
+Build-OS: Windows 10
+Built-By: Administrator
+Build-Jdk: 21.0.3
+Build-Timestamp: 2024-06-10 23:09:19
+Automatic-Module-Name: com.baomidou.mybatis.plus.extension
+

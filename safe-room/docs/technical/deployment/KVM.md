@@ -1,0 +1,1854 @@
+---
+title: KVM
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+# KVM 部署指南
+
+> **版本**: v1.0
+> **最后更新**: 2025-11-16
+> **维护者**: 基础设施团队
+
+## 概述
+
+本文档详细介绍如何在KVM (Kernel-based Virtual Machine) 环境中部署健身房综合管理系统，包括环境搭建、虚拟机管理、网络和存储配置、性能优化等完整的KVM虚拟化部署方案。
+
+## 目录
+
+- [1. KVM 架构概述](#1-kvm-架构概述)
+- [2. KVM 环境搭建](#2-kvm-环境搭建)
+- [3. 虚拟机创建和管理](#3-虚拟机创建和管理)
+- [4. 网络配置](#4-网络配置)
+- [5. 存储管理](#5-存储管理)
+- [6. 性能优化](#6-性能优化)
+- [7. 高可用配置](#7-高可用配置)
+- [8. 监控和维护](#8-监控和维护)
+- [9. 备份和恢复](#9-备份和恢复)
+- [10. 故障排查](#10-故障排查)
+- [11. 最佳实践](#11-最佳实践)
+
+---
+
+## 1. KVM 架构概述
+
+### 1.1 KVM 组件架构
+
+```mermaid
+graph TB
+    subgraph "物理主机层"
+        HW[物理硬件<br/>CPU/内存/存储/网络]
+        KERNEL[Linux Kernel<br/>KVM模块]
+    end
+
+    subgraph "虚拟化层"
+        QEMU[QEMU<br/>虚拟机模拟器]
+        LIBVIRT[Libvirt<br/>虚拟化管理API]
+        KVM[KVM<br/>内核虚拟化模块]
+    end
+
+    subgraph "管理层"
+        VMM[虚拟机管理器<br/>virt-manager/virsh]
+        CLI[命令行工具<br/>qemu-kvm/virsh]
+        API[Libvirt API<br/>管理接口]
+    end
+
+    subgraph "虚拟机层"
+        VM1[VM 1<br/>健身房应用]
+        VM2[VM 2<br/>数据库]
+        VM3[VM 3<br/>缓存服务]
+        VM4[VM 4<br/>监控服务]
+    end
+
+    subgraph "存储层"
+        LOCAL[本地存储<br/>LVM/目录]
+        NFS[NFS存储<br/>网络文件系统]
+        CEPH[Ceph存储<br/>分布式存储]
+        ISCSI[iSCSI存储<br/>块存储]
+    end
+
+    HW --> KERNEL
+    KERNEL --> KVM
+    KVM --> QEMU
+    QEMU --> VM1
+    QEMU --> VM2
+    QEMU --> VM3
+    QEMU --> VM4
+
+    LIBVIRT --> QEMU
+    VMM --> LIBVIRT
+    CLI --> LIBVIRT
+    API --> LIBVIRT
+
+    QEMU --> LOCAL
+    QEMU --> NFS
+    QEMU --> CEPH
+    QEMU --> ISCSI
+```
+
+### 1.2 部署架构
+
+#### 健身房系统KVM部署架构
+
+```mermaid
+graph TB
+    subgraph "KVM主机集群"
+        HOST1[KVM Host 1<br/>8CPU/64GB/2TB]
+        HOST2[KVM Host 2<br/>8CPU/64GB/2TB]
+        HOST3[KVM Host 3<br/>8CPU/64GB/2TB]
+    end
+
+    subgraph "虚拟机分布"
+        WEB1[Web VM1<br/>Nginx + Frontend]
+        WEB2[Web VM2<br/>Nginx + Frontend]
+        API1[API VM1<br/>Spring Boot]
+        API2[API VM2<br/>Spring Boot]
+        API3[API VM3<br/>Spring Boot]
+        DB1[DB VM1<br/>PostgreSQL Primary]
+        DB2[DB VM2<br/>PostgreSQL Replica]
+        REDIS1[Redis VM1<br/>Redis Cluster]
+        REDIS2[Redis VM2<br/>Redis Cluster]
+    end
+
+    subgraph "存储架构"
+        CEPH[Ceph集群<br/>分布式存储]
+        NFS[NFS服务器<br/>共享存储]
+        BACKUP[备份存储<br/>冷备数据]
+    end
+
+    subgraph "网络架构"
+        BRIDGE[Linux Bridge<br/>br0]
+        VLAN[VLAN隔离<br/>业务/存储/管理]
+        BOND[Bonding<br/>链路聚合]
+    end
+
+    HOST1 --> WEB1
+    HOST1 --> API1
+    HOST1 --> DB1
+
+    HOST2 --> WEB2
+    HOST2 --> API2
+    HOST2 --> REDIS1
+
+    HOST3 --> API3
+    HOST3 --> DB2
+    HOST3 --> REDIS2
+
+    CEPH --> DB1
+    CEPH --> DB2
+    NFS --> WEB1
+    NFS --> WEB2
+    BACKUP --> DB1
+
+    BRIDGE --> WEB1
+    BRIDGE --> API1
+    VLAN --> DB1
+    BOND --> HOST1
+```
+
+### 1.3 环境要求
+
+#### 硬件要求
+
+| 组件 | 最低配置 | 推荐配置 | 高可用配置 |
+|------|----------|----------|------------|
+| **KVM主机** | 4CPU/16GB/500GB | 8CPU/64GB/1TB | 12CPU/128GB/2TB |
+| **存储** | 1TB SAS/SATA | 2TB SSD + 4TB HDD | 分布式存储集群 |
+| **网络** | 1Gbps | 10Gbps | 25Gbps + 链路聚合 |
+| **虚拟机** | 2vCPU/4GB/100GB | 4vCPU/8GB/200GB | 8vCPU/16GB/500GB |
+
+#### 软件要求
+
+| 组件 | 版本要求 | 说明 |
+|------|----------|------|
+| **Linux发行版** | CentOS 8+/Ubuntu 20.04+ | 支持KVM的主流发行版 |
+| **QEMU/KVM** | 6.0+ | 虚拟化核心组件 |
+| **Libvirt** | 8.0+ | 虚拟化管理工具 |
+| **virt-manager** | 3.2+ | 图形化管理工具 |
+
+---
+
+## 2. KVM 环境搭建
+
+### 2.1 系统准备
+
+#### 检查硬件虚拟化支持
+
+```bash
+# 检查CPU虚拟化支持
+grep -E "(vmx|svm)" /proc/cpuinfo
+
+# 检查KVM模块是否加载
+lsmod | grep kvm
+
+# 启用IOMMU（如果需要PCI直通）
+grep -E "(intel_iommu|amd_iommu).*(on|off)" /etc/default/grub
+```
+
+#### 安装KVM组件
+
+```bash
+# CentOS/RHEL 安装
+yum update -y
+yum install -y qemu-kvm qemu-img virt-manager libvirt libvirt-python virt-install virt-viewer bridge-utils
+
+# Ubuntu/Debian 安装
+apt update
+apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virt-manager
+
+# 启动和启用服务
+systemctl enable libvirtd
+systemctl start libvirtd
+
+# 添加用户到libvirt组
+usermod -aG libvirt $USER
+usermod -aG libvirt-qemu $USER
+```
+
+#### 网络配置
+
+```bash
+# 创建网络桥接
+cat > /etc/sysconfig/network-scripts/ifcfg-br0 << EOF
+DEVICE=br0
+TYPE=Bridge
+BOOTPROTO=static
+IPADDR=192.168.1.10
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+DNS1=8.8.8.8
+ONBOOT=yes
+EOF
+
+# 配置物理网卡
+cat > /etc/sysconfig/network-scripts/ifcfg-enp1s0 << EOF
+DEVICE=enp1s0
+TYPE=Ethernet
+BOOTPROTO=none
+BRIDGE=br0
+ONBOOT=yes
+EOF
+
+# 重启网络服务
+systemctl restart network
+```
+
+### 2.2 存储配置
+
+#### LVM 存储池配置
+
+```bash
+# 创建LVM存储池
+pvcreate /dev/sdb
+vgcreate vg_kvm /dev/sdb
+lvcreate -l 100%FREE -n lv_vms vg_kvm
+
+# 格式化文件系统
+mkfs.ext4 /dev/vg_kvm/lv_vms
+
+# 创建挂载点
+mkdir -p /var/lib/libvirt/images
+mount /dev/vg_kvm/lv_vms /var/lib/libvirt/images
+
+# 添加到fstab
+echo "/dev/vg_kvm/lv_vms /var/lib/libvirt/images ext4 defaults 0 0" >> /etc/fstab
+```
+
+#### NFS 存储配置
+
+```bash
+# 安装NFS客户端
+yum install -y nfs-utils
+
+# 创建挂载点
+mkdir -p /mnt/nfs-storage
+
+# 配置自动挂载
+echo "nfs-server:/export/kvm /mnt/nfs-storage nfs defaults 0 0" >> /etc/fstab
+mount -a
+
+# 创建存储池
+virsh pool-define-as nfs-storage dir --target /mnt/nfs-storage
+virsh pool-start nfs-storage
+virsh pool-autostart nfs-storage
+```
+
+### 2.3 安全配置
+
+#### SELinux 配置
+
+```bash
+# 配置SELinux允许KVM
+setsebool -P virt_use_nfs 1
+setsebool -P virt_sandbox_use_nfs 1
+
+# 如果需要禁用SELinux（不推荐）
+# sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+# reboot
+```
+
+#### 防火墙配置
+
+```bash
+# 配置firewalld允许KVM流量
+firewall-cmd --permanent --add-service=libvirt
+firewall-cmd --permanent --add-port=16509/tcp
+firewall-cmd --reload
+
+# 或者使用iptables
+iptables -A INPUT -p tcp --dport 16509 -j ACCEPT
+iptables -A INPUT -i virbr0 -j ACCEPT
+```
+
+---
+
+## 3. 虚拟机创建和管理
+
+### 3.1 虚拟机模板创建
+
+#### CentOS 7 模板创建
+
+```bash
+# 创建虚拟机
+virt-install \
+  --name centos7-template \
+  --ram 2048 \
+  --vcpus 2 \
+  --disk path=/var/lib/libvirt/images/centos7-template.img,size=20 \
+  --network bridge=br0 \
+  --os-variant centos7.0 \
+  --location /var/lib/libvirt/images/CentOS-7-x86_64-Minimal.iso \
+  --initrd-inject ks.cfg \
+  --extra-args "ks=file:/ks.cfg console=ttyS0"
+
+# Kickstart配置文件 (ks.cfg)
+cat > ks.cfg << EOF
+install
+text
+reboot
+lang en_US.UTF-8
+keyboard us
+network --onboot yes --device eth0 --bootproto dhcp
+rootpw --plaintext password
+firewall --disabled
+selinux --permissive
+timezone Asia/Shanghai
+bootloader --location=mbr
+zerombr
+clearpart --all --initlabel
+part / --fstype ext4 --size 1 --grow
+
+%packages
+@core
+qemu-guest-agent
+cloud-init
+%end
+
+%post
+yum update -y
+yum install -y cloud-init
+systemctl enable cloud-init
+%end
+EOF
+
+# 启动虚拟机并等待安装完成
+virsh start centos7-template
+```
+
+#### 模板优化和清理
+
+```bash
+# 停止虚拟机
+virsh shutdown centos7-template
+
+# 移除硬件特定信息
+virt-sysprep -d centos7-template
+
+# 创建模板快照
+qemu-img create -f qcow2 -b centos7-template.img centos7-template-snapshot.img
+
+# 注册为模板
+virsh vol-create-as default centos7-template qcow2 20G --format qcow2
+virsh vol-upload centos7-template centos7-template-snapshot.img /var/lib/libvirt/images/
+```
+
+### 3.2 虚拟机克隆和部署
+
+#### 批量克隆虚拟机
+
+```bash
+#!/bin/bash
+# 批量克隆脚本
+TEMPLATE_NAME="centos7-template"
+VM_PREFIX="fitness-app"
+VM_COUNT=3
+
+for i in $(seq 1 $VM_COUNT); do
+    VM_NAME="${VM_PREFIX}-0${i}"
+
+    # 克隆虚拟机
+    virt-clone \
+      --original $TEMPLATE_NAME \
+      --name $VM_NAME \
+      --file /var/lib/libvirt/images/${VM_NAME}.img
+
+    # 配置虚拟机
+    virsh setmem $VM_NAME 4G --config
+    virsh setvcpus $VM_NAME 2 --config
+
+    # 配置网络
+    virsh attach-interface $VM_NAME bridge br0 --model virtio --config
+
+    # 启动虚拟机
+    virsh start $VM_NAME
+
+    echo "Created VM: $VM_NAME"
+done
+```
+
+#### Ansible 自动化部署
+
+```yaml
+# Ansible playbook for VM deployment
+---
+- name: Deploy Fitness Gym VMs
+  hosts: localhost
+  vars:
+    vm_configs:
+      - name: fitness-web-01
+        memory: 2048
+        vcpus: 2
+        disk_size: 20
+        network: br0
+      - name: fitness-api-01
+        memory: 4096
+        vcpus: 4
+        disk_size: 50
+        network: br0
+      - name: fitness-db-01
+        memory: 8192
+        vcpus: 4
+        disk_size: 100
+        network: br0
+
+  tasks:
+    - name: Create VM disks
+      command: qemu-img create -f qcow2 /var/lib/libvirt/images/{{ item.name }}.img {{ item.disk_size }}G
+      loop: "{{ vm_configs }}"
+
+    - name: Define VMs
+      virt:
+        name: "{{ item.name }}"
+        state: present
+        memory: "{{ item.memory }}"
+        vcpus: "{{ item.vcpus }}"
+        disks:
+          - path: /var/lib/libvirt/images/{{ item.name }}.img
+            format: qcow2
+        interfaces:
+          - network: "{{ item.network }}"
+            model: virtio
+        boot_firmware: bios
+      loop: "{{ vm_configs }}"
+
+    - name: Start VMs
+      virt:
+        name: "{{ item.name }}"
+        state: running
+      loop: "{{ vm_configs }}"
+```
+
+### 3.3 虚拟机管理
+
+#### 基本管理命令
+
+```bash
+# 列出所有虚拟机
+virsh list --all
+
+# 查看虚拟机信息
+virsh dominfo fitness-app-01
+
+# 启动/停止虚拟机
+virsh start fitness-app-01
+virsh shutdown fitness-app-01
+virsh destroy fitness-app-01
+
+# 重启虚拟机
+virsh reboot fitness-app-01
+
+# 删除虚拟机
+virsh undefine fitness-app-01
+rm /var/lib/libvirt/images/fitness-app-01.img
+```
+
+#### 资源动态调整
+
+```bash
+# 热添加CPU
+virsh setvcpus fitness-app-01 4 --live
+
+# 热添加内存
+virsh setmem fitness-app-01 8G --live
+
+# 添加磁盘
+virsh attach-disk fitness-app-01 /var/lib/libvirt/images/fitness-app-01-extra.img vdb --live
+
+# 添加网络接口
+virsh attach-interface fitness-app-01 bridge br0 --model virtio --live
+```
+
+#### 快照管理
+
+```bash
+# 创建快照
+virsh snapshot-create-as fitness-app-01 "backup-before-update" "Snapshot before system update"
+
+# 列出快照
+virsh snapshot-list fitness-app-01
+
+# 恢复快照
+virsh snapshot-revert fitness-app-01 "backup-before-update"
+
+# 删除快照
+virsh snapshot-delete fitness-app-01 "backup-before-update"
+```
+
+---
+
+## 4. 网络配置
+
+### 4.1 网络桥接配置
+
+#### Linux Bridge 配置
+
+```bash
+# 创建网桥
+nmcli con add type bridge con-name br0 ifname br0
+nmcli con add type bridge-slave con-name br0-eth0 ifname eth0 master br0
+
+# 配置网桥IP
+nmcli con modify br0 ipv4.addresses 192.168.1.10/24
+nmcli con modify br0 ipv4.gateway 192.168.1.1
+nmcli con modify br0 ipv4.dns 8.8.8.8
+nmcli con modify br0 ipv4.method manual
+
+# 激活配置
+nmcli con up br0
+nmcli con up br0-eth0
+```
+
+#### Open vSwitch 配置
+
+```bash
+# 安装Open vSwitch
+yum install -y openvswitch
+
+# 启动服务
+systemctl enable openvswitch
+systemctl start openvswitch
+
+# 创建网桥
+ovs-vsctl add-br ovs-br0
+
+# 添加物理接口
+ovs-vsctl add-port ovs-br0 eth0
+
+# 配置VLAN
+ovs-vsctl set port ovs-br0 tag=100
+
+# 创建VLAN子接口
+ip link add link ovs-br0 name ovs-br0.100 type vlan id 100
+ip addr add 192.168.1.10/24 dev ovs-br0.100
+ip link set ovs-br0.100 up
+```
+
+### 4.2 VLAN 和网络隔离
+
+#### VLAN 配置
+
+```bash
+# 创建VLAN网桥
+cat > /etc/sysconfig/network-scripts/ifcfg-br0.100 << EOF
+DEVICE=br0.100
+BOOTPROTO=none
+ONBOOT=yes
+VLAN=yes
+BRIDGE=br0
+EOF
+
+# 创建VLAN接口
+cat > /etc/sysconfig/network-scripts/ifcfg-eth0.100 << EOF
+DEVICE=eth0.100
+BOOTPROTO=none
+ONBOOT=yes
+VLAN=yes
+EOF
+
+# 重启网络
+systemctl restart network
+```
+
+#### 网络隔离策略
+
+```bash
+# 为不同业务创建隔离网络
+# 应用网络 (br0.100)
+virsh net-define <(cat <<EOF
+<network>
+  <name>app-network</name>
+  <bridge name='virbr100'/>
+  <forward mode='bridge'/>
+  <bridge name='br0.100'/>
+</network>
+EOF)
+
+# 数据库网络 (br0.200)
+virsh net-define <(cat <<EOF
+<network>
+  <name>db-network</name>
+  <bridge name='virbr200'/>
+  <forward mode='bridge'/>
+  <bridge name='br0.200'/>
+</network>
+EOF)
+
+# 启动网络
+virsh net-start app-network
+virsh net-start db-network
+virsh net-autostart app-network
+virsh net-autostart db-network
+```
+
+### 4.3 链路聚合配置
+
+#### Bonding 配置
+
+```bash
+# 创建bonding接口
+cat > /etc/sysconfig/network-scripts/ifcfg-bond0 << EOF
+DEVICE=bond0
+TYPE=Bond
+BONDING_MASTER=yes
+BOOTPROTO=static
+IPADDR=192.168.1.10
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+BONDING_OPTS="mode=4 miimon=100"
+ONBOOT=yes
+EOF
+
+# 配置slave接口
+cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << EOF
+DEVICE=eth0
+TYPE=Ethernet
+BOOTPROTO=none
+MASTER=bond0
+SLAVE=yes
+ONBOOT=yes
+EOF
+
+cat > /etc/sysconfig/network-scripts/ifcfg-eth1 << EOF
+DEVICE=eth1
+TYPE=Ethernet
+BOOTPROTO=none
+MASTER=bond0
+SLAVE=yes
+ONBOOT=yes
+EOF
+
+# 重启网络
+systemctl restart network
+```
+
+#### KVM网络优化
+
+```bash
+# 启用vhost_net加速
+modprobe vhost_net
+
+# 配置virtio_net参数
+echo "options virtio_net gso=1" >> /etc/modprobe.d/virtio_net.conf
+
+# 启用多队列
+# 在VM XML中配置
+<interface type='bridge'>
+  <source bridge='br0'/>
+  <model type='virtio'/>
+  <driver name='vhost' queues='4'/>
+</interface>
+```
+
+---
+
+## 5. 存储管理
+
+### 5.1 LVM 存储管理
+
+#### LVM 卷管理
+
+```bash
+# 创建LVM卷组
+pvcreate /dev/sdb /dev/sdc
+vgcreate vg_fitness /dev/sdb /dev/sdc
+
+# 创建逻辑卷
+lvcreate -L 100G -n lv_app vg_fitness
+lvcreate -L 200G -n lv_db vg_fitness
+lvcreate -l 100%FREE -n lv_backup vg_fitness
+
+# 格式化文件系统
+mkfs.ext4 /dev/vg_fitness/lv_app
+mkfs.ext4 /dev/vg_fitness/lv_db
+mkfs.ext4 /dev/vg_fitness/lv_backup
+
+# 挂载文件系统
+mkdir -p /mnt/fitness-app /mnt/fitness-db /mnt/fitness-backup
+mount /dev/vg_fitness/lv_app /mnt/fitness-app
+mount /dev/vg_fitness/lv_db /mnt/fitness-db
+mount /dev/vg_fitness/lv_backup /mnt/fitness-backup
+```
+
+#### 存储池配置
+
+```bash
+# 创建LVM存储池
+virsh pool-define-as lvm-pool logical --source-name vg_fitness --target /dev/vg_fitness
+virsh pool-start lvm-pool
+virsh pool-autostart lvm-pool
+
+# 创建存储卷
+virsh vol-create-as lvm-pool app-vol 50G
+virsh vol-create-as lvm-pool db-vol 100G
+
+# 分配给虚拟机
+virsh attach-disk fitness-app-01 /dev/vg_fitness/app-vol vdb --driver qemu --subdriver raw --persistent
+virsh attach-disk fitness-db-01 /dev/vg_fitness/db-vol vdb --driver qemu --subdriver raw --persistent
+```
+
+### 5.2 Ceph 分布式存储
+
+#### Ceph 集群部署
+
+```bash
+# 安装Ceph
+yum install -y ceph-deploy
+
+# 创建Ceph集群
+mkdir ceph-cluster
+cd ceph-cluster
+ceph-deploy new node1 node2 node3
+
+# 安装Ceph
+ceph-deploy install node1 node2 node3
+
+# 创建monitor
+ceph-deploy mon create-initial
+
+# 添加OSD
+ceph-deploy osd prepare node1:/dev/sdb node2:/dev/sdc node3:/dev/sdd
+ceph-deploy osd activate node1:/dev/sdb node2:/dev/sdc node3:/dev/sdd
+
+# 复制配置文件
+ceph-deploy admin node1 node2 node3
+
+# 检查集群状态
+ceph health
+ceph status
+```
+
+#### KVM 与 Ceph 集成
+
+```bash
+# 创建RBD存储池
+ceph osd pool create libvirt-pool 128
+rbd pool init libvirt-pool
+
+# 创建RBD镜像
+rbd create libvirt-pool/fitness-app-01 --size 50G
+rbd create libvirt-pool/fitness-db-01 --size 100G
+
+# 创建libvirt存储池
+virsh pool-define-as ceph-pool rbd --pool libvirt-pool --mon-host 192.168.1.11:6789,192.168.1.12:6789,192.168.1.13:6789 --auth-type ceph --auth-username admin
+virsh pool-start ceph-pool
+
+# 创建存储卷
+virsh vol-create-as ceph-pool fitness-app-vol 50G
+virsh vol-create-as ceph-pool fitness-db-vol 100G
+
+# 分配给虚拟机
+virsh attach-disk fitness-app-01 ceph-pool/fitness-app-vol vdb --driver qemu --subdriver rbd --persistent
+virsh attach-disk fitness-db-01 ceph-pool/fitness-db-vol vdb --driver qemu --subdriver rbd --persistent
+```
+
+### 5.3 存储性能优化
+
+#### 缓存配置
+
+```bash
+# 启用writeback缓存
+virsh attach-disk fitness-db-01 /var/lib/libvirt/images/fitness-db-01.img vda \
+  --driver qemu \
+  --subdriver qcow2 \
+  --cache writeback \
+  --persistent
+
+# 配置I/O调度器
+echo "deadline" > /sys/block/sda/queue/scheduler
+
+# 调整读写缓冲区
+echo 1024 > /sys/block/sda/queue/nr_requests
+echo 256 > /sys/block/sda/queue/read_ahead_kb
+```
+
+#### SSD 优化
+
+```bash
+# SSD存储池配置
+# 创建SSD存储池
+virsh pool-define-as ssd-pool dir --target /mnt/ssd-storage
+virsh pool-start ssd-pool
+virsh pool-autostart ssd-pool
+
+# 配置虚拟机使用SSD存储
+virsh vol-create-as ssd-pool fitness-db-data 100G --format raw
+
+# 分配高性能存储给数据库VM
+virsh attach-disk fitness-db-01 ssd-pool/fitness-db-data vdb \
+  --driver qemu \
+  --subdriver raw \
+  --cache none \
+  --persistent
+```
+
+---
+
+## 6. 性能优化
+
+### 6.1 CPU 优化
+
+#### CPU 绑定和隔离
+
+```bash
+# 创建CPU亲和性组
+systemctl set-property libvirtd.service AllowedCPUs=0-7
+systemctl set-property libvirtd.service CPUQuota=800%
+
+# 为虚拟机配置CPU绑定
+virsh vcpupin fitness-app-01 0 0
+virsh vcpupin fitness-app-01 1 1
+virsh vcpupin fitness-app-01 2 2
+virsh vcpupin fitness-app-01 3 3
+
+# 配置NUMA
+virsh numatune fitness-db-01 --mode strict --nodeset 0
+```
+
+#### CPU 超分配配置
+
+```bash
+# 计算CPU超分配比率
+# 物理CPU核心数
+PHYSICAL_CPUS=$(nproc)
+
+# 虚拟CPU总数
+VIRTUAL_CPUS=$(virsh list --all | grep running | wc -l)
+VIRTUAL_CPUS=$((VIRTUAL_CPUS * 2))  # 假设每个VM 2 vCPU
+
+# 超分配比率
+OVERCOMMIT_RATIO=$((VIRTUAL_CPUS / PHYSICAL_CPUS))
+
+echo "CPU Overcommit Ratio: $OVERCOMMIT_RATIO:1"
+```
+
+### 6.2 内存优化
+
+#### 大页内存配置
+
+```bash
+# 启用大页内存
+echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+# 配置libvirt使用大页
+cat >> /etc/libvirt/qemu.conf << EOF
+hugetlbfs_mount = "/dev/hugepages"
+EOF
+
+# 重启libvirt
+systemctl restart libvirtd
+
+# 为VM配置大页内存
+virsh setmem fitness-db-01 8G --pagesize 2048 --current
+```
+
+#### KSM 配置
+
+```bash
+# 启用KSM (Kernel Samepage Merging)
+echo 1 > /sys/kernel/mm/ksm/run
+echo 1000 > /sys/kernel/mm/ksm/pages_to_scan
+echo 20 > /sys/kernel/mm/ksm/sleep_millisecs
+
+# 配置KSM监控
+#!/bin/bash
+while true; do
+    KSM_SHARED=$(cat /sys/kernel/mm/ksm/pages_shared)
+    KSM_SHARING=$(cat /sys/kernel/mm/ksm/pages_sharing)
+    SAVED_MEMORY=$((KSM_SHARING * 4))  # 假设4KB页面大小
+
+    echo "$(date): KSM saved ${SAVED_MEMORY}KB memory"
+    sleep 60
+done
+```
+
+### 6.3 I/O 优化
+
+#### Virtio 配置
+
+```xml
+<!-- 虚拟机XML配置 -->
+<devices>
+  <disk type='file' device='disk'>
+    <driver name='qemu' type='qcow2' cache='writeback' io='threads'/>
+    <source file='/var/lib/libvirt/images/fitness-app-01.img'/>
+    <target dev='vda' bus='virtio'/>
+  </disk>
+  <interface type='bridge'>
+    <source bridge='br0'/>
+    <model type='virtio'/>
+    <driver name='vhost' queues='4'/>
+  </interface>
+</devices>
+```
+
+#### I/O 线程配置
+
+```bash
+# 配置I/O线程
+virsh setvcpus fitness-db-01 4 --config
+virsh iothreadadd fitness-db-01 2 --config
+virsh iothreadadd fitness-db-01 3 --config
+
+# 为磁盘分配I/O线程
+virsh attach-disk fitness-db-01 /var/lib/libvirt/images/fitness-db-01.img vda \
+  --driver qemu,type=qcow2,cache=writeback \
+  --iothread 2 \
+  --persistent
+```
+
+### 6.4 网络优化
+
+#### 多队列配置
+
+```bash
+# 检查多队列支持
+ethtool -l eth0
+
+# 配置多队列
+ethtool -L eth0 combined 4
+
+# 在VM中配置多队列网络
+virsh setvcpus fitness-app-01 4 --config
+
+# 编辑VM XML添加多队列
+virsh edit fitness-app-01
+# 添加: <driver name='vhost' queues='4'/>
+```
+
+#### SR-IOV 配置
+
+```bash
+# 检查SR-IOV支持
+lspci | grep Ethernet
+
+# 启用SR-IOV
+echo 4 > /sys/class/net/eth0/device/sriov_numvfs
+
+# 配置VF给VM
+virsh nodedev-detach pci_0000_01_00_1
+virsh attach-device fitness-app-01 sriov-vf.xml --persistent
+
+# sriov-vf.xml内容
+cat > sriov-vf.xml << EOF
+<interface type='hostdev' managed='yes'>
+  <source>
+    <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
+  </source>
+</interface>
+EOF
+```
+
+---
+
+## 7. 高可用配置
+
+### 7.1 Pacemaker 集群
+
+#### 集群配置
+
+```bash
+# 安装Pacemaker
+yum install -y pacemaker pcs fence-agents-all
+
+# 启动服务
+systemctl enable pcsd
+systemctl start pcsd
+
+# 设置集群密码
+passwd hacluster
+
+# 创建集群
+pcs cluster auth node1 node2 node3
+pcs cluster setup --name fitness-cluster node1 node2 node3
+pcs cluster start --all
+
+# 配置集群属性
+pcs property set stonith-enabled=false
+pcs property set no-quorum-policy=ignore
+```
+
+#### 虚拟机高可用配置
+
+```bash
+# 配置虚拟机资源
+pcs resource create vm-fitness-app-01 ocf:heartbeat:VirtualDomain \
+  config=/etc/libvirt/qemu/fitness-app-01.xml \
+  hypervisor=qemu:///system \
+  migration_transport=ssh \
+  meta allow-migrate=true op monitor interval=30s
+
+# 配置IP资源
+pcs resource create vip-fitness-app IPaddr2 ip=192.168.1.100 cidr_netmask=24
+
+# 配置组
+pcs resource group add fitness-app-group vip-fitness-app vm-fitness-app-01
+
+# 配置约束
+pcs constraint colocation add vip-fitness-app with vm-fitness-app-01 score=INFINITY
+pcs constraint order vip-fitness-app then vm-fitness-app-01
+```
+
+### 7.2 共享存储配置
+
+#### DRBD 配置
+
+```bash
+# 安装DRBD
+yum install -y drbd kmod-drbd
+
+# 配置DRBD资源
+cat > /etc/drbd.d/fitness.res << EOF
+resource fitness {
+  protocol C;
+  handlers {
+    pri-on-incon-degr "/usr/lib/drbd/notify-pri-on-incon-degr.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+    pri-lost-after-sb "/usr/lib/drbd/notify-pri-lost-after-sb.sh; /usr/lib/drbd/notify-emergency-reboot.sh; echo b > /proc/sysrq-trigger ; reboot -f";
+    local-io-error "/usr/lib/drbd/notify-io-error.sh; /usr/lib/drbd/notify-emergency-shutdown.sh; echo o > /proc/sysrq-trigger ; halt -f";
+  }
+  startup {
+    wfc-timeout  0;
+    degr-wfc-timeout 120;
+  }
+  disk {
+    on-io-error   detach;
+  }
+  net {
+    cram-hmac-alg sha1;
+    shared-secret "fitness-secret";
+  }
+  syncer {
+    rate 100M;
+  }
+  on node1 {
+    device /dev/drbd0;
+    disk /dev/vg_fitness/lv_shared;
+    address 192.168.1.11:7788;
+    meta-disk internal;
+  }
+  on node2 {
+    device /dev/drbd0;
+    disk /dev/vg_fitness/lv_shared;
+    address 192.168.1.12:7788;
+    meta-disk internal;
+  }
+}
+EOF
+
+# 初始化DRBD
+drbdadm create-md fitness
+drbdadm up fitness
+
+# 在主节点上初始化
+drbdadm primary --force fitness
+mkfs.ext4 /dev/drbd0
+mount /dev/drbd0 /mnt/shared
+```
+
+### 7.3 负载均衡配置
+
+#### Keepalived 配置
+
+```bash
+# 安装Keepalived
+yum install -y keepalived
+
+# Master节点配置
+cat > /etc/keepalived/keepalived.conf << EOF
+vrrp_instance VI_1 {
+    state MASTER
+    interface eth0
+    virtual_router_id 51
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass fitness123
+    }
+    virtual_ipaddress {
+        192.168.1.100
+    }
+}
+EOF
+
+# Backup节点配置
+cat > /etc/keepalived/keepalived.conf << EOF
+vrrp_instance VI_1 {
+    state BACKUP
+    interface eth0
+    virtual_router_id 51
+    priority 50
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass fitness123
+    }
+    virtual_ipaddress {
+        192.168.1.100
+    }
+}
+EOF
+
+# 启动服务
+systemctl enable keepalived
+systemctl start keepalived
+```
+
+---
+
+## 8. 监控和维护
+
+### 8.1 监控配置
+
+#### Prometheus + Grafana
+
+```bash
+# 安装node_exporter
+useradd --no-create-home --shell /bin/false node_exporter
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz
+tar xvf node_exporter-1.6.0.linux-amd64.tar.gz
+cp node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+chown node_exporter:node_exporter /usr/local/bin/node_exporter
+
+# 创建systemd服务
+cat > /etc/systemd/system/node_exporter.service << EOF
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable node_exporter
+systemctl start node_exporter
+```
+
+#### Libvirt 监控
+
+```bash
+# 安装virt-top监控工具
+yum install -y virt-top
+
+# 创建监控脚本
+cat > /usr/local/bin/kvm-monitor.sh << 'EOF'
+#!/bin/bash
+echo "=== KVM Host Status ==="
+echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')%"
+echo "Memory Usage: $(free | grep Mem | awk '{printf "%.2f", $3/$2 * 100.0}')%"
+echo "Disk Usage: $(df / | tail -1 | awk '{print $5}')"
+
+echo -e "\n=== VM Status ==="
+virsh list --all
+
+echo -e "\n=== Storage Pools ==="
+virsh pool-list --all
+
+echo -e "\n=== Networks ==="
+virsh net-list --all
+EOF
+
+chmod +x /usr/local/bin/kvm-monitor.sh
+```
+
+### 8.2 日志管理
+
+#### 系统日志配置
+
+```bash
+# 配置rsyslog收集libvirt日志
+cat > /etc/rsyslog.d/libvirt.conf << EOF
+:syslogtag,contains,"libvirtd" /var/log/libvirt/libvirt.log
+& stop
+EOF
+
+# 重启rsyslog
+systemctl restart rsyslog
+
+# 配置日志轮转
+cat > /etc/logrotate.d/libvirt << EOF
+/var/log/libvirt/*.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    create 0644 root root
+    postrotate
+        /bin/systemctl reload rsyslog.service
+    endscript
+}
+EOF
+```
+
+#### 虚拟机日志
+
+```bash
+# 配置虚拟机控制台日志
+virsh ttyconsole fitness-app-01
+
+# 查看虚拟机日志
+virsh dumpxml fitness-app-01 | grep -A 5 "serial"
+
+# 配置串口日志
+virsh edit fitness-app-01
+# 添加以下配置：
+<serial type='pty'>
+  <target type='isa-serial' port='0'>
+    <model name='isa-serial'/>
+  </target>
+</serial>
+<console type='pty'>
+  <target type='serial' port='0'/>
+</console>
+```
+
+### 8.3 补丁管理
+
+#### 系统更新
+
+```bash
+# 配置自动更新
+yum install -y yum-cron
+systemctl enable yum-cron
+systemctl start yum-cron
+
+# 手动更新
+yum update -y
+
+# 更新KVM相关包
+yum update qemu-kvm libvirt
+
+# 重启服务
+systemctl restart libvirtd
+```
+
+#### 虚拟机更新
+
+```bash
+# 在虚拟机内部执行更新
+virsh console fitness-app-01
+# 在VM控制台中：
+yum update -y
+reboot
+
+# 批量更新脚本
+for vm in $(virsh list --name); do
+    echo "Updating $vm..."
+    virsh shutdown $vm
+    virsh start $vm
+    # 等待VM启动完成
+    sleep 60
+    # 这里可以添加自动化更新逻辑
+done
+```
+
+---
+
+## 9. 备份和恢复
+
+### 9.1 虚拟机备份
+
+#### 完整备份
+
+```bash
+#!/bin/bash
+# 虚拟机完整备份脚本
+VM_NAME=$1
+BACKUP_DIR="/backup/kvm"
+
+# 创建备份目录
+mkdir -p $BACKUP_DIR/$VM_NAME
+
+# 停止虚拟机
+virsh shutdown $VM_NAME
+
+# 等待VM停止
+while [ "$(virsh domstate $VM_NAME)" != "shut off" ]; do
+    sleep 5
+done
+
+# 备份VM配置
+virsh dumpxml $VM_NAME > $BACKUP_DIR/$VM_NAME/$VM_NAME.xml
+
+# 备份磁盘镜像
+DISKS=$(virsh domblklist $VM_NAME | grep -o '/.*\.img\|\.qcow2\|\.raw')
+for disk in $DISKS; do
+    cp $disk $BACKUP_DIR/$VM_NAME/
+done
+
+# 启动虚拟机
+virsh start $VM_NAME
+
+echo "Backup completed for $VM_NAME"
+```
+
+#### 增量备份
+
+```bash
+#!/bin/bash
+# 增量备份脚本
+VM_NAME=$1
+BACKUP_DIR="/backup/kvm"
+
+# 创建快照
+SNAPSHOT_NAME="backup-$(date +%Y%m%d_%H%M%S)"
+virsh snapshot-create-as $VM_NAME $SNAPSHOT_NAME
+
+# 备份增量数据
+qemu-img convert -f qcow2 -O qcow2 -B $BACKUP_DIR/$VM_NAME/base.img $BACKUP_DIR/$VM_NAME/incremental.img
+
+# 清理旧快照（保留最近5个）
+SNAPSHOTS=$(virsh snapshot-list $VM_NAME --name | head -n -5)
+for snapshot in $SNAPSHOTS; do
+    virsh snapshot-delete $VM_NAME $snapshot
+done
+```
+
+### 9.2 恢复策略
+
+#### 从备份恢复
+
+```bash
+#!/bin/bash
+# 虚拟机恢复脚本
+VM_NAME=$1
+BACKUP_DIR="/backup/kvm"
+
+# 检查VM是否存在，如果存在则删除
+if virsh domstate $VM_NAME > /dev/null 2>&1; then
+    virsh destroy $VM_NAME
+    virsh undefine $VM_NAME
+fi
+
+# 恢复磁盘镜像
+cp $BACKUP_DIR/$VM_NAME/*.img /var/lib/libvirt/images/
+
+# 恢复VM配置
+virsh define $BACKUP_DIR/$VM_NAME/$VM_NAME.xml
+
+# 启动VM
+virsh start $VM_NAME
+
+echo "Recovery completed for $VM_NAME"
+```
+
+#### 灾难恢复
+
+```bash
+#!/bin/bash
+# 灾难恢复脚本
+PRIMARY_HOST="kvm-host-1"
+BACKUP_HOST="kvm-host-2"
+VM_LIST=("fitness-app-01" "fitness-db-01")
+
+# 检查主节点状态
+if ! ping -c 3 $PRIMARY_HOST > /dev/null; then
+    echo "Primary host $PRIMARY_HOST is down, starting failover..."
+
+    # 在备份节点上恢复VM
+    for vm in "${VM_LIST[@]}"; do
+        echo "Recovering $vm on $BACKUP_HOST..."
+
+        # 复制备份文件到备份节点
+        scp -r /backup/kvm/$vm root@$BACKUP_HOST:/backup/kvm/
+
+        # 在备份节点上恢复VM
+        ssh root@$BACKUP_HOST "/usr/local/bin/recover-vm.sh $vm"
+
+        echo "$vm recovered successfully"
+    done
+
+    echo "Failover completed"
+else
+    echo "Primary host is still accessible"
+fi
+```
+
+### 9.3 备份验证
+
+#### 自动化验证
+
+```bash
+#!/bin/bash
+# 备份验证脚本
+VM_NAME=$1
+BACKUP_DIR="/backup/kvm"
+
+echo "Validating backup for $VM_NAME..."
+
+# 检查备份文件是否存在
+if [ ! -f "$BACKUP_DIR/$VM_NAME/$VM_NAME.xml" ]; then
+    echo "ERROR: VM configuration backup not found"
+    exit 1
+fi
+
+# 检查磁盘镜像
+DISKS=$(grep "source file" $BACKUP_DIR/$VM_NAME/$VM_NAME.xml | grep -o '/[^"]*\.img\|\.qcow2\|\.raw')
+for disk in $DISKS; do
+    if [ ! -f "$BACKUP_DIR/$VM_NAME/$(basename $disk)" ]; then
+        echo "ERROR: Disk image $disk not found in backup"
+        exit 1
+    fi
+done
+
+# 验证磁盘镜像完整性
+for disk in $BACKUP_DIR/$VM_NAME/*.img; do
+    if ! qemu-img check $disk > /dev/null 2>&1; then
+        echo "ERROR: Disk image $disk is corrupted"
+        exit 1
+    fi
+done
+
+echo "Backup validation passed for $VM_NAME"
+```
+
+---
+
+## 10. 故障排查
+
+### 10.1 虚拟机启动问题
+
+#### VM无法启动
+
+```bash
+# 检查libvirt状态
+systemctl status libvirtd
+
+# 查看详细错误信息
+virsh start fitness-app-01 2>&1
+
+# 检查VM配置
+virsh dumpxml fitness-app-01 | grep -A 10 -B 10 "<domain"
+
+# 检查磁盘文件
+ls -la /var/lib/libvirt/images/fitness-app-01.img
+qemu-img info /var/lib/libvirt/images/fitness-app-01.img
+
+# 检查权限
+ls -ld /var/lib/libvirt/images/
+```
+
+#### 引导失败
+
+```bash
+# 检查引导顺序
+virsh dumpxml fitness-app-01 | grep -A 10 "<os>"
+
+# 修复引导配置
+virsh edit fitness-app-01
+# 确保有正确的boot设备：
+<boot dev='hd'/>
+
+# 检查虚拟硬件
+virsh dumpxml fitness-app-01 | grep -A 5 "<disk"
+virsh dumpxml fitness-app-01 | grep -A 5 "<interface"
+```
+
+### 10.2 网络连接问题
+
+#### VM无法访问网络
+
+```bash
+# 检查网桥状态
+brctl show br0
+
+# 检查VM网络配置
+virsh dumpxml fitness-app-01 | grep -A 10 "<interface"
+
+# 检查DHCP服务
+systemctl status dnsmasq
+
+# 测试网络连通性
+virsh console fitness-app-01
+# 在VM内部：
+ping 8.8.8.8
+ip route show
+```
+
+#### DNS解析问题
+
+```bash
+# 检查DNS配置
+cat /etc/resolv.conf
+
+# 检查libvirt DNS
+virsh net-dumpxml default | grep dns
+
+# 在VM中检查DNS
+virsh console fitness-app-01
+# cat /etc/resolv.conf
+# nslookup google.com
+```
+
+### 10.3 存储问题
+
+#### 存储空间不足
+
+```bash
+# 检查存储池状态
+virsh pool-list --all
+virsh pool-info default
+
+# 检查磁盘使用情况
+df -h /var/lib/libvirt/images/
+
+# 扩展虚拟磁盘
+qemu-img resize /var/lib/libvirt/images/fitness-app-01.img +10G
+
+# 在VM内部扩展分区
+virsh console fitness-app-01
+# 使用fdisk或parted扩展分区
+# resize2fs /dev/vda1
+```
+
+#### I/O性能问题
+
+```bash
+# 监控I/O统计
+virsh domblkstat fitness-app-01 vda
+
+# 检查存储性能
+iostat -x 1 5
+
+# 优化存储配置
+virsh edit fitness-app-01
+# 更改cache模式：
+<driver name='qemu' type='qcow2' cache='writeback'/>
+```
+
+### 10.4 性能问题
+
+#### CPU使用率过高
+
+```bash
+# 检查CPU使用情况
+virsh cpu-stats fitness-app-01
+
+# 查看进程CPU使用
+virsh console fitness-app-01
+# top
+# ps aux --sort=-%cpu | head
+
+# 调整CPU分配
+virsh setvcpus fitness-app-01 4 --live
+```
+
+#### 内存不足
+
+```bash
+# 检查内存使用
+virsh dommemstat fitness-app-01
+
+# 查看VM内存使用
+virsh console fitness-app-01
+# free -h
+# top
+
+# 增加内存分配
+virsh setmem fitness-app-01 8G --live
+```
+
+---
+
+## 11. 最佳实践
+
+### 11.1 架构设计最佳实践
+
+#### 资源规划
+
+1. **计算资源**: 根据应用负载预留20-30%的buffer
+2. **存储资源**: 规划足够的IOPS和吞吐量
+3. **网络资源**: 确保足够的带宽和低延迟
+4. **监控覆盖**: 实施全面的监控和告警
+
+#### 安全隔离
+
+```bash
+# 创建隔离网络
+virsh net-define <(cat <<EOF
+<network>
+  <name>secure-network</name>
+  <bridge name='virbr_secure'/>
+  <forward mode='nat'/>
+  <ip address='192.168.100.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.100.2' end='192.168.100.254'/>
+    </dhcp>
+  </ip>
+</network>
+EOF)
+
+# 为敏感VM使用隔离网络
+virsh attach-interface fitness-db-01 network secure-network --model virtio --persistent
+```
+
+### 11.2 运维最佳实践
+
+#### 定期维护
+
+```bash
+#!/bin/bash
+# 定期维护脚本
+
+echo "=== KVM Environment Maintenance ==="
+
+# 更新系统
+yum update -y
+
+# 更新KVM组件
+yum update qemu-kvm libvirt -y
+
+# 清理未使用的存储卷
+virsh vol-list default | grep -v "Name\|----" | while read vol _; do
+    if ! virsh vol-info $vol default > /dev/null 2>&1; then
+        echo "Removing unused volume: $vol"
+        virsh vol-delete $vol default
+    fi
+done
+
+# 优化存储池
+virsh pool-refresh default
+
+# 检查VM健康状态
+for vm in $(virsh list --name); do
+    echo "Checking $vm..."
+    if ! virsh domstate $vm | grep -q "running"; then
+        echo "WARNING: $vm is not running"
+    fi
+done
+
+# 备份重要配置
+tar czf /backup/kvm-config-$(date +%Y%m%d).tar.gz /etc/libvirt/
+
+echo "Maintenance completed"
+```
+
+#### 容量规划
+
+```bash
+#!/bin/bash
+# 容量规划脚本
+
+echo "=== KVM Capacity Planning ==="
+
+# CPU容量
+TOTAL_CPU=$(nproc)
+USED_CPU=$(virsh list --name | wc -l)
+USED_CPU=$((USED_CPU * 2))  # 假设每个VM 2 vCPU
+CPU_UTILIZATION=$((USED_CPU * 100 / TOTAL_CPU))
+
+echo "CPU: $USED_CPU/$TOTAL_CPU cores used ($CPU_UTILIZATION%)"
+
+# 内存容量
+TOTAL_MEM=$(free -g | grep Mem | awk '{print $2}')
+USED_MEM=$(virsh list --name | xargs -I {} virsh dommemstat {} | grep actual | awk '{sum += $2} END {print sum/1024/1024}')
+MEM_UTILIZATION=$((USED_MEM * 100 / TOTAL_MEM))
+
+echo "Memory: ${USED_MEM}GB/${TOTAL_MEM}GB used ($MEM_UTILIZATION%)"
+
+# 存储容量
+TOTAL_STORAGE=$(df /var/lib/libvirt/images/ | tail -1 | awk '{print $2/1024/1024}')
+USED_STORAGE=$(df /var/lib/libvirt/images/ | tail -1 | awk '{print $3/1024/1024}')
+STORAGE_UTILIZATION=$((USED_STORAGE * 100 / TOTAL_STORAGE))
+
+echo "Storage: ${USED_STORAGE}GB/${TOTAL_STORAGE}GB used ($STORAGE_UTILIZATION%)"
+
+# 告警阈值
+if [ $CPU_UTILIZATION -gt 80 ]; then
+    echo "WARNING: CPU utilization is high"
+fi
+
+if [ $MEM_UTILIZATION -gt 85 ]; then
+    echo "WARNING: Memory utilization is high"
+fi
+
+if [ $STORAGE_UTILIZATION -gt 90 ]; then
+    echo "CRITICAL: Storage utilization is critical"
+fi
+```
+
+### 11.3 监控最佳实践
+
+#### 综合监控策略
+
+```bash
+# 安装全面监控栈
+yum install -y prometheus grafana node-exporter libvirt-exporter
+
+# 配置Prometheus抓取目标
+cat > /etc/prometheus/prometheus.yml << EOF
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: 'libvirt'
+    static_configs:
+      - targets: ['localhost:9177']
+
+  - job_name: 'vm-metrics'
+    file_sd_configs:
+      - files:
+        - /etc/prometheus/vm-targets.yml
+EOF
+
+# 配置VM指标收集
+cat > /etc/prometheus/vm-targets.yml << EOF
+- targets:
+  - fitness-app-01:9100
+  - fitness-db-01:9100
+  labels:
+    vm: 'fitness-app-01'
+EOF
+```
+
+#### 告警规则
+
+```yaml
+# Prometheus告警规则
+groups:
+  - name: kvm.alerts
+    rules:
+      - alert: KVMHostDown
+        expr: up{job="node"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "KVM host is down"
+          description: "KVM host {{ $labels.instance }} is not responding"
+
+      - alert: KVMHighCPU
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on KVM host"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+      - alert: KVMHighMemory
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on KVM host"
+          description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+```
+
+### 11.4 备份最佳实践
+
+#### 3-2-1备份策略
+
+```bash
+#!/bin/bash
+# 3-2-1备份策略实现
+# 3份备份，2种不同介质，1份异地存储
+
+VM_NAME=$1
+BACKUP_ROOT="/backup"
+
+# 1. 本地LVM快照备份
+lvcreate -L 50G -s -n ${VM_NAME}_snap vg_kvm/lv_vms
+mount /dev/vg_kvm/${VM_NAME}_snap ${BACKUP_ROOT}/local/${VM_NAME}
+
+# 2. NFS网络存储备份
+rsync -av ${BACKUP_ROOT}/local/${VM_NAME}/ ${BACKUP_ROOT}/nfs/${VM_NAME}/
+
+# 3. 异地对象存储备份（模拟）
+# aws s3 sync ${BACKUP_ROOT}/nfs/${VM_NAME}/ s3://fitness-backup/${VM_NAME}/
+
+# 验证备份完整性
+for backup in local nfs; do
+    if ! diff -r ${BACKUP_ROOT}/local/${VM_NAME} ${BACKUP_ROOT}/${backup}/${VM_NAME}; then
+        echo "ERROR: $backup backup verification failed"
+        exit 1
+    fi
+done
+
+# 清理本地快照
+umount ${BACKUP_ROOT}/local/${VM_NAME}
+lvremove -f vg_kvm/${VM_NAME}_snap
+
+echo "3-2-1 backup completed for $VM_NAME"
+```
+
+#### 备份自动化
+
+```bash
+# 配置定时备份
+cat > /etc/cron.d/kvm-backup << EOF
+# 每日凌晨2点执行完整备份
+0 2 * * * root /usr/local/bin/kvm-backup.sh full
+
+# 每4小时执行增量备份
+0 */4 * * * root /usr/local/bin/kvm-backup.sh incremental
+
+# 每周日执行验证
+0 3 * * 0 root /usr/local/bin/kvm-backup-verify.sh
+EOF
+
+# 启用定时任务
+systemctl restart crond
+```
+
+通过实施这些KVM最佳实践，可以构建高可用、可扩展、安全可靠的虚拟化基础设施，为健身房综合管理系统提供稳定的运行环境。
+
+---
+
+*最后更新: 2025-11-16*  
+*版本: v1.0*  
+*维护者: 基础设施团队*

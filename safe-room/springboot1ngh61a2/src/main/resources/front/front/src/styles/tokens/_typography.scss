@@ -1,0 +1,249 @@
+// =================================
+// Design Token System - Typography
+// =================================
+
+// Font Families
+$font-family-primary: 'Montserrat', 'Segoe UI', 'PingFang SC', 'HarmonyOS Sans', 'Roboto', sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
+$font-family-display: 'Montserrat', 'Poppins', 'Segoe UI', sans-serif;
+
+// Font Sizes (using rem for scalability)
+$font-size-xs: 0.75rem;   // 12px
+$font-size-sm: 0.875rem;  // 14px
+$font-size-base: 1rem;    // 16px
+$font-size-lg: 1.125rem;  // 18px
+$font-size-xl: 1.25rem;   // 20px
+$font-size-2xl: 1.5rem;   // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem;  // 36px
+$font-size-5xl: 3rem;     // 48px
+$font-size-6xl: 3.75rem;  // 60px
+
+// Font Weights
+$font-weight-thin: 100;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// Letter Spacing
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
+
+// Text Transform
+$text-transform-uppercase: uppercase;
+$text-transform-lowercase: lowercase;
+$text-transform-capitalize: capitalize;
+$text-transform-none: none;
+
+// Typography Scale Map
+$typography-scale: (
+  'h1': (
+    size: $font-size-4xl,
+    weight: $font-weight-bold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-tight,
+    margin-bottom: 1rem
+  ),
+  'h2': (
+    size: $font-size-3xl,
+    weight: $font-weight-bold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-tight,
+    margin-bottom: 0.875rem
+  ),
+  'h3': (
+    size: $font-size-2xl,
+    weight: $font-weight-semibold,
+    line-height: $line-height-snug,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.75rem
+  ),
+  'h4': (
+    size: $font-size-xl,
+    weight: $font-weight-semibold,
+    line-height: $line-height-snug,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.625rem
+  ),
+  'h5': (
+    size: $font-size-lg,
+    weight: $font-weight-medium,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.5rem
+  ),
+  'h6': (
+    size: $font-size-base,
+    weight: $font-weight-medium,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-wide,
+    margin-bottom: 0.5rem
+  ),
+  'body-large': (
+    size: $font-size-lg,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 1rem
+  ),
+  'body': (
+    size: $font-size-base,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 1rem
+  ),
+  'body-small': (
+    size: $font-size-sm,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.75rem
+  ),
+  'caption': (
+    size: $font-size-xs,
+    weight: $font-weight-normal,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-wide,
+    margin-bottom: 0.5rem
+  ),
+  'button': (
+    size: $font-size-sm,
+    weight: $font-weight-medium,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-wider,
+    margin-bottom: 0
+  ),
+  'label': (
+    size: $font-size-sm,
+    weight: $font-weight-medium,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-wide,
+    margin-bottom: 0.25rem
+  )
+);
+
+// CSS Custom Properties for Typography
+:root {
+  --font-family-primary: #{$font-family-primary};
+  --font-family-mono: #{$font-family-mono};
+  --font-family-display: #{$font-family-display};
+
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-base: #{$font-size-base};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  --font-size-2xl: #{$font-size-2xl};
+  --font-size-3xl: #{$font-size-3xl};
+  --font-size-4xl: #{$font-size-4xl};
+
+  --font-weight-normal: #{$font-weight-normal};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+
+  --line-height-tight: #{$line-height-tight};
+  --line-height-normal: #{$line-height-normal};
+  --line-height-relaxed: #{$line-height-relaxed};
+}
+
+// Typography Mixins
+@mixin typography($variant) {
+  $config: map-get($typography-scale, $variant);
+
+  @if $config {
+    font-size: map-get($config, size);
+    font-weight: map-get($config, weight);
+    line-height: map-get($config, line-height);
+    letter-spacing: map-get($config, letter-spacing);
+
+    @if map-has-key($config, margin-bottom) {
+      margin-bottom: map-get($config, margin-bottom);
+    }
+  } @else {
+    @warn "Typography variant '#{$variant}' not found";
+  }
+}
+
+// Heading Mixins
+@mixin heading($level) {
+  @include typography('h#{$level}');
+
+  margin-top: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+}
+
+@mixin body-text($size: base) {
+  @include typography('body#{$size}');
+
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+}
+
+@mixin caption-text {
+  @include typography('caption');
+
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-primary);
+}
+
+// Text Utility Classes
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-muted { color: var(--color-text-muted); }
+.text-inverse { color: var(--color-text-inverse); }
+.text-brand { color: var(--color-brand); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+
+// Font Weight Utility Classes
+.font-thin { font-weight: $font-weight-thin; }
+.font-light { font-weight: $font-weight-light; }
+.font-normal { font-weight: $font-weight-normal; }
+.font-medium { font-weight: $font-weight-medium; }
+.font-semibold { font-weight: $font-weight-semibold; }
+.font-bold { font-weight: $font-weight-bold; }
+.font-extrabold { font-weight: $font-weight-extrabold; }
+.font-black { font-weight: $font-weight-black; }
+
+// Text Transform Utility Classes
+.text-uppercase { text-transform: $text-transform-uppercase; }
+.text-lowercase { text-transform: $text-transform-lowercase; }
+.text-capitalize { text-transform: $text-transform-capitalize; }
+.text-none { text-transform: $text-transform-none; }
+
+// Responsive Typography
+@media (max-width: 768px) {
+  :root {
+    --font-size-4xl: 2rem;
+    --font-size-3xl: 1.5rem;
+    --font-size-2xl: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-4xl: 1.75rem;
+    --font-size-3xl: 1.25rem;
+    --font-size-2xl: 1.125rem;
+  }
+}

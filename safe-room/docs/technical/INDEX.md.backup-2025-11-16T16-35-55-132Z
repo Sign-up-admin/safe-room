@@ -1,0 +1,273 @@
+---
+title: 技术文档索引
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+
+# 🔧 技术文档索引
+
+> **版本**：v1.0.0
+> **更新日期**：2025-11-16
+> **适用范围**：技术文档导航
+> **关键词**：技术文档, 系统架构, API, 数据库
+
+---
+
+## 📋 目录
+
+- [概述](#概述)
+- [架构文档](#架构文档)
+- [API 文档](#api-文档)
+- [数据库文档](#数据库文档)
+- [部署文档](#部署文档)
+- [文档统计](#文档统计)
+
+---
+
+## 📖 概述
+
+### 文档定位
+
+技术文档是健身房综合管理系统的技术实现指南，涵盖了系统架构、接口规范、数据设计、部署运维等关键技术内容。
+
+### 适用对象
+
+- **架构师**：负责系统设计和技术选型
+- **后端开发**：实现业务逻辑和接口
+- **前端开发**：调用接口和数据交互
+- **运维人员**：部署和维护系统
+- **测试人员**：接口测试和集成测试
+
+### 技术栈概览
+
+```
+后端技术栈
+├── 框架: Spring Boot
+├── 语言: Java 17
+├── 数据库: MySQL 8.0
+├── 缓存: Redis
+└── 消息队列: RabbitMQ
+
+前端技术栈
+├── 框架: Vue.js 3
+├── 状态管理: Pinia
+├── 构建工具: Vite
+├── 测试: Vitest + Playwright
+└── UI库: 自建组件库
+
+部署技术栈
+├── 容器化: Docker
+├── 编排: Docker Compose
+├── CI/CD: GitHub Actions
+├── 监控: Prometheus + Grafana
+└── 网关: Nginx
+```
+
+---
+
+## 🏗️ 架构文档
+
+### 系统架构设计
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [系统架构总览](../ARCHITECTURE.md) | active | - | 整体架构设计和组件关系 |
+| [云原生架构](architecture/CLOUD_NATIVE.md) | active | - | 云原生设计和容器化方案 |
+
+### 架构视图
+
+#### 逻辑架构
+```
+健身房管理系统
+├── 表示层 (Vue.js SPA)
+├── 应用层 (Spring Boot)
+├── 领域层 (业务逻辑)
+├── 基础设施层 (数据库/缓存/消息队列)
+└── 部署层 (Docker/K8s)
+```
+
+#### 物理架构
+```
+生产环境
+├── Web服务器 (Nginx)
+├── 应用服务器 (Spring Boot)
+├── 数据库服务器 (MySQL)
+├── 缓存服务器 (Redis)
+└── 文件服务器 (MinIO)
+```
+
+---
+
+## 🔌 API 文档
+
+### 接口规范
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [API 概览](api/API.md) | active | - | API 设计原则和规范 |
+| [API 参考](api/API_REFERENCE.md) | active | - | 完整的接口列表 |
+| [API 安全](api/API_SECURITY.md) | active | - | 接口安全规范和认证 |
+
+### 接口分类
+
+#### 用户接口
+- 用户注册和登录
+- 个人信息管理
+- 会员卡管理
+
+#### 课程接口
+- 课程信息查询
+- 课程预约和取消
+- 课程评价
+
+#### 教练接口
+- 教练信息查询
+- 私教预约
+- 教练评价
+
+#### 管理接口
+- 管理员权限管理
+- 数据统计和报表
+- 系统配置管理
+
+---
+
+## 🗄️ 数据库文档
+
+### 数据模型设计
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [数据库概览](database/DATABASE.md) | active | - | 数据库设计原则和规范 |
+| [数据库架构](database/DATABASE_SCHEMA.md) | active | - | 完整的表结构和关系 |
+
+### 核心数据表
+
+#### 用户相关表
+- `user` - 用户基本信息
+- `user_membership` - 用户会员信息
+- `user_profile` - 用户扩展信息
+
+#### 课程相关表
+- `course` - 课程基本信息
+- `course_booking` - 课程预约记录
+- `course_comment` - 课程评价
+
+#### 教练相关表
+- `coach` - 教练基本信息
+- `coach_booking` - 私教预约记录
+- `coach_schedule` - 教练排班
+
+#### 系统管理表
+- `admin_user` - 管理员信息
+- `system_config` - 系统配置
+- `operation_log` - 操作日志
+
+### 数据关系图
+
+```mermaid
+erDiagram
+    USER ||--o{ USER_MEMBERSHIP : has
+    USER ||--o{ COURSE_BOOKING : books
+    USER ||--o{ COACH_BOOKING : books
+    COURSE ||--o{ COURSE_BOOKING : "is booked"
+    COACH ||--o{ COACH_BOOKING : "is booked"
+    COACH ||--o{ COURSE : teaches
+```
+
+---
+
+## 🚀 部署文档
+
+### 部署环境
+
+| 环境 | 用途 | 配置 | 文档 |
+|------|------|------|------|
+| 本地开发 | 开发调试 | Docker Compose | [Docker 部署](deployment/DOCKER.md) |
+| 测试环境 | 集成测试 | 单机部署 | [部署操作](deployment/DEPLOYMENT_OPERATIONS.md) |
+| 生产环境 | 线上服务 | 集群部署 | [生产部署](deployment/PRODUCTION_DEPLOYMENT.md) |
+
+### 部署文档列表
+
+| 文档 | 状态 | 更新日期 | 说明 |
+|------|------|----------|------|
+| [Docker 部署](deployment/DOCKER.md) | active | - | 容器化部署指南 |
+| [部署操作](deployment/DEPLOYMENT_OPERATIONS.md) | active | - | 部署流程和运维 |
+| [生产部署](deployment/PRODUCTION_DEPLOYMENT.md) | active | - | 生产环境部署配置 |
+| [环境配置](deployment/ENVIRONMENT_SETUP.md) | active | - | 环境搭建和配置 |
+| [监控配置](deployment/MONITORING_SETUP.md) | active | - | 监控和日志配置 |
+
+### 部署流程
+
+```mermaid
+graph TD
+    A[环境准备] --> B[代码构建]
+    B --> C[镜像构建]
+    C --> D[服务部署]
+    D --> E[配置更新]
+    E --> F[服务启动]
+    F --> G[健康检查]
+    G --> H[流量切换]
+```
+
+---
+
+## 📊 文档统计
+
+### 数量统计
+
+| 分类 | 文档数量 | 占比 | 状态 |
+|------|----------|------|------|
+| 架构文档 | 2 | 7.4% | ✅ 完整 |
+| API 文档 | 3 | 11.1% | ✅ 完整 |
+| 数据库文档 | 2 | 7.4% | ✅ 完整 |
+| 部署文档 | 20 | 74.1% | ✅ 完整 |
+| **总计** | **27** | **100%** | |
+
+### 文档状态分布
+
+| 状态 | 数量 | 占比 | 说明 |
+|------|------|----------|------|
+| active | 27 | 100% | 所有技术文档都是活跃状态 |
+| draft | 0 | 0% | 无草稿文档 |
+| deprecated | 0 | 0% | 无过时文档 |
+
+### 更新频率
+
+- **最近1个月更新**: 3 个文档
+- **最近3个月更新**: 8 个文档
+- **超过3个月未更新**: 16 个文档
+
+---
+
+## 🔗 相关文档
+
+### 需求文档
+
+- [需求文档索引](../requirements/INDEX.md)
+- [前端需求概览](../requirements/frontend/FRONTEND_REQUIREMENTS_OVERVIEW.md)
+
+### 开发文档
+
+- [开发指南](../development/guides/DEVELOPMENT.md)
+- [测试策略](../development/testing/TESTING_STRATEGY.md)
+- [CI/CD 指南](../development/guides/CI_CD_GUIDE.md)
+
+### 项目文档
+
+- [主索引](../INDEX.md)
+- [文档编写指南](../DOCUMENTATION_GUIDE.md)
+
+---
+
+## 📝 更新记录
+
+| 日期 | 版本 | 更新日期 | 更新内容 | 更新人 |
+|------|------|----------|----------|--------|
+| 2025-11-16 | v1.0.0 | 文档工程团队 | 初始版本，建立技术文档索引 | 文档工程团队 |
+
+---
+
+*本文档由自动化工具生成和维护，最后更新时间：2025-11-16*

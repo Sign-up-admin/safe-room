@@ -1,0 +1,1004 @@
+{
+  "totalComponents": 116,
+  "totalDocs": 130,
+  "missingDocs": 54,
+  "priorityBreakdown": {
+    "p0": 17,
+    "p1": 3,
+    "p2": 0,
+    "p3": 34
+  },
+  "missingComponents": {
+    "p0": [
+      {
+        "name": "APP",
+        "path": "App.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\SIJIAOYUYUE",
+        "path": "pages\\sijiaoyuyue\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\SIJIAOYUYUE",
+        "path": "pages\\sijiaoyuyue\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\SIJIAOYUYUE",
+        "path": "pages\\sijiaoyuyue\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "INDEX_PAGES\\PAY",
+        "path": "pages\\pay\\index.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\KECHENGYUYUE",
+        "path": "pages\\kechengyuyue\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\KECHENGYUYUE",
+        "path": "pages\\kechengyuyue\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\KECHENGYUYUE",
+        "path": "pages\\kechengyuyue\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\JIANSHENKECHENG",
+        "path": "pages\\jianshenkecheng\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\JIANSHENKECHENG",
+        "path": "pages\\jianshenkecheng\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\JIANSHENKECHENG",
+        "path": "pages\\jianshenkecheng\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\JIANSHENJIAOLIAN",
+        "path": "pages\\jianshenjiaolian\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\JIANSHENJIAOLIAN",
+        "path": "pages\\jianshenjiaolian\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\JIANSHENJIAOLIAN",
+        "path": "pages\\jianshenjiaolian\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\DISCUSSJIANSHENKECHENG",
+        "path": "pages\\discussjianshenkecheng\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\DISCUSSJIANSHENKECHENG",
+        "path": "pages\\discussjianshenkecheng\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\DISCUSSJIANSHENKECHENG",
+        "path": "pages\\discussjianshenkecheng\\add.vue",
+        "type": "component"
+      }
+    ],
+    "p1": [
+      {
+        "name": "MODULELISTPAGE",
+        "path": "pages\\shared\\ModuleListPage.vue",
+        "type": "component"
+      },
+      {
+        "name": "MODULEFORMPAGE",
+        "path": "pages\\shared\\ModuleFormPage.vue",
+        "type": "component"
+      },
+      {
+        "name": "MODULEDETAILPAGE",
+        "path": "pages\\shared\\ModuleDetailPage.vue",
+        "type": "component"
+      }
+    ],
+    "p2": [],
+    "p3": [
+      {
+        "name": "LIST",
+        "path": "pages\\yonghu\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL",
+        "path": "pages\\yonghu\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD",
+        "path": "pages\\yonghu\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\STOREUP",
+        "path": "pages\\storeup\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\NEWSTYPE",
+        "path": "pages\\newstype\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\NEWSTYPE",
+        "path": "pages\\newstype\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\NEWSTYPE",
+        "path": "pages\\newstype\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "NEWS-LIST",
+        "path": "pages\\news\\news-list.vue",
+        "type": "component"
+      },
+      {
+        "name": "NEWS-DETAIL",
+        "path": "pages\\news\\news-detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\KECHENGLEIXING",
+        "path": "pages\\kechengleixing\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\KECHENGLEIXING",
+        "path": "pages\\kechengleixing\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\KECHENGLEIXING",
+        "path": "pages\\kechengleixing\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\KECHENGTUIKE",
+        "path": "pages\\kechengtuike\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\KECHENGTUIKE",
+        "path": "pages\\kechengtuike\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\KECHENGTUIKE",
+        "path": "pages\\kechengtuike\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\JIANSHENQICAI",
+        "path": "pages\\jianshenqicai\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\JIANSHENQICAI",
+        "path": "pages\\jianshenqicai\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\JIANSHENQICAI",
+        "path": "pages\\jianshenqicai\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\HUIYUANKAGOUMAI",
+        "path": "pages\\huiyuankagoumai\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\HUIYUANKAGOUMAI",
+        "path": "pages\\huiyuankagoumai\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\HUIYUANKAGOUMAI",
+        "path": "pages\\huiyuankagoumai\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\HUIYUANXUFEI",
+        "path": "pages\\huiyuanxufei\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\HUIYUANXUFEI",
+        "path": "pages\\huiyuanxufei\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\HUIYUANXUFEI",
+        "path": "pages\\huiyuanxufei\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\HUIYUANKA",
+        "path": "pages\\huiyuanka\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\HUIYUANKA",
+        "path": "pages\\huiyuanka\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\HUIYUANKA",
+        "path": "pages\\huiyuanka\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "404",
+        "path": "pages\\error\\404.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\DAOQITIXING",
+        "path": "pages\\daoqitixing\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "DETAIL_PAGES\\DAOQITIXING",
+        "path": "pages\\daoqitixing\\detail.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\DAOQITIXING",
+        "path": "pages\\daoqitixing\\add.vue",
+        "type": "component"
+      },
+      {
+        "name": "DOCS",
+        "path": "pages\\api\\docs.vue",
+        "type": "component"
+      },
+      {
+        "name": "LIST_PAGES\\CHAT",
+        "path": "pages\\chat\\list.vue",
+        "type": "component"
+      },
+      {
+        "name": "ADD_PAGES\\CHAT",
+        "path": "pages\\chat\\add.vue",
+        "type": "component"
+      }
+    ]
+  },
+  "existingComponents": [
+    "ADVANCEDFILTERS",
+    "ADVANCEDSEARCH",
+    "ANIMATIONS",
+    "APIDOCS",
+    "BOOKINGCALENDAR",
+    "BOOKINGCONFLICT",
+    "BOOKINGRECOMMEND",
+    "BOOKINGSUMMARY",
+    "BREADCRUMB",
+    "CENTER",
+    "CHATADD",
+    "CHATLIST",
+    "COACHADD",
+    "COACHNETWORK",
+    "COACHRECOMMEND",
+    "COOKIECONSENT",
+    "COUNTDOWN",
+    "COURSEBENEFITSCHART",
+    "COURSEBOOKINGDETAIL",
+    "COURSECARD",
+    "COURSEPICKER",
+    "COURSEREFUND",
+    "COURSEREFUNDADD",
+    "COURSEREFUNDDETAIL",
+    "COURSETYPE",
+    "COURSETYPEADD",
+    "COURSETYPEDETAIL",
+    "DISCLAIMER",
+    "DISCUSSFITNESSCOURSE",
+    "DISCUSSFITNESSCOURSEADD",
+    "DISCUSSFITNESSCOURSEDETAIL",
+    "DISCUSSIONCOMPOSER",
+    "DISCUSSIONREPLIES",
+    "EDITOR",
+    "EQUIPMENT3DVIEWER",
+    "EQUIPMENTDETAIL",
+    "ERRORPAGE",
+    "EXPIRATIONREMINDER",
+    "EXPIRATIONREMINDERADD",
+    "EXPIRATIONREMINDERDETAIL",
+    "FAVORITESOVERVIEW",
+    "FILEUPLOAD",
+    "FITNESSCOACHDETAIL",
+    "FITNESSCOURSEADD",
+    "FITNESSCOURSEDETAIL",
+    "FITNESSEQUIPMENT",
+    "FITNESSEQUIPMENTADD",
+    "FITNESSEQUIPMENTDETAIL",
+    "FLOATINGSERVICEBUTTON",
+    "FOCUSMANAGEMENT",
+    "FOOTER",
+    "GOALSELECTOR",
+    "HEROSECTION",
+    "HOME",
+    "HOTTOPICS",
+    "HOVERGLOW",
+    "IMG",
+    "INDEX",
+    "KEYBOARDNAVIGATION",
+    "LOADINGGLOW",
+    "LOGIN",
+    "MEMBERSHIPBENEFITS",
+    "MEMBERSHIPCARD",
+    "MEMBERSHIPCARDADD",
+    "MEMBERSHIPCARDDETAIL",
+    "MEMBERSHIPCARDLIST",
+    "MEMBERSHIPCOMPARISON",
+    "MEMBERSHIPPURCHASE",
+    "MEMBERSHIPPURCHASEDETAIL",
+    "MEMBERSHIPRENEWAL",
+    "MEMBERSHIPRENEWALADD",
+    "MEMBERSHIPRENEWALDETAIL",
+    "MEMBERSHIPSELECTION",
+    "MESSAGECENTER",
+    "MOBILEFORM",
+    "MOBILEPAYMENTCONFIRM",
+    "MODULEDETAIL",
+    "MODULEFORM",
+    "MODULELIST",
+    "MOTION",
+    "NEWSDETAIL",
+    "NEWSLIST",
+    "NEWSTYPEADD",
+    "NEWSTYPEDETAIL",
+    "NEWSTYPELIST",
+    "NOTFOUND",
+    "NOTIFICATIONCENTER",
+    "NOTIFICATIONITEM",
+    "NOTIFICATIONSETTINGS",
+    "NOTIFICATIONTOAST",
+    "NOTIFICATIONWEBSOCKET",
+    "PAGETRANSITION",
+    "PARTICLESYSTEM",
+    "PAY",
+    "PAYMENTMETHODCARD",
+    "PAYMENTRESULT",
+    "PAYMENTSTATUS",
+    "PAYMENTSTEPPER",
+    "PRICINGENGINE",
+    "PRIVACY",
+    "PRIVATECOACHBOOKING",
+    "PRIVATECOACHBOOKINGDETAIL",
+    "RECOMMENDATIONCARD",
+    "REGISTER",
+    "REQUIREMENTS",
+    "ROTATEVERIFY",
+    "SAFEHTML",
+    "SCHEDULEPLANNER",
+    "SCROLLANIMATION",
+    "SERVICECARDS",
+    "SHAREDMODULEDETAILPAGE",
+    "SHAREDMODULEFORMPAGE",
+    "SHAREDMODULELISTPAGE",
+    "SMARTHEADER",
+    "STEPPER",
+    "STEPTRANSITION",
+    "STOREUP",
+    "SUCCESSANIMATION",
+    "TECHBUTTON",
+    "TECHCARD",
+    "TECHSTEPPER",
+    "TERMS",
+    "TESTIMONIALS",
+    "THEME",
+    "TIMEABLE",
+    "TOPICCLOUD",
+    "USERADD",
+    "USERDETAIL",
+    "USERLIST",
+    "VERIFYCODE"
+  ],
+  "allComponents": [
+    {
+      "name": "APP",
+      "path": "App.vue",
+      "type": "component"
+    },
+    {
+      "name": "INDEX",
+      "path": "pages\\index.vue",
+      "type": "component"
+    },
+    {
+      "name": "TIMEABLE",
+      "path": "components\\timeable.vue",
+      "type": "component"
+    },
+    {
+      "name": "NOTIFICATIONTOAST",
+      "path": "components\\NotificationToast.vue",
+      "type": "component"
+    },
+    {
+      "name": "NOTIFICATIONSETTINGS",
+      "path": "components\\NotificationSettings.vue",
+      "type": "component"
+    },
+    {
+      "name": "NOTIFICATIONITEM",
+      "path": "components\\NotificationItem.vue",
+      "type": "component"
+    },
+    {
+      "name": "NOTIFICATIONCENTER",
+      "path": "components\\NotificationCenter.vue",
+      "type": "component"
+    },
+    {
+      "name": "IMG",
+      "path": "components\\img.vue",
+      "type": "component"
+    },
+    {
+      "name": "FILEUPLOAD",
+      "path": "components\\FileUpload.vue",
+      "type": "component"
+    },
+    {
+      "name": "EDITOR",
+      "path": "components\\Editor.vue",
+      "type": "component"
+    },
+    {
+      "name": "COUNTDOWN",
+      "path": "components\\CountDown.vue",
+      "type": "component"
+    },
+    {
+      "name": "COOKIECONSENT",
+      "path": "components\\CookieConsent.vue",
+      "type": "component"
+    },
+    {
+      "name": "BREADCRUMB",
+      "path": "components\\Breadcrumb.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST",
+      "path": "pages\\yonghu\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL",
+      "path": "pages\\yonghu\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD",
+      "path": "pages\\yonghu\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\STOREUP",
+      "path": "pages\\storeup\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\SIJIAOYUYUE",
+      "path": "pages\\sijiaoyuyue\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\SIJIAOYUYUE",
+      "path": "pages\\sijiaoyuyue\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\SIJIAOYUYUE",
+      "path": "pages\\sijiaoyuyue\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULELISTPAGE",
+      "path": "pages\\shared\\ModuleListPage.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULEFORMPAGE",
+      "path": "pages\\shared\\ModuleFormPage.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULEDETAILPAGE",
+      "path": "pages\\shared\\ModuleDetailPage.vue",
+      "type": "component"
+    },
+    {
+      "name": "REGISTER",
+      "path": "pages\\register\\register.vue",
+      "type": "component"
+    },
+    {
+      "name": "INDEX_PAGES\\PAY",
+      "path": "pages\\pay\\index.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\NEWSTYPE",
+      "path": "pages\\newstype\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\NEWSTYPE",
+      "path": "pages\\newstype\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\NEWSTYPE",
+      "path": "pages\\newstype\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "NEWS-LIST",
+      "path": "pages\\news\\news-list.vue",
+      "type": "component"
+    },
+    {
+      "name": "NEWS-DETAIL",
+      "path": "pages\\news\\news-detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "LOGIN",
+      "path": "pages\\login\\login.vue",
+      "type": "component"
+    },
+    {
+      "name": "TERMS",
+      "path": "pages\\legal\\terms.vue",
+      "type": "component"
+    },
+    {
+      "name": "REQUIREMENTS",
+      "path": "pages\\legal\\requirements.vue",
+      "type": "component"
+    },
+    {
+      "name": "PRIVACY",
+      "path": "pages\\legal\\privacy.vue",
+      "type": "component"
+    },
+    {
+      "name": "DISCLAIMER",
+      "path": "pages\\legal\\disclaimer.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\KECHENGYUYUE",
+      "path": "pages\\kechengyuyue\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\KECHENGYUYUE",
+      "path": "pages\\kechengyuyue\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\KECHENGYUYUE",
+      "path": "pages\\kechengyuyue\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\KECHENGLEIXING",
+      "path": "pages\\kechengleixing\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\KECHENGLEIXING",
+      "path": "pages\\kechengleixing\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\KECHENGLEIXING",
+      "path": "pages\\kechengleixing\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\KECHENGTUIKE",
+      "path": "pages\\kechengtuike\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\KECHENGTUIKE",
+      "path": "pages\\kechengtuike\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\KECHENGTUIKE",
+      "path": "pages\\kechengtuike\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\JIANSHENQICAI",
+      "path": "pages\\jianshenqicai\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "EQUIPMENTDETAIL",
+      "path": "pages\\jianshenqicai\\EquipmentDetail.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\JIANSHENQICAI",
+      "path": "pages\\jianshenqicai\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\JIANSHENQICAI",
+      "path": "pages\\jianshenqicai\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\JIANSHENKECHENG",
+      "path": "pages\\jianshenkecheng\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\JIANSHENKECHENG",
+      "path": "pages\\jianshenkecheng\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\JIANSHENKECHENG",
+      "path": "pages\\jianshenkecheng\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\JIANSHENJIAOLIAN",
+      "path": "pages\\jianshenjiaolian\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\JIANSHENJIAOLIAN",
+      "path": "pages\\jianshenjiaolian\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\JIANSHENJIAOLIAN",
+      "path": "pages\\jianshenjiaolian\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\HUIYUANKAGOUMAI",
+      "path": "pages\\huiyuankagoumai\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\HUIYUANKAGOUMAI",
+      "path": "pages\\huiyuankagoumai\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\HUIYUANKAGOUMAI",
+      "path": "pages\\huiyuankagoumai\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\HUIYUANXUFEI",
+      "path": "pages\\huiyuanxufei\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\HUIYUANXUFEI",
+      "path": "pages\\huiyuanxufei\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\HUIYUANXUFEI",
+      "path": "pages\\huiyuanxufei\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\HUIYUANKA",
+      "path": "pages\\huiyuanka\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\HUIYUANKA",
+      "path": "pages\\huiyuanka\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\HUIYUANKA",
+      "path": "pages\\huiyuanka\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "HOME",
+      "path": "pages\\home\\home.vue",
+      "type": "component"
+    },
+    {
+      "name": "ERRORPAGE",
+      "path": "pages\\error\\ErrorPage.vue",
+      "type": "component"
+    },
+    {
+      "name": "404",
+      "path": "pages\\error\\404.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\DISCUSSJIANSHENKECHENG",
+      "path": "pages\\discussjianshenkecheng\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\DISCUSSJIANSHENKECHENG",
+      "path": "pages\\discussjianshenkecheng\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\DISCUSSJIANSHENKECHENG",
+      "path": "pages\\discussjianshenkecheng\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\DAOQITIXING",
+      "path": "pages\\daoqitixing\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "DETAIL_PAGES\\DAOQITIXING",
+      "path": "pages\\daoqitixing\\detail.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\DAOQITIXING",
+      "path": "pages\\daoqitixing\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "CENTER",
+      "path": "pages\\center\\center.vue",
+      "type": "component"
+    },
+    {
+      "name": "DOCS",
+      "path": "pages\\api\\docs.vue",
+      "type": "component"
+    },
+    {
+      "name": "LIST_PAGES\\CHAT",
+      "path": "pages\\chat\\list.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADD_PAGES\\CHAT",
+      "path": "pages\\chat\\add.vue",
+      "type": "component"
+    },
+    {
+      "name": "TESTIMONIALS",
+      "path": "components\\home\\Testimonials.vue",
+      "type": "component"
+    },
+    {
+      "name": "SMARTHEADER",
+      "path": "components\\home\\SmartHeader.vue",
+      "type": "component"
+    },
+    {
+      "name": "SERVICECARDS",
+      "path": "components\\home\\ServiceCards.vue",
+      "type": "component"
+    },
+    {
+      "name": "HEROSECTION",
+      "path": "components\\home\\HeroSection.vue",
+      "type": "component"
+    },
+    {
+      "name": "FOOTER",
+      "path": "components\\home\\Footer.vue",
+      "type": "component"
+    },
+    {
+      "name": "FLOATINGSERVICEBUTTON",
+      "path": "components\\home\\FloatingServiceButton.vue",
+      "type": "component"
+    },
+    {
+      "name": "COACHNETWORK",
+      "path": "components\\home\\CoachNetwork.vue",
+      "type": "component"
+    },
+    {
+      "name": "MEMBERSHIPCOMPARISON",
+      "path": "components\\membership\\MembershipComparison.vue",
+      "type": "component"
+    },
+    {
+      "name": "MEMBERSHIPCARD",
+      "path": "components\\membership\\MembershipCard.vue",
+      "type": "component"
+    },
+    {
+      "name": "MEMBERSHIPBENEFITS",
+      "path": "components\\membership\\MembershipBenefits.vue",
+      "type": "component"
+    },
+    {
+      "name": "PAYMENTSTEPPER",
+      "path": "components\\payment\\PaymentStepper.vue",
+      "type": "component"
+    },
+    {
+      "name": "PAYMENTRESULT",
+      "path": "components\\payment\\PaymentResult.vue",
+      "type": "component"
+    },
+    {
+      "name": "PAYMENTMETHODCARD",
+      "path": "components\\payment\\PaymentMethodCard.vue",
+      "type": "component"
+    },
+    {
+      "name": "MOBILEPAYMENTCONFIRM",
+      "path": "components\\payment\\MobilePaymentConfirm.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULELIST",
+      "path": "components\\modules\\ModuleList.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULEFORM",
+      "path": "components\\modules\\ModuleForm.vue",
+      "type": "component"
+    },
+    {
+      "name": "MODULEDETAIL",
+      "path": "components\\modules\\ModuleDetail.vue",
+      "type": "component"
+    },
+    {
+      "name": "COURSECARD",
+      "path": "components\\courses\\CourseCard.vue",
+      "type": "component"
+    },
+    {
+      "name": "COURSEBENEFITSCHART",
+      "path": "components\\courses\\CourseBenefitsChart.vue",
+      "type": "component"
+    },
+    {
+      "name": "FAVORITESOVERVIEW",
+      "path": "components\\favorites\\FavoritesOverview.vue",
+      "type": "component"
+    },
+    {
+      "name": "TOPICCLOUD",
+      "path": "components\\discussion\\TopicCloud.vue",
+      "type": "component"
+    },
+    {
+      "name": "DISCUSSIONREPLIES",
+      "path": "components\\discussion\\DiscussionReplies.vue",
+      "type": "component"
+    },
+    {
+      "name": "DISCUSSIONCOMPOSER",
+      "path": "components\\discussion\\DiscussionComposer.vue",
+      "type": "component"
+    },
+    {
+      "name": "ADVANCEDFILTERS",
+      "path": "components\\discussion\\AdvancedFilters.vue",
+      "type": "component"
+    },
+    {
+      "name": "VERIFYCODE",
+      "path": "components\\common\\VerifyCode.vue",
+      "type": "component"
+    },
+    {
+      "name": "TECHSTEPPER",
+      "path": "components\\common\\TechStepper.vue",
+      "type": "component"
+    },
+    {
+      "name": "TECHCARD",
+      "path": "components\\common\\TechCard.vue",
+      "type": "component"
+    },
+    {
+      "name": "TECHBUTTON",
+      "path": "components\\common\\TechButton.vue",
+      "type": "component"
+    },
+    {
+      "name": "STEPPER",
+      "path": "components\\common\\Stepper.vue",
+      "type": "component"
+    },
+    {
+      "name": "SAFEHTML",
+      "path": "components\\common\\SafeHtml.vue",
+      "type": "component"
+    },
+    {
+      "name": "ROTATEVERIFY",
+      "path": "components\\common\\RotateVerify.vue",
+      "type": "component"
+    },
+    {
+      "name": "RECOMMENDATIONCARD",
+      "path": "components\\common\\RecommendationCard.vue",
+      "type": "component"
+    },
+    {
+      "name": "MOBILEFORM",
+      "path": "components\\common\\MobileForm.vue",
+      "type": "component"
+    },
+    {
+      "name": "EQUIPMENT3DVIEWER",
+      "path": "components\\common\\Equipment3DViewer.vue",
+      "type": "component"
+    },
+    {
+      "name": "SCHEDULEPLANNER",
+      "path": "components\\booking\\SchedulePlanner.vue",
+      "type": "component"
+    },
+    {
+      "name": "GOALSELECTOR",
+      "path": "components\\booking\\GoalSelector.vue",
+      "type": "component"
+    },
+    {
+      "name": "COURSEPICKER",
+      "path": "components\\booking\\CoursePicker.vue",
+      "type": "component"
+    },
+    {
+      "name": "COACHRECOMMEND",
+      "path": "components\\booking\\CoachRecommend.vue",
+      "type": "component"
+    },
+    {
+      "name": "BOOKINGSUMMARY",
+      "path": "components\\booking\\BookingSummary.vue",
+      "type": "component"
+    },
+    {
+      "name": "BOOKINGCALENDAR",
+      "path": "components\\booking\\BookingCalendar.vue",
+      "type": "component"
+    }
+  ]
+}

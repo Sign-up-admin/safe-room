@@ -1,0 +1,21 @@
+[2025-11-15 16:51:23] [INFO] === Full-stack dev launcher ===
+[2025-11-15 16:51:23] [INFO] Docker check passed
+[2025-11-15 16:51:23] [INFO] Java check passed
+[2025-11-15 16:51:24] [INFO] Maven check passed
+[2025-11-15 16:51:24] [INFO] Node.js check passed
+[2025-11-15 16:51:25] [INFO] npm check passed
+[2025-11-15 16:51:25] [INFO] PostgreSQL container already running: fitness_gym_postgres
+[2025-11-15 16:51:25] [INFO] Database container fitness_gym_postgres is healthy
+[2025-11-15 16:51:25] [INFO] PostgreSQL port 127.0.0.1:5432 is ready
+[2025-11-15 16:51:27] [WARN] Warning: port 8080 already in use; Spring Boot may fail to bind
+[2025-11-15 16:51:27] [INFO] Spring Boot backend started. Log: C:\safe-room\logs\backend-20251115_165123.log. PID: 16724
+[2025-11-15 16:51:27] [INFO] Spring Boot backend port 127.0.0.1:8080 is ready
+[2025-11-15 16:51:29] [WARN] Note: port 8082 already in use; Vite will pick another port
+[2025-11-15 16:51:29] [INFO] Front Vite started. Log: C:\safe-room\logs\front-vite-20251115_165123.log. PID: 21288
+[2025-11-15 16:51:29] [INFO] Front Vite port 127.0.0.1:8082 is ready
+[2025-11-15 16:51:30] [WARN] Note: port 8081 already in use; admin Vite will pick another port
+[2025-11-15 16:51:30] [INFO] Admin Vite started. Log: C:\safe-room\logs\admin-vite-20251115_165123.log. PID: 7268
+[2025-11-15 16:51:30] [INFO] Admin Vite port 127.0.0.1:8081 is ready
+[2025-11-15 16:51:31] [INFO] Process info written to: C:\safe-room\logs\start-all-processes.json
+[2025-11-15 16:51:31] [INFO] All services triggered. Check each console window for live logs.
+[2025-11-15 16:51:31] [INFO] Use .\stop-all.ps1 to stop services when finished.

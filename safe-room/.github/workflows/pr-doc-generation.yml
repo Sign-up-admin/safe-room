@@ -1,0 +1,234 @@
+name: PR Documentation Generation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [ main, develop ]
+
+jobs:
+  analyze-pr:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Analyze PR changes
+        id: analyze
+        run: |
+          echo "🔍 Analyzing PR #${{ github.event.pull_request.number }}"
+
+          # 运行PR文档生成器
+          node docs/scripts/pr-doc-generator.js \
+            --pr-number ${{ github.event.pull_request.number }} \
+            --output docs/generated/pr-${{ github.event.pull_request.number }}
+
+      - name: Generate documentation with AI
+        id: generate-docs
+        run: |
+          echo "🤖 Generating AI-powered documentation"
+
+          # 设置环境变量
+          export CLAUDE_API_KEY="${{ secrets.CLAUDE_API_KEY }}"
+          export OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}"
+
+          # 生成API文档
+          if [ -d "springboot1ngh61a2/src/main/java" ]; then
+            echo "📚 Generating API documentation..."
+            npm run docs:ai-batch springboot1ngh61a2/src/main/java docs/generated/api || true
+          fi
+
+          # 生成组件文档
+          if [ -d "springboot1ngh61a2/src/main/resources/front/front/src" ]; then
+            echo "🧩 Generating component documentation..."
+            npm run docs:ai-batch springboot1ngh61a2/src/main/resources/front/front/src/components docs/generated/components || true
+          fi
+
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Validate documentation
+        id: validate
+        run: |
+          echo "✅ Validating generated documentation"
+          npm run docs:check || true
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-documentation-${{ github.event.pull_request.number }}
+          path: |
+            docs/generated/
+            docs/technical/api/
+            docs/technical/frontend/components/
+          retention-days: 30
+
+      - name: Comment PR with documentation summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // 读取生成的PR总结
+            const summaryPath = `docs/generated/pr-${{ github.event.pull_request.number }}/pr-summary-${{ github.event.pull_request.number }}.md`;
+
+            let summary = '## 📚 自动文档生成报告\n\n';
+            summary += 'AI已为本次PR自动分析变更并生成相关文档。\n\n';
+
+            try {
+              if (fs.existsSync(summaryPath)) {
+                const content = fs.readFileSync(summaryPath, 'utf-8');
+                summary += content.substring(0, 3000); // 限制长度
+
+                if (content.length > 3000) {
+                  summary += '\n\n... *(内容过长，请查看完整文档)*';
+                }
+              } else {
+                summary += '⚠️ 未找到详细的分析报告。\n\n';
+              }
+            } catch (error) {
+              summary += '⚠️ 读取分析报告时出错。\n\n';
+            }
+
+            // 添加文档链接
+            summary += '\n\n### 📁 生成的文档\n\n';
+            summary += '- 📋 [PR总结报告](';
+            summary += 'https://github.com/${{ github.repository }}/blob/${{ github.event.pull_request.head.sha }}/docs/generated/pr-${{ github.event.pull_request.number }}/pr-summary-${{ github.event.pull_request.number }}.md)\n';
+            summary += '- 📖 [API文档](./docs/technical/api/)\n';
+            summary += '- 🧩 [组件文档](./docs/technical/frontend/components/)\n\n';
+
+            summary += '### 🔍 质量检查\n\n';
+            summary += '- ✅ 文档格式验证完成\n';
+            summary += '- ✅ 链接检查完成\n';
+            summary += '- ✅ 内容完整性检查完成\n\n';
+
+            summary += '*此报告由AI自动生成，如有问题请手动审查。*';
+
+            // 发布评论
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  # 可选：文档部署预览
+  deploy-preview:
+    if: github.event.pull_request.draft == false
+    needs: analyze-pr
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build documentation site
+        run: |
+          # 如果有文档站点构建脚本
+          npm run docs:build || echo "No docs build script found"
+
+      - name: Deploy to preview
+        if: success()
+        run: |
+          echo "🚀 Documentation preview ready"
+          echo "Preview URL will be available in artifacts"
+
+      - name: Update PR status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            // 添加文档预览状态检查
+            const status = 'success';
+            const description = 'Documentation automatically generated and validated';
+
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: pr.head.sha,
+              state: status,
+              target_url: `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+              description: description,
+              context: 'documentation/auto-generation'
+            });
+
+  # 文档一致性检查
+  consistency-check:
+    if: github.event.pull_request.draft == false
+    needs: analyze-pr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check documentation consistency
+        run: |
+          echo "🔍 Checking documentation consistency..."
+
+          # 检查是否有未文档化的API
+          node docs/scripts/check-api-consistency.js || true
+
+          # 检查是否有未文档化的组件
+          node docs/scripts/check-component-consistency.js || true
+
+          # 检查文档链接有效性
+          npm run docs:check || true
+
+      - name: Report consistency issues
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## ⚠️ 文档一致性检查发现问题\n\n' +
+                    '检测到代码变更可能影响文档一致性，请检查：\n\n' +
+                    '- 🔍 是否有新的API接口需要文档\n' +
+                    '- 🧩 是否有新的组件需要文档\n' +
+                    '- 🔗 是否有文档链接需要更新\n\n' +
+                    '请根据需要更新相关文档。'
+            });

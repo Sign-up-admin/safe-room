@@ -1,0 +1,1075 @@
+<template>
+  <div class="module-page">
+    <header class="module-page__header">
+      <div>
+        <p class="eyebrow">{{ moduleKey }}</p>
+        <h2>{{ title }}</h2>
+      </div>
+      <div class="actions">
+        <el-button v-if="permissions.create" type="primary" @click="openForm">新增</el-button>
+        <el-dropdown v-if="permissions.remove && selectedRows.length > 0" @command="handleBatchCommand">
+          <el-button type="danger">
+            批量操作 ({{ selectedRows.length }}) <el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="delete">批量删除</el-dropdown-item>
+              <el-dropdown-item v-if="hasStatusField" command="enable">批量启用</el-dropdown-item>
+              <el-dropdown-item v-if="hasStatusField" command="disable">批量禁用</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-dropdown v-if="permissions.export" @command="handleExportCommand">
+          <el-button :loading="exporting">
+            导出数据 <el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="excel">导出Excel</el-dropdown-item>
+              <el-dropdown-item command="csv">导出CSV</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-button @click="fetchList">刷新</el-button>
+      </div>
+    </header>
+
+    <!-- 搜索和筛选区域 -->
+    <div class="search-bar">
+      <el-form :inline="true" :model="searchForm" class="search-form">
+        <el-form-item label="关键词">
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="请输入关键词搜索"
+            clearable
+            style="width: 200px"
+            @keyup.enter="handleSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+        <el-form-item v-if="hasStatusField" label="状态">
+          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable style="width: 150px">
+            <el-option label="全部" :value="undefined" />
+            <el-option label="启用" :value="1" />
+            <el-option label="禁用" :value="0" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="hasDateField" label="日期范围">
+          <el-date-picker
+            v-model="searchForm.dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="YYYY-MM-DD"
+            style="width: 240px"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleSearch">搜索</el-button>
+          <el-button @click="handleReset">重置</el-button>
+          <el-button v-if="hasAdvancedFilter" text type="primary" @click="showAdvancedFilter = !showAdvancedFilter">
+            {{ showAdvancedFilter ? '收起' : '高级筛选' }}
+          </el-button>
+        </el-form-item>
+      </el-form>
+      <!-- 高级筛选区域 -->
+      <el-collapse-transition>
+        <div v-if="showAdvancedFilter" class="advanced-filter">
+          <el-form :inline="true" :model="advancedFilter" class="advanced-filter-form">
+            <el-form-item
+              v-for="column in filterableColumns"
+              :key="column"
+              :label="getColumnLabel(column)"
+            >
+              <el-input
+                v-if="getFieldType(column) === 'text'"
+                v-model="advancedFilter[column]"
+                :placeholder="'请输入' + getColumnLabel(column)"
+                clearable
+                style="width: 180px"
+              />
+              <el-input-number
+                v-else-if="getFieldType(column) === 'number'"
+                v-model="advancedFilter[column]"
+                :placeholder="'请输入' + getColumnLabel(column)"
+                style="width: 180px"
+              />
+              <el-date-picker
+                v-else-if="getFieldType(column) === 'date'"
+                v-model="advancedFilter[column]"
+                type="date"
+                :placeholder="'请选择' + getColumnLabel(column)"
+                value-format="YYYY-MM-DD"
+                style="width: 180px"
+              />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleAdvancedSearch">应用筛选</el-button>
+              <el-button @click="handleResetAdvancedFilter">清除</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-collapse-transition>
+    </div>
+
+    <div v-if="listError" class="table-error">
+      <el-result icon="warning" title="列表加载失败" :sub-title="listError">
+        <template #extra>
+          <el-button type="primary" @click="fetchList">重试</el-button>
+        </template>
+      </el-result>
+    </div>
+
+    <div class="table-container">
+      <div v-if="showScrollHint" class="scroll-hint">
+        <el-alert
+          title="表格内容过多"
+          description="建议左右滚动查看完整内容，或使用更大的屏幕获得更好的体验。"
+          type="info"
+          :closable="false"
+          show-icon
+          size="small"
+        />
+      </div>
+      <el-table v-else v-loading="loading" :data="records" border stripe @selection-change="handleSelectionChange">
+      <el-table-column v-if="permissions.remove" type="selection" width="55" />
+      <el-table-column type="index" label="#" width="60" />
+      <el-table-column
+        v-for="column in displayColumns"
+        :key="column"
+        :prop="column"
+        :label="getColumnLabel(column)"
+        min-width="140"
+        show-overflow-tooltip
+      >
+        <template #default="{ row }">
+          <template v-if="getFieldType(column) === 'image' && row[column]">
+            <el-image
+              :src="getImageUrl(row[column])"
+              :preview-src-list="[getImageUrl(row[column])]"
+              style="width: 60px; height: 60px; border-radius: 4px"
+              fit="cover"
+            />
+          </template>
+          <span v-else>{{ formatCellValue(row[column], column) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="hasOperations" label="操作" width="220" fixed="right">
+        <template #default="{ row }">
+          <el-button v-if="permissions.view" text type="primary" size="small" @click="viewRowWithPermission(row)">
+            查看
+          </el-button>
+          <el-button v-if="permissions.update" text size="small" @click="openForm(row)">编辑</el-button>
+          <el-button v-if="permissions.remove" text type="danger" size="small" @click="removeRow(row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+      <template #empty>
+        <el-empty description="暂无数据">
+          <el-button v-if="permissions.create" type="primary" @click="openForm">去新增</el-button>
+        </el-empty>
+      </template>
+    </el-table>
+
+    <div class="pagination">
+      <el-pagination
+        background
+        layout="total, sizes, prev, pager, next"
+        :total="pagination.total"
+        :current-page="pagination.page"
+        :page-size="pagination.limit"
+        :page-sizes="[10, 20, 30, 50]"
+        @size-change="handleSizeChangeLocal"
+        @current-change="handlePageChangeLocal"
+      />
+    </div>
+
+    <el-dialog v-model="detailVisible" :title="detailTitle" width="520px">
+      <pre class="json-view">{{ formattedDetail }}</pre>
+    </el-dialog>
+
+    <el-dialog
+      v-model="formVisible"
+      :title="isEditing ? '编辑' + title : '新增' + title"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <el-form ref="formRef" label-width="120px" :model="formModel" :rules="formRules">
+        <el-form-item v-for="column in displayColumns" :key="column" :label="getColumnLabel(column)" :prop="column">
+          <el-input
+            v-if="getFieldType(column) === 'text' || getFieldType(column) === 'textarea'"
+            v-model="formModel[column]"
+            :type="getFieldType(column) === 'textarea' ? 'textarea' : 'text'"
+            :rows="getFieldType(column) === 'textarea' ? 4 : 1"
+            :placeholder="'请输入' + getColumnLabel(column)"
+          />
+          <el-input-number
+            v-else-if="getFieldType(column) === 'number'"
+            v-model="formModel[column]"
+            :placeholder="'请输入' + getColumnLabel(column)"
+            style="width: 100%"
+          />
+          <el-date-picker
+            v-else-if="getFieldType(column) === 'date'"
+            v-model="formModel[column]"
+            type="date"
+            :placeholder="'请选择' + getColumnLabel(column)"
+            style="width: 100%"
+            value-format="YYYY-MM-DD"
+          />
+          <el-date-picker
+            v-else-if="getFieldType(column) === 'datetime'"
+            v-model="formModel[column]"
+            type="datetime"
+            :placeholder="'请选择' + getColumnLabel(column)"
+            style="width: 100%"
+            value-format="YYYY-MM-DD HH:mm:ss"
+          />
+          <el-switch
+            v-else-if="getFieldType(column) === 'boolean'"
+            v-model="formModel[column]"
+            :active-value="1"
+            :inactive-value="0"
+          />
+          <FileUpload
+            v-else-if="getFieldType(column) === 'image'"
+            v-model="formModel[column]"
+            :type="1"
+            :limit="1"
+            tip="支持jpg/png/webp格式，大小不超过5MB"
+          />
+          <FileUpload
+            v-else-if="getFieldType(column) === 'file'"
+            v-model="formModel[column]"
+            :type="2"
+            :limit="1"
+            tip="支持常见文件格式，大小不超过10MB"
+          />
+          <RichTextEditor
+            v-else-if="getFieldType(column) === 'richtext'"
+            v-model="formModel[column]"
+            :placeholder="'请输入' + getColumnLabel(column)"
+          />
+          <el-select
+            v-else-if="getFieldType(column) === 'select'"
+            v-model="formModel[column]"
+            :placeholder="'请选择' + getColumnLabel(column)"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="option in getSelectOptions(column)"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value"
+            />
+          </el-select>
+          <el-input
+            v-else-if="getFieldType(column) === 'password'"
+            v-model="formModel[column]"
+            type="password"
+            :placeholder="'请输入' + getColumnLabel(column)"
+            show-password
+          />
+          <el-input v-else v-model="formModel[column]" :placeholder="'请输入' + getColumnLabel(column)" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="closeForm">取消</el-button>
+        <el-button type="primary" :loading="submitting" @click="submitForm">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 批量状态变更对话框 -->
+    <el-dialog v-model="showBatchStatusDialog" title="批量状态变更" width="400px">
+      <el-form label-width="100px">
+        <el-form-item label="选择状态">
+          <el-radio-group v-model="batchStatusValue">
+            <el-radio :label="1">启用</el-radio>
+            <el-radio :label="0">禁用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item>
+          <el-alert
+            :title="`将更新 ${selectedRows.length} 条记录的状态`"
+            type="info"
+            :closable="false"
+            show-icon
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showBatchStatusDialog = false">取消</el-button>
+        <el-button type="primary" :loading="batchUpdating" @click="handleBatchStatusUpdate">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 数据导入对话框 -->
+    <el-dialog v-model="showImportDialog" title="Excel数据导入" width="600px">
+      <el-steps :active="importStep" finish-status="success" align-center>
+        <el-step title="下载模板" />
+        <el-step title="上传文件" />
+        <el-step title="导入完成" />
+      </el-steps>
+      <div class="import-content" style="margin-top: 30px; min-height: 200px">
+        <div v-if="importStep === 0" class="import-step">
+          <el-alert
+            title="请先下载Excel模板，按照模板格式填写数据后上传"
+            type="info"
+            :closable="false"
+            show-icon
+            style="margin-bottom: 20px"
+          />
+          <el-button type="primary" @click="downloadTemplate">下载模板</el-button>
+          <el-button type="primary" @click="importStep = 1" style="margin-left: 10px">已有文件，直接上传</el-button>
+        </div>
+        <div v-if="importStep === 1" class="import-step">
+          <el-upload
+            ref="importUploadRef"
+            :action="importActionUrl"
+            :headers="importHeaders"
+            :on-success="handleImportSuccess"
+            :on-error="handleImportError"
+            :before-upload="handleBeforeImport"
+            :limit="1"
+            accept=".xlsx,.xls"
+            :auto-upload="false"
+            drag
+          >
+            <el-icon class="el-icon--upload" style="font-size: 67px; color: #c0c4cc; margin: 40px 0 16px">
+              <upload-filled />
+            </el-icon>
+            <div class="el-upload__text">将文件拖到此处，或点击上传</div>
+            <template #tip>
+              <div class="el-upload__tip">只能上传xlsx/xls文件，且不超过10MB</div>
+            </template>
+          </el-upload>
+          <div style="margin-top: 20px; text-align: center">
+            <el-button @click="importStep = 0">上一步</el-button>
+            <el-button type="primary" @click="submitImport">开始导入</el-button>
+          </div>
+        </div>
+        <div v-if="importStep === 2" class="import-step">
+          <el-alert
+            :title="`成功导入 ${importResult.successCount} 条，失败 ${importResult.failCount} 条`"
+            :type="importResult.failCount > 0 ? 'warning' : 'success'"
+            :closable="false"
+            show-icon
+            style="margin-bottom: 20px"
+          />
+          <el-table v-if="importResult.errors && importResult.errors.length > 0" :data="importResult.errors" border>
+            <el-table-column prop="row" label="行号" width="80" />
+            <el-table-column prop="message" label="错误信息" />
+          </el-table>
+          <div style="margin-top: 20px; text-align: center">
+            <el-button type="primary" @click="handleImportComplete">完成</el-button>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
+import { Search, ArrowDown, UploadFilled } from '@element-plus/icons-vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import http from '@/utils/http'
+import FileUpload from '@/components/common/FileUpload.vue'
+import RichTextEditor from '@/components/common/RichTextEditor.vue'
+import storage from '@/utils/storage'
+import { isAuth } from '@/utils/utils'
+import type { UploadFile, UploadFiles, UploadProps, UploadInstance } from 'element-plus'
+import type { ListResponse } from '@/composables'
+import { useCrud, useForm, useDetail, useFieldMapping } from '@/composables'
+
+const props = defineProps<{
+  moduleKey: string
+  title: string
+}>()
+
+// 使用组合式函数
+const crud = useCrud({
+  moduleKey: props.moduleKey,
+  title: props.title,
+})
+
+const form = useForm({
+  onSuccess: () => {
+    crud.logOperation(form.isEditing.value ? 'UPDATE' : 'ADD', form.formModel)
+    crud.fetchList()
+  },
+})
+
+const detail = useDetail<Record<string, any>>()
+
+const fieldMapping = useFieldMapping()
+
+// 解构状态和方法
+const {
+  records,
+  loading,
+  listError,
+  submitting,
+  exporting,
+  selectedRows,
+  searchForm,
+  pagination,
+  fetchList,
+  handleSearch,
+  handleReset,
+  handlePageChange,
+  handleSizeChange,
+  handleSelectionChange,
+  batchRemove,
+  removeRow,
+  handleExport,
+  logOperation,
+} = crud
+
+const {
+  isEditing,
+  formRef,
+  formModel,
+} = form
+
+const { detailVisible, detailRecord, detailTitle, formattedDetail, viewRow } = detail
+
+const { getColumnLabel, getFieldType, getImageUrl, getSelectOptions, formatCellValue, generateFormRules } = fieldMapping
+
+// 表单相关状态和方法
+const formVisible = ref(false)
+
+function openForm(record?: Record<string, any>) {
+  // 权限检查
+  if (record && !permissions.value.update) return
+  if (!record && !permissions.value.create) return
+
+  if (record) {
+    form.setEditMode(record)
+  } else {
+    form.setAddMode()
+  }
+  formVisible.value = true
+}
+
+function closeForm() {
+  formVisible.value = false
+  form.resetForm()
+}
+
+// 扩展搜索表单
+const extendedSearchForm = reactive({
+  ...searchForm,
+  status: undefined as number | undefined,
+  dateRange: undefined as [string, string] | undefined,
+})
+
+// 高级筛选相关
+const showAdvancedFilter = ref(false)
+const advancedFilter = reactive<Record<string, any>>({})
+
+// 批量状态变更相关
+const showBatchStatusDialog = ref(false)
+const batchStatusValue = ref<0 | 1>(1)
+const batchUpdating = ref(false)
+
+// 表单验证规则
+const formRules = computed(() => generateFormRules(displayColumns.value))
+
+// 数据导入相关
+const showImportDialog = ref(false)
+const importing = ref(false)
+const importStep = ref(0)
+const importUploadRef = ref<UploadInstance>()
+const importResult = reactive({
+  successCount: 0,
+  failCount: 0,
+  errors: [] as Array<{ row: number; message: string }>,
+})
+
+const displayColumns = computed(() => {
+  const sample = records.value[0] || detailRecord.value
+  if (!sample) return []
+  return Object.keys(sample)
+    .filter(key => !['addtime', 'password'].includes(key))
+    .slice(0, 8)
+})
+
+const showScrollHint = computed(() => {
+  if (typeof window === 'undefined') return false
+  const width = window.innerWidth
+  return width >= 992 && width <= 1199 && displayColumns.value.length > 6
+})
+
+// 提交表单（包装以支持操作日志）
+async function submitForm() {
+  await form.submitForm()
+  if (!formVisible.value) {
+    // 表单已关闭，说明提交成功
+    await logOperation(isEditing.value ? 'UPDATE' : 'ADD', formModel)
+  }
+}
+
+// 批量操作命令处理
+async function handleBatchCommand(command: string) {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要操作的记录')
+    return
+  }
+
+  switch (command) {
+    case 'delete':
+      await batchRemove()
+      break
+    case 'enable':
+      await batchUpdateStatus(1)
+      break
+    case 'disable':
+      await batchUpdateStatus(0)
+      break
+    default:
+      ElMessage.warning('未知的操作命令')
+  }
+}
+
+// 批量更新状态
+async function batchUpdateStatus(status: number) {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要操作的记录')
+    return
+  }
+  
+  const statusText = status === 1 ? '启用' : '禁用'
+  try {
+    await ElMessageBox.confirm(
+      `确定要${statusText}选中的 ${selectedRows.value.length} 条记录吗？`,
+      `批量${statusText}确认`,
+      {
+        confirmButtonText: statusText,
+        cancelButtonText: '取消',
+        type: 'warning',
+      },
+    )
+    
+    const ids = selectedRows.value.map(row => row.id)
+    // 批量更新状态
+    const updatePromises = ids.map(id => {
+      const row = selectedRows.value.find(r => r.id === id)
+      if (!row) return Promise.resolve()
+      return http.post(`/${props.moduleKey}/update`, {
+        ...row,
+        status: status,
+      })
+    })
+    
+    await Promise.all(updatePromises)
+    ElMessage.success(`批量${statusText}成功`)
+    selectedRows.value = []
+    fetchList()
+  } catch (error: any) {
+    if (error === 'cancel') {
+      return
+    }
+    console.error(error)
+    const message = error?.response?.data?.msg || error?.message || `批量${statusText}失败`
+    ElMessage.error(message)
+  }
+}
+
+// 导出命令处理
+function handleExportCommand(command: string) {
+  if (command === 'excel') {
+    handleExportLocal()
+  } else if (command === 'csv') {
+    exportToCSV()
+  }
+}
+
+// 创建新记录
+function createRow() {
+  openForm()
+}
+
+const permissions = computed(() => ({
+  create: isAuth(props.moduleKey, 'Add'),
+  update: isAuth(props.moduleKey, 'Edit'),
+  remove: isAuth(props.moduleKey, 'Delete'),
+  view: isAuth(props.moduleKey, 'View'),
+  export: isAuth(props.moduleKey, 'Export'),
+}))
+
+const hasOperations = computed(() => permissions.value.view || permissions.value.update || permissions.value.remove)
+
+// 检查是否有状态字段
+const hasStatusField = computed(() => {
+  return displayColumns.value.some(col => col === 'status' || col === 'zhuangtai')
+})
+
+// 检查是否有日期字段
+const hasDateField = computed(() => {
+  return displayColumns.value.some(col => {
+    const type = getFieldType(col)
+    return type === 'date' || type === 'datetime' || col.includes('time') || col.includes('date')
+  })
+})
+
+// 可筛选的列（排除图片、富文本等）
+const filterableColumns = computed(() => {
+  return displayColumns.value.filter(col => {
+    const type = getFieldType(col)
+    return ['text', 'number', 'date'].includes(type) && col !== 'id'
+  })
+})
+
+// 是否有高级筛选功能
+const hasAdvancedFilter = computed(() => {
+  return filterableColumns.value.length > 0
+})
+
+// 基础 URL
+const baseUrl = computed(() => '/api/')
+
+// 导入相关计算属性
+const importActionUrl = computed(() => {
+  return `${baseUrl.value}${props.moduleKey}/import`
+})
+
+const importHeaders = computed(() => ({
+  Token: storage.get('Token') || '',
+}))
+
+onMounted(() => {
+  fetchList()
+})
+
+watch(
+  () => props.moduleKey,
+  () => {
+    pagination.page = 1
+    fetchList()
+  },
+)
+
+async function fetchListLocal() {
+  loading.value = true
+  listError.value = ''
+  try {
+    const params: Record<string, any> = {
+      page: pagination.page,
+      limit: pagination.limit,
+      sort: 'id',
+      order: 'desc',
+    }
+    if (searchForm.keyword) {
+      params.keyword = searchForm.keyword
+    }
+    if (searchForm.status !== undefined) {
+      params.status = searchForm.status
+    }
+    if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+      params.startDate = searchForm.dateRange[0]
+      params.endDate = searchForm.dateRange[1]
+    }
+    // 高级筛选参数
+    Object.keys(advancedFilter).forEach(key => {
+      if (advancedFilter[key] !== undefined && advancedFilter[key] !== null && advancedFilter[key] !== '') {
+        params[key] = advancedFilter[key]
+      }
+    })
+    const response = await http.get<{ code: number; data: ListResponse }>(`/${props.moduleKey}/list`, {
+      params,
+    })
+    if (response.data.code === 0) {
+      records.value = response.data.data?.list ?? []
+      pagination.total = response.data.data?.total ?? 0
+    } else {
+      const message = (response.data as any)?.msg
+      throw new Error(message || '加载失败')
+    }
+  } catch (error: any) {
+    console.error(error)
+    listError.value = error?.response?.data?.msg || error?.message || '加载数据失败'
+  } finally {
+    loading.value = false
+  }
+}
+
+function handlePageChangeLocal(page: number) {
+  pagination.page = page
+  fetchListLocal()
+}
+
+function handleSizeChangeLocal(size: number) {
+  pagination.limit = size
+  pagination.page = 1
+  fetchListLocal()
+}
+
+// 导出Excel - 支持后端导出和前端CSV导出两种方式
+async function handleExportLocal() {
+  if (!permissions.value.export) {
+    ElMessage.warning('您没有导出权限')
+    return
+  }
+  
+  exporting.value = true
+  try {
+    // 首先尝试后端导出接口
+    try {
+      const params: Record<string, any> = {
+        page: 1,
+        limit: 10000,
+      }
+      if (searchForm.keyword) {
+        params.keyword = searchForm.keyword
+      }
+
+      const response = await http.get(`/${props.moduleKey}/export`, {
+        params,
+        responseType: 'blob',
+      })
+
+      // 检查响应是否为blob类型
+      if (response.data instanceof Blob) {
+        const blob = response.data
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${props.title}_${new Date().toISOString().split('T')[0]}.xlsx`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        ElMessage.success('导出成功')
+        exporting.value = false
+        return
+      }
+    } catch (backendError: any) {
+      // 如果后端导出接口不存在或失败，使用前端CSV导出
+      console.warn('后端导出接口不可用，使用前端CSV导出:', backendError)
+    }
+
+    // 前端CSV导出
+    await exportToCSV()
+  } catch (error: any) {
+    console.error(error)
+    ElMessage.error(error?.response?.data?.msg || error?.message || '导出失败')
+  } finally {
+    exporting.value = false
+  }
+}
+
+// 前端CSV导出
+async function exportToCSV() {
+  try {
+    // 获取所有数据
+    const params: Record<string, any> = {
+      page: 1,
+      limit: 10000,
+    }
+    if (searchForm.keyword) {
+      params.keyword = searchForm.keyword
+    }
+
+    const response = await http.get<{ code: number; data: ListResponse }>(`/${props.moduleKey}/list`, {
+      params,
+    })
+
+    if (response.data.code !== 0 || !response.data.data?.list) {
+      throw new Error('获取数据失败')
+    }
+
+    const data = response.data.data.list
+    if (data.length === 0) {
+      ElMessage.warning('没有数据可导出')
+      return
+    }
+
+    // 生成CSV内容
+    const headers = displayColumns.value.map(col => getColumnLabel(col))
+    const rows = data.map(row => {
+      return displayColumns.value.map(col => {
+        const value = formatCellValue(row[col], col)
+        // CSV格式处理：包含逗号、引号或换行符的值需要用引号包裹，引号需要转义
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+          return `"${value.replace(/"/g, '""')}"`
+        }
+        return value ?? ''
+      })
+    })
+
+    // 组合CSV内容
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(',')),
+    ].join('\n')
+
+    // 添加BOM以支持中文
+    const BOM = '\uFEFF'
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${props.title}_${new Date().toISOString().split('T')[0]}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+    ElMessage.success('CSV导出成功')
+  } catch (error: any) {
+    console.error('CSV导出失败:', error)
+    throw error
+  }
+}
+
+// viewRow 已在 useDetail 中定义，这里只需要包装权限检查
+function viewRowWithPermission(row: Record<string, any>) {
+  if (!permissions.value.view) return
+  viewRow(row)
+}
+
+// 导入相关方法
+function handleImportSuccess(result: any) {
+  // 导入成功处理
+  ElMessage.success(`成功导入 ${result.successCount} 条数据`)
+}
+
+function handleImportError(error: any) {
+  // 导入错误处理
+  ElMessage.error(error.message || '导入失败')
+}
+
+function handleBeforeImport(file: File) {
+  // 导入前验证
+  const isValidType = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                     file.type === 'application/vnd.ms-excel'
+  if (!isValidType) {
+    ElMessage.error('只支持 Excel 文件格式')
+    return false
+  }
+  return true
+}
+
+// 高级搜索相关方法
+function handleAdvancedSearch() {
+  // 实现高级搜索逻辑
+  fetchListLocal()
+}
+
+function handleResetAdvancedFilter() {
+  // 重置高级筛选
+  searchForm.keyword = ''
+  fetchListLocal()
+}
+
+// 批量操作相关方法
+function handleBatchStatusUpdate(status: string) {
+  // 实现批量状态更新
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请选择要操作的记录')
+    return
+  }
+  // 这里可以实现批量状态更新的逻辑
+}
+
+// 导入导出相关方法
+function downloadTemplate() {
+  // 下载导入模板
+  const link = document.createElement('a')
+  link.href = `/${props.moduleKey}/template`
+  link.download = `${props.title}导入模板.xlsx`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+function submitImport(file: File) {
+  // 提交导入文件
+  // 这里可以实现文件导入的逻辑
+}
+
+function handleImportComplete() {
+  // 导入完成处理
+  fetchListLocal()
+}
+
+defineExpose({
+  refresh: fetchListLocal,
+  fetchList: fetchListLocal,
+  openForm,
+  records,
+  formModel,
+  pagination,
+  handleAdvancedSearch,
+  handleResetAdvancedFilter,
+  closeForm,
+  handleBatchStatusUpdate,
+  downloadTemplate,
+  submitImport,
+  handleImportComplete,
+})
+</script>
+
+<style scoped lang="scss">
+@use '@/styles/tokens' as *;
+
+.module-page {
+  padding: 24px;
+  background: $color-bg-panel;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: calc(100vh - 120px);
+}
+
+.module-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 6px 0 0;
+    color: $color-text-primary;
+    font-size: $font-size-xxl;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.eyebrow {
+  letter-spacing: 0.4em;
+  color: $color-primary;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.search-bar {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: $color-bg-secondary;
+  border-radius: 8px;
+  border: 1px solid $color-border;
+}
+
+.search-form {
+  margin: 0;
+}
+
+.table-error {
+  margin-bottom: 16px;
+  border: 1px dashed rgba(255, 95, 95, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 95, 95, 0.05);
+  padding: 12px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
+.json-view {
+  max-height: 400px;
+  overflow: auto;
+  background: $color-bg-secondary;
+  color: $color-text-primary;
+  padding: 16px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: $font-size-sm;
+  border: 1px solid $color-border;
+}
+
+.image-preview {
+  margin-top: 8px;
+}
+
+// 响应式设计
+@media (width <= 768px) {
+  .module-page {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .module-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    h2 {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .actions {
+    width: 100%;
+    flex-wrap: wrap;
+
+    .el-button {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+
+  .search-bar {
+    padding: 12px;
+  }
+
+  .search-form {
+    :deep(.el-form-item) {
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    :deep(.el-input),
+    :deep(.el-select) {
+      width: 100% !important;
+    }
+  }
+
+  :deep(.el-table) {
+    font-size: $font-size-sm;
+
+    .el-table__cell {
+      padding: 8px 4px;
+    }
+  }
+
+  :deep(.el-pagination) {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (width > 768px) and (width <= 1024px) {
+  .module-page {
+    padding: 20px;
+  }
+
+  .search-form {
+    :deep(.el-form-item) {
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.table-container {
+  position: relative;
+}
+
+.scroll-hint {
+  margin-bottom: 16px;
+}
+</style>

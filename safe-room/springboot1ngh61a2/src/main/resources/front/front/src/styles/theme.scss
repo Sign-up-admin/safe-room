@@ -1,0 +1,111 @@
+@use './design-tokens.scss' as *;
+@use './element-plus-theme.scss';
+@use './responsive.scss';
+
+body {
+  background: $color-bg-deep;
+  color: $color-text-primary;
+  font-family: $font-family-base;
+}
+
+.el-card {
+  background: rgba(13, 13, 13, 0.85);
+  border: 1px solid $color-border;
+  border-radius: $card-radius;
+  box-shadow: $shadow-soft;
+  color: $color-text-primary;
+}
+
+.el-divider {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.el-button--primary {
+  @include yellow-button(false, 48px);
+  padding: 0 32px;
+}
+
+.el-table {
+  background: transparent;
+  color: $color-text-primary;
+}
+
+.el-table th,
+.el-table tr {
+  background: transparent;
+}
+
+.el-table__header-wrapper th {
+  background: rgba(255, 255, 255, 0.04);
+  color: $color-text-primary;
+}
+
+.el-table__body-wrapper td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.el-table__inner-wrapper::before {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.el-pagination.is-background .el-pager li:not(.is-disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: $color-text-primary;
+
+  &.is-active {
+    background-color: $color-yellow;
+    color: #0a0a0a;
+  }
+}
+
+.el-page-header {
+  color: $color-text-secondary;
+
+  .el-page-header__title,
+  .el-page-header__content {
+    color: $color-text-primary;
+    letter-spacing: 0.2em;
+  }
+}
+
+.el-tag {
+  background: rgba(253, 216, 53, 0.1);
+  border-color: rgba(253, 216, 53, 0.25);
+  color: $color-yellow;
+  border-radius: 999px;
+}
+
+.el-link.el-link--primary {
+  color: $color-yellow;
+}
+
+.app-dark-bg {
+  min-height: 100vh;
+  background: $color-bg-deep;
+  color: $color-text-primary;
+}
+
+.glass-card {
+  @include glass-card();
+}
+
+.yellow-button {
+  @include yellow-button();
+}
+
+.yellow-outline-button {
+  @include yellow-button(true);
+}
+
+.section-eyebrow {
+  @include section-eyebrow;
+}
+
+.panel-divider {
+  border: none;
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 24px 0;
+}
+

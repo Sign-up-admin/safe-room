@@ -1,0 +1,112 @@
+---
+title: DATABASE
+version: v1.0.0
+last_updated: 2025-11-16
+status: active
+category: technical
+---
+## 数据库文档
+
+后端默认使用 PostgreSQL，相关脚本位于 `springboot1ngh61a2/src/main/resources/`：
+
+- `schema-postgresql.sql`：生产/本地初始化结构
+- `data.sql`：种子数据
+- `test-schema.sql` + `test-data.sql`：测试专用
+
+### 1. 连接信息
+
+| 环境 | Host | Port | DB | 用户 | 文件 |
+| --- | --- | --- | --- | --- | --- |
+| 本地 (Docker) | `localhost` | `5432` | `fitness_gym` | `postgres` | `.env` / `docker-compose.yml` |
+| Spring Boot | `DB_HOST` / `DB_PORT` | - | - | - | `application.yml` / `application-prod.yml` |
+
+### 2. 主要表概览
+
+| 表 | 说明 | 关键字段 |
+| --- | --- | --- |
+| `user` | 会员数据 | `id`, `username`, `password`, `full_name`, `gender`, `height`, `weight`, `phone_number`, `token` |
+| `users` | 管理员账号 | `id`, `username`, `password`, `role` |
+| `fitness_coach` | 教练资料 | `id`, `coach_id`, `coach_name`, `image`, `speciality`, `rating` |
+| `fitness_course` | 课程信息 | `id`, `course_name`, `course_type`, `coach_id`, `price`, `duration`, `cover_img`, `clicknum` |
+| `course_type` | 课程分类 | `id`, `type_name`, `sort_order` |
+| `course_reservation` | 课程预约 | `id`, `course_id`, `user_id`, `reservation_time`, `status`, `audit_result` |
+| `private_coaching_reservation` | 私教预约 | 与 `course_reservation` 类似，包含教练指定信息 |
+| `course_refund` | 退课记录 | `status`、`reason`、`amount` |
+| `favorite` | 收藏记录 | `id`, `user_id`, `tablename`, `refid`, `type` |
+| `membership_card` | 会员卡定义 | `id`, `membership_card_name`, `price`, `validity_period`, `rights_desc` |
+| `membership_card_purchase` | 购卡记录 | `payment_status`, `expire_date` |
+| `membership_renewal` | 续费记录 | `renew_type`, `amount`, `expire_date` |
+| `equipment` | 健身器材 | `id`, `equipment_name`, `status`, `location` |
+| `news` / `news_type` | 资讯与分类 | `title`, `content`, `author`, `publish_time` |
+| `fitness_course_discussion` | 课程讨论 | `user_id`, `course_id`, `content`, `reply` |
+| `config` | 轮播/系统配置 | `config_name`, `value`, `status` |
+| `token` | Token 白名单 | `userid`, `username`, `token`, `expire_time` |
+
+> 若表名仍为拼音（例如 `jianshenkecheng`），可参考 `REFACTORING_PROGRESS.md` 中的映射表进行中英对照。
+
+### 3. 关系与约束
+
+- 会员与预约：`course_reservation.user_id → user.id`
+- 课程与预约：`course_reservation.course_id → fitness_course.id`
+- 教练与课程：`fitness_course.coach_id → fitness_coach.id`
+- 收藏：`favorite.refid` 与 `tablename` 组合决定关联实体
+- 会员卡购买：`membership_card_purchase.membership_card_id → membership_card.id`
+
+目前 SQL 脚本以逻辑外键为主，未强制添加 `FOREIGN KEY`，因此需由应用层负责约束。
+
+### 4. 表字段示例
+
+#### 4.1 `fitness_course`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | bigint PK | 自增主键 |
+| `course_name` | varchar | 课程名称 |
+| `course_type` | varchar | 课程类型 |
+| `coach_id` | varchar | 教练工号 |
+| `price` | numeric(10,2) | 价格 |
+| `duration` | int | 时长（分钟） |
+| `image` | varchar | 封面 |
+| `clicknum` | int | 点击量 |
+| `addtime` | timestamp | 创建时间 |
+
+#### 4.2 `course_reservation`
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `id` | bigint PK |
+| `course_id` | bigint | 关联课程 |
+| `user_id` | bigint | 会员 |
+| `reservation_time` | timestamp |
+| `status` | varchar | `pending/approved/rejected` |
+| `audit_result` | text | 审核回复 |
+| `ispay` | varchar | 支付状态 `unpaid/paid/refunded` |
+
+### 5. 数据迁移建议
+
+1. 所有结构调整请优先修改 `schema-postgresql.sql`，同步更新 `test-schema.sql`。
+2. 需要保留旧数据时，可编写独立迁移脚本或 Flyway/Liquibase 方案。
+3. 若在生产环境修改表名/字段名，请同步更新：
+   - `com.entity.*`
+   - `mapper/*.xml`
+   - 前端 `src/config/modules.ts` 中的字段映射
+
+### 6. 调试命令
+
+```bash
+# 进入容器
+docker exec -it fitness_gym_postgres psql -U postgres -d fitness_gym
+
+# 查看所有表
+\dt
+
+# 查看字段
+\d fitness_course
+```
+
+### 7. 数据一致性
+
+- 通过 `@Transactional` 保证业务原子性（例如预约、支付、库存等操作）。
+- 软删除通过 `delete` 接口直接删除记录，若需保留历史可扩展 `is_deleted` 字段。
+- 定期备份：参考 `DEPLOYMENT.md` 中的 `pg_dump`/`psql` 示例。
+

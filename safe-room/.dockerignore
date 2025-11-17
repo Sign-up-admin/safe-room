@@ -1,0 +1,77 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.vscode
+.idea
+*.iml
+*.swp
+*.swo
+*.sublime-*
+
+# OS files
+*.DS_Store
+Thumbs.db
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+target
+dist
+*.jar
+*.war
+*.class
+
+# Logs
+logs
+*.log
+*.log.*
+
+# Node modules (will be installed during build)
+node_modules
+**/node_modules
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.temp
+
+# Test files
+test-results
+coverage
+*.coverage
+playwright-report
+
+# Documentation (not needed in image)
+*.md
+!README.md
+docs
+
+# Scripts (not needed in image)
+*.ps1
+*.sh
+*.bat
+
+# Docker files (avoid recursive copying)
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Other
+*.zip
+*.tar.gz
+*.rar
+mp-ext-*.zip
+
