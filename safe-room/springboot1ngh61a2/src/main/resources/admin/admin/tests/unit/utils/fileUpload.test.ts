@@ -47,10 +47,10 @@ describe('fileUpload', () => {
       })
 
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('文件类型不支�?)
+      expect(result.error).toContain('文件类型不支�?)
     })
 
-    it('should reject file exceeding max size', () => {
+      it('应该拒绝超过最大大小的文件', () => {
       const largeContent = 'a'.repeat(11 * 1024 * 1024) // 11MB
       const file = new File([largeContent], 'large.jpg', { type: 'image/jpeg' })
       const result = validateFile(file, {
@@ -81,7 +81,7 @@ describe('fileUpload', () => {
       })
 
       expect(result.valid).toBe(false)
-      expect(result.error).toContain('文件类型不支�?)
+      expect(result.error).toContain('文件类型不支�?)
     })
 
     it('should validate with default config when no config provided', () => {

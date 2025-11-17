@@ -101,7 +101,7 @@ describe('CSRF Token工具', () => {
       expect(sessionStorage.getItem('csrf_token')).toBeNull()
     })
 
-    it('如果token不存在，应该不报�?, () => {
+      it('如果token不存在，应该不报错', () => {
       expect(() => clearCsrfToken()).not.toThrow()
     })
   })
@@ -132,7 +132,7 @@ describe('CSRF Token工具', () => {
   })
 
   describe('CSRF_TOKEN_HEADER', () => {
-    it('应该是正确的请求头名�?, () => {
+      it('应该是正确的请求头名称', () => {
       expect(CSRF_TOKEN_HEADER).toBe('X-CSRF-Token')
     })
   })

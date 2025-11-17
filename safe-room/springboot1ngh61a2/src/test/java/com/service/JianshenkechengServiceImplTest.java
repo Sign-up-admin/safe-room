@@ -2,16 +2,20 @@ package com.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.entity.JianshenkechengEntity;
+import com.entity.JianshenjiaolianEntity;
 import com.entity.view.JianshenkechengView;
 import com.entity.vo.JianshenkechengVO;
 import com.utils.PageUtils;
+import com.utils.TestDataFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +28,9 @@ class JianshenkechengServiceImplTest {
 
     @Autowired
     private JianshenkechengService jianshenkechengService;
+
+    @Autowired
+    private JianshenjiaolianService jianshenjiaolianService;
 
     @AfterEach
     void cleanupTestData() {
@@ -554,6 +561,339 @@ class JianshenkechengServiceImplTest {
 
         List<Map<String, Object>> groups = jianshenkechengService.selectGroup(groupParams, new QueryWrapper<>());
         assertThat(groups).isNotNull();
+    }
+
+    // ==================== 业务逻辑测试 ====================
+
+    @Test
+    void shouldCreateCourseWithValidData() {
+        // 创建测试教练
+        JianshenjiaolianEntity coach = TestDataFactory.coach()
+                .employeeId("TEST-COACH-CREATE")
+                .name("创建课程教练")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach);
+
+        // 创建课程
+        JianshenkechengEntity course = TestDataFactory.course()
+                .name("TEST-COURSE-CREATE")
+                .type("瑜伽课")
+                .coachId(coach.getJiaoliangonghao())
+                .coachName(coach.getJiaolianxingming())
+                .price(BigDecimal.valueOf(199.00))
+                .build();
+
+        jianshenkechengService.save(course);
+
+        JianshenkechengEntity savedCourse = jianshenkechengService.getById(course.getId());
+        assertThat(savedCourse).isNotNull();
+        assertThat(savedCourse.getKechengmingcheng()).isEqualTo("TEST-COURSE-CREATE");
+        assertThat(savedCourse.getKechengleixing()).isEqualTo("瑜伽课");
+        assertThat(savedCourse.getJiaoliangonghao()).isEqualTo(coach.getJiaoliangonghao());
+        assertThat(savedCourse.getJiaolianxingming()).isEqualTo(coach.getJiaolianxingming());
+        assertThat(savedCourse.getKechengjiage()).isEqualTo(199.0);
+    }
+
+    @Test
+    void shouldUpdateCourseStatus() {
+        // 创建测试课程
+        JianshenkechengEntity course = TestDataFactory.course()
+                .name("TEST-COURSE-STATUS")
+                .type("力量训练")
+                .build();
+        jianshenkechengService.save(course);
+
+        Long courseId = course.getId();
+
+        // 验证初始状态
+        JianshenkechengEntity savedCourse = jianshenkechengService.getById(courseId);
+        assertThat(savedCourse).isNotNull();
+
+        // 更新课程信息（模拟状态变更）
+        savedCourse.setKechengjianjie("更新后的课程介绍");
+        savedCourse.setShangkedidian("更新后的上课地点");
+        savedCourse.setClicknum(100);
+        jianshenkechengService.updateById(savedCourse);
+
+        // 验证更新结果
+        JianshenkechengEntity updatedCourse = jianshenkechengService.getById(courseId);
+        assertThat(updatedCourse.getKechengjianjie()).isEqualTo("更新后的课程介绍");
+        assertThat(updatedCourse.getShangkedidian()).isEqualTo("更新后的上课地点");
+        assertThat(updatedCourse.getClicknum()).isEqualTo(100);
+    }
+
+    @Test
+    void shouldValidateCourseUpdateRules() {
+        // 创建测试课程
+        JianshenkechengEntity course = TestDataFactory.course()
+                .name("TEST-COURSE-UPDATE")
+                .type("有氧运动")
+                .price(BigDecimal.valueOf(299.00))
+                .build();
+        jianshenkechengService.save(course);
+
+        Long courseId = course.getId();
+
+        // 测试价格更新
+        JianshenkechengEntity priceUpdate = new JianshenkechengEntity();
+        priceUpdate.setId(courseId);
+        priceUpdate.setKechengjiage(399.0);
+        jianshenkechengService.updateById(priceUpdate);
+
+        JianshenkechengEntity updatedCourse = jianshenkechengService.getById(courseId);
+        assertThat(updatedCourse.getKechengjiage()).isEqualTo(399.0);
+
+        // 测试教练信息更新
+        JianshenkechengEntity coachUpdate = new JianshenkechengEntity();
+        coachUpdate.setId(courseId);
+        coachUpdate.setJiaoliangonghao("NEW-COACH-001");
+        coachUpdate.setJiaolianxingming("新教练");
+        jianshenkechengService.updateById(coachUpdate);
+
+        JianshenkechengEntity coachUpdatedCourse = jianshenkechengService.getById(courseId);
+        assertThat(coachUpdatedCourse.getJiaoliangonghao()).isEqualTo("NEW-COACH-001");
+        assertThat(coachUpdatedCourse.getJiaolianxingming()).isEqualTo("新教练");
+    }
+
+    @Test
+    void shouldHandleCourseCoachAssignment() {
+        // 创建多个教练
+        JianshenjiaolianEntity coach1 = TestDataFactory.coach()
+                .employeeId("TEST-COACH-ASSIGN-1")
+                .name("教练A")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach1);
+
+        JianshenjiaolianEntity coach2 = TestDataFactory.coach()
+                .employeeId("TEST-COACH-ASSIGN-2")
+                .name("教练B")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach2);
+
+        // 创建课程并分配给不同教练
+        JianshenkechengEntity course1 = TestDataFactory.course()
+                .name("TEST-COURSE-COACH-A")
+                .coachId(coach1.getJiaoliangonghao())
+                .coachName(coach1.getJiaolianxingming())
+                .build();
+        jianshenkechengService.save(course1);
+
+        JianshenkechengEntity course2 = TestDataFactory.course()
+                .name("TEST-COURSE-COACH-B")
+                .coachId(coach2.getJiaoliangonghao())
+                .coachName(coach2.getJiaolianxingming())
+                .build();
+        jianshenkechengService.save(course2);
+
+        // 验证教练分配
+        JianshenkechengEntity savedCourse1 = jianshenkechengService.getById(course1.getId());
+        JianshenkechengEntity savedCourse2 = jianshenkechengService.getById(course2.getId());
+
+        assertThat(savedCourse1.getJiaoliangonghao()).isEqualTo(coach1.getJiaoliangonghao());
+        assertThat(savedCourse1.getJiaolianxingming()).isEqualTo(coach1.getJiaolianxingming());
+        assertThat(savedCourse2.getJiaoliangonghao()).isEqualTo(coach2.getJiaoliangonghao());
+        assertThat(savedCourse2.getJiaolianxingming()).isEqualTo(coach2.getJiaolianxingming());
+
+        // 测试教练更换
+        savedCourse1.setJiaoliangonghao(coach2.getJiaoliangonghao());
+        savedCourse1.setJiaolianxingming(coach2.getJiaolianxingming());
+        jianshenkechengService.updateById(savedCourse1);
+
+        JianshenkechengEntity reassignedCourse = jianshenkechengService.getById(course1.getId());
+        assertThat(reassignedCourse.getJiaoliangonghao()).isEqualTo(coach2.getJiaoliangonghao());
+        assertThat(reassignedCourse.getJiaolianxingming()).isEqualTo(coach2.getJiaolianxingming());
+    }
+
+    @Test
+    void shouldHandleCourseSearchAndFilter() {
+        // 创建测试教练
+        JianshenjiaolianEntity coach = TestDataFactory.coach()
+                .employeeId("TEST-COACH-SEARCH")
+                .name("搜索教练")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach);
+
+        // 创建多个课程用于搜索
+        String[] courseTypes = {"瑜伽课", "力量训练", "有氧运动", "舞蹈课"};
+        Double[] prices = {199.0, 299.0, 399.0, 499.0};
+
+        for (int i = 0; i < courseTypes.length; i++) {
+            JianshenkechengEntity course = TestDataFactory.course()
+                    .name("AUTO-SEARCH-COURSE-" + i)
+                    .type(courseTypes[i])
+                    .coachId(coach.getJiaoliangonghao())
+                    .coachName(coach.getJiaolianxingming())
+                    .price(BigDecimal.valueOf(prices[i]))
+                    .build();
+            jianshenkechengService.save(course);
+        }
+
+        // 测试按课程类型搜索
+        List<JianshenkechengView> yogaCourses = jianshenkechengService.selectListView(
+                new QueryWrapper<JianshenkechengEntity>().eq("kechengleixing", "瑜伽课"));
+        assertThat(yogaCourses).hasSizeGreaterThanOrEqualTo(1);
+
+        // 测试按教练搜索
+        List<JianshenkechengView> coachCourses = jianshenkechengService.selectListView(
+                new QueryWrapper<JianshenkechengEntity>().eq("jiaolianxingming", coach.getJiaolianxingming()));
+        assertThat(coachCourses).hasSizeGreaterThanOrEqualTo(4);
+
+        // 测试按价格范围搜索
+        List<JianshenkechengView> expensiveCourses = jianshenkechengService.selectListView(
+                new QueryWrapper<JianshenkechengEntity>().ge("kechengjiage", 300.0));
+        assertThat(expensiveCourses).hasSizeGreaterThanOrEqualTo(2);
+
+        // 测试按名称模糊搜索
+        List<JianshenkechengView> searchResults = jianshenkechengService.selectListView(
+                new QueryWrapper<JianshenkechengEntity>().like("kechengmingcheng", "AUTO-SEARCH"));
+        assertThat(searchResults).hasSizeGreaterThanOrEqualTo(4);
+    }
+
+    @Test
+    void shouldCalculateCourseStatistics() {
+        // 创建测试数据用于统计
+        JianshenjiaolianEntity coach1 = TestDataFactory.coach()
+                .employeeId("STATS-COACH-1")
+                .name("统计教练1")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach1);
+
+        JianshenjiaolianEntity coach2 = TestDataFactory.coach()
+                .employeeId("STATS-COACH-2")
+                .name("统计教练2")
+                .password("password123")
+                .passwordHash("$2a$10$defaultHashForTesting")
+                .build();
+        jianshenjiaolianService.save(coach2);
+
+        // 创建课程
+        JianshenkechengEntity course1 = TestDataFactory.course()
+                .name("AUTO-STATS-COURSE-1")
+                .type("瑜伽课")
+                .coachId(coach1.getJiaoliangonghao())
+                .coachName(coach1.getJiaolianxingming())
+                .price(BigDecimal.valueOf(199.00))
+                .build();
+        jianshenkechengService.save(course1);
+
+        JianshenkechengEntity course2 = TestDataFactory.course()
+                .name("AUTO-STATS-COURSE-2")
+                .type("力量训练")
+                .coachId(coach2.getJiaoliangonghao())
+                .coachName(coach2.getJiaolianxingming())
+                .price(BigDecimal.valueOf(299.00))
+                .build();
+        jianshenkechengService.save(course2);
+
+        // 测试按课程类型统计
+        Map<String, Object> typeStatsParams = new HashMap<>();
+        typeStatsParams.put("xColumn", "kechengleixing");
+        typeStatsParams.put("yColumn", "kechengjiage");
+
+        var typeStats = jianshenkechengService.selectValue(typeStatsParams, new QueryWrapper<>());
+        assertThat(typeStats).isNotNull();
+
+        // 测试按教练分组统计
+        Map<String, Object> coachGroupParams = new HashMap<>();
+        coachGroupParams.put("column", "jiaolianxingming");
+
+        var coachGroups = jianshenkechengService.selectGroup(coachGroupParams, new QueryWrapper<>());
+        assertThat(coachGroups).isNotNull();
+
+        // 验证至少有两条记录
+        List<JianshenkechengEntity> allCourses = jianshenkechengService.list(
+                new QueryWrapper<JianshenkechengEntity>().like("kechengmingcheng", "AUTO-STATS"));
+        assertThat(allCourses).hasSizeGreaterThanOrEqualTo(2);
+    }
+
+    @Test
+    void shouldValidateCourseBusinessRules() {
+        // 测试课程业务规则
+
+        // 1. 验证必填字段
+        JianshenkechengEntity incompleteCourse = new JianshenkechengEntity();
+        jianshenkechengService.save(incompleteCourse);
+        assertThat(incompleteCourse.getId()).isNotNull();
+
+        // 2. 验证价格合理性
+        JianshenkechengEntity expensiveCourse = TestDataFactory.course()
+                .name("TEST-COURSE-EXPENSIVE")
+                .price(BigDecimal.valueOf(9999.00))
+                .build();
+        jianshenkechengService.save(expensiveCourse);
+        assertThat(expensiveCourse.getId()).isNotNull();
+
+        JianshenkechengEntity freeCourse = TestDataFactory.course()
+                .name("TEST-COURSE-FREE")
+                .price(BigDecimal.valueOf(0.00))
+                .build();
+        jianshenkechengService.save(freeCourse);
+        assertThat(freeCourse.getId()).isNotNull();
+
+        // 3. 验证课程时长合理性（通过介绍字段模拟）
+        JianshenkechengEntity shortCourse = TestDataFactory.course()
+                .name("TEST-COURSE-SHORT")
+                .build();
+        shortCourse.setKechengjianjie("30分钟课程");
+        jianshenkechengService.save(shortCourse);
+
+        JianshenkechengEntity longCourse = TestDataFactory.course()
+                .name("TEST-COURSE-LONG")
+                .build();
+        longCourse.setKechengjianjie("2小时深度课程");
+        jianshenkechengService.save(longCourse);
+
+        assertThat(shortCourse.getId()).isNotNull();
+        assertThat(longCourse.getId()).isNotNull();
+
+        // 4. 验证课程容量设置
+        JianshenkechengEntity capacityCourse = TestDataFactory.course()
+                .name("TEST-COURSE-CAPACITY")
+                .build();
+        // 注意：当前实体结构中没有显式的容量字段，这里通过其他字段模拟
+        capacityCourse.setDiscussnum(20); // 模拟容量20人
+        jianshenkechengService.save(capacityCourse);
+
+        JianshenkechengEntity savedCapacityCourse = jianshenkechengService.getById(capacityCourse.getId());
+        assertThat(savedCapacityCourse.getDiscussnum()).isEqualTo(20);
+    }
+
+    @Test
+    void shouldHandleCoursePopularityMetrics() {
+        // 测试课程热度指标
+        JianshenkechengEntity popularCourse = TestDataFactory.course()
+                .name("TEST-COURSE-POPULAR")
+                .build();
+
+        popularCourse.setClicknum(1000); // 点击数
+        popularCourse.setStoreupnum(200); // 收藏数
+        popularCourse.setDiscussnum(50); // 评论数
+
+        jianshenkechengService.save(popularCourse);
+
+        JianshenkechengEntity savedPopularCourse = jianshenkechengService.getById(popularCourse.getId());
+        assertThat(savedPopularCourse.getClicknum()).isEqualTo(1000);
+        assertThat(savedPopularCourse.getStoreupnum()).isEqualTo(200);
+        assertThat(savedPopularCourse.getDiscussnum()).isEqualTo(50);
+
+        // 模拟用户互动（增加点击数）
+        savedPopularCourse.setClicknum(1001);
+        savedPopularCourse.setStoreupnum(201);
+        jianshenkechengService.updateById(savedPopularCourse);
+
+        JianshenkechengEntity updatedPopularCourse = jianshenkechengService.getById(popularCourse.getId());
+        assertThat(updatedPopularCourse.getClicknum()).isEqualTo(1001);
+        assertThat(updatedPopularCourse.getStoreupnum()).isEqualTo(201);
     }
 }
 

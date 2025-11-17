@@ -52,7 +52,7 @@ const axios = {
 }
 
 // Default response creators
-export const createMockResponse = (data: any, status = 200, statusText = 'OK') => ({
+export const createMockResponse = (data: unknown, status = 200, statusText = 'OK') => ({
   data,
   status,
   statusText,
@@ -92,7 +92,7 @@ axios.create.mockReturnValue(axios)
 /**
  * Mock GET请求 - 使用统一的响应格式
  */
-export const mockApiGet = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiGet = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.get.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -105,7 +105,7 @@ export const mockApiGet = (url: string, data?: any, options?: { code?: number; m
 /**
  * Mock POST请求 - 使用统一的响应格式
  */
-export const mockApiPost = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiPost = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -118,7 +118,7 @@ export const mockApiPost = (url: string, data?: any, options?: { code?: number; 
 /**
  * Mock PUT请求 - 使用统一的响应格式
  */
-export const mockApiPut = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiPut = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.put.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -131,7 +131,7 @@ export const mockApiPut = (url: string, data?: any, options?: { code?: number; m
 /**
  * Mock DELETE请求 - 使用统一的响应格式
  */
-export const mockApiDelete = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiDelete = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createApiResponse(data, { code: 0, msg: 'success', ...options })
   axios.delete.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -144,7 +144,7 @@ export const mockApiDelete = (url: string, data?: any, options?: { code?: number
 /**
  * Mock列表查询 - 使用分页响应格式
  */
-export const mockApiList = (url: string, items: any[], pagination?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiList = (url: string, items: unknown[], pagination?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createListResponse(items, pagination, options)
   axios.get.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -157,7 +157,7 @@ export const mockApiList = (url: string, items: any[], pagination?: any, options
 /**
  * Mock详情查询
  */
-export const mockApiDetail = (url: string, data: any, options?: { code?: number; msg?: string }) => {
+export const mockApiDetail = (url: string, data: unknown, options?: { code?: number; msg?: string }) => {
   const response = createDetailResponse(data, options?.msg || '获取成功')
   axios.get.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -170,7 +170,7 @@ export const mockApiDetail = (url: string, data: any, options?: { code?: number;
 /**
  * Mock创建操作
  */
-export const mockApiCreate = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiCreate = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createCreateResponse(data, options?.msg || '创建成功')
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -183,7 +183,7 @@ export const mockApiCreate = (url: string, data?: any, options?: { code?: number
 /**
  * Mock更新操作
  */
-export const mockApiUpdate = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiUpdate = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createUpdateResponse(data, options?.msg || '更新成功')
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -196,7 +196,7 @@ export const mockApiUpdate = (url: string, data?: any, options?: { code?: number
 /**
  * Mock删除操作
  */
-export const mockApiRemove = (url: string, data?: any, options?: { code?: number; msg?: string }) => {
+export const mockApiRemove = (url: string, data?: unknown, options?: { code?: number; msg?: string }) => {
   const response = createDeleteResponse(data?.count, options?.msg || '删除成功')
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -209,7 +209,7 @@ export const mockApiRemove = (url: string, data?: any, options?: { code?: number
 /**
  * Mock登录
  */
-export const mockApiLogin = (url: string, token: string, user: any, options?: { code?: number; msg?: string }) => {
+export const mockApiLogin = (url: string, token: string, user: unknown, options?: { code?: number; msg?: string }) => {
   const response = createLoginResponse(token, user, options?.msg || '登录成功')
   axios.post.mockImplementation((requestUrl: string) => {
     if (requestUrl === url || requestUrl.includes(url)) {
@@ -239,9 +239,9 @@ export const mockApiError = (url: string, code = 500, msg = '操作失败', erro
 /**
  * Mock成功响应（通用）
  */
-export const mockApiSuccess = (method: string, url: string, data?: any, msg = '操作成功') => {
+export const mockApiSuccess = (method: string, url: string, data?: unknown, msg = '操作成功') => {
   const response = createSuccessResponse(data, msg)
-  const axiosMethod = (axios as any)[method.toLowerCase()]
+  const axiosMethod = (axios as Record<string, (...args: unknown[]) => unknown>)[method.toLowerCase()]
 
   if (axiosMethod) {
     axiosMethod.mockImplementation((requestUrl: string) => {

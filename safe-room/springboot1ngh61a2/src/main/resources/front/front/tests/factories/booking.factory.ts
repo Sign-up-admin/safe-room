@@ -1,7 +1,23 @@
 import { faker } from '@faker-js/faker'
 import { createMockUser } from './user.factory'
 import { createMockCourse } from './course.factory'
-import type { validateApiResponse } from '../../../../../../../../tests/shared/types/api-response.types'
+
+export interface User {
+  id: number
+  username: string
+  email: string
+  phone?: string
+  avatar?: string
+}
+
+export interface Course {
+  id: number
+  name: string
+  description: string
+  duration: number
+  price: number
+  category: string
+}
 
 export interface Booking {
   id: number
@@ -13,8 +29,8 @@ export interface Booking {
   notes?: string
   createTime: string
   updateTime?: string
-  user?: any
-  course?: any
+  user?: User
+  course?: Course
 }
 
 /**

@@ -1,5 +1,4 @@
 import { faker } from '@faker-js/faker'
-import type { validateApiResponse, validatePageResult } from '../../../../../../../../tests/shared/types/api-response.types'
 
 export interface Course {
   id: number

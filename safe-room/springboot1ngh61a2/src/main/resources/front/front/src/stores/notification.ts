@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import type { Notification, NotificationPreferences, NotificationStats, NotificationStatus, NotificationType, NotificationChannel } from '@/types/notification'
+import type { Notification, NotificationPreferences, NotificationStats } from '@/types/notification'
+import { NotificationStatus, NotificationType, NotificationChannel } from '@/types/notification'
 
 // Node.js 环境变量类型声明
 declare const process: {

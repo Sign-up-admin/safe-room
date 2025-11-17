@@ -59,14 +59,14 @@ describe('错误处理工具', () => {
       expect(errors[0].componentName).toBe('TestComponent')
     })
 
-    it('应该处理字符串错�?, () => {
+      it('应该处理字符串错误', () => {
       vueErrorHandler('String error', null, 'render')
       const errors = getStoredErrors()
       expect(errors.length).toBe(1)
       expect(errors[0].message).toContain('String error')
     })
 
-    it('应该处理未知类型的错�?, () => {
+    it('应该处理未知类型的错�?, () => {
       vueErrorHandler({ toString: () => 'Unknown error' }, null, 'render')
       const errors = getStoredErrors()
       expect(errors.length).toBe(1)
@@ -170,7 +170,7 @@ describe('错误处理工具', () => {
       expect(errors).toEqual([])
     })
 
-    it('应该返回存储的错�?, () => {
+    it('应该返回存储的错�?, () => {
       vueErrorHandler(new Error('Test'), null, 'render')
       const errors = getStoredErrors()
       expect(errors.length).toBe(1)
@@ -184,7 +184,7 @@ describe('错误处理工具', () => {
   })
 
   describe('clearStoredErrors', () => {
-    it('应该清除存储的错�?, () => {
+    it('应该清除存储的错�?, () => {
       vueErrorHandler(new Error('Test'), null, 'render')
       clearStoredErrors()
       const errors = getStoredErrors()
@@ -193,7 +193,7 @@ describe('错误处理工具', () => {
   })
 
   describe('错误去重', () => {
-    it('5秒内相同错误应该只记录一�?, () => {
+    it('5秒内相同错误应该只记录一�?, () => {
       vi.useFakeTimers()
       const error = new Error('Same error')
       
@@ -222,14 +222,14 @@ describe('错误处理工具', () => {
   })
 
   describe('错误数量限制', () => {
-    it('应该只保留最�?0条错�?, () => {
+    it('应该只保留最�?0条错�?, () => {
       for (let i = 0; i < 60; i++) {
         vueErrorHandler(new Error(`Error ${i}`), null, 'render')
       }
       
       const errors = getStoredErrors()
       expect(errors.length).toBe(50)
-      // 应该保留最新的50�?
+      // 应该保留最新的50�?
       expect(errors[0].message).toContain('Error 10')
     })
   })

@@ -40,7 +40,7 @@ describe('Menu工具', () => {
       expect(vi.mocked(getMenuList)).toHaveBeenCalled()
     })
 
-    it('应该返回正确的菜单结�?, () => {
+      it('应该返回正确的菜单结构', () => {
       const result = menu.list()
       expect(result[0]).toHaveProperty('roleName')
       expect(result[0]).toHaveProperty('backMenu')

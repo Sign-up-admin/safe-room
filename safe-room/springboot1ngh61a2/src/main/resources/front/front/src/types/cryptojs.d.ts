@@ -1,10 +1,18 @@
 declare module '@/common/cryptojs.js' {
   export interface WordArray {
-    toString(encoder?: any): string
+    toString(encoder?: Encoder): string
+    words: number[]
+    sigBytes: number
   }
 
   export interface CipherParams {
     ciphertext: WordArray
+    key?: WordArray
+    iv?: WordArray
+    salt?: WordArray
+    algorithm?: string
+    mode?: ModeInstance
+    padding?: PadInstance
   }
 
   export interface Encoder {
@@ -20,30 +28,38 @@ declare module '@/common/cryptojs.js' {
     parse(str: string): WordArray
   }
 
+  export interface ModeInstance {
+    name: string
+  }
+
   export interface Mode {
-    ECB: any
-    CBC: any
+    ECB: ModeInstance
+    CBC: ModeInstance
+  }
+
+  export interface PadInstance {
+    name: string
   }
 
   export interface Pad {
-    Pkcs7: any
+    Pkcs7: PadInstance
   }
 
   export interface DES {
-    encrypt(message: string | WordArray, key: WordArray, cfg?: { mode?: any; padding?: any }): CipherParams
-    decrypt(ciphertext: string | CipherParams, key: WordArray, cfg?: { mode?: any; padding?: any }): WordArray
+    encrypt(message: string | WordArray, key: WordArray, cfg?: { mode?: ModeInstance; padding?: PadInstance }): CipherParams
+    decrypt(ciphertext: string | CipherParams, key: WordArray, cfg?: { mode?: ModeInstance; padding?: PadInstance }): WordArray
   }
 
   export interface AES {
     encrypt(
       message: string | WordArray,
       key: WordArray,
-      cfg?: { mode?: any; padding?: any; iv?: WordArray },
+      cfg?: { mode?: ModeInstance; padding?: PadInstance; iv?: WordArray },
     ): CipherParams
     decrypt(
       ciphertext: string | CipherParams,
       key: WordArray,
-      cfg?: { mode?: any; padding?: any; iv?: WordArray },
+      cfg?: { mode?: ModeInstance; padding?: PadInstance; iv?: WordArray },
     ): WordArray
   }
 
