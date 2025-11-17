@@ -88,7 +88,7 @@ const submitting = ref(false)
 const replyRecord = ref<Record<string, any> | null>(null)
 
 // Chat过滤表单
-const chatFilterForm = reactive({
+let chatFilterForm = reactive({
   isreply: null as number | null,
   ask: '',
 })

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import storage from '@/utils/storage'
+import { tokenStorage } from '@/utils/secureStorage'
 
 /**
  * 全局错误处理工具
@@ -693,8 +695,6 @@ export class ErrorHandlerService {
 
   private clearAuthAndRedirect(loginPath: string): void {
     // 清除认证信息
-    const tokenStorage = require('@/utils/secureStorage').tokenStorage
-    const storage = require('@/utils/storage')
 
     tokenStorage.clearToken()
     storage.remove('Token')

@@ -3,6 +3,7 @@ import router from '@/router/index'
 import storage from '@/utils/storage'
 import { tokenStorage } from '@/utils/secureStorage'
 import { getOrCreateCsrfToken, CSRF_TOKEN_HEADER } from '@/utils/csrf'
+import { errorHandler } from '@/utils/errorHandler'
 
 export interface ApiResponse<T extends Record<string, unknown> = Record<string, unknown>> {
   code: number
@@ -71,8 +72,6 @@ http.interceptors.request.use(
 // Response interceptor
 http.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
-    // 导入错误处理器
-    const { errorHandler } = require('@/utils/errorHandler')
 
     if (response.data) {
       const code = response.data.code
@@ -119,8 +118,6 @@ http.interceptors.response.use(
     return response
   },
   (error: AxiosError<ApiResponse>) => {
-    // 导入错误处理器
-    const { errorHandler } = require('@/utils/errorHandler')
 
     // 处理HTTP错误和网络错误
     const status = error.response?.status

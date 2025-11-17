@@ -184,7 +184,7 @@ const uploading = ref(false)
 const previewVisible = ref(false)
 const previewAsset = ref<FormModel | null>(null)
 const assetBaseUrl = base.get().url
-const filterForm = reactive<{
+let filterForm = reactive<{
   keyword: string
   assetType: string
   module: string
