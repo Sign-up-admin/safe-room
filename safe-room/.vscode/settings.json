@@ -21,5 +21,26 @@
     "[javascript]":  {
                          "editor.defaultFormatter":  "dbaeumer.vscode-eslint"
                      },
-    "git.path":  "C:\\Users\\李\\AppData\\Local\\GitHubDesktop\\app-3.5.4\\resources\\app\\git\\cmd\\git.exe"
+    "git.path":  "C:\\Users\\李\\AppData\\Local\\GitHubDesktop\\app-3.5.4\\resources\\app\\git\\cmd\\git.exe",
+    // 禁用自动文件跟踪和监视
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/build/**": true
+    },
+    "files.watchFiles": "off",
+    "files.autoSave": "off",
+    "files.autoSaveDelay": 0,
+    "files.hotExit": "off",
+    "files.useExperimentalFileWatcher": false,
+    "files.saveConflictResolution": "overwriteFileOnDisk",
+    // 禁用自动刷新
+    "files.refreshOnWindowFocus": false,
+    "files.refreshOnActivate": false,
+    // 禁用Git自动刷新
+    "git.autoRefresh": false,
+    "git.enableSmartCommit": false,
+    "git.autofetch": false
 }
