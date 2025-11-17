@@ -43,6 +43,13 @@
     "test:e2e:ui": "npm run check:all && npm run build:check && playwright test --ui",
     "test:e2e:debug": "npm run check:all && npm run build:check && playwright test --debug",
     "test:e2e:report": "playwright show-report",
+    "test:e2e:phased": "node ../../../../phased-e2e-execution-manager.js --projects=front",
+    "test:e2e:phased:serial": "node ../../../../phased-e2e-execution-manager.js --projects=front --serial",
+    "test:e2e:phased:parallel": "node ../../../../phased-e2e-execution-manager.js --projects=front --fast",
+    "test:e2e:phased:fast": "node ../../../../phased-e2e-execution-manager.js --projects=front --fast --max-parallel=6",
+    "test:quality": "node ../../../../check-test-quality.js front",
+    "test:quality:fix": "node ../../../../check-test-quality.js --fix front",
+    "test:quality:strict": "node ../../../../check-test-quality.js --strict front",
     "prepare": "husky install || true"
   },
   "dependencies": {

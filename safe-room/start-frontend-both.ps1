@@ -123,8 +123,9 @@ try {
     $processInfoPath = Join-Path $logDir "frontend-processes-$timestamp.json"
     $processInfo | ConvertTo-Json -Depth 5 | Set-Content $processInfoPath
     Write-Log "进程信息已保存到: $processInfoPath" "INFO"
-    
-} catch {
+}
+
+catch {
     Write-Log "启动过程中发生错误: $($_.Exception.Message)" "ERROR"
     Write-Host $_.Exception.StackTrace -ForegroundColor Red
     exit 1

@@ -169,5 +169,184 @@ export class TrainerBookingPage {
 
     return ''
   }
+
+  async searchTrainers(searchTerm: string): Promise<void> {
+    const searchInput = this.page.locator('input[placeholder*="搜索"], input[name="search"], .search-input')
+
+    if (await searchInput.count() > 0) {
+      await searchInput.clear()
+      await searchInput.fill(searchTerm)
+      await this.page.keyboard.press('Enter')
+      await this.page.waitForTimeout(1000) // Wait for search results
+
+      logTestStep(`搜索教练: ${searchTerm}`)
+    } else {
+      logTestStep('无教练搜索功能')
+    }
+  }
+
+  async applyTrainerFilter(filterType: 'specialty' | 'price' | 'rating' | 'experience', value: string): Promise<void> {
+    const filterMap = {
+      specialty: ['select[name*="specialty"]', '.specialty-filter', '[name*="zhuan"]'],
+      price: ['select[name*="price"]', '.price-filter', '[name*="jiage"]'],
+      rating: ['select[name*="rating"]', '.rating-filter', '[name*="pingfen"]'],
+      experience: ['select[name*="experience"]', '.experience-filter', '[name*="jingyan"]']
+    }
+
+    const selectors = filterMap[filterType]
+
+    for (const selector of selectors) {
+      try {
+        const filterElement = this.page.locator(selector)
+        if (await filterElement.count() > 0) {
+          if (selector.includes('select')) {
+            await filterElement.selectOption(value)
+          } else {
+            await this.page.locator(`${selector}:has-text("${value}")`).click()
+          }
+
+          await this.page.waitForTimeout(500) // Wait for filter to apply
+          logTestStep(`应用教练${filterType}筛选: ${value}`)
+          return
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    logTestStep(`教练${filterType}筛选器不可用`)
+  }
+
+  async selectTrainerPackage(index = 0): Promise<void> {
+    const packageSelectors = [
+      '.package-card',
+      '.plan-card',
+      '.pricing-card',
+      '[class*="package"]'
+    ]
+
+    for (const selector of packageSelectors) {
+      try {
+        const packages = this.page.locator(selector)
+        const count = await packages.count()
+        if (count > index) {
+          await packages.nth(index).click()
+          logTestStep(`选择教练套餐 ${index + 1}`)
+          return
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    logTestStep('无教练套餐选择')
+  }
+
+  async selectTrainerGoal(goal: string): Promise<void> {
+    const goalSelectors = [
+      `button:has-text("${goal}")`,
+      `.goal-item:has-text("${goal}")`,
+      `.target:has-text("${goal}")`,
+      `[data-goal="${goal}"]`
+    ]
+
+    for (const selector of goalSelectors) {
+      try {
+        const goalElement = this.page.locator(selector)
+        if (await goalElement.count() > 0) {
+          await goalElement.click()
+          logTestStep(`选择训练目标: ${goal}`)
+          return
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    logTestStep(`训练目标 ${goal} 不可用`)
+  }
+
+  async getTrainerInfo(index = 0): Promise<{
+    name: string,
+    specialty: string,
+    rating: string,
+    experience: string,
+    price: string
+  }> {
+    const trainerSelectors = [
+      '.trainer-card',
+      '.coach-card',
+      '.trainer-item'
+    ]
+
+    for (const selector of trainerSelectors) {
+      try {
+        const trainers = this.page.locator(selector)
+        const count = await trainers.count()
+        if (count > index) {
+          const trainer = trainers.nth(index)
+
+          const name = await trainer.locator('.trainer-name, .coach-name, .name').textContent() || ''
+          const specialty = await trainer.locator('.specialty, .zhuan, [class*="special"]').textContent() || ''
+          const rating = await trainer.locator('.rating, .score, [class*="rating"]').textContent() || ''
+          const experience = await trainer.locator('.experience, .years, [class*="exp"]').textContent() || ''
+          const price = await trainer.locator('.price, .trainer-price, [class*="price"]').textContent() || ''
+
+          return { name, specialty, rating, experience, price }
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    return { name: '', specialty: '', rating: '', experience: '', price: '' }
+  }
+
+  async checkTimeConflict(): Promise<boolean> {
+    const conflictSelectors = [
+      '.time-conflict',
+      '.conflict-message',
+      '.time-unavailable',
+      'text=时间冲突',
+      'text=已被预约'
+    ]
+
+    for (const selector of conflictSelectors) {
+      try {
+        const conflictElement = this.page.locator(selector)
+        if (await conflictElement.isVisible()) {
+          return true
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    return false
+  }
+
+  async selectAvailableTimeSlot(): Promise<boolean> {
+    const availableSelectors = [
+      '.time-slot:not([disabled]):not(.booked):not(.conflict)',
+      '.calendar-slot:not([disabled]):not(.booked)',
+      '[class*="available"]:not([disabled])'
+    ]
+
+    for (const selector of availableSelectors) {
+      try {
+        const availableSlots = this.page.locator(selector)
+        const count = await availableSlots.count()
+        if (count > 0) {
+          await availableSlots.first().click()
+          logTestStep('选择可用时间段')
+          return true
+        }
+      } catch (error) {
+        // Try next selector
+      }
+    }
+
+    return false
+  }
 }
 

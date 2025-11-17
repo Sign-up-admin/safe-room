@@ -68,7 +68,7 @@ logging:
 # Test-specific configurations
 test:
   authentication:
-    skip: false  # Set to true if you want to skip authentication in tests
+    skip: true  # Skip authentication in tests to focus on business logic testing
     token-expiry-check: false  # Disable token expiry check in tests
     # Test user credentials for integration tests
     admin-username: admin

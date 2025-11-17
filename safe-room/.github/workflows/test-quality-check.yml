@@ -1,0 +1,154 @@
+name: Test Quality Check
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/**/tests/**'
+      - 'check-test-quality.js'
+      - 'phased-e2e-execution-manager.js'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/**/tests/**'
+      - 'check-test-quality.js'
+      - 'phased-e2e-execution-manager.js'
+
+jobs:
+  test-quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'springboot1ngh61a2/src/main/resources/front/front/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm ci
+
+    - name: Run test quality check
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm run test:quality:strict
+
+    - name: Run test quality check with auto-fix (if failed)
+      if: failure()
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm run test:quality:fix
+
+    - name: Check for test quality issues
+      run: |
+        if [ -f "test-quality-issues.json" ]; then
+          echo "Test quality issues found:"
+          cat test-quality-issues.json
+          exit 1
+        else
+          echo "✅ All test quality checks passed!"
+        fi
+
+    - name: Upload test quality report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-quality-report
+        path: |
+          test-quality-report.html
+          test-quality-issues.json
+        retention-days: 30
+
+  e2e-smoke-test:
+    runs-on: ubuntu-latest
+    needs: test-quality-check
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'springboot1ngh61a2/src/main/resources/front/front/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npx playwright install --with-deps
+
+    - name: Run smoke tests
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm run test:e2e -- --grep "login" --max-failures=1
+
+    - name: Upload smoke test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: smoke-test-results
+        path: |
+          springboot1ngh61a2/src/main/resources/front/front/playwright-report/
+          springboot1ngh61a2/src/main/resources/front/front/test-results/
+        retention-days: 30
+
+  performance-baseline-check:
+    runs-on: ubuntu-latest
+    needs: e2e-smoke-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'springboot1ngh61a2/src/main/resources/front/front/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm ci
+
+    - name: Install Playwright browsers
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npx playwright install --with-deps
+
+    - name: Run performance baseline test
+      run: |
+        cd springboot1ngh61a2/src/main/resources/front/front
+        npm run test:e2e -- tests/e2e/pages.spec.ts --reporter=json > performance-baseline.json
+
+    - name: Check performance regression
+      run: |
+        # 这里可以添加性能回归检查逻辑
+        # 比较当前性能指标与基准线
+        if [ -f "performance-baseline.json" ]; then
+          echo "Performance baseline captured"
+          # TODO: 实现性能回归检测
+        fi
+
+    - name: Upload performance baseline
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-baseline
+        path: |
+          springboot1ngh61a2/src/main/resources/front/front/performance-baseline.json
+        retention-days: 30

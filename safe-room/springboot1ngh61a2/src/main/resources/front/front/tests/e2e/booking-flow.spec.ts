@@ -6,7 +6,7 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { logTestStep } from '../utils/shared-helpers'
+import { logTestStep, setupTestDataIsolation } from '../utils/shared-helpers'
 import { setupBookingScenario } from '../utils/e2e-test-setup'
 import {
   waitForPageFullyLoaded,
@@ -15,11 +15,27 @@ import {
   waitForElementReady
 } from '../utils/wait-helpers'
 import { selectors } from '../utils/selectors'
+import { testData } from '../utils/test-data-manager'
 
 test.describe('预约流程E2E测试', () => {
+  let testId: string
+  let cleanupData: () => Promise<void>
+
   test.beforeEach(async ({ page }) => {
+    // 设置测试数据隔离
+    const isolation = await setupTestDataIsolation(page, { title: 'booking-flow-test' })
+    testId = isolation.testId
+    cleanupData = isolation.cleanup
+
     // 使用预设的预约场景设置，包含完整的Mock和会话配置
     await setupBookingScenario(page)
+  })
+
+  test.afterEach(async ({ page }) => {
+    // 清理测试数据
+    if (cleanupData) {
+      await cleanupData()
+    }
   })
 
   test('课程预约完整流程', async ({ page }) => {
@@ -94,15 +110,21 @@ test.describe('预约流程E2E测试', () => {
       const bookingForm = page.getByTestId(selectors.booking.infoForm)
       await waitForElementReady(bookingForm)
 
+      // 使用隔离的测试用户数据
+      const testUser = testData.createUser(testId, {
+        username: `booking_test_user_${Date.now()}`,
+        phone: `138001${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`
+      })
+
       // 使用稳定的data-testid选择器填写表单
       const nameInput = page.getByTestId(selectors.booking.nameInput)
       await waitForElementReady(nameInput)
-      await nameInput.fill('测试用户')
+      await nameInput.fill(testUser.username)
       await logTestStep('填写姓名')
 
       const phoneInput = page.getByTestId(selectors.booking.phoneInput)
       await waitForElementReady(phoneInput)
-      await phoneInput.fill('13800138000')
+      await phoneInput.fill(testUser.phone!)
       await logTestStep('填写手机号')
 
       // 勾选协议复选框
@@ -163,11 +185,11 @@ test.describe('预约流程E2E测试', () => {
     const conflictSlots = page.locator('.calendar-slot--conflict')
     if (await conflictSlots.count() > 0) {
       await conflictSlots.first().click()
-      await page.waitForTimeout(500)
 
-      // 验证冲突提示
+      // 使用智能等待验证冲突提示
       const conflictMessage = page.locator('text=冲突, text=时间冲突')
-      await expect(conflictMessage.first()).toBeVisible({ timeout: 3000 })
+      await waitForElementReady(conflictMessage.first())
+      await expect(conflictMessage.first()).toBeVisible()
     }
   })
 
@@ -180,45 +202,45 @@ test.describe('预约流程E2E测试', () => {
     const coachCards = page.locator('.coach-card')
     if (await coachCards.count() > 0) {
       await coachCards.first().click()
-      await page.waitForTimeout(500)
+      await waitForElementStable(coachCards.first())
     }
 
     // 步骤2: 选择目标和套餐
     const nextButton = page.locator('button:has-text("下一步")').first()
     if (await nextButton.isEnabled()) {
       await nextButton.click()
-      await page.waitForTimeout(500)
+      await waitForPageFullyLoaded(page)
     }
 
-    await expect(page.locator('text=设定目标')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=设定目标')).toBeVisible()
     const packageCards = page.locator('.package-card')
     if (await packageCards.count() > 0) {
       await packageCards.first().click()
-      await page.waitForTimeout(500)
+      await waitForElementStable(packageCards.first())
     }
 
     // 步骤3: 选择时间
     const nextButton2 = page.locator('button:has-text("下一步")').nth(1)
     if (await nextButton2.isEnabled()) {
       await nextButton2.click()
-      await page.waitForTimeout(500)
+      await waitForPageFullyLoaded(page)
     }
 
-    await expect(page.locator('text=安排私教时间')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=安排私教时间')).toBeVisible()
     const timeSlots = page.locator('.calendar-slot:not([disabled])').first()
     if (await timeSlots.count() > 0) {
       await timeSlots.click()
-      await page.waitForTimeout(500)
+      await waitForElementStable(timeSlots)
     }
 
     // 步骤4: 确认支付
     const nextButton3 = page.locator('button:has-text("下一步")').nth(2)
     if (await nextButton3.isEnabled()) {
       await nextButton3.click()
-      await page.waitForTimeout(500)
+      await waitForPageFullyLoaded(page)
     }
 
-    await expect(page.locator('text=确认预约')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=确认预约')).toBeVisible()
     await page.fill('input[placeholder*="姓名"], input[placeholder*="联系人"]', '测试用户')
     await page.fill('input[placeholder*="手机"], input[placeholder*="电话"]', '13800138000')
     await page.check('input[type="checkbox"]')
@@ -226,7 +248,10 @@ test.describe('预约流程E2E测试', () => {
     const submitButton = page.locator('button:has-text("提交预约")')
     if (await submitButton.isEnabled()) {
       await submitButton.click()
-      await page.waitForTimeout(1000)
+      await waitForFormSubmission(page, {
+        successSelectors: ['text=预约成功'],
+        errorSelectors: ['text=失败', 'text=错误']
+      })
     }
 
     // 验证成功提示
@@ -235,7 +260,7 @@ test.describe('预约流程E2E测试', () => {
 
   test('支付流程测试', async ({ page }) => {
     await page.goto('/#/index/pay?amount=100&tableName=kechengyuyue&recordId=1&title=测试订单')
-    await page.waitForLoadState('networkidle')
+    await waitForPageFullyLoaded(page)
 
     // 验证订单信息显示
     await expect(page.locator('text=¥100')).toBeVisible()
@@ -245,18 +270,21 @@ test.describe('预约流程E2E测试', () => {
     const paymentMethods = page.locator('.payment-method')
     if (await paymentMethods.count() > 0) {
       await paymentMethods.first().click()
-      await page.waitForTimeout(500)
+      await waitForElementStable(paymentMethods.first())
     }
 
     // 确认支付
     const payButton = page.locator('button:has-text("确认支付")')
     if (await payButton.isEnabled()) {
       await payButton.click()
-      await page.waitForTimeout(1000)
+      await waitForFormSubmission(page, {
+        successSelectors: ['text=支付成功', 'text=支付完成'],
+        errorSelectors: ['text=支付失败', 'text=支付错误']
+      })
     }
 
     // 验证支付状态显示
-    await expect(page.locator('text=等待支付结果, text=支付中')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=等待支付结果, text=支付中')).toBeVisible()
   })
 })
 

@@ -1,437 +1,124 @@
 ﻿<template>
   <div class="login-page">
+    <!-- 背景层 -->
     <div class="login-background">
-      <div class="background-pattern"></div>
+      <div class="background-base"></div>
       <div class="background-gradient"></div>
     </div>
 
-    <div class="login-container">
-      <el-card class="login-card" shadow="always">
-        <div class="login-card__header">
-          <div class="logo-section">
-            <div class="logo-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 2L2 7L12 12L22 7L12 2Z"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M2 17L12 22L22 17"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M2 12L12 17L22 12"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
-            <p class="eyebrow">GYM ADMIN</p>
-            <h1>管理后台登录</h1>
-            <p class="subtitle">使用管理员或教练账号登录后台系统</p>
-          </div>
-        </div>
+    <!-- 关闭按钮 -->
+    <div class="dismiss-button-wrapper">
+      <button
+        type="button"
+        class="dismiss-button"
+        title="关闭"
+        @click="handleClose"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="dismiss-icon">
+          <path d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"></path>
+        </svg>
+      </button>
+    </div>
 
-        <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="login-form">
-          <el-form-item label="账号" prop="username">
-            <el-input
-              v-model="form.username"
-              placeholder="请输入账号"
-              autocomplete="username"
-              clearable
-              size="large"
-              prefix-icon="User"
-              @keyup.enter="handleLogin"
-            />
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input
-              v-model="form.password"
-              placeholder="请输入密码"
-              type="password"
-              show-password
-              autocomplete="current-password"
-              size="large"
-              prefix-icon="Lock"
-              @keyup.enter="handleLogin"
-            />
-          </el-form-item>
-          <el-form-item>
-            <div class="form-options">
-              <el-checkbox v-model="rememberAccount">记住账号</el-checkbox>
-              <span class="security-tip">建议在个人设备上使用</span>
-            </div>
-          </el-form-item>
-          <el-form-item v-if="roleOptions.length > 1" label="登录身份" prop="roleName">
-            <el-radio-group v-model="form.roleName" class="role-radio-group">
-              <el-radio-button v-for="role in roleOptions" :key="role.roleName" :value="role.roleName">
-                {{ role.roleName }}
-              </el-radio-button>
-            </el-radio-group>
-          </el-form-item>
-          <el-button type="primary" class="submit-btn" size="large" :loading="submitting" @click="handleLogin">
-            <span v-if="!submitting">立即登录</span>
-            <span v-else>登录中...</span>
-          </el-button>
-        </el-form>
+    <!-- 主要内容区域 -->
+    <div class="login-content">
+      <div class="login-container">
+        <h1 class="login-title">Meet your AI companion</h1>
+        <p class="login-subtitle">
+          Create an account or sign in to keep all your conversations and to generate images
+        </p>
 
-        <div class="login-footer">
-          <div class="footer-links">
-            <a href="#" class="footer-link" @click.prevent="handleForgotPassword">找回密码</a>
-            <span class="divider">|</span>
-            <a href="/front" class="footer-link">前往门户</a>
-            <span class="divider">|</span>
-            <a href="#" class="footer-link" @click.prevent="handleSupport">技术支持</a>
-          </div>
-          <p class="security-tip-footer">建议使用企业网络，请勿在公共设备保存密码</p>
+        <div class="login-buttons">
+          <button
+            type="button"
+            class="social-button microsoft-button"
+            title="Continue with Microsoft"
+            @click="handleSocialLogin('microsoft')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 24" class="social-icon">
+              <path fill="#F25022" d="M12.05 3H3.5v8.55h8.55V3Z"></path>
+              <path fill="#7FBA00" d="M21.5 3h-8.55v8.55h8.55V3Z"></path>
+              <path fill="#00A4EF" d="M12.05 12.45H3.5V21h8.55v-8.55Z"></path>
+              <path fill="#FFB900" d="M21.5 12.45h-8.55V21h8.55v-8.55Z"></path>
+            </svg>
+            Continue with Microsoft
+          </button>
+
+          <button
+            type="button"
+            class="social-button apple-button"
+            title="Continue with Apple"
+            @click="handleSocialLogin('apple')"
+          >
+            <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="social-icon">
+              <path d="M16.289 7.53846C17.3723 7.53846 18.7302 6.8061 19.5389 5.82962C20.2712 4.94469 20.8053 3.70884 20.8053 2.47298C20.8053 2.30515 20.79 2.13732 20.7595 2C19.5541 2.04577 18.1047 2.80865 17.235 3.8309C16.5484 4.60903 15.9229 5.82963 15.9229 7.08074C15.9229 7.26383 15.9534 7.44692 15.9686 7.50795C16.0449 7.5232 16.167 7.53846 16.289 7.53846ZM12.4747 26C13.9547 26 14.6107 25.0083 16.4569 25.0083C18.3335 25.0083 18.7455 25.9695 20.3933 25.9695C22.0106 25.9695 23.0939 24.4743 24.1161 23.0095C25.2604 21.3312 25.7334 19.6834 25.7639 19.6071C25.6571 19.5766 22.5599 18.3102 22.5599 14.7552C22.5599 11.6732 25.0011 10.2848 25.1384 10.178C23.5211 7.85887 21.0646 7.79784 20.3933 7.79784C18.5777 7.79784 17.0977 8.89638 16.167 8.89638C15.16 8.89638 13.8326 7.85887 12.2611 7.85887C9.27061 7.85887 6.23438 10.3306 6.23438 14.9994C6.23438 17.8983 7.36343 20.965 8.75186 22.9485C9.94194 24.6268 10.9794 26 12.4747 26Z"></path>
+            </svg>
+            Continue with Apple
+          </button>
+
+          <button
+            type="button"
+            class="social-button google-button"
+            title="Continue with Google"
+            @click="handleSocialLogin('google')"
+          >
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="social-icon">
+              <path d="M29.546 13.667H16.6074V19.1073H24.0425C23.6865 20.781 22.7411 22.2039 21.3419 23.1773V26.6204H25.6809C28.2662 24.1829 29.754 20.5792 29.754 16.3183C29.754 15.4014 29.6798 14.5178 29.546 13.667Z" fill="#4285F4"></path>
+              <path d="M25.6811 26.6202L24.1728 25.4233L21.3422 23.1771C20.0963 24.0439 18.4918 24.5553 16.6077 24.5553C13.0066 24.5553 9.94929 22.0813 8.84297 18.7412H4.37549V22.2862C6.62805 26.8602 11.2579 29.9995 16.6077 29.9995C20.3024 29.9995 23.4137 28.7583 25.6811 26.6202Z" fill="#34A853"></path>
+              <path d="M8.84338 18.7412C8.55701 17.8759 8.39918 16.9539 8.39918 16C8.39918 15.0465 8.55701 14.1245 8.84338 13.2592V9.71387H4.37549C3.44448 11.6046 2.91699 13.7387 2.91699 16C2.91699 18.2617 3.44448 20.3958 4.37549 22.2865L8.84338 18.7412Z" fill="#FBBC05"></path>
+              <path d="M21.9211 9.56791L25.7683 5.64882C23.3952 3.38751 20.301 2 16.6078 2C11.258 2 6.62807 5.13939 4.37549 9.71335L8.843 13.2583C9.94932 9.91789 13.0066 7.44426 16.6078 7.44426C18.6489 7.44426 20.4778 8.1629 21.9211 9.56791Z" fill="#EA4335"></path>
+            </svg>
+            Continue with Google
+          </button>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts" name="Login">
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
-import http from '@/utils/http'
-import menu from '@/utils/menu'
-import storage from '@/utils/storage'
-import { tokenStorage } from '@/utils/secureStorage'
-import { validateInput, containsSqlInjection, containsXss } from '@/utils/validator'
-
-interface RoleOption {
-  roleName: string
-  tableName: string
-}
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const formRef = ref<FormInstance>()
-const submitting = ref(false)
-const roleOptions = ref<RoleOption[]>([])
 
-const rememberAccount = ref(storage.get('rememberAccountFlag') === 'true')
-const form = reactive({
-  username: '',
-  password: '',
-  roleName: '',
-})
-
-const rules: FormRules<typeof form> = {
-  username: [
-    { required: true, message: '请输入账号', trigger: 'blur' },
-    {
-      validator: (_rule, value, callback) => {
-        // 规范化值类型，确保是字符串
-        const normalizedValue = normalizeFormValue(value)
-        if (!normalizedValue) {
-          callback()
-          return
-        }
-        // 验证输入安全性
-        if (containsSqlInjection(normalizedValue) || containsXss(normalizedValue)) {
-          callback(new Error('账号包含非法字符'))
-          return
-        }
-        // 验证用户名格式
-        if (normalizedValue.length < 3 || normalizedValue.length > 20) {
-          callback(new Error('账号长度应在3-20个字符之间'))
-          return
-        }
-        callback()
-      },
-      trigger: 'blur',
-    },
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    {
-      validator: (_rule, value, callback) => {
-        // 规范化值类型，确保是字符串
-        const normalizedValue = normalizeFormValue(value)
-        if (!normalizedValue) {
-          callback()
-          return
-        }
-        // 验证输入安全性
-        if (containsSqlInjection(normalizedValue) || containsXss(normalizedValue)) {
-          callback(new Error('密码包含非法字符'))
-          return
-        }
-        callback()
-      },
-      trigger: 'blur',
-    },
-  ],
-  roleName: [{ required: roleOptions.value.length > 1, message: '请选择登录身份', trigger: 'change' }],
+const handleClose = () => {
+  router.push('/')
 }
 
-// 规范化表单值的辅助函数
-function normalizeFormValue(value: any): string {
-  if (value === null || value === undefined) {
-    return ''
-  }
-  if (Array.isArray(value)) {
-    return String(value[0] ?? '')
-  }
-  return String(value)
-}
-
-onMounted(() => {
-  if (rememberAccount.value) {
-    const savedUsername = storage.get('rememberAccountUsername')
-    const savedRole = storage.get('rememberAccountRole')
-    // 规范化从存储中读取的值
-    form.username = normalizeFormValue(savedUsername)
-    form.roleName = normalizeFormValue(savedRole)
-  }
-
-  // 确保初始值为字符串类型
-  form.username = normalizeFormValue(form.username)
-  form.password = normalizeFormValue(form.password)
-  form.roleName = normalizeFormValue(form.roleName)
-
-  const roles = menu.list().filter(item => {
-    const normalized = (item.hasBackLogin || '').toString().toLowerCase()
-    return item.hasBackLogin === '是' || normalized === 'yes' || normalized === 'true'
-  })
-  roleOptions.value = roles.map(role => ({ roleName: role.roleName, tableName: role.tableName }))
-  if (roleOptions.value.length === 0) {
-    ElMessage.warning('无可登录角色，请联系管理员')
-  } else if (roleOptions.value.length === 1) {
-    form.roleName = roleOptions.value[0].roleName
-  }
-
-  // 检查是否从错误页面跳转而来
-  const redirect = router.currentRoute.value.query['redirect'] as string
-  if (redirect && router.currentRoute.value.query['from'] === 'error') {
-    ElMessage.warning('您的登录已过期，请重新登录')
-  }
-})
-
-// 监听表单值变化，确保 username 和 password 始终为字符串类型
-watch(
-  () => form.username,
-  newValue => {
-    if (newValue !== null && newValue !== undefined && !Array.isArray(newValue) && typeof newValue === 'string') {
-      return // 已经是正确的类型，无需处理
-    }
-    // 如果值被意外转换为数组或其他类型，立即修正
-    form.username = normalizeFormValue(newValue)
-  },
-  { immediate: false },
-)
-
-watch(
-  () => form.password,
-  newValue => {
-    if (newValue !== null && newValue !== undefined && !Array.isArray(newValue) && typeof newValue === 'string') {
-      return // 已经是正确的类型，无需处理
-    }
-    // 如果值被意外转换为数组或其他类型，立即修正
-    form.password = normalizeFormValue(newValue)
-  },
-  { immediate: false },
-)
-
-function isValidInternalPath(path: string): boolean {
-  // 验证路径是否为系统内路径，防止开放重定向漏洞
-  return path.startsWith('/') && !path.startsWith('//') && !path.includes('http')
-}
-
-/**
- * 验证路由是否存在且有效
- * @param path 要验证的路由路径
- * @returns 如果路由存在且有效返回true，否则返回false
- */
-function isValidRoute(path: string): boolean {
-  if (!isValidInternalPath(path)) {
-    return false
-  }
-
-  // 检查是否是公开路由（登录后不应该跳转到登录页等公开路由）
-  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
-  if (publicRoutes.includes(path)) {
-    return false
-  }
-
-  try {
-    // 检查路由是否存在
-    const matched = router.resolve(path)
-    
-    // 如果匹配到NotFound路由，说明路由不存在
-    if (matched.name === 'NotFound') {
-      return false
-    }
-    
-    // 如果没有任何匹配的路由，说明路由不存在
-    if (!matched.matched || matched.matched.length === 0) {
-      return false
-    }
-    
-    // 路由存在且有效
-    return true
-  } catch (error) {
-    // 如果解析路由时出错，说明路由无效
-    // console.warn('路由验证失败:', path, error)
-    return false
-  }
-}
-
-async function handleLogin() {
-  if (submitting.value) return
-
-  try {
-    await formRef.value?.validate()
-  } catch {
-    return
-  }
-
-  // 确保 username 和 password 是字符串类型（防止数组或其他类型）
-  const username = normalizeFormValue(form.username).trim()
-  const password = normalizeFormValue(form.password)
-
-  // 输入验证
-  const usernameValidation = validateInput(username)
-  const passwordValidation = validateInput(password)
-
-  if (!usernameValidation.isValid || !passwordValidation.isValid) {
-    ElMessage.error('输入包含非法字符，请检查后重试')
-    return
-  }
-
-  const selectedRole = roleOptions.value.find(role => role.roleName === form.roleName) ?? roleOptions.value[0]
-  if (!selectedRole) {
-    ElMessage.error('未匹配到可用角色')
-    return
-  }
-
-  submitting.value = true
-  try {
-    const response = await http.post(`/` + selectedRole.tableName + `/login`, null, {
-      params: {
-        username: username,
-        password: password,
-      },
-    })
-    const data = response.data as { code: number; msg: string; token?: string }
-    if (data.code !== 0 || !data.token) {
-      ElMessage.error(data.msg || '登录失败')
-      throw new Error(data.msg || '登录失败')
-    }
-
-    // 使用secureStorage存储Token（带过期时间，1小时）
-    const expiryTime = Date.now() + 60 * 60 * 1000 // 1小时后过期
-    tokenStorage.setToken(data.token, expiryTime)
-
-    // 向后兼容，同时存储到localStorage
-    storage.set('Token', data.token)
-    storage.set('role', selectedRole.roleName)
-    storage.set('sessionTable', selectedRole.tableName)
-    storage.set('adminName', username)
-    if (rememberAccount.value) {
-      storage.set('rememberAccountFlag', 'true')
-      storage.set('rememberAccountUsername', username)
-      storage.set('rememberAccountRole', selectedRole.roleName)
-    } else {
-      storage.remove('rememberAccountFlag')
-      storage.remove('rememberAccountUsername')
-      storage.remove('rememberAccountRole')
-    }
-    ElMessage.success('登录成功')
-    
-    // 处理登录后的重定向，验证路径安全性和有效性
-    const redirect = router.currentRoute.value.query['redirect'] as string
-    let targetPath = '/'
-    
-    if (redirect && isValidInternalPath(redirect)) {
-      // 验证路由是否存在且有效
-      if (isValidRoute(redirect)) {
-        targetPath = redirect
-      } else {
-        // 路由无效，记录警告但继续跳转到首页
-        // console.warn('登录后重定向路径无效，已回退到首页:', redirect)
-      }
-    }
-    
-    // 使用nextTick确保token已完全设置到storage，避免路由守卫拦截
-    await nextTick()
-    
-    // 再次确认token已设置（双重检查）
-    const verifyToken = tokenStorage.getToken() || storage.get('Token')
-    if (!verifyToken) {
-      // console.error('Token设置失败，无法跳转')
-      ElMessage.error('登录状态保存失败，请重新登录')
-      return
-    }
-    
-    // 执行路由跳转
-    try {
-      await router.replace(targetPath)
-    } catch (error: any) {
-      // 如果跳转失败，回退到首页
-      // console.error('路由跳转失败:', error)
-      try {
-        await router.replace('/')
-      } catch (fallbackError) {
-        // 如果首页也跳转失败，强制刷新页面
-        // console.error('首页跳转也失败，强制刷新:', fallbackError)
-        window.location.href = '/'
-      }
-    }
-  } catch (error: any) {
-    // 记录错误日志
-    // console.error('登录失败:', error)
-  } finally {
-    submitting.value = false
-  }
-}
-
-function handleForgotPassword() {
-  router.push('/forgot-password')
-}
-
-function handleSupport() {
-  ElMessage.info('技术支持：请联系系统管理员')
+const handleSocialLogin = (provider: string) => {
+  ElMessage.info(`${provider}登录功能开发中`)
 }
 </script>
 
 <style scoped lang="scss">
-// 登录页面容器 - 修复布局问题
+@import '@/styles/variables';
+
 .login-page {
-  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  box-sizing: border-box;
 }
 
-// 背景层
 .login-background {
   position: absolute;
   inset: 0;
-  z-index: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-.background-pattern {
+.background-base {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  background: none;
+  background-color: var(--color-bg-secondary, #f9fafb);
 }
 
 .background-gradient {
@@ -439,320 +126,237 @@ function handleSupport() {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #091628, #101f3d);
+  background: linear-gradient(
+    135deg,
+    rgba(250, 251, 252, 1) 0%,
+    rgba(245, 247, 250, 1) 50%,
+    rgba(250, 251, 252, 1) 100%
+  );
+  opacity: 1;
 }
 
-// 登录容器 - 修复定位和宽度问题
-.login-container {
+.dismiss-button-wrapper {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.dismiss-button {
   position: relative;
-  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  color: #111827;
+  fill: #111827;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.6);
+    color: #4b5563;
+    fill: #4b5563;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #111827;
+    z-index: 1;
+  }
+}
+
+.dismiss-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentColor;
+}
+
+.login-content {
+  position: relative;
   width: 100%;
-  max-width: 520px;
-  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.login-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  max-width: 23.375rem;
   margin: 0 auto;
 }
 
-// 登录卡片 - 修复样式冲突
-.login-card {
-  width: 100%;
-  border-radius: 24px;
-  padding: 48px 40px;
-  background: #ffffff !important;
-  box-shadow: 0 30px 80px rgba(10, 24, 64, 0.45) !important;
-  border: none !important;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  box-sizing: border-box;
-  position: relative;
-  display: block;
-
-  :deep(.el-card__body) {
-    padding: 0 !important;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 35px 90px rgba(10, 24, 64, 0.5) !important;
-  }
-}
-
-// 登录卡片头部
-.login-card__header {
-  margin-bottom: 32px;
+.login-title {
+  margin-bottom: 1rem;
   text-align: center;
-  width: 100%;
-  box-sizing: border-box;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  line-height: 1.2;
+  color: #111827;
+
+  @media (min-width: 640px) {
+    font-size: 2.25rem;
+  }
 }
 
-.logo-section {
+.login-subtitle {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.5;
+
+  @media (min-width: 640px) {
+    margin-bottom: 3.5rem;
+  }
+}
+
+.login-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.logo-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  background: #3a80ff;
-  border-radius: 16px;
-  color: white;
-  margin-bottom: 8px;
-  box-shadow: 0 8px 20px rgba(58, 128, 255, 0.3);
-  flex-shrink: 0;
+  gap: 1rem;
+  width: 100%;
+  min-width: 21.5625rem;
 
-  svg {
-    width: 32px;
-    height: 32px;
-    display: block;
+  @media (min-width: 640px) {
+    min-width: 23.375rem;
   }
 }
 
-.eyebrow {
-  color: #3a80ff;
-  letter-spacing: 0.3em;
-  font-size: 12px;
-  font-weight: 600;
-  margin: 0;
-  text-transform: uppercase;
-  line-height: 1.5;
-}
-
-h1 {
-  margin: 8px 0;
-  color: #1a202c;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.3;
-}
-
-.subtitle {
-  margin: 0;
-  color: #718096;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-// 登录表单样式已提取到 components/_forms.scss
-// 使用 .login-form 类名即可应用统一样式
-
-// 提交按钮
-.submit-btn {
-  width: 100%;
-  margin-top: 8px;
-  height: 48px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-  background: #3a80ff !important;
-  border: none !important;
-  box-shadow: 0 8px 20px rgba(58, 128, 255, 0.3);
-  transition: all 0.3s ease;
-  color: #ffffff !important;
+.social-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 1rem 1.25rem;
+  gap: 0.75rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  color: #111827;
+  fill: #111827;
+  font-size: 1rem;
   cursor: pointer;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:focus {
-    box-shadow: 0 0 0 4px rgba(58, 128, 255, 0.2);
-    outline: none;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-  }
-
-  &:hover:not(:disabled) {
-    background: #4a90ff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(58, 128, 255, 0.4);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-}
-
-// 登录页脚
-.login-footer {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   width: 100%;
-  box-sizing: border-box;
-}
+  min-width: 21.5625rem;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+  outline: 2px solid transparent;
+  outline-offset: 1px;
 
-.footer-links {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  width: 100%;
-  box-sizing: border-box;
-
-  a {
-    white-space: nowrap;
-    flex-shrink: 0;
+  @media (min-width: 640px) {
+    min-width: 23.375rem;
   }
-}
-
-.footer-link {
-  color: #3a80ff;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color 0.3s ease;
-  display: inline-block;
-  line-height: 1.5;
-  cursor: pointer;
 
   &:hover {
-    color: #4a90ff;
-    text-decoration: underline;
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
-  &:focus {
-    outline: none;
-    text-decoration: underline;
+  &:active {
+    background: rgba(255, 255, 255, 0.6);
+    color: #4b5563;
+    fill: #4b5563;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #111827;
+    z-index: 1;
   }
 }
 
-.divider {
-  color: #cbd5e0;
-  font-size: 14px;
-  user-select: none;
-  white-space: nowrap;
+.social-icon {
+  width: 1.5rem;
+  height: 1.5rem;
   flex-shrink: 0;
 }
 
-.security-tip-footer {
-  margin: 0;
-  padding: 0;
-  font-size: 12px;
-  color: #a0aec0;
-  line-height: 1.5;
-  text-align: center;
-  width: 100%;
-  word-wrap: break-word;
-  box-sizing: border-box;
+.microsoft-button .social-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-// 响应式设计
-@media (width <= 992px) {
-  .login-card {
-    padding: 32px 24px;
-  }
-
-  h1 {
-    font-size: 22px;
-  }
+.apple-button .social-icon {
+  color: #000;
 }
 
-@media (width <= 768px) {
-  .login-page {
-    padding: 20px;
+@media (prefers-color-scheme: dark) {
+  .apple-button .social-icon {
+    color: #fff;
   }
 
-  .login-card {
-    padding: 32px 24px;
-    border-radius: 16px;
+  .background-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(30, 41, 59, 1) 0%,
+      rgba(51, 65, 85, 1) 100%
+    );
   }
 
-  h1 {
-    font-size: 20px;
+  .login-title {
+    color: #f9fafb;
   }
 
-  .logo-icon {
-    width: 56px;
-    height: 56px;
+  .login-subtitle {
+    color: #d1d5db;
+  }
 
-    svg {
-      width: 28px;
-      height: 28px;
+  .dismiss-button {
+    background: rgba(55, 65, 81, 0.3);
+    color: #f9fafb;
+    fill: #f9fafb;
+
+    &:hover {
+      background: rgba(55, 65, 81, 0.4);
+    }
+
+    &:active {
+      background: rgba(55, 65, 81, 0.2);
+      color: #9ca3af;
+      fill: #9ca3af;
     }
   }
 
-  .login-form {
-    :deep(.el-input__wrapper) {
-      min-height: 44px;
+  .social-button {
+    background: rgba(55, 65, 81, 0.3);
+    color: #f9fafb;
+    fill: #f9fafb;
+
+    &:hover {
+      background: rgba(55, 65, 81, 0.4);
     }
-  }
-}
 
-@media (width <= 480px) {
-  .login-page {
-    padding: 16px;
-  }
-
-  .login-card {
-    padding: 24px 20px;
-    border-radius: 12px;
-  }
-
-  .login-card__header {
-    margin-bottom: 24px;
-  }
-
-  h1 {
-    font-size: 18px;
-  }
-
-  .subtitle {
-    font-size: 13px;
-  }
-
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .security-tip {
-    white-space: normal;
-    text-align: left;
-  }
-
-  .role-radio-group {
-    :deep(.el-radio-button) {
-      .el-radio-button__inner {
-        padding: 8px 12px;
-        font-size: 13px;
-      }
+    &:active {
+      background: rgba(55, 65, 81, 0.2);
+      color: #9ca3af;
+      fill: #9ca3af;
     }
-  }
-
-  .footer-links {
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .divider {
-    display: none;
-  }
-
-  .security-tip-footer {
-    font-size: 11px;
-    padding: 0 8px;
-  }
-
-  .submit-btn {
-    height: 44px;
-    font-size: 15px;
   }
 }
 </style>

@@ -1,7 +1,14 @@
 <template>
-  <ModuleCrudPage module-key="jianshenjiaolian" title="健身教练" />
+  <div>
+    <!-- 空白页面 -->
+  </div>
 </template>
 
 <script setup lang="ts">
-import ModuleCrudPage from '@/components/common/ModuleCrudPage.vue'
+// 空白页面
 </script>
+
+<style scoped>
+/* 空白样式 */
+</style>
+

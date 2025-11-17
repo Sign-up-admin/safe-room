@@ -1,55 +1,78 @@
 /**
- * API utility module
- * Provides API endpoint access with backward compatibility
- * @deprecated Use constants/apiEndpoints.ts for new code
+ * API请求封装
  */
-import { API_ENDPOINTS } from '@/constants/apiEndpoints'
 
-const api = {
-  // Customer service
-  chatpage: API_ENDPOINTS.CHAT.PAGE,
-  chatbyuseridpage: API_ENDPOINTS.CHAT.PAGE_BY_USER_ID,
-  chatsave: API_ENDPOINTS.CHAT.SAVE,
-  // Points order
-  orderpage: API_ENDPOINTS.ORDER.PAGE,
-  orderdelete: API_ENDPOINTS.ORDER.DELETE,
-  orderinfo: API_ENDPOINTS.ORDER.INFO,
-  ordersave: API_ENDPOINTS.ORDER.SAVE,
-  orderupdate: API_ENDPOINTS.ORDER.UPDATE,
-  // Configuration
-  configpage: API_ENDPOINTS.CONFIG.PAGE,
-  configdelete: API_ENDPOINTS.CONFIG.DELETE,
-  configinfo: API_ENDPOINTS.CONFIG.INFO,
-  configsave: API_ENDPOINTS.CONFIG.SAVE,
-  configupdate: API_ENDPOINTS.CONFIG.UPDATE,
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import type { ApiResponse } from '@/types'
+import { API_BASE_URL, STORAGE_KEYS } from './constants'
+import { useUserStore } from '@/stores/user'
+import router from '@/router'
 
-  // File upload endpoints
-  fileupload: API_ENDPOINTS.FILE.UPLOAD,
+// 创建axios实例
+const api: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
 
-  // Menu endpoints
-  menulist: API_ENDPOINTS.MENU.LIST,
+// 请求拦截器
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(STORAGE_KEYS.TOKEN)
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
-  // Session endpoints
-  session: API_ENDPOINTS.SESSION.GET,
+// 响应拦截器
+api.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse>) => {
+    const { data } = response
+    
+    // 如果code不为0，说明有错误
+    if (data.code !== 0 && data.code !== 200) {
+      return Promise.reject(new Error(data.msg || '请求失败'))
+    }
+    
+    return response
+  },
+  (error) => {
+    // 处理401未授权错误
+    if (error.response?.status === 401) {
+      const userStore = useUserStore()
+      userStore.logout()
+      router.push({ name: 'Login' })
+    }
+    
+    return Promise.reject(error)
+  }
+)
 
-  // Count endpoints
-  usercount: API_ENDPOINTS.COUNT.USER,
-  fitnesscoursecount: API_ENDPOINTS.COUNT.FITNESS_COURSE,
-  coursereservationcount: API_ENDPOINTS.COUNT.COURSE_RESERVATION,
-  courserefundcount: API_ENDPOINTS.COUNT.COURSE_REFUND,
-  membershippurchasecount: API_ENDPOINTS.COUNT.MEMBERSHIP_PURCHASE,
-
-  // Chart data endpoints
-  reservationdaily: API_ENDPOINTS.CHART.COURSE_RESERVATION_DAILY,
-  refunddaily: API_ENDPOINTS.CHART.COURSE_REFUND_DAILY,
-  membershippurchasegroup: API_ENDPOINTS.CHART.MEMBERSHIP_PURCHASE_GROUP,
-  membershiprenewaldaily: API_ENDPOINTS.CHART.MEMBERSHIP_RENEWAL_DAILY,
-
-  // Legacy compatibility properties - 这些属性与上面的小写版本指向相同的端点值
-  // 为了向后兼容保留，但会导致端点值重复
-  orderInfo: API_ENDPOINTS.ORDER.INFO,
-  configUpdate: API_ENDPOINTS.CONFIG.UPDATE,
-  userCount: API_ENDPOINTS.COUNT.USER,
+// 封装请求方法
+export const request = {
+  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return api.get<ApiResponse<T>>(url, config).then(res => res.data)
+  },
+  
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return api.post<ApiResponse<T>>(url, data, config).then(res => res.data)
+  },
+  
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return api.put<ApiResponse<T>>(url, data, config).then(res => res.data)
+  },
+  
+  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return api.delete<ApiResponse<T>>(url, config).then(res => res.data)
+  }
 }
 
 export default api
+

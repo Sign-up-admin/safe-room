@@ -46,11 +46,11 @@ INSERT INTO jianshenjiaolian (id, addtime, jiaoliangonghao, mima, password_hash,
 
 -- 健身课程
 INSERT INTO jianshenkecheng (id, addtime, kechengmingcheng, kechengleixing, tupian, shangkeshijian, shangkedidian, kechengjiage, kechengjianjie, kechengshipin, shangkejihua, shangkeshichang, baomingrenshu, yuyuerenshu, status, jiaoliangonghao, jiaolianxingming, clicktime, clicknum, discussnum, storeupnum) VALUES
-  (1, CURRENT_TIMESTAMP, '燃脂训练营', '综合课程', 'upload/kecheng1.jpg', DATEADD(DAY, 1, CURRENT_TIMESTAMP), '一号健身房', 199.0, '适合初学者的燃脂课程，结合有氧和力量训练', NULL, '热身+力量训练+有氧燃脂', 60, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 15, 3, 5),
-  (2, CURRENT_TIMESTAMP, '瑜伽入门', '瑜伽课程', 'upload/kecheng2.jpg', DATEADD(DAY, 2, CURRENT_TIMESTAMP), '瑜伽室', 149.0, '适合初学者的瑜伽课程，帮助放松身心', NULL, '基础呼吸+简单体式', 60, 0, 0, 0, 'coach002', '李娜', CURRENT_TIMESTAMP, 20, 5, 8),
-  (3, CURRENT_TIMESTAMP, '拳击基础', '拳击训练', 'upload/kecheng3.jpg', DATEADD(DAY, 3, CURRENT_TIMESTAMP), '拳击室', 249.0, '学习基本拳击技巧，提升反应速度和协调性', NULL, '热身+基本拳法+沙袋练习', 90, 0, 0, 0, 'coach003', '王强', CURRENT_TIMESTAMP, 12, 2, 4),
-  (4, CURRENT_TIMESTAMP, '普拉提核心', '普拉提', 'upload/kecheng4.jpg', DATEADD(DAY, 1, CURRENT_TIMESTAMP), '普拉提室', 179.0, '专注于核心力量训练，改善体态', NULL, '核心激活+基础体式', 45, 0, 0, 0, 'coach004', '赵敏', CURRENT_TIMESTAMP, 18, 4, 6),
-  (5, CURRENT_TIMESTAMP, '游泳基础', '游泳课程', 'upload/kecheng5.jpg', DATEADD(DAY, 4, CURRENT_TIMESTAMP), '游泳池', 219.0, '学习自由泳和蛙泳基础动作', NULL, '水上热身+泳姿教学', 60, 0, 0, 0, 'coach005', '刘伟', CURRENT_TIMESTAMP, 10, 1, 3),
-  (6, CURRENT_TIMESTAMP, '力量训练', '力量训练', 'upload/kecheng6.jpg', DATEADD(DAY, 2, CURRENT_TIMESTAMP), '力量训练区', 199.0, '系统性的力量训练，提升肌肉力量', NULL, '热身+杠铃练习+器械训练', 90, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 14, 3, 5),
-  (7, CURRENT_TIMESTAMP, '动感单车', '动感单车', 'upload/kecheng7.jpg', DATEADD(DAY, 1, CURRENT_TIMESTAMP), '单车室', 129.0, '高强度的有氧运动，快速燃脂', NULL, '热身+间歇训练+冲刺', 45, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 16, 4, 7),
-  (8, CURRENT_TIMESTAMP, '流瑜伽', '瑜伽课程', 'upload/kecheng8.jpg', DATEADD(DAY, 3, CURRENT_TIMESTAMP), '瑜伽室', 179.0, '动态的瑜伽练习，提升柔韧性和力量', NULL, '流畅体式连接+冥想', 75, 0, 0, 0, 'coach002', '李娜', CURRENT_TIMESTAMP, 22, 6, 9);
+  (1, CURRENT_TIMESTAMP, '燃脂训练营', '综合课程', 'upload/kecheng1.jpg', CURRENT_TIMESTAMP + INTERVAL '1' DAY, '一号健身房', 199.0, '适合初学者的燃脂课程，结合有氧和力量训练', NULL, '热身+力量训练+有氧燃脂', 60, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 15, 3, 5),
+  (2, CURRENT_TIMESTAMP, '瑜伽入门', '瑜伽课程', 'upload/kecheng2.jpg', CURRENT_TIMESTAMP + INTERVAL '2' DAY, '瑜伽室', 149.0, '适合初学者的瑜伽课程，帮助放松身心', NULL, '基础呼吸+简单体式', 60, 0, 0, 0, 'coach002', '李娜', CURRENT_TIMESTAMP, 20, 5, 8),
+  (3, CURRENT_TIMESTAMP, '拳击基础', '拳击训练', 'upload/kecheng3.jpg', CURRENT_TIMESTAMP + INTERVAL '3' DAY, '拳击室', 249.0, '学习基本拳击技巧，提升反应速度和协调性', NULL, '热身+基本拳法+沙袋练习', 90, 0, 0, 0, 'coach003', '王强', CURRENT_TIMESTAMP, 12, 2, 4),
+  (4, CURRENT_TIMESTAMP, '普拉提核心', '普拉提', 'upload/kecheng4.jpg', CURRENT_TIMESTAMP + INTERVAL '1' DAY, '普拉提室', 179.0, '专注于核心力量训练，改善体态', NULL, '核心激活+基础体式', 45, 0, 0, 0, 'coach004', '赵敏', CURRENT_TIMESTAMP, 18, 4, 6),
+  (5, CURRENT_TIMESTAMP, '游泳基础', '游泳课程', 'upload/kecheng5.jpg', CURRENT_TIMESTAMP + INTERVAL '4' DAY, '游泳池', 219.0, '学习自由泳和蛙泳基础动作', NULL, '水上热身+泳姿教学', 60, 0, 0, 0, 'coach005', '刘伟', CURRENT_TIMESTAMP, 10, 1, 3),
+  (6, CURRENT_TIMESTAMP, '力量训练', '力量训练', 'upload/kecheng6.jpg', CURRENT_TIMESTAMP + INTERVAL '2' DAY, '力量训练区', 199.0, '系统性的力量训练，提升肌肉力量', NULL, '热身+杠铃练习+器械训练', 90, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 14, 3, 5),
+  (7, CURRENT_TIMESTAMP, '动感单车', '动感单车', 'upload/kecheng7.jpg', CURRENT_TIMESTAMP + INTERVAL '1' DAY, '单车室', 129.0, '高强度的有氧运动，快速燃脂', NULL, '热身+间歇训练+冲刺', 45, 0, 0, 0, 'coach001', '张三', CURRENT_TIMESTAMP, 16, 4, 7),
+  (8, CURRENT_TIMESTAMP, '流瑜伽', '瑜伽课程', 'upload/kecheng8.jpg', CURRENT_TIMESTAMP + INTERVAL '3' DAY, '瑜伽室', 179.0, '动态的瑜伽练习，提升柔韧性和力量', NULL, '流畅体式连接+冥想', 75, 0, 0, 0, 'coach002', '李娜', CURRENT_TIMESTAMP, 22, 6, 9);

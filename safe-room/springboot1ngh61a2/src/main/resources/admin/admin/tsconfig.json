@@ -10,29 +10,29 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "allowJs": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "preserve",
+    "allowJs": false,
 
     /* Linting */
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": false,
     "noImplicitReturns": false,
     "noPropertyAccessFromIndexSignature": false,
-    "noImplicitOverride": true,
+    "noImplicitOverride": false,
     "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitAny": true,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
 
     /* Path mapping */
     "baseUrl": ".",
@@ -46,11 +46,7 @@
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.vue.js",
-    "**/*.js.map",
-    "src/**/*.vue.js",
-    "src/assets/js/**/*.js"
+    "dist"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

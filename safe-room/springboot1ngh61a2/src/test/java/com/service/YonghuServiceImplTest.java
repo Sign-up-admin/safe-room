@@ -1950,6 +1950,21 @@ class YonghuServiceImplTest {
             assertThat(member.getYonghuxingming()).isEqualTo("批量会员" + (i + 1));
         }
     }
+
+    /**
+     * 创建测试用户实体
+     */
+    private YonghuEntity createTestYonghuEntity(String memberName, String phone, boolean isVip) {
+        YonghuEntity user = new YonghuEntity();
+        user.setYonghuxingming(memberName);
+        user.setShoujihaoma(phone);
+        user.setYonghuzhanghao("test-" + phone);
+        user.setMima("test123");
+        user.setHuiyuankamingcheng(isVip ? "VIP会员" : "普通会员");
+        user.setHuiyuankahao("TEST-CARD-" + phone.substring(phone.length() - 4));
+        user.setYouxiaoqizhi(new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000L)); // 一年后到期
+        return user;
+    }
 }
 
 

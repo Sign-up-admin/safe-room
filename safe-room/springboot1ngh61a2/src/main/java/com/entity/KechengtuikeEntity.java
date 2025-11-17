@@ -170,10 +170,29 @@ public class KechengtuikeEntity<T> implements Serializable {
 	/**
 	 * Is it paid
 	 */
-					
+
 	private String ispay;
-	
-	
+
+	/**
+	 * Withdrawal number
+	 */
+
+	private String tuikebianhao;
+
+	/**
+	 * Withdrawal time
+	 */
+	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat
+	private Date tuikeshijian;
+
+	/**
+	 * Refund amount
+	 */
+
+	private Double tuikuanjine;
+
+
 	@JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat
 	private Date addtime;
@@ -431,6 +450,42 @@ public class KechengtuikeEntity<T> implements Serializable {
 	 */
 	public String getIspay() {
 		return ispay;
+	}
+	/**
+	 * Set: Withdrawal number
+	 */
+	public void setTuikebianhao(String tuikebianhao) {
+		this.tuikebianhao = tuikebianhao;
+	}
+	/**
+	 * Get: Withdrawal number
+	 */
+	public String getTuikebianhao() {
+		return tuikebianhao;
+	}
+	/**
+	 * Set: Withdrawal time
+	 */
+	public void setTuikeshijian(Date tuikeshijian) {
+		this.tuikeshijian = tuikeshijian;
+	}
+	/**
+	 * Get: Withdrawal time
+	 */
+	public Date getTuikeshijian() {
+		return tuikeshijian;
+	}
+	/**
+	 * Set: Refund amount
+	 */
+	public void setTuikuanjine(Double tuikuanjine) {
+		this.tuikuanjine = tuikuanjine;
+	}
+	/**
+	 * Get: Refund amount
+	 */
+	public Double getTuikuanjine() {
+		return tuikuanjine;
 	}
 
 }

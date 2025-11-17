@@ -340,7 +340,85 @@ export async function waitForElementReady(
 }
 
 /**
- * 智能重试执行器
+ * 错误分类枚举
+ */
+export enum ErrorType {
+  NETWORK = 'network',
+  TIMEOUT = 'timeout',
+  ELEMENT_NOT_FOUND = 'element_not_found',
+  ELEMENT_NOT_VISIBLE = 'element_not_visible',
+  ELEMENT_NOT_STABLE = 'element_not_stable',
+  FORM_VALIDATION = 'form_validation',
+  ASSERTION = 'assertion',
+  UNKNOWN = 'unknown'
+}
+
+/**
+ * 分类错误信息
+ */
+export class CategorizedError extends Error {
+  public readonly type: ErrorType
+  public readonly originalError: any
+  public readonly context?: string
+  public readonly retryable: boolean
+
+  constructor(type: ErrorType, message: string, originalError?: any, context?: string) {
+    super(message)
+    this.name = 'CategorizedError'
+    this.type = type
+    this.originalError = originalError
+    this.context = context
+    this.retryable = this.isRetryable(type)
+  }
+
+  private isRetryable(type: ErrorType): boolean {
+    // 网络和超时错误通常可以重试
+    return [ErrorType.NETWORK, ErrorType.TIMEOUT, ErrorType.ELEMENT_NOT_VISIBLE, ErrorType.ELEMENT_NOT_STABLE].includes(type)
+  }
+
+  /**
+   * 从原始错误创建分类错误
+   */
+  static fromError(error: any, context?: string): CategorizedError {
+    const message = error.message || String(error)
+
+    // 网络相关错误
+    if (message.includes('net::') || message.includes('NetworkError') || message.includes('fetch')) {
+      return new CategorizedError(ErrorType.NETWORK, `网络错误: ${message}`, error, context)
+    }
+
+    // 超时错误
+    if (message.includes('timeout') || message.includes('Timeout')) {
+      return new CategorizedError(ErrorType.TIMEOUT, `超时错误: ${message}`, error, context)
+    }
+
+    // 元素未找到
+    if (message.includes('not found') || message.includes('not visible')) {
+      return new CategorizedError(ErrorType.ELEMENT_NOT_FOUND, `元素未找到: ${message}`, error, context)
+    }
+
+    // 元素不稳定
+    if (message.includes('stable') || message.includes('位置变化')) {
+      return new CategorizedError(ErrorType.ELEMENT_NOT_STABLE, `元素不稳定: ${message}`, error, context)
+    }
+
+    // 断言错误
+    if (message.includes('AssertionError') || message.includes('expect')) {
+      return new CategorizedError(ErrorType.ASSERTION, `断言失败: ${message}`, error, context)
+    }
+
+    // 表单验证错误
+    if (message.includes('validation') || message.includes('required')) {
+      return new CategorizedError(ErrorType.FORM_VALIDATION, `表单验证失败: ${message}`, error, context)
+    }
+
+    // 未知错误
+    return new CategorizedError(ErrorType.UNKNOWN, `未知错误: ${message}`, error, context)
+  }
+}
+
+/**
+ * 智能重试执行器（增强版）
  */
 export async function withSmartRetry<T>(
   operation: () => Promise<T>,
@@ -351,12 +429,14 @@ export async function withSmartRetry<T>(
 
   let lastError: any
   let delay = initialDelay
+  let categorizedError: CategorizedError | null = null
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await operation()
     } catch (error) {
       lastError = error
+      categorizedError = CategorizedError.fromError(error, context)
 
       // 如果是最后一次尝试，直接抛出错误
       if (attempt === maxRetries) {
@@ -364,12 +444,20 @@ export async function withSmartRetry<T>(
       }
 
       // 检查是否应该重试
+      let shouldRetry = categorizedError.retryable
       if (retryCondition && !retryCondition(error)) {
+        shouldRetry = false
+      }
+
+      if (!shouldRetry) {
+        if (context) {
+          console.log(`${context}: 错误类型 ${categorizedError.type} 不支持重试`)
+        }
         break
       }
 
       if (context) {
-        console.log(`${context}: 第 ${attempt + 1} 次尝试失败，将在 ${delay}ms 后重试`)
+        console.log(`${context}: 第 ${attempt + 1} 次尝试失败 (${categorizedError.type})，将在 ${delay}ms 后重试`)
       }
 
       // 等待重试延迟
@@ -380,7 +468,8 @@ export async function withSmartRetry<T>(
     }
   }
 
-  throw lastError
+  // 如果有分类错误，抛出它；否则抛出原始错误
+  throw categorizedError || lastError
 }
 
 /**
@@ -677,3 +766,402 @@ export class PerformanceWaitMonitor {
  * 全局性能监控实例
  */
 export const globalPerformanceMonitor = new PerformanceWaitMonitor()
+
+/**
+ * 带截图的错误处理工具
+ */
+export class ScreenshotErrorHandler {
+  private page: Page
+  private screenshotDir: string
+
+  constructor(page: Page, screenshotDir = './test-results/screenshots') {
+    this.page = page
+    this.screenshotDir = screenshotDir
+  }
+
+  /**
+   * 带截图的异步操作执行
+   */
+  async withScreenshot<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+    options: {
+      fullPage?: boolean
+      includeTimestamp?: boolean
+      onError?: (error: any, screenshotPath: string) => void
+    } = {}
+  ): Promise<T> {
+    const { fullPage = true, includeTimestamp = true, onError } = options
+
+    try {
+      return await operation()
+    } catch (error) {
+      // 生成截图文件名
+      const timestamp = includeTimestamp ? `-${Date.now()}` : ''
+      const sanitizedName = operationName.replace(/[^a-zA-Z0-9-_]/g, '_')
+      const screenshotPath = `${this.screenshotDir}/error-${sanitizedName}${timestamp}.png`
+
+      try {
+        // 确保目录存在
+        await this.ensureDirectoryExists(this.screenshotDir)
+
+        // 截图
+        await this.page.screenshot({
+          path: screenshotPath,
+          fullPage,
+          type: 'png'
+        })
+
+        console.log(`错误截图已保存: ${screenshotPath}`)
+
+        // 调用自定义错误处理
+        if (onError) {
+          onError(error, screenshotPath)
+        }
+      } catch (screenshotError) {
+        console.error(`截图失败: ${screenshotError.message}`)
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * 条件截图
+   */
+  async conditionalScreenshot(
+    condition: () => Promise<boolean>,
+    screenshotName: string,
+    options: { fullPage?: boolean } = {}
+  ): Promise<string | null> {
+    const { fullPage = true } = options
+
+    try {
+      const shouldScreenshot = await condition()
+      if (!shouldScreenshot) {
+        return null
+      }
+
+      const timestamp = Date.now()
+      const sanitizedName = screenshotName.replace(/[^a-zA-Z0-9-_]/g, '_')
+      const screenshotPath = `${this.screenshotDir}/${sanitizedName}-${timestamp}.png`
+
+      await this.ensureDirectoryExists(this.screenshotDir)
+
+      await this.page.screenshot({
+        path: screenshotPath,
+        fullPage,
+        type: 'png'
+      })
+
+      return screenshotPath
+    } catch (error) {
+      console.error(`条件截图失败: ${error.message}`)
+      return null
+    }
+  }
+
+  private async ensureDirectoryExists(dirPath: string): Promise<void> {
+    const fs = await import('fs/promises')
+    const path = await import('path')
+
+    try {
+      await fs.access(dirPath)
+    } catch {
+      // 目录不存在，创建它
+      await fs.mkdir(dirPath, { recursive: true })
+    }
+  }
+}
+
+/**
+ * 创建带时间戳的截图文件名
+ */
+export function takeScreenshotWithTimestamp(
+  page: Page,
+  name: string,
+  options: { fullPage?: boolean; dir?: string } = {}
+): Promise<string> {
+  const { fullPage = true, dir = './test-results/screenshots' } = options
+  const timestamp = Date.now()
+  const sanitizedName = name.replace(/[^a-zA-Z0-9-_]/g, '_')
+  const screenshotPath = `${dir}/${sanitizedName}-${timestamp}.png`
+
+  return page.screenshot({
+    path: screenshotPath,
+    fullPage,
+    type: 'png'
+  }).then(() => screenshotPath)
+}
+
+/**
+ * 增强的测试监控器
+ */
+export class EnhancedTestMonitor {
+  private startTime: number
+  private testMetrics: Map<string, any>
+  private errorTracker: Map<string, any[]>
+  private performanceData: any[]
+  private screenshotsTaken: string[]
+
+  constructor() {
+    this.startTime = Date.now()
+    this.testMetrics = new Map()
+    this.errorTracker = new Map()
+    this.performanceData = []
+    this.screenshotsTaken = []
+  }
+
+  /**
+   * 开始测试监控
+   */
+  startTest(testName: string, metadata: any = {}) {
+    const testStart = {
+      name: testName,
+      startTime: Date.now(),
+      metadata,
+      steps: [],
+      errors: [],
+      screenshots: []
+    }
+
+    this.testMetrics.set(testName, testStart)
+    console.log(`🧪 开始测试: ${testName}`)
+  }
+
+  /**
+   * 记录测试步骤
+   */
+  recordStep(testName: string, stepName: string, status: 'start' | 'success' | 'failure', data?: any) {
+    const testData = this.testMetrics.get(testName)
+    if (!testData) return
+
+    const step = {
+      name: stepName,
+      timestamp: Date.now(),
+      status,
+      data
+    }
+
+    testData.steps.push(step)
+
+    const emoji = status === 'success' ? '✅' : status === 'failure' ? '❌' : '⏳'
+    console.log(`${emoji} ${testName} - ${stepName}`)
+  }
+
+  /**
+   * 记录错误
+   */
+  recordError(testName: string, error: any, context?: string) {
+    const testData = this.testMetrics.get(testName)
+    if (!testData) return
+
+    const errorInfo = {
+      timestamp: Date.now(),
+      error: {
+        message: error.message,
+        stack: error.stack,
+        type: error.name
+      },
+      context,
+      categorizedError: CategorizedError.fromError(error, context)
+    }
+
+    testData.errors.push(errorInfo)
+
+    // 按错误类型分组跟踪
+    const errorType = errorInfo.categorizedError.type
+    if (!this.errorTracker.has(errorType)) {
+      this.errorTracker.set(errorType, [])
+    }
+    this.errorTracker.get(errorType)!.push({
+      test: testName,
+      error: errorInfo,
+      timestamp: errorInfo.timestamp
+    })
+
+    console.error(`❌ ${testName} 错误 (${errorType}): ${error.message}`)
+  }
+
+  /**
+   * 记录性能指标
+   */
+  recordPerformance(testName: string, metricName: string, value: number, unit: string = 'ms') {
+    const performanceEntry = {
+      testName,
+      metricName,
+      value,
+      unit,
+      timestamp: Date.now()
+    }
+
+    this.performanceData.push(performanceEntry)
+    console.log(`📊 ${testName} - ${metricName}: ${value}${unit}`)
+  }
+
+  /**
+   * 记录截图
+   */
+  recordScreenshot(testName: string, screenshotPath: string, context?: string) {
+    const testData = this.testMetrics.get(testName)
+    if (testData) {
+      testData.screenshots.push({
+        path: screenshotPath,
+        timestamp: Date.now(),
+        context
+      })
+    }
+
+    this.screenshotsTaken.push(screenshotPath)
+    console.log(`📸 截图已保存: ${screenshotPath}`)
+  }
+
+  /**
+   * 结束测试监控
+   */
+  endTest(testName: string, status: 'passed' | 'failed' | 'skipped' = 'passed') {
+    const testData = this.testMetrics.get(testName)
+    if (!testData) return
+
+    testData.endTime = Date.now()
+    testData.duration = testData.endTime - testData.startTime
+    testData.status = status
+
+    const duration = (testData.duration / 1000).toFixed(2)
+    const emoji = status === 'passed' ? '✅' : status === 'failed' ? '❌' : '⏭️'
+    console.log(`${emoji} 测试完成: ${testName} (${duration}s, ${status})`)
+  }
+
+  /**
+   * 生成测试报告
+   */
+  generateReport() {
+    const endTime = Date.now()
+    const totalDuration = endTime - this.startTime
+
+    const report = {
+      summary: {
+        totalTests: this.testMetrics.size,
+        totalDuration,
+        startTime: new Date(this.startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
+        screenshotsTaken: this.screenshotsTaken.length
+      },
+      tests: Array.from(this.testMetrics.entries()).map(([name, data]) => ({
+        name,
+        status: data.status,
+        duration: data.duration,
+        stepsCount: data.steps.length,
+        errorsCount: data.errors.length,
+        screenshotsCount: data.screenshots.length,
+        metadata: data.metadata
+      })),
+      performance: {
+        metrics: this.performanceData,
+        averages: this.calculatePerformanceAverages()
+      },
+      errors: {
+        byType: Object.fromEntries(this.errorTracker),
+        totalErrors: Array.from(this.errorTracker.values()).reduce((sum, errors) => sum + errors.length, 0),
+        errorTypes: Array.from(this.errorTracker.keys())
+      },
+      recommendations: this.generateRecommendations()
+    }
+
+    return report
+  }
+
+  private calculatePerformanceAverages() {
+    const metricsByName = new Map<string, number[]>()
+
+    this.performanceData.forEach(entry => {
+      if (!metricsByName.has(entry.metricName)) {
+        metricsByName.set(entry.metricName, [])
+      }
+      metricsByName.get(entry.metricName)!.push(entry.value)
+    })
+
+    const averages: any = {}
+    metricsByName.forEach((values, name) => {
+      averages[name] = {
+        average: values.reduce((sum, val) => sum + val, 0) / values.length,
+        min: Math.min(...values),
+        max: Math.max(...values),
+        count: values.length
+      }
+    })
+
+    return averages
+  }
+
+  private generateRecommendations() {
+    const recommendations = []
+    const report = this.generateReport()
+
+    // 基于错误模式生成建议
+    const errorTypes = report.errors.errorTypes
+    if (errorTypes.includes('NETWORK')) {
+      recommendations.push({
+        type: 'network',
+        priority: 'high',
+        message: '检测到网络错误，建议检查API稳定性和服务可用性'
+      })
+    }
+
+    if (errorTypes.includes('TIMEOUT')) {
+      recommendations.push({
+        type: 'timeout',
+        priority: 'high',
+        message: '检测到超时错误，建议优化页面加载性能或增加超时时间'
+      })
+    }
+
+    if (errorTypes.includes('ELEMENT_NOT_FOUND')) {
+      recommendations.push({
+        type: 'stability',
+        priority: 'medium',
+        message: '检测到元素定位问题，建议使用更稳定的选择器或等待策略'
+      })
+    }
+
+    // 基于性能数据生成建议
+    const avgLoadTime = report.performance.averages['page_load_time']?.average
+    if (avgLoadTime && avgLoadTime > 5000) {
+      recommendations.push({
+        type: 'performance',
+        priority: 'medium',
+        message: `页面平均加载时间过长 (${avgLoadTime.toFixed(2)}ms)，建议优化资源加载`
+      })
+    }
+
+    return recommendations
+  }
+
+  /**
+   * 导出报告到文件
+   */
+  async exportReport(filePath: string = './test-results/enhanced-report.json') {
+    const report = this.generateReport()
+
+    try {
+      const fs = await import('fs/promises')
+      const path = await import('path')
+
+      // 确保目录存在
+      const dir = path.dirname(filePath)
+      await fs.mkdir(dir, { recursive: true })
+
+      await fs.writeFile(filePath, JSON.stringify(report, null, 2), 'utf8')
+      console.log(`📊 增强测试报告已导出: ${filePath}`)
+    } catch (error) {
+      console.error('导出报告失败:', error)
+    }
+
+    return report
+  }
+}
+
+/**
+ * 全局增强测试监控实例
+ */
+export const globalTestMonitor = new EnhancedTestMonitor()

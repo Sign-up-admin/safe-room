@@ -97,8 +97,8 @@ export default defineConfig({
   ],
 
   // 全局测试钩子
-  globalSetup: require.resolve('./tests/setup/global-setup.ts'),
-  globalTeardown: require.resolve('./tests/setup/global-teardown.ts'),
+  globalSetup: path.resolve(__dirname, 'tests/setup/global-setup.ts'),
+  globalTeardown: path.resolve(__dirname, 'tests/setup/global-teardown.ts'),
 
   // 测试执行监控
   metadata: {

@@ -1,147 +1,74 @@
-/**
- * 用户状态管理
- */
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { User, SessionResponse } from '@/types/api'
-import { tokenStorage } from '@/utils/secureStorage'
-import storage from '@/utils/storage'
-import http from '@/utils/http'
-import api from '@/utils/api'
-
-interface UserState {
-  user: User | null
-  token: string | null
-  role: string | null
-  permissions: string[]
-}
+import type { UserInfo, LoginCredentials } from '@/types/user'
 
 export const useUserStore = defineStore('user', () => {
   // 状态
-  const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
-  const role = ref<string | null>(null)
-  const permissions = ref<string[]>([])
+  const userInfo = ref<UserInfo | null>(null)
+  const token = ref<string>('')
+  const isAuthenticated = ref<boolean>(false)
 
   // 计算属性
-  const isAuthenticated = computed(() => !!token.value)
-  const userName = computed(() => user.value?.username || '')
-  const userRole = computed(() => role.value || '')
+  const username = computed(() => userInfo.value?.username || '')
+  const userRole = computed(() => userInfo.value?.role || null)
+  const displayName = computed(() => userInfo.value?.name || userInfo.value?.username || '访客')
 
-  /**
-   * 初始化用户信息（从存储中恢复）
-   */
-  function initUser() {
-    const storedToken = tokenStorage.getToken() || storage.get('Token')
-    if (storedToken) {
-      token.value = storedToken
-      // 尝试从存储中恢复用户信息
-      const storedUser = storage.get('user')
-      if (storedUser && typeof storedUser === 'object') {
-        user.value = storedUser as User
-      }
-      const storedRole = storage.get('role')
-      if (storedRole) {
-        role.value = storedRole
-      }
+  // 方法
+  function setUserInfo(info: UserInfo) {
+    userInfo.value = info
+    if (info.token) {
+      token.value = info.token
+      localStorage.setItem('token', info.token)
     }
+    isAuthenticated.value = true
   }
 
-  /**
-   * 设置用户信息
-   */
-  function setUser(userData: User | null, userToken: string | null, userRole: string | null) {
-    user.value = userData
-    token.value = userToken
-    role.value = userRole
-
-    if (userToken) {
-      tokenStorage.setToken(userToken)
-      storage.set('Token', userToken)
-    }
-    if (userData) {
-      storage.set('user', userData)
-    }
-    if (userRole) {
-      storage.set('role', userRole)
-    }
+  function setToken(newToken: string) {
+    token.value = newToken
+    localStorage.setItem('token', newToken)
+    isAuthenticated.value = !!newToken
   }
 
-  /**
-   * 获取当前用户会话信息
-   */
-  async function fetchSession(): Promise<SessionResponse | null> {
-    try {
-      const response = await http.get<SessionResponse>(api.session)
-      if (response.data) {
-        user.value = response.data as User
-        role.value = response.data.role || null
-        storage.set('user', response.data)
-        storage.set('role', response.data.role)
-        return response.data
-      }
-      return null
-    } catch (error) {
-      console.error('获取用户会话失败:', error)
-      return null
-    }
-  }
-
-  /**
-   * 设置权限
-   */
-  function setPermissions(perms: string[]) {
-    permissions.value = perms
-  }
-
-  /**
-   * 检查权限
-   */
-  function hasPermission(permission: string): boolean {
-    return permissions.value.includes(permission)
-  }
-
-  /**
-   * 检查角色
-   */
-  function hasRole(roleName: string): boolean {
-    return role.value === roleName
-  }
-
-  /**
-   * 登出
-   */
   function logout() {
-    user.value = null
-    token.value = null
-    role.value = null
-    permissions.value = []
-    tokenStorage.clearToken()
-    storage.remove('Token')
-    storage.remove('user')
-    storage.remove('role')
+    userInfo.value = null
+    token.value = ''
+    isAuthenticated.value = false
+    localStorage.removeItem('token')
+    localStorage.removeItem('userInfo')
   }
 
-  // 初始化
-  initUser()
+  function initUser() {
+    const savedToken = localStorage.getItem('token')
+    const savedUserInfo = localStorage.getItem('userInfo')
+    
+    if (savedToken) {
+      token.value = savedToken
+      isAuthenticated.value = true
+    }
+    
+    if (savedUserInfo) {
+      try {
+        userInfo.value = JSON.parse(savedUserInfo)
+      } catch (e) {
+        console.error('Failed to parse user info:', e)
+      }
+    }
+  }
 
   return {
     // 状态
-    user,
+    userInfo,
     token,
-    role,
-    permissions,
-    // 计算属性
     isAuthenticated,
-    userName,
+    // 计算属性
+    username,
     userRole,
+    displayName,
     // 方法
-    setUser,
-    fetchSession,
-    setPermissions,
-    hasPermission,
-    hasRole,
+    setUserInfo,
+    setToken,
     logout,
-    initUser,
+    initUser
   }
 })
+

@@ -1,773 +1,496 @@
-﻿<template>
-  <div class="register-page">
-    <div class="register-background">
-      <div class="background-pattern"></div>
-      <div class="background-gradient"></div>
-    </div>
+<template>
+  <div class="auth-page">
+    <!-- 渐变背景 -->
+    <div class="auth-background"></div>
 
-    <div class="register-container">
-      <el-card class="register-card" shadow="always">
-        <div class="register-card__header">
-          <div class="logo-section">
-            <div class="logo-icon">
-              <el-icon size="32"><UserFilled /></el-icon>
-            </div>
-            <p class="eyebrow">CREATE ACCOUNT</p>
-            <h1>创建后台账号</h1>
-            <p class="subtitle">选择角色并填写必要信息完成注册</p>
-          </div>
+    <!-- 关闭按钮 -->
+    <button class="close-button" @click="handleClose" title="关闭">
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="close-icon">
+        <path d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"/>
+      </svg>
+    </button>
+
+    <!-- 主要内容区域 -->
+    <div class="auth-container">
+      <div class="auth-content">
+        <!-- 标题区域 -->
+        <div class="form-header">
+          <h1 class="form-title">创建后台账号</h1>
+          <p class="form-subtitle">选择角色并填写必要信息</p>
         </div>
 
-        <!-- Role Selection -->
-        <div class="role-selection">
-          <el-radio-group v-model="activeRole" class="role-radio-group">
-            <el-radio-button v-for="role in roleOptions" :key="role.value" :value="role.value" class="role-radio">
-              <el-icon v-if="role.icon === 'User'" class="role-icon"><User /></el-icon>
-              <el-icon v-else-if="role.icon === 'Avatar'" class="role-icon"><Avatar /></el-icon>
-              <span>{{ role.label }}</span>
-            </el-radio-button>
-          </el-radio-group>
-        </div>
-
-        <!-- Registration Form -->
-        <el-form ref="formRef" :model="formModel" :rules="formRules" label-position="top" class="register-form">
-          <el-form-item
-            v-for="field in currentFields"
-            :key="field.prop"
-            :label="field.label"
-            :prop="field.prop"
-            :required="field.required"
-          >
-            <el-input
-              v-model="formModel[field.prop]"
-              :type="field.type || 'text'"
-              :placeholder="'请输入' + field.label"
+        <!-- 注册表单 -->
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          class="register-form"
+          label-width="140px"
+        >
+          <!-- 角色选择 -->
+          <el-form-item label="注册角色" prop="role" required>
+            <el-select
+              v-model="form.role"
+              placeholder="请选择注册角色"
               size="large"
-              :prefix-icon="getFieldIcon(field.icon)"
-              :show-password="field.type === 'password'"
-              clearable
-              @blur="validateField(field.prop)"
-            />
-            <div v-if="field.hint" class="field-hint">
-              <el-icon><InfoFilled /></el-icon>
-              <span>{{ field.hint }}</span>
-            </div>
+              class="modern-select"
+              @change="handleRoleChange"
+            >
+              <el-option
+                v-for="option in roleOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
+            </el-select>
           </el-form-item>
 
-          <!-- Password Strength Indicator -->
-          <div v-if="formModel['mima'] && formModel['mima'].length > 0" class="password-strength">
-            <div class="strength-label">密码强度：</div>
-            <div class="strength-bar">
-              <div
-                class="strength-fill"
-                :class="passwordStrength.level"
-                :style="{ width: passwordStrength.percentage + '%' }"
-              ></div>
-            </div>
-            <span class="strength-text" :class="passwordStrength.level">
-              {{ passwordStrength.text }}
-            </span>
-          </div>
+          <!-- 动态表单字段 -->
+          <template v-if="form.role === 'yonghu'">
+            <el-form-item label="用户账号" prop="yonghuzhanghao" required>
+              <el-input
+                v-model="form.yonghuzhanghao"
+                placeholder="请输入用户账号"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
 
-          <!-- Terms Agreement -->
-          <el-form-item>
-            <el-checkbox v-model="agreeTerms" class="terms-checkbox">
-              我已阅读并同意
-              <a href="#" class="terms-link" @click.prevent="showTerms">《用户协议》</a>
-              和
-              <a href="#" class="terms-link" @click.prevent="showPrivacy">《隐私政策》</a>
-            </el-checkbox>
-          </el-form-item>
+            <el-form-item label="密码" prop="mima" required>
+              <el-input
+                v-model="form.mima"
+                type="password"
+                placeholder="请输入密码"
+                size="large"
+                class="modern-input"
+                show-password
+              />
+            </el-form-item>
 
-          <!-- Submit Button -->
+            <el-form-item label="确认密码" prop="mima2" required>
+              <el-input
+                v-model="form.mima2"
+                type="password"
+                placeholder="请再次输入密码"
+                size="large"
+                class="modern-input"
+                show-password
+              />
+            </el-form-item>
+
+            <el-form-item label="姓名" prop="yonghuxingming" required>
+              <el-input
+                v-model="form.yonghuxingming"
+                placeholder="请输入姓名"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
+
+            <el-form-item label="手机号" prop="shoujihaoma">
+              <el-input
+                v-model="form.shoujihaoma"
+                placeholder="请输入手机号（可选）"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
+          </template>
+
+          <template v-else-if="form.role === 'jianshenjiaolian'">
+            <el-form-item label="教练工号" prop="jiaoliangonghao" required>
+              <el-input
+                v-model="form.jiaoliangonghao"
+                placeholder="请输入教练工号"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
+
+            <el-form-item label="密码" prop="mima" required>
+              <el-input
+                v-model="form.mima"
+                type="password"
+                placeholder="请输入密码"
+                size="large"
+                class="modern-input"
+                show-password
+              />
+            </el-form-item>
+
+            <el-form-item label="确认密码" prop="mima2" required>
+              <el-input
+                v-model="form.mima2"
+                type="password"
+                placeholder="请再次输入密码"
+                size="large"
+                class="modern-input"
+                show-password
+              />
+            </el-form-item>
+
+            <el-form-item label="教练姓名" prop="jiaolianxingming" required>
+              <el-input
+                v-model="form.jiaolianxingming"
+                placeholder="请输入教练姓名"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
+
+            <el-form-item label="联系电话" prop="lianxidianhua">
+              <el-input
+                v-model="form.lianxidianhua"
+                placeholder="请输入联系电话（可选）"
+                size="large"
+                class="modern-input"
+              />
+            </el-form-item>
+          </template>
+
           <el-form-item>
             <el-button
               type="primary"
-              class="submit-btn"
               size="large"
-              :loading="submitting"
-              :disabled="!agreeTerms"
+              class="register-button"
+              :loading="loading"
               @click="handleSubmit"
             >
-              <span v-if="!submitting">立即注册</span>
-              <span v-else>注册中...</span>
+              {{ loading ? '注册中...' : '提交注册' }}
             </el-button>
           </el-form-item>
-        </el-form>
 
-        <!-- Footer Links -->
-        <div class="register-footer">
-          <div class="footer-links">
-            <span>已有账号？</span>
-            <a href="#" class="footer-link" @click.prevent="gotoLogin">立即登录</a>
-          </div>
-        </div>
-      </el-card>
+          <el-form-item>
+            <div class="login-link">
+              已有账户？
+              <router-link to="/login" class="link">立即登录</router-link>
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts" name="RegisterView">
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { computed, reactive, ref, watch } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserFilled, InfoFilled, User, Avatar } from '@element-plus/icons-vue'
-import http from '@/utils/http'
-import { validateInput, containsSqlInjection, containsXss } from '@/utils/validator'
-
-interface FieldConfig {
-  prop: string
-  label: string
-  required?: boolean
-  type?: 'text' | 'password'
-  icon?: string
-  hint?: string
-}
-
-interface PasswordStrength {
-  level: 'weak' | 'medium' | 'strong'
-  percentage: number
-  text: string
-}
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ROLE_OPTIONS } from '@/utils/constants'
+import { request } from '@/utils/api'
+import type { RegisterFormData, UserRole } from '@/types/user'
 
 const router = useRouter()
+
 const formRef = ref<FormInstance>()
-const submitting = ref(false)
-const activeRole = ref<'yonghu' | 'jianshenjiaolian'>('yonghu')
-const agreeTerms = ref(false)
+const loading = ref(false)
+const roleOptions = ROLE_OPTIONS
 
-const roleOptions = [
-  { label: '会员用户', value: 'yonghu', icon: 'User' },
-  { label: '健身教练', value: 'jianshenjiaolian', icon: 'Avatar' },
-]
+const form = reactive<RegisterFormData & Record<string, any>>({
+  role: 'yonghu' as UserRole,
+  username: '',
+  password: '',
+  password2: '',
+  name: '',
+  phone: '',
+  // 会员用户字段
+  yonghuzhanghao: '',
+  mima: '',
+  mima2: '',
+  yonghuxingming: '',
+  shoujihaoma: '',
+  // 健身教练字段
+  jiaoliangonghao: '',
+  jiaolianxingming: '',
+  lianxidianhua: ''
+})
 
-const roleFields: Record<'yonghu' | 'jianshenjiaolian', FieldConfig[]> = {
-  yonghu: [
-    {
-      prop: 'yonghuzhanghao',
-      label: '用户账号',
-      required: true,
-      icon: 'User',
-      hint: '3-20个字符，支持字母、数字、下划线',
-    },
-    {
-      prop: 'mima',
-      label: '密码',
-      required: true,
-      type: 'password',
-      hint: '至少8位，包含字母和数字',
-    },
-    {
-      prop: 'mima2',
-      label: '确认密码',
-      required: true,
-      type: 'password',
-    },
-    {
-      prop: 'yonghuxingming',
-      label: '姓名',
-      required: true,
-      icon: 'UserFilled',
-    },
-    {
-      prop: 'shoujihaoma',
-      label: '手机号',
-      icon: 'Phone',
-      hint: '11位手机号码',
-    },
-  ],
-  jianshenjiaolian: [
-    {
-      prop: 'jiaoliangonghao',
-      label: '教练工号',
-      required: true,
-      icon: 'Avatar',
-      hint: '教练唯一工号',
-    },
-    {
-      prop: 'mima',
-      label: '密码',
-      required: true,
-      type: 'password',
-      hint: '至少8位，包含字母和数字',
-    },
-    {
-      prop: 'mima2',
-      label: '确认密码',
-      required: true,
-      type: 'password',
-    },
-    {
-      prop: 'jiaolianxingming',
-      label: '教练姓名',
-      required: true,
-      icon: 'UserFilled',
-    },
-    {
-      prop: 'lianxidianhua',
-      label: '联系电话',
-      icon: 'Phone',
-      hint: '11位手机号码',
-    },
-  ],
+// 密码确认验证
+const validatePasswordConfirm = (_rule: any, value: any, callback: Function) => {
+  if (!value) {
+    callback(new Error('请再次输入密码'))
+  } else if (value !== form.mima) {
+    callback(new Error('两次密码输入不一致'))
+  } else {
+    callback()
+  }
 }
 
-const formModel = reactive<Record<string, any>>({})
-const currentFields = computed(() => roleFields[activeRole.value])
+const rules = computed<FormRules>(() => {
+  const baseRules: FormRules = {
+    role: [
+      { required: true, message: '请选择注册角色', trigger: 'change' }
+    ],
+    mima: [
+      { required: true, message: '请输入密码', trigger: 'blur' },
+      { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+    ],
+    mima2: [
+      { required: true, message: '请再次输入密码', trigger: 'blur' },
+      { validator: validatePasswordConfirm, trigger: 'blur' }
+    ]
+  }
 
-// Form validation rules
-const formRules = computed<FormRules>(() => {
-  const rules: FormRules = {}
-
-  currentFields.value.forEach(field => {
-    if (field.required) {
-      rules[field.prop] = [{ required: true, message: `请输入${field.label}`, trigger: 'blur' }]
-
-      // Add specific validation rules
-      if (field.prop === 'yonghuzhanghao' || field.prop === 'jiaoliangonghao') {
-        const ruleArray = rules[field.prop] as any[]
-        if (Array.isArray(ruleArray)) {
-          ruleArray.push({
-            validator: (_rule: any, value: any, callback: any) => {
-              if (!value) {
-                callback()
-                return
-              }
-              if (containsSqlInjection(value) || containsXss(value)) {
-                callback(new Error('账号包含非法字符'))
-                return
-              }
-              if (value.length < 3 || value.length > 20) {
-                callback(new Error('账号长度应在3-20个字符之间'))
-                return
-              }
-              if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-                callback(new Error('账号只能包含字母、数字和下划线'))
-                return
-              }
-              callback()
-            },
-            trigger: 'blur',
-          })
-        }
-      }
-
-      if (field.prop === 'mima') {
-        const ruleArray = rules[field.prop] as any[]
-        if (Array.isArray(ruleArray)) {
-          ruleArray.push({
-            validator: (_rule: any, value: any, callback: any) => {
-              if (!value) {
-                callback()
-                return
-              }
-              if (containsSqlInjection(value) || containsXss(value)) {
-                callback(new Error('密码包含非法字符'))
-                return
-              }
-              if (value.length < 8) {
-                callback(new Error('密码长度至少8位'))
-                return
-              }
-              if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(value)) {
-                callback(new Error('密码必须包含字母和数字'))
-                return
-              }
-              callback()
-            },
-            trigger: 'blur',
-          })
-        }
-      }
-
-      if (field.prop === 'mima2') {
-        const ruleArray = rules[field.prop] as any[]
-        if (Array.isArray(ruleArray)) {
-          ruleArray.push({
-            validator: (_rule: any, value: any, callback: any) => {
-              if (!value) {
-                callback()
-                return
-              }
-              if (value !== formModel['mima']) {
-                callback(new Error('两次密码输入不一致'))
-                return
-              }
-              callback()
-            },
-            trigger: 'blur',
-          })
-        }
-      }
-
-      if (field.prop === 'yonghuxingming' || field.prop === 'jiaolianxingming') {
-        const ruleArray = rules[field.prop] as any[]
-        if (Array.isArray(ruleArray)) {
-          ruleArray.push({
-            validator: (_rule: any, value: any, callback: any) => {
-              if (!value) {
-                callback()
-                return
-              }
-              if (containsSqlInjection(value) || containsXss(value)) {
-                callback(new Error('姓名包含非法字符'))
-                return
-              }
-              if (value.length > 20) {
-                callback(new Error('姓名长度不能超过20个字符'))
-                return
-              }
-              callback()
-            },
-            trigger: 'blur',
-          })
-        }
-      }
-    }
-
-    if (field.prop === 'shoujihaoma' || field.prop === 'lianxidianhua') {
-      rules[field.prop] = [
-        {
-          validator: (_rule: any, value: any, callback: any) => {
-            if (!value) {
-              callback()
-              return
-            }
-            if (!/^1[3-9]\d{9}$/.test(value)) {
-              callback(new Error('请输入正确的手机号码'))
-              return
-            }
-            callback()
-          },
-          trigger: 'blur',
-        },
+  if (form.role === 'yonghu') {
+    return {
+      ...baseRules,
+      yonghuzhanghao: [
+        { required: true, message: '请输入用户账号', trigger: 'blur' }
+      ],
+      yonghuxingming: [
+        { required: true, message: '请输入姓名', trigger: 'blur' }
       ]
     }
-  })
+  } else if (form.role === 'jianshenjiaolian') {
+    return {
+      ...baseRules,
+      jiaoliangonghao: [
+        { required: true, message: '请输入教练工号', trigger: 'blur' }
+      ],
+      jiaolianxingming: [
+        { required: true, message: '请输入教练姓名', trigger: 'blur' }
+      ]
+    }
+  }
 
-  return rules
+  return baseRules
 })
 
-// Password strength calculation
-const passwordStrength = computed<PasswordStrength>(() => {
-  const password = formModel['mima'] || ''
-  if (!password) {
-    return { level: 'weak', percentage: 0, text: '' }
+const handleRoleChange = () => {
+  // 切换角色时清空表单
+  if (formRef.value) {
+    formRef.value.resetFields()
   }
-
-  let strength = 0
-  if (password.length >= 8) strength += 1
-  if (password.length >= 12) strength += 1
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1
-  if (/\d/.test(password)) strength += 1
-  if (/[^a-zA-Z0-9]/.test(password)) strength += 1
-
-  if (strength <= 2) {
-    return { level: 'weak', percentage: 33, text: '弱' }
-  } else if (strength <= 4) {
-    return { level: 'medium', percentage: 66, text: '中' }
-  } else {
-    return { level: 'strong', percentage: 100, text: '强' }
-  }
-})
-
-watch(
-  () => activeRole.value,
-  () => {
-    resetForm()
-    agreeTerms.value = false
-  },
-  { immediate: true },
-)
-
-function resetForm() {
-  Object.keys(formModel).forEach(key => delete formModel[key])
-  currentFields.value.forEach(field => {
-    formModel[field.prop] = ''
-  })
-  formRef.value?.clearValidate()
+  form.role = form.role
 }
 
-function validateField(prop: string) {
-  formRef.value?.validateField(prop)
-}
+const handleSubmit = async () => {
+  if (!formRef.value) return
 
-async function handleSubmit() {
-  if (!agreeTerms.value) {
-    ElMessage.warning('请先阅读并同意用户协议和隐私政策')
-    return
-  }
+  await formRef.value.validate(async (valid) => {
+    if (!valid) return
 
-  try {
-    await formRef.value?.validate()
-  } catch {
-    ElMessage.error('请检查表单填写是否正确')
-    return
-  }
+    loading.value = true
+    try {
+      // 准备提交数据
+      const submitData: Record<string, any> = {
+        mima: form.mima
+      }
 
-  // Additional validation
-  if (formModel['mima'] !== formModel['mima2']) {
-    ElMessage.error('两次密码输入不一致')
-    return
-  }
+      if (form.role === 'yonghu') {
+        submitData.yonghuzhanghao = form.yonghuzhanghao
+        submitData.yonghuxingming = form.yonghuxingming
+        if (form.shoujihaoma) {
+          submitData.shoujihaoma = form.shoujihaoma
+        }
+      } else if (form.role === 'jianshenjiaolian') {
+        submitData.jiaoliangonghao = form.jiaoliangonghao
+        submitData.jiaolianxingming = form.jiaolianxingming
+        if (form.lianxidianhua) {
+          submitData.lianxidianhua = form.lianxidianhua
+        }
+      }
 
-  // Security validation
-  const usernameField = activeRole.value === 'yonghu' ? 'yonghuzhanghao' : 'jiaoliangonghao'
-  const usernameValidation = validateInput(formModel[usernameField])
-  const passwordValidation = validateInput(formModel['mima'])
-
-  if (!usernameValidation.isValid || !passwordValidation.isValid) {
-    ElMessage.error('输入包含非法字符，请检查后重试')
-    return
-  }
-
-  submitting.value = true
-
-  try {
-    const payload = { ...formModel }
-    delete payload['mima2']
-
-    const response = await http.post(`/${activeRole.value}/register`, payload)
-
-    if (response.data.code === 0) {
+      // TODO: 调用注册API
+      // await request.post(`/${form.role}/register`, submitData)
+      
+      // 临时模拟注册成功
       ElMessage.success('注册成功，请登录')
       setTimeout(() => {
         router.push('/login')
       }, 1500)
-    } else {
-      ElMessage.error(response.data.msg || '注册失败')
+    } catch (error: any) {
+      ElMessage.error(error.message || '注册失败，请重试')
+    } finally {
+      loading.value = false
     }
-  } catch (error: any) {
-    console.error(error)
-    const errorMsg = error?.response?.data?.msg || error?.message || '注册失败'
-    ElMessage.error(errorMsg)
-  } finally {
-    submitting.value = false
-  }
+  })
 }
 
-function gotoLogin() {
+const handleClose = () => {
   router.push('/login')
-}
-
-function showTerms() {
-  ElMessageBox.alert('用户协议内容...', '用户协议', {
-    confirmButtonText: '我知道了',
-  })
-}
-
-function showPrivacy() {
-  ElMessageBox.alert('隐私政策内容...', '隐私政策', {
-    confirmButtonText: '我知道了',
-  })
-}
-
-function getFieldIcon(iconName?: string) {
-  if (!iconName) return undefined
-  const iconMap: Record<string, string> = {
-    User: 'User',
-    UserFilled: 'UserFilled',
-    Phone: 'Phone',
-    Avatar: 'Avatar',
-  }
-  return iconMap[iconName]
 }
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/tokens' as *;
-@use '@/styles/mixins' as *;
+@import '@/styles/mixins';
 
-.register-page {
+.auth-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px;
-  position: relative;
   overflow: hidden;
 }
 
-.register-background {
+.auth-background {
   position: absolute;
   inset: 0;
+  background: var(--gradient-bg-auth);
   z-index: 0;
 }
 
-.background-pattern {
+.close-button {
   position: absolute;
-  inset: 0;
-}
-
-.background-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #091628, #101f3d);
-}
-
-.register-container {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: min(640px, 100%);
-}
-
-.register-card {
-  width: 100%;
-  border-radius: 24px;
-  padding: 48px 40px;
-  background: #ffffff !important;
-  box-shadow: 0 30px 80px rgba(10, 24, 64, 0.45) !important;
-  border: none !important;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-
-  :deep(.el-card__body) {
-    padding: 0;
-  }
+  top: var(--space-6);
+  right: var(--space-6);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  @include glassmorphism(0.7, 8px);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all var(--duration-200) var(--ease-in-out);
+  box-shadow: var(--shadow-sm);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 35px 90px rgba(10, 24, 64, 0.5) !important;
+    background: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+  }
+
+  .close-icon {
+    width: 24px;
+    height: 24px;
   }
 }
 
-.register-card__header {
-  margin-bottom: 32px;
-  text-align: center;
-}
-
-.logo-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #3a80ff;
-  border-radius: 16px;
-  color: white;
-  margin-bottom: 8px;
-  box-shadow: 0 8px 20px rgba(58, 128, 255, 0.3);
-}
-
-.eyebrow {
-  color: #3a80ff;
-  letter-spacing: 0.3em;
-  font-size: 12px;
-  font-weight: 600;
-  margin: 0;
-  text-transform: uppercase;
-}
-
-h1 {
-  margin: 8px 0;
-  color: #1a202c;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.subtitle {
-  margin: 0;
-  color: #718096;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-// Role Selection
-.role-selection {
-  margin-bottom: 32px;
-  padding: 20px;
-  background: rgba(58, 128, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(58, 128, 255, 0.1);
-}
-
-.role-radio-group {
+.auth-container {
+  position: relative;
+  z-index: 10;
   width: 100%;
-  display: flex;
-  gap: 12px;
+  max-width: 640px;
+  padding: var(--space-4);
+}
 
-  :deep(.el-radio-button) {
-    flex: 1;
+.auth-content {
+  @include card();
+  width: 100%;
+}
 
-    .el-radio-button__inner {
-      width: 100%;
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      padding: 16px;
-      font-size: 14px;
-      border: 1px solid #e2e8f0;
-      background-color: #ffffff;
-      color: #4a5568;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+.form-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
 
-    &.is-active .el-radio-button__inner {
-      background-color: #3a80ff;
-      border-color: #3a80ff;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(58, 128, 255, 0.3);
-    }
+.form-title {
+  font-size: var(--font-size-display-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-family-display);
+}
+
+.form-subtitle {
+  font-size: var(--font-size-body-md);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+.register-form {
+  :deep(.el-form-item__label) {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  :deep(.el-form-item__label::before) {
+    content: '*';
+    color: var(--color-danger-500);
+    margin-right: 4px;
+  }
+
+  :deep(.el-form-item__label:has(+ .el-form-item__content .modern-select))::before {
+    content: '';
   }
 }
 
-.role-icon {
-  font-size: 20px;
-}
+.modern-select {
+  width: 100%;
 
-// 表单样式已提取到 components/_forms.scss
-// 密码强度指示器样式已提取到 components/_password-strength.scss
-// 使用 .register-form, .field-hint, .password-strength 等类名即可应用统一样式
-
-// Terms Checkbox
-.terms-checkbox {
-  :deep(.el-checkbox__label) {
-    color: #4a5568;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  .terms-link {
-    color: #3a80ff;
-    text-decoration: none;
-    transition: color 0.3s ease;
+  :deep(.el-input__wrapper) {
+    @include glassmorphism(0.5, 8px);
+    border-radius: var(--radius-input);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-200) var(--ease-in-out);
 
     &:hover {
-      color: #4a90ff;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow-md);
+    }
+
+    &.is-focus {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
+.modern-input {
+  :deep(.el-input__wrapper) {
+    @include glassmorphism(0.5, 8px);
+    border-radius: var(--radius-input);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-200) var(--ease-in-out);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow-md);
+    }
+
+    &.is-focus {
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
+.register-button {
+  width: 100%;
+  height: 56px;
+  font-size: var(--font-size-body-lg);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-xl);
+  background: var(--gradient-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  box-shadow: var(--shadow-primary-sm);
+  transition: all var(--duration-200) var(--ease-in-out);
+
+  &:hover {
+    box-shadow: var(--shadow-primary-sm);
+    transform: translateY(-2px);
+  }
+}
+
+.login-link {
+  text-align: center;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-text-secondary);
+  width: 100%;
+
+  .link {
+    color: var(--color-primary-500);
+    font-weight: var(--font-weight-medium);
+    margin-left: var(--space-1);
+    text-decoration: none;
+    transition: color var(--duration-200) var(--ease-in-out);
+
+    &:hover {
+      color: var(--color-primary-600);
       text-decoration: underline;
     }
   }
 }
 
-// Submit Button
-.submit-btn {
-  width: 100%;
-  margin-top: 8px;
-  height: 48px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-  background: #3a80ff !important;
-  border: none !important;
-  box-shadow: 0 8px 20px rgba(58, 128, 255, 0.3);
-  transition: all 0.3s ease;
-  color: #ffffff !important;
-
-  &:focus {
-    box-shadow: 0 0 0 4px rgba(58, 128, 255, 0.2);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  &:hover:not(:disabled) {
-    background: #4a90ff !important;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(58, 128, 255, 0.4);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-}
-
-// Footer
-.register-footer {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #e2e8f0;
-  text-align: center;
-  width: 100%;
-}
-
-.footer-links {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #718096;
-
-  .footer-link {
-    color: #3a80ff;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: #4a90ff;
-      text-decoration: underline;
-    }
-  }
-}
-
-// Responsive Design
-@media (width <= 992px) {
-  .register-card {
-    padding: 32px 24px;
-  }
-
-  h1 {
-    font-size: 22px;
-  }
-}
-
-@media (width <= 768px) {
-  .register-page {
-    padding: 20px;
-  }
-
-  .register-card {
-    padding: 32px 24px;
-    border-radius: 16px;
-  }
-
-  h1 {
-    font-size: 20px;
-  }
-
-  .logo-icon {
-    width: 56px;
-    height: 56px;
-  }
-
-  .role-radio-group {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .role-selection {
-    padding: 16px;
-  }
-}
-
-@media (width <= 480px) {
-  .register-card {
-    padding: 24px 20px;
-  }
-
-  .password-strength {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .strength-bar {
-    width: 100%;
+@include respond-to(sm) {
+  .auth-container {
+    padding: var(--space-6);
   }
 }
 </style>

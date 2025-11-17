@@ -270,7 +270,8 @@ export class NetworkUtils {
  */
 export class TestDataUtils {
   /**
-   * 生成随机测试数据
+   * 生成随机测试数据（兼容性方法，已废弃，建议使用TestDataManager）
+   * @deprecated 使用 TestDataManager.generateIsolatedUser() 等方法
    */
   static generateRandomData(type: 'user' | 'coach' | 'course' | 'booking'): any {
     const timestamp = Date.now()
@@ -1468,6 +1469,50 @@ export async function setupEnhancedMock(page: Page): Promise<void> {
 
   } catch (error) {
     console.warn(`Mock setup failed: ${error.message}`)
+  }
+}
+
+/**
+ * 测试数据隔离设置
+ */
+export async function setupTestDataIsolation(page: Page, testInfo: any): Promise<{
+  testId: string
+  dataManager: any
+  cleanup: () => Promise<void>
+}> {
+  const { TestDataManager } = await import('./test-data-manager')
+  const dataManager = TestDataManager.getInstance()
+  const testId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+  // 创建测试数据上下文
+  const context = dataManager.createTestContext(testId, testInfo.title || 'unknown_test')
+
+  // 设置页面上下文用于数据清理
+  const cleanup = async () => {
+    await dataManager.cleanupTestContext(testId, page)
+  }
+
+  return { testId, dataManager, cleanup }
+}
+
+/**
+ * 性能监控设置
+ */
+export async function setupPerformanceMonitoring(page: Page, testInfo: any): Promise<{
+  monitor: any
+  startMonitoring: () => Promise<void>
+  stopMonitoring: () => Promise<any>
+  markCheckpoint: (name: string) => Promise<number>
+}> {
+  const { PerformanceMonitor } = await import('./performance-monitor')
+  const testId = `perf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const monitor = new PerformanceMonitor(page, testId, testInfo.title || 'unknown_test')
+
+  return {
+    monitor,
+    startMonitoring: () => monitor.startMonitoring(),
+    stopMonitoring: () => monitor.stopMonitoring(),
+    markCheckpoint: (name: string) => monitor.markCheckpoint(name)
   }
 }
 

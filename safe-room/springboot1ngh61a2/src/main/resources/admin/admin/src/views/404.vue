@@ -1,9 +1,14 @@
 <template>
-  <ErrorPage code="404" />
+  <div>
+    <!-- 空白页面 -->
+  </div>
 </template>
 
-<script setup lang="ts" name="NotFound">
-import { defineAsyncComponent } from 'vue'
-
-const ErrorPage = defineAsyncComponent(() => import('./error/ErrorPage.vue'))
+<script setup lang="ts">
+// 空白页面
 </script>
+
+<style scoped>
+/* 空白样式 */
+</style>
+

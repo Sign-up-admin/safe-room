@@ -1,0 +1,209 @@
+/**
+ * 现代化样式系统 - CSS变量定义
+ * 基于 Microsoft Copilot 设计理念
+ */
+
+:root {
+  // ========== 色彩系统 ==========
+  
+  // 主色调 - 蓝色系
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;  // 主色
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  // 成功色 - 绿色系
+  --color-success-50: #f0fdf4;
+  --color-success-500: #22c55e;  // 主成功色
+  --color-success-600: #16a34a;
+
+  // 警告色 - 橙色系
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;  // 主警告色
+  --color-warning-600: #d97706;
+
+  // 危险色 - 红色系
+  --color-danger-50: #fef2f2;
+  --color-danger-500: #ef4444;  // 主危险色
+  --color-danger-600: #dc2626;
+
+  // 语义色彩
+  --color-text-primary: #111827;      // 主要文字
+  --color-text-secondary: #6b7280;    // 次要文字
+  --color-text-tertiary: #9ca3af;     // 辅助文字
+  --color-text-inverse: #ffffff;      // 深色背景上的文字
+
+  --color-bg-primary: #ffffff;        // 主要背景
+  --color-bg-secondary: #f9fafb;      // 次要背景
+  --color-bg-tertiary: #f3f4f6;       // 辅助背景
+  --color-bg-overlay: rgba(0, 0, 0, 0.5); // 遮罩层
+
+  --color-border-light: #f3f4f6;      // 浅边框
+  --color-border-medium: #d1d5db;     // 中等边框
+  --color-border-dark: #9ca3af;       // 深边框
+
+  // 渐变色彩
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  --gradient-bg-auth: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 50%, #fafbfc 100%);
+  --gradient-bg-dashboard: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+  --gradient-bg-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+
+  // ========== 字体系统 ==========
+  
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  --font-family-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-size-display-2xl: clamp(2.5rem, 5vw, 4rem);
+  --font-size-display-xl: clamp(2rem, 4vw, 3rem);
+  --font-size-display-lg: clamp(1.5rem, 3vw, 2.25rem);
+  --font-size-display-md: clamp(1.25rem, 2.5vw, 1.875rem);
+  --font-size-display-sm: clamp(1.125rem, 2vw, 1.5rem);
+  --font-size-body-lg: 1.125rem;
+  --font-size-body-md: 1rem;
+  --font-size-body-sm: 0.875rem;
+  --font-size-body-xs: 0.75rem;
+
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  // ========== 间距系统 ==========
+  
+  --space-px: 1px;
+  --space-0: 0;
+  --space-1: 0.25rem;    // 4px
+  --space-2: 0.5rem;     // 8px
+  --space-3: 0.75rem;    // 12px
+  --space-4: 1rem;       // 16px
+  --space-5: 1.25rem;    // 20px
+  --space-6: 1.5rem;     // 24px
+  --space-8: 2rem;       // 32px
+  --space-10: 2.5rem;    // 40px
+  --space-12: 3rem;      // 48px
+  --space-16: 4rem;      // 64px
+  --space-20: 5rem;      // 80px
+  --space-24: 6rem;      // 96px
+  --space-32: 8rem;      // 128px
+
+  --container-xs: 20rem;     // 320px
+  --container-sm: 24rem;     // 384px
+  --container-md: 28rem;     // 448px
+  --container-lg: 32rem;    // 512px
+  --container-xl: 36rem;    // 576px
+  --container-2xl: 42rem;   // 672px
+
+  // ========== 圆角系统 ==========
+  
+  --radius-none: 0;
+  --radius-sm: 0.125rem;    // 2px
+  --radius-md: 0.375rem;    // 6px
+  --radius-lg: 0.5rem;      // 8px
+  --radius-xl: 0.75rem;     // 12px
+  --radius-2xl: 1rem;       // 16px
+  --radius-3xl: 1.5rem;     // 24px
+  --radius-full: 9999px;    // 完全圆角
+
+  --radius-button: var(--radius-xl);
+  --radius-card: var(--radius-2xl);
+  --radius-input: var(--radius-lg);
+  --radius-modal: var(--radius-2xl);
+
+  // ========== 阴影系统 ==========
+  
+  --shadow-none: 0 0 #0000;
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-highlight: 0 0 0 1px rgba(255, 255, 255, 0.2);
+
+  --shadow-primary-xs: 0 1px 2px 0 rgba(59, 130, 246, 0.05);
+  --shadow-primary-sm: 0 1px 3px 0 rgba(59, 130, 246, 0.1);
+  --shadow-success-xs: 0 1px 2px 0 rgba(34, 197, 94, 0.05);
+  --shadow-success-sm: 0 1px 3px 0 rgba(34, 197, 94, 0.1);
+  --shadow-danger-xs: 0 1px 2px 0 rgba(239, 68, 68, 0.05);
+  --shadow-danger-sm: 0 1px 3px 0 rgba(239, 68, 68, 0.1);
+
+  // ========== 动画系统 ==========
+  
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-emphasized-in: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-emphasized-out: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-emphasized-in-out: cubic-bezier(0.05, 0.7, 0.1, 1.15);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --duration-0: 0ms;
+  --duration-25: 25ms;
+  --duration-50: 50ms;
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+
+  // ========== 响应式断点 ==========
+  
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  // ========== Z-index层级 ==========
+  
+  --z-index-base: 0;
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}
+
+// 浅色主题（默认）
+[data-theme="light"] {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --gradient-bg-auth: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 50%, #fafbfc 100%);
+}
+
+// 深色主题
+[data-theme="dark"] {
+  --color-bg-primary: #111827;
+  --color-bg-secondary: #1f2937;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --gradient-bg-auth: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
