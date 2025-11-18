@@ -69,3 +69,4 @@ if (Test-Path $adminPath) {
     Write-Host "❌ 找不到admin前端路径: $adminPath" -ForegroundColor Red
     exit 1
 }
+

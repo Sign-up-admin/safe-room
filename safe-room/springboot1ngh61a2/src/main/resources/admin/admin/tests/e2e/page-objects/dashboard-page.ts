@@ -169,3 +169,4 @@ export class DashboardPage extends BasePage {
     await this.takeScreenshot('dashboard-state');
   }
 }
+

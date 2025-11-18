@@ -1,21 +1,20 @@
 {
-  "timestamp": "2025-11-17T16:46:35.684Z",
+  "timestamp": "2025-11-18T00:05:13.223Z",
   "execution": {
     "mode": "serial",
     "projects": [
-      "admin",
       "front"
     ],
     "maxParallel": 1,
     "failFast": false,
-    "totalDuration": 357547
+    "totalDuration": 321413
   },
   "phases": [
     {
       "id": "preparation",
       "name": "准备阶段",
       "status": "failed",
-      "startTime": 1763397638140,
+      "startTime": 1763423991813,
       "tasks": [
         {
           "id": "preparation-check-environment",
@@ -23,9 +22,9 @@
           "type": "system",
           "project": null,
           "status": "success",
-          "startTime": 1763397638140,
-          "endTime": 1763397640021,
-          "duration": 1881
+          "startTime": 1763423991813,
+          "endTime": 1763423993591,
+          "duration": 1778
         },
         {
           "id": "preparation-install-dependencies",
@@ -33,9 +32,9 @@
           "type": "system",
           "project": null,
           "status": "success",
-          "startTime": 1763397640021,
-          "endTime": 1763397670062,
-          "duration": 30041
+          "startTime": 1763423993591,
+          "endTime": 1763424002958,
+          "duration": 9367
         },
         {
           "id": "preparation-reset-database",
@@ -43,10 +42,10 @@
           "type": "system",
           "project": null,
           "status": "failed",
-          "startTime": 1763397670062,
-          "error": "命令失败 (退出码 1):  Container fitness_gym_minio  Running\n Container fitness_gym_postgres  Recreate\n Container fitness_gym_postgres  Recreated\n Container fitness_gym_postgres  Starting\n Container fitness_gym_postgres  Started\n Container fitness_gym_minio  Waiting\n Container fitness_gym_postgres  Waiting\n Container fitness_gym_minio  Healthy\n Container fitness_gym_postgres  Healthy\n Container fitness_gym_backend  Starting\nError response from daemon: ports are not available: exposing port TCP 0.0.0.0:8080 -> 127.0.0.1:0: listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.\n",
-          "endTime": 1763397692927,
-          "duration": 22865
+          "startTime": 1763424002958,
+          "error": "命令失败 (退出码 1):  Container fitness_gym_minio  Running\n Container fitness_gym_postgres  Running\n Container fitness_gym_postgres  Waiting\n Container fitness_gym_minio  Waiting\n Container fitness_gym_postgres  Healthy\n Container fitness_gym_minio  Healthy\n Container fitness_gym_backend  Starting\nError response from daemon: ports are not available: exposing port TCP 0.0.0.0:8080 -> 127.0.0.1:0: listen tcp 0.0.0.0:8080: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.\n",
+          "endTime": 1763424010342,
+          "duration": 7384
         },
         {
           "id": "preparation-start-services",
@@ -54,10 +53,10 @@
           "type": "system",
           "project": null,
           "status": "failed",
-          "startTime": 1763397692927,
+          "startTime": 1763424010342,
           "error": "后端服务启动超时",
-          "endTime": 1763397995682,
-          "duration": 302755
+          "endTime": 1763424313222,
+          "duration": 302880
         }
       ],
       "metrics": {
@@ -65,13 +64,13 @@
         "passedTasks": 2,
         "failedTasks": 2,
         "passRate": 50,
-        "totalDuration": 357542,
-        "avgDuration": 89385.5,
-        "minDuration": 1881,
-        "maxDuration": 302755
+        "totalDuration": 321409,
+        "avgDuration": 80352.25,
+        "minDuration": 1778,
+        "maxDuration": 302880
       },
-      "endTime": 1763397995682,
-      "duration": 357542
+      "endTime": 1763424313223,
+      "duration": 321410
     }
   ],
   "summary": {
@@ -82,6 +81,6 @@
     "totalTasks": 4,
     "passedTasks": 2,
     "overallPassRate": 50,
-    "totalDuration": 357542
+    "totalDuration": 321410
   }
 }

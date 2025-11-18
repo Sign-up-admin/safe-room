@@ -81,15 +81,15 @@ Write-Host ""
 
 # 执行分阶段测试
 try {
-    & "node.exe" "phased-e2e-execution-manager.js" @args
+    $process = Start-Process -FilePath "node.exe" -ArgumentList "phased-e2e-execution-manager.js" @args -NoNewWindow -Wait -PassThru
 
-    if ($LASTEXITCODE -eq 0) {
+    if ($process.ExitCode -eq 0) {
         Write-Host ""
         Write-Host "✅ 分阶段E2E测试执行完成" -ForegroundColor Green
     } else {
         Write-Host ""
         Write-Host "❌ 分阶段E2E测试执行失败" -ForegroundColor Red
-        exit $LASTEXITCODE
+        exit $process.ExitCode
     }
 } catch {
     Write-Host ""

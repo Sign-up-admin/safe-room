@@ -172,3 +172,4 @@ test.describe('Complete User Journey', () => {
     await expect(page.locator('input[data-testid*="phone"]')).toHaveValue('13800138000')
   })
 })
+

@@ -508,3 +508,4 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await takeScreenshotWithTimestamp(page, 'performance_monitoring_journey')
   })
 })
+

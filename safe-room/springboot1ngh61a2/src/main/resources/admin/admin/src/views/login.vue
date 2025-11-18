@@ -2,8 +2,8 @@
   <div class="login-page">
     <!-- 背景层 -->
     <div class="login-background">
-      <div class="background-base"></div>
-      <div class="background-gradient"></div>
+      <div class="absolute size-full bg-none bg-background-150"></div>
+      <div class="absolute size-full bg-gradient-authentication-light dark:bg-gradient-authentication-dark" style="opacity: 1;"></div>
     </div>
 
     <!-- 关闭按钮 -->
@@ -91,6 +91,10 @@ const handleSocialLogin = (provider: string) => {
 }
 </script>
 
+<style>
+@import '@/styles/copilot-reference.css';
+</style>
+
 <style scoped lang="scss">
 @import '@/styles/variables';
 
@@ -110,29 +114,6 @@ const handleSocialLogin = (provider: string) => {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-.background-base {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: none;
-  background-color: var(--color-bg-secondary, #f9fafb);
-}
-
-.background-gradient {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    rgba(250, 251, 252, 1) 0%,
-    rgba(245, 247, 250, 1) 50%,
-    rgba(250, 251, 252, 1) 100%
-  );
-  opacity: 1;
 }
 
 .dismiss-button-wrapper {

@@ -29,3 +29,4 @@ export interface RegisterResponse extends ApiResponse {
 // 通用列表响应
 export type ListResponse<T> = ApiResponse<PaginationResponse<T>>
 
+

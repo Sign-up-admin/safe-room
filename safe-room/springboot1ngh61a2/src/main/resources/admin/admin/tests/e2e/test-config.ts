@@ -174,3 +174,4 @@ export function validateConfig(): void {
   console.log(`🌐 Frontend: ${testConfig.frontendUrl}`);
   console.log(`🏭 Environment: ${testConfig.environment}`);
 }
+

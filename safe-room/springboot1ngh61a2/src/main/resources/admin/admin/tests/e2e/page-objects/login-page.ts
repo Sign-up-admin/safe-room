@@ -134,3 +134,4 @@ export class LoginPage extends BasePage {
     return this.isVisible(this.selectors.registerLink);
   }
 }
+
