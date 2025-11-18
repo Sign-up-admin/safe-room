@@ -11,9 +11,14 @@ async function globalSetup() {
   try {
     // Verify backend connectivity
     console.log('🔍 Checking backend connectivity...');
+    const backendController = new AbortController();
+    const backendTimeoutId = setTimeout(() => backendController.abort(), 10000);
+
     const backendResponse = await fetch(`${testConfig.backendUrl}/actuator/health`, {
-      timeout: 10000,
+      signal: backendController.signal,
     });
+
+    clearTimeout(backendTimeoutId);
 
     if (!backendResponse.ok) {
       throw new Error(`Backend health check failed: ${backendResponse.status}`);
@@ -23,9 +28,14 @@ async function globalSetup() {
 
     // Verify frontend is accessible
     console.log('🔍 Checking frontend accessibility...');
+    const frontendController = new AbortController();
+    const frontendTimeoutId = setTimeout(() => frontendController.abort(), 10000);
+
     const frontendResponse = await fetch(testConfig.frontendUrl, {
-      timeout: 10000,
+      signal: frontendController.signal,
     });
+
+    clearTimeout(frontendTimeoutId);
 
     if (!frontendResponse.ok) {
       throw new Error(`Frontend accessibility check failed: ${frontendResponse.status}`);
