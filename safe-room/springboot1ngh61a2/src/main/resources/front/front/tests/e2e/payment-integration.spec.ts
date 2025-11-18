@@ -10,9 +10,7 @@ test.describe('支付集成功能模块测试', () => {
   })
 
   test.describe('支付页面访问', () => {
-    test('应正确显示支付页面', async ({ page }) => {
-      // 导航到会员卡购买页面触发支付流程
-      await page.goto('/#/index/huiyuanka')
+    test('应正确显示支付页面'/#/index/huiyuanka')
       await page.waitForLoadState('networkidle')
 
       // 点击购买按钮进入支付流程
@@ -30,8 +28,8 @@ test.describe('支付集成功能模块测试', () => {
       }
     })
 
-    test('应显示订单信息', async ({ page }) => {
-      // 通过会员卡购买进入支付页面
+    test('应显示订单信�?, async ({ page }) => {
+      // 通过会员卡购买进入支付页�?
       await page.goto('/#/index/huiyuanka')
       await page.waitForLoadState('networkidle')
 
@@ -47,11 +45,11 @@ test.describe('支付集成功能模块测试', () => {
         expect(amount).toBeTruthy()
         expect(amount).toMatch(/[\d.]+/)
 
-        // 验证订单号显示
+        // 验证订单号显�?
         const orderNumber = await paymentPage.getOrderNumber()
         expect(orderNumber).toBeTruthy()
 
-        logTestStep(`订单信息显示正常 - 金额: ${amount}, 订单号: ${orderNumber}`)
+        logTestStep(`订单信息显示正常 - 金额: ${amount}, 订单�? ${orderNumber}`)
       }
     })
   })
@@ -65,16 +63,16 @@ test.describe('支付集成功能模块测试', () => {
 
       // 验证支付宝支付选项被选中
       const selectedMethod = page.locator('.payment-method.selected, .payment-option.active')
-      const isAlipaySelected = await selectedMethod.filter({ hasText: '支付宝' }).count() > 0
+      const isAlipaySelected = await selectedMethod.filter({ hasText: '支付�? }).count() > 0
 
       if (isAlipaySelected) {
         logTestStep('支付宝支付方式选择成功')
       } else {
-        logTestStep('支付宝支付选项未找到')
+        logTestStep('支付宝支付选项未找�?)
       }
     })
 
-    test('应支持微信支付方式', async ({ page }) => {
+    test('应支持微信支付方�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -87,11 +85,11 @@ test.describe('支付集成功能模块测试', () => {
       if (isWechatSelected) {
         logTestStep('微信支付方式选择成功')
       } else {
-        logTestStep('微信支付选项未找到')
+        logTestStep('微信支付选项未找�?)
       }
     })
 
-    test('应支持余额支付方式', async ({ page }) => {
+    test('应支持余额支付方�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -104,7 +102,7 @@ test.describe('支付集成功能模块测试', () => {
       if (isBalanceSelected) {
         logTestStep('余额支付方式选择成功')
       } else {
-        logTestStep('余额支付选项未找到')
+        logTestStep('余额支付选项未找�?)
       }
     })
 
@@ -116,14 +114,14 @@ test.describe('支付集成功能模块测试', () => {
 
       // 验证银行卡支付选项被选中
       const selectedMethod = page.locator('.payment-method.selected, .payment-option.active')
-      const isCardSelected = await selectedMethod.filter({ hasText: '银行卡' }).count() > 0
+      const isCardSelected = await selectedMethod.filter({ hasText: '银行�? }).count() > 0
 
       if (isCardSelected) {
-        // 验证银行卡表单出现
+        // 验证银行卡表单出�?
         await expect(page.locator('.card-form, .bank-card-form')).toBeVisible()
         logTestStep('银行卡支付方式选择成功')
       } else {
-        logTestStep('银行卡支付选项未找到')
+        logTestStep('银行卡支付选项未找�?)
       }
     })
   })
@@ -135,7 +133,7 @@ test.describe('支付集成功能模块测试', () => {
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('card')
 
-      // 尝试直接提交空表单
+      // 尝试直接提交空表�?
       await paymentPage.confirmPayment()
 
       // 验证表单验证错误
@@ -143,21 +141,21 @@ test.describe('支付集成功能模块测试', () => {
       const errorCount = await errorMessages.count()
 
       if (errorCount > 0) {
-        logTestStep(`银行卡表单验证发现 ${errorCount} 个错误`)
+        logTestStep(`银行卡表单验证发�?${errorCount} 个错误`)
       } else {
-        logTestStep('银行卡表单验证检查完成')
+        logTestStep('银行卡表单验证检查完�?)
       }
     })
 
-    test('应验证银行卡号格式', async ({ page }) => {
+    test('应验证银行卡号格�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('card')
 
-      // 填写无效的银行卡号
+      // 填写无效的银行卡�?
       await paymentPage.fillPaymentForm({
-        cardNumber: '12345678901234567890123456789012345678901234567890', // 过长的卡号
+        cardNumber: '12345678901234567890123456789012345678901234567890', // 过长的卡�?
         cardHolder: '测试用户',
         expiryDate: '12/25',
         cvv: '123'
@@ -166,13 +164,13 @@ test.describe('支付集成功能模块测试', () => {
       await paymentPage.confirmPayment()
 
       // 验证格式验证错误
-      const formatErrors = page.locator('text=卡号格式错误, text=无效的卡号, text=卡号不正确')
+      const formatErrors = page.locator('text=卡号格式错误, text=无效的卡�? text=卡号不正�?)
       const hasFormatError = await formatErrors.count() > 0
 
       if (hasFormatError) {
         logTestStep('银行卡号格式验证正常')
       } else {
-        logTestStep('银行卡号格式验证未触发')
+        logTestStep('银行卡号格式验证未触�?)
       }
     })
 
@@ -182,7 +180,7 @@ test.describe('支付集成功能模块测试', () => {
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('card')
 
-      // 填写持卡人信息
+      // 填写持卡人信�?
       await paymentPage.fillPaymentForm({
         cardHolder: '测试用户123', // 包含数字的持卡人姓名
         cardNumber: '4111111111111111',
@@ -193,7 +191,7 @@ test.describe('支付集成功能模块测试', () => {
       await paymentPage.confirmPayment()
 
       // 验证持卡人姓名验证（如果有的话）
-      logTestStep('持卡人信息填写完成')
+      logTestStep('持卡人信息填写完�?)
     })
   })
 
@@ -210,13 +208,13 @@ test.describe('支付集成功能模块测试', () => {
       // 等待支付成功
       try {
         await paymentPage.waitForPaymentSuccess()
-        logTestStep('支付宝支付流程成功完成')
+        logTestStep('支付宝支付流程成功完�?)
       } catch (error) {
-        logTestStep('支付宝支付流程测试完成')
+        logTestStep('支付宝支付流程测试完�?)
       }
     })
 
-    test('应完成微信支付流程', async ({ page }) => {
+    test('应完成微信支付流�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -234,7 +232,7 @@ test.describe('支付集成功能模块测试', () => {
       }
     })
 
-    test('应完成余额支付流程', async ({ page }) => {
+    test('应完成余额支付流�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -243,7 +241,7 @@ test.describe('支付集成功能模块测试', () => {
       // 确认支付
       await paymentPage.confirmPayment()
 
-      // 等待支付成功（余额支付通常更快）
+      // 等待支付成功（余额支付通常更快�?
       try {
         await paymentPage.waitForPaymentSuccess()
         logTestStep('余额支付流程成功完成')
@@ -252,7 +250,7 @@ test.describe('支付集成功能模块测试', () => {
       }
     })
 
-    test('应处理支付失败情况', async ({ page }) => {
+    test('应处理支付失败情�?, async ({ page }) => {
       // 修改Mock API返回支付失败
       await page.route('**/payment/**', async (route) => {
         await route.fulfill({
@@ -260,7 +258,7 @@ test.describe('支付集成功能模块测试', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             code: 1,
-            msg: '支付失败，余额不足'
+            msg: '支付失败，余额不�?
           })
         })
       })
@@ -281,25 +279,25 @@ test.describe('支付集成功能模块测试', () => {
     })
   })
 
-  test.describe('支付状态管理', () => {
-    test('应正确显示支付状态', async ({ page }) => {
+  test.describe('支付状态管�?, () => {
+    test('应正确显示支付状�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('alipay')
       await paymentPage.confirmPayment()
 
-      // 验证支付状态显示
+      // 验证支付状态显�?
       const statusElement = page.locator('.payment-status, .status-indicator')
       if (await statusElement.isVisible()) {
         const statusText = await statusElement.textContent()
-        logTestStep(`支付状态: ${statusText}`)
+        logTestStep(`支付状�? ${statusText}`)
       } else {
-        logTestStep('支付状态显示测试完成')
+        logTestStep('支付状态显示测试完�?)
       }
     })
 
-    test('应支持支付取消操作', async ({ page }) => {
+    test('应支持支付取消操�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       // 查找取消支付按钮
@@ -307,22 +305,22 @@ test.describe('支付集成功能模块测试', () => {
       if (await cancelBtn.isVisible()) {
         await cancelBtn.click()
 
-        // 验证返回或取消成功
+        // 验证返回或取消成�?
         await page.waitForURL(/#\/index\//, { timeout: 3000 }).catch(() => {})
         logTestStep('支付取消操作成功')
       } else {
-        logTestStep('无取消支付按钮')
+        logTestStep('无取消支付按�?)
       }
     })
 
-    test('应支持支付结果查询', async ({ page }) => {
+    test('应支持支付结果查�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('wechat')
       await paymentPage.confirmPayment()
 
-      // 查找支付结果查询按钮或链接
+      // 查找支付结果查询按钮或链�?
       const queryBtn = page.locator('button:has-text("查询结果"), .query-result, text=查看支付结果')
       if (await queryBtn.isVisible()) {
         await queryBtn.click()
@@ -334,7 +332,7 @@ test.describe('支付集成功能模块测试', () => {
   })
 
   test.describe('支付安全验证', () => {
-    test('应支持支付密码验证', async ({ page }) => {
+    test('应支持支付密码验�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -362,7 +360,7 @@ test.describe('支付集成功能模块测试', () => {
       const paymentPage = new PaymentPage(page)
       await paymentPage.selectPaymentMethod('card')
 
-      // 填写银行卡信息
+      // 填写银行卡信�?
       await paymentPage.fillPaymentForm({
         cardNumber: '4111111111111111',
         cardHolder: '测试用户',
@@ -373,21 +371,21 @@ test.describe('支付集成功能模块测试', () => {
       await paymentPage.confirmPayment()
 
       // 检查是否需要短信验证码
-      const smsCodeInput = page.locator('input[placeholder*="验证码"], input[name*="sms"]')
+      const smsCodeInput = page.locator('input[placeholder*="验证�?], input[name*="sms"]')
       if (await smsCodeInput.isVisible()) {
-        // 填写验证码
+        // 填写验证�?
         await smsCodeInput.fill('123456')
 
-        logTestStep('支付验证码验证功能正常')
+        logTestStep('支付验证码验证功能正�?)
       } else {
-        logTestStep('无需支付验证码')
+        logTestStep('无需支付验证�?)
       }
     })
   })
 
-  test.describe('支付记录和历史', () => {
-    test('应显示支付记录', async ({ page }) => {
-      // 导航到用户中心支付记录页面
+  test.describe('支付记录和历�?, () => {
+    test('应显示支付记�?, async ({ page }) => {
+      // 导航到用户中心支付记录页�?
       await page.goto('/#/index/center')
       await page.waitForLoadState('networkidle')
 
@@ -402,11 +400,11 @@ test.describe('支付集成功能模块测试', () => {
 
         logTestStep(`显示 ${recordCount} 条支付记录`)
       } else {
-        logTestStep('无支付记录页面')
+        logTestStep('无支付记录页�?)
       }
     })
 
-    test('应支持支付记录详情查看', async ({ page }) => {
+    test('应支持支付记录详情查�?, async ({ page }) => {
       await page.goto('/#/index/center')
       await page.waitForLoadState('networkidle')
 
@@ -427,9 +425,9 @@ test.describe('支付集成功能模块测试', () => {
     })
   })
 
-  test.describe('响应式支付体验', () => {
-    test('应在移动端优化支付流程', async ({ page }) => {
-      // 设置移动端视口
+  test.describe('响应式支付体�?, () => {
+    test('应在移动端优化支付流�?, async ({ page }) => {
+      // 设置移动端视�?
       await page.setViewportSize({ width: 375, height: 667 })
 
       await navigateToPaymentPage(page)
@@ -438,11 +436,11 @@ test.describe('支付集成功能模块测试', () => {
       await paymentPage.selectPaymentMethod('wechat')
       await paymentPage.confirmPayment()
 
-      logTestStep('移动端支付流程正常')
+      logTestStep('移动端支付流程正�?)
     })
 
-    test('应在平板端提供完整支付功能', async ({ page }) => {
-      // 设置平板端视口
+    test('应在平板端提供完整支付功�?, async ({ page }) => {
+      // 设置平板端视�?
       await page.setViewportSize({ width: 768, height: 1024 })
 
       await navigateToPaymentPage(page)
@@ -453,12 +451,12 @@ test.describe('支付集成功能模块测试', () => {
       // 验证平板端表单布局
       await expect(page.locator('.card-form')).toBeVisible()
 
-      logTestStep('平板端支付功能正常')
+      logTestStep('平板端支付功能正�?)
     })
   })
 
-  test.describe('支付数据完整性', () => {
-    test('应验证支付订单数据结构', async ({ page }) => {
+  test.describe('支付数据完整�?, () => {
+    test('应验证支付订单数据结�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -467,14 +465,14 @@ test.describe('支付集成功能模块测试', () => {
       const amount = await paymentPage.getOrderAmount()
       expect(amount).toMatch(/^\d+(\.\d{1,2})?$|^\d+$/)
 
-      // 验证订单号格式
+      // 验证订单号格�?
       const orderNumber = await paymentPage.getOrderNumber()
       expect(orderNumber).toBeTruthy()
 
       logTestStep('支付订单数据结构完整')
     })
 
-    test('应验证支付结果反馈', async ({ page }) => {
+    test('应验证支付结果反�?, async ({ page }) => {
       await navigateToPaymentPage(page)
 
       const paymentPage = new PaymentPage(page)
@@ -493,7 +491,7 @@ test.describe('支付集成功能模块测试', () => {
 
 // 辅助函数：导航到支付页面
 async function navigateToPaymentPage(page: any): Promise<void> {
-  // 通过会员卡购买进入支付页面
+  // 通过会员卡购买进入支付页�?
   await page.goto('/#/index/huiyuanka')
   await page.waitForLoadState('networkidle')
 

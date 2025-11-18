@@ -14,7 +14,7 @@ test.describe('Front homepage', () => {
     await homePage.expectHero()
     await expect(page).toHaveTitle(/Gym/i, { timeout: 10_000 }).catch(() => {
       // 页面标题目前为空，忽略错误但保留日志，方便未来补充断言
-      console.warn('Home page title was empty – consider adding <title> for better UX.')
+      console.warn('Home page title was empty �?consider adding <title> for better UX.')
     })
   })
 })

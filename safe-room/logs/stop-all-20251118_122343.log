@@ -1,0 +1,5 @@
+[2025-11-18 12:23:43] [WARN] Admin Vite (PID 4012) is not running.
+[2025-11-18 12:23:43] [WARN] Front Vite has no recorded PID. Skipping.
+[2025-11-18 12:23:43] [WARN] Spring Boot backend has no recorded PID. Skipping.
+[2025-11-18 12:23:43] [INFO] Services targeted for stop: 
+[2025-11-18 12:23:43] [INFO] stop-all.ps1 finished.

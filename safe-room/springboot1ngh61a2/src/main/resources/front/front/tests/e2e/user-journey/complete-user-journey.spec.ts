@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../../utils/shared-helpers'
+import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../utils/shared-helpers'
 import { FrontHomePage, FrontLoginPage, FrontRegisterPage } from '../../utils/page-objects/front-pages'
 import { CourseListPage, CourseDetailPage, CourseBookingPage } from '../../utils/page-objects/course-page'
 import { MembershipPage } from '../../utils/page-objects/membership-page'
@@ -14,11 +14,9 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
   }
 
   test.beforeEach(async ({ page }) => {
-    // 设置完整的测试环境
-    await setupTestEnvironment(page)
+    // 设置完整的测试环�?    await setupTestEnvironment(page)
 
-    // 生成唯一的测试用户数据
-    const timestamp = Date.now()
+    // 生成唯一的测试用户数�?    const timestamp = Date.now()
     const randomNum = Math.floor(Math.random() * 1000)
     testUser = {
       username: `journey_user_${timestamp}_${randomNum}`,
@@ -31,7 +29,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
   })
 
   test('完整用户注册登录游程', async ({ page }) => {
-    logTestStep('开始完整用户注册登录游程')
+    logTestStep('开始完整用户注册登录游�?)
 
     // === 阶段1: 用户注册 ===
 
@@ -41,14 +39,12 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await loginPage.expectScaffold()
     logTestStep('访问登录页面')
 
-    // 步骤2: 导航到注册页面
-    const registerLink = page.locator('a:has-text("注册"), a:has-text("立即注册"), text=注册').first()
+    // 步骤2: 导航到注册页�?    const registerLink = page.locator('a:has-text("注册"), a:has-text("立即注册"), text=注册').first()
     await expect(registerLink).toBeVisible()
     await registerLink.click()
 
-    // 验证跳转到注册页面
-    await expect(page).toHaveURL(/.*\/register/)
-    logTestStep('导航到注册页面')
+    // 验证跳转到注册页�?    await expect(page).toHaveURL(/.*\/register/)
+    logTestStep('导航到注册页�?)
 
     // 步骤3: 填写注册信息
     const registerPage = new FrontRegisterPage(page)
@@ -58,7 +54,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
       confirmPassword: testUser.password,
       phone: testUser.phone,
       name: testUser.name,
-      gender: '男'
+      gender: '�?
     })
     await registerPage.agreeToTerms()
     logTestStep('填写注册信息')
@@ -70,8 +66,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await page.waitForURL('**/login**', { timeout: 10000 })
     await expect(page).toHaveURL(/.*\/login/)
 
-    // 检查成功消息
-    const successMessage = page.locator('text=注册成功, .success-message')
+    // 检查成功消�?    const successMessage = page.locator('text=注册成功, .success-message')
     if (await successMessage.count() > 0) {
       logTestStep('注册成功提示显示')
     }
@@ -85,10 +80,9 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     // 验证登录成功
     await page.waitForURL('**/index/home**', { timeout: 15000 })
     await expect(page).toHaveURL(/.*\/index\/home/)
-    logTestStep('登录成功，进入首页')
+    logTestStep('登录成功，进入首�?)
 
-    // 验证用户状态显示
-    const userInfo = page.locator('.user-info, .user-name, .navbar .user')
+    // 验证用户状态显�?    const userInfo = page.locator('.user-info, .user-name, .navbar .user')
     if (await userInfo.count() > 0) {
       const userText = await userInfo.textContent()
       expect(userText).toMatch(new RegExp(testUser.username, 'i'))
@@ -101,14 +95,12 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     const homePage = new FrontHomePage(page)
     await homePage.expectHero()
 
-    // 检查热门课程展示
-    const hotCourses = page.locator('.hot-courses, .course-list, text=HOT COURSES')
+    // 检查热门课程展�?    const hotCourses = page.locator('.hot-courses, .course-list, text=HOT COURSES')
     if (await hotCourses.count() > 0) {
       logTestStep('热门课程区域正确显示')
     }
 
-    // 检查推荐内容
-    const recommendations = page.locator('.recommendations, .featured, .banners')
+    // 检查推荐内�?    const recommendations = page.locator('.recommendations, .featured, .banners')
     if (await recommendations.count() > 0) {
       logTestStep('推荐内容区域正确显示')
     }
@@ -119,12 +111,11 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
   })
 
   test('完整课程预约游程', async ({ page }) => {
-    logTestStep('开始完整课程预约游程')
+    logTestStep('开始完整课程预约游�?)
 
-    // === 前提: 用户已登录 ===
+    // === 前提: 用户已登�?===
 
-    // 使用已注册用户登录
-    const loginPage = new FrontLoginPage(page)
+    // 使用已注册用户登�?    const loginPage = new FrontLoginPage(page)
     await loginPage.goto()
     await loginPage.login('testuser', '123456')
 
@@ -144,8 +135,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     // === 阶段2: 查看课程详情 ===
 
-    // 步骤2: 点击第一个课程查看详情
-    await courseListPage.clickCourseCard(0)
+    // 步骤2: 点击第一个课程查看详�?    await courseListPage.clickCourseCard(0)
 
     const courseDetailPage = new CourseDetailPage(page)
     await courseDetailPage.expectLoaded()
@@ -184,32 +174,30 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await page.waitForSelector('text=预约成功, text=提交成功, .success-message', { timeout: 5000 })
     logTestStep('课程预约成功')
 
-    // === 阶段4: 验证预约状态 ===
+    // === 阶段4: 验证预约状�?===
 
-    // 步骤7: 返回课程列表或个人中心验证预约
-    await page.goto('/#/center')
+    // 步骤7: 返回课程列表或个人中心验证预�?    await page.goto('/#/center')
     await page.waitForLoadState('networkidle')
 
-    // 检查预约记录
-    const bookingRecords = page.locator('text=已预约, .booking-record, .my-bookings')
+    // 检查预约记�?    const bookingRecords = page.locator('text=已预�? .booking-record, .my-bookings')
     if (await bookingRecords.count() > 0) {
-      logTestStep('预约记录在个人中心正确显示')
+      logTestStep('预约记录在个人中心正确显�?)
     }
 
     await takeScreenshotWithTimestamp(page, 'complete_course_booking_journey')
   })
 
   test('完整会员购买游程', async ({ page }) => {
-    logTestStep('开始完整会员购买游程')
+    logTestStep('开始完整会员购买游�?)
 
-    // === 前提: 用户已登录 ===
+    // === 前提: 用户已登�?===
 
     const loginPage = new FrontLoginPage(page)
     await loginPage.goto()
     await loginPage.login('testuser', '123456')
     await page.waitForURL('**/index/home**', { timeout: 10000 })
 
-    // === 阶段1: 浏览会员卡 ===
+    // === 阶段1: 浏览会员�?===
 
     // 步骤1: 访问会员页面
     const membershipPage = new MembershipPage(page)
@@ -218,21 +206,19 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     const cardCount = await membershipPage.getCardCount()
     expect(cardCount).toBeGreaterThan(0)
-    logTestStep(`会员卡列表加载完成，共 ${cardCount} 个会员卡`)
+    logTestStep(`会员卡列表加载完成，�?${cardCount} 个会员卡`)
 
-    // === 阶段2: 选择会员卡 ===
+    // === 阶段2: 选择会员�?===
 
-    // 步骤2: 选择季卡（中等价格选项）
-    await membershipPage.selectCard(1) // 索引1通常是季卡
-
+    // 步骤2: 选择季卡（中等价格选项�?    await membershipPage.selectCard(1) // 索引1通常是季�?
     const cardName = await membershipPage.getSelectedCardName()
     const cardPrice = await membershipPage.getSelectedCardPrice()
 
     expect(cardName).toBeTruthy()
     expect(cardPrice).toBeTruthy()
-    logTestStep(`选择会员卡: ${cardName} - 价格: ${cardPrice}`)
+    logTestStep(`选择会员�? ${cardName} - 价格: ${cardPrice}`)
 
-    // === 阶段3: 购买会员卡 ===
+    // === 阶段3: 购买会员�?===
 
     // 步骤3: 点击购买按钮
     await membershipPage.clickPurchaseButton()
@@ -249,36 +235,34 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     // 验证购买成功
     await page.waitForSelector('text=购买成功, text=订单创建成功, .success-message', { timeout: 5000 })
-    logTestStep('会员卡购买成功')
+    logTestStep('会员卡购买成�?)
 
-    // === 阶段4: 验证会员状态 ===
+    // === 阶段4: 验证会员状�?===
 
-    // 步骤6: 检查会员状态更新
-    await page.goto('/#/center')
+    // 步骤6: 检查会员状态更�?    await page.goto('/#/center')
     await page.waitForLoadState('networkidle')
 
     const membershipStatus = page.locator('text=会员, text=VIP, .membership-status, .vip-badge')
     if (await membershipStatus.count() > 0) {
-      logTestStep('会员状态正确更新')
+      logTestStep('会员状态正确更�?)
     }
 
     await takeScreenshotWithTimestamp(page, 'complete_membership_purchase_journey')
   })
 
-  test('跨模块业务流程 - 会员购买后预约课程', async ({ page }) => {
+  test('跨模块业务流�?- 会员购买后预约课�?, async ({ page }) => {
     logTestStep('开始跨模块业务流程测试')
 
-    // === 前提: 用户已登录 ===
+    // === 前提: 用户已登�?===
 
     const loginPage = new FrontLoginPage(page)
     await loginPage.goto()
     await loginPage.login('testuser', '123456')
     await page.waitForURL('**/index/home**', { timeout: 10000 })
 
-    // === 阶段1: 购买会员卡 ===
+    // === 阶段1: 购买会员�?===
 
-    // 快速购买月卡
-    const membershipPage = new MembershipPage(page)
+    // 快速购买月�?    const membershipPage = new MembershipPage(page)
     await membershipPage.goto()
     await membershipPage.selectCard(0) // 月卡
     await membershipPage.clickPurchaseButton()
@@ -290,7 +274,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await membershipPage.submitPurchase()
 
     await page.waitForSelector('text=购买成功, .success-message', { timeout: 5000 })
-    logTestStep('会员卡购买完成')
+    logTestStep('会员卡购买完�?)
 
     // === 阶段2: 使用会员折扣预约课程 ===
 
@@ -299,8 +283,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     await courseListPage.goto()
     await courseListPage.clickCourseCard(0)
 
-    // 查看是否有会员折扣显示
-    const discountBadge = page.locator('text=会员折扣, text=会员价, .discount, .vip-price')
+    // 查看是否有会员折扣显�?    const discountBadge = page.locator('text=会员折扣, text=会员�? .discount, .vip-price')
     if (await discountBadge.count() > 0) {
       logTestStep('会员折扣正确显示')
     }
@@ -323,28 +306,26 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     // === 阶段3: 验证完整流程 ===
 
-    // 检查个人中心的所有状态
-    await page.goto('/#/center')
+    // 检查个人中心的所有状�?    await page.goto('/#/center')
     await page.waitForLoadState('networkidle')
 
     const userCenterPage = new UserCenterPage(page)
 
-    // 验证会员状态
-    const hasMembership = await userCenterPage.hasMembershipStatus()
+    // 验证会员状�?    const hasMembership = await userCenterPage.hasMembershipStatus()
     expect(hasMembership).toBe(true)
 
     // 验证预约记录
     const bookingCount = await userCenterPage.getBookingCount()
     expect(bookingCount).toBeGreaterThan(0)
 
-    logTestStep('跨模块业务流程验证完成')
+    logTestStep('跨模块业务流程验证完�?)
     await takeScreenshotWithTimestamp(page, 'cross_module_business_flow')
   })
 
-  test('数据一致性验证游程', async ({ page }) => {
-    logTestStep('开始数据一致性验证游程')
+  test('数据一致性验证游�?, async ({ page }) => {
+    logTestStep('开始数据一致性验证游�?)
 
-    // === 前提: 用户已登录并有数据 ===
+    // === 前提: 用户已登录并有数�?===
 
     const loginPage = new FrontLoginPage(page)
     await loginPage.goto()
@@ -353,8 +334,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     // === 阶段1: 创建预约数据 ===
 
-    // 创建一个课程预约
-    const courseListPage = new CourseListPage(page)
+    // 创建一个课程预�?    const courseListPage = new CourseListPage(page)
     await courseListPage.goto()
     await courseListPage.clickCourseCard(0)
 
@@ -365,16 +345,16 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     const bookingPage = new CourseBookingPage(page)
     await bookingPage.selectTimeSlot('10:00-11:00')
     await bookingPage.fillBookingForm({
-      name: '一致性测试用户',
+      name: '一致性测试用�?,
       phone: '13800123456',
-      notes: '数据一致性验证测试'
+      notes: '数据一致性验证测�?
     })
     await bookingPage.submitBooking()
 
     await page.waitForSelector('text=预约成功', { timeout: 5000 })
     logTestStep('创建预约数据完成')
 
-    // === 阶段2: 跨页面数据验证 ===
+    // === 阶段2: 跨页面数据验�?===
 
     // 访问个人中心验证数据
     await page.goto('/#/center')
@@ -382,8 +362,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     const userCenterPage = new UserCenterPage(page)
 
-    // 验证预约信息一致性
-    const bookings = await userCenterPage.getBookingList()
+    // 验证预约信息一致�?    const bookings = await userCenterPage.getBookingList()
     expect(bookings.length).toBeGreaterThan(0)
 
     // 检查最新预约是否包含正确的课程信息
@@ -391,9 +370,9 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     expect(latestBooking.courseName).toContain(courseTitle.split(' ')[0]) // 部分匹配
     expect(latestBooking.status).toMatch(/预约|确认/)
 
-    logTestStep('预约数据在个人中心正确显示')
+    logTestStep('预约数据在个人中心正确显�?)
 
-    // === 阶段3: 页面刷新后数据持久性 ===
+    // === 阶段3: 页面刷新后数据持久�?===
 
     // 刷新页面
     await page.reload()
@@ -404,17 +383,15 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     expect(refreshedBookings.length).toBe(bookings.length)
     expect(refreshedBookings[0].courseName).toBe(latestBooking.courseName)
 
-    logTestStep('页面刷新后数据保持一致')
+    logTestStep('页面刷新后数据保持一�?)
 
     // === 阶段4: 多标签页数据同步 ===
 
     // 打开新标签页访问同一数据
     const newPage = await page.context().newPage()
     await newPage.goto(page.url())
-    await setupTestEnvironment(newPage) // 设置相同的测试环境
-
-    // 在新标签页中验证数据一致性
-    const newPageBookings = await userCenterPage.getBookingListFromPage(newPage)
+    await setupTestEnvironment(newPage) // 设置相同的测试环�?
+    // 在新标签页中验证数据一致�?    const newPageBookings = await userCenterPage.getBookingListFromPage(newPage)
     expect(newPageBookings.length).toBe(bookings.length)
 
     await newPage.close()
@@ -442,9 +419,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     logTestStep(`首页完全加载时间: ${fullyLoaded}ms`)
 
     // 验证性能指标
-    expect(domContentLoaded).toBeLessThan(3000) // DOM加载应小于3秒
-    expect(fullyLoaded).toBeLessThan(5000) // 完全加载应小于5秒
-
+    expect(domContentLoaded).toBeLessThan(3000) // DOM加载应小�?�?    expect(fullyLoaded).toBeLessThan(5000) // 完全加载应小�?�?
     // === 阶段2: 操作响应性能 ===
 
     // 测试登录操作性能
@@ -458,8 +433,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     const loginTime = Date.now() - loginStart
     logTestStep(`登录操作耗时: ${loginTime}ms`)
 
-    expect(loginTime).toBeLessThan(8000) // 登录应小于8秒
-
+    expect(loginTime).toBeLessThan(8000) // 登录应小�?�?
     // === 阶段3: 业务操作性能 ===
 
     // 测试课程预约性能
@@ -485,8 +459,7 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
     const bookingTime = Date.now() - bookingStart
     logTestStep(`完整预约流程耗时: ${bookingTime}ms`)
 
-    expect(bookingTime).toBeLessThan(15000) // 完整预约应小于15秒
-
+    expect(bookingTime).toBeLessThan(15000) // 完整预约应小�?5�?
     // === 阶段4: 内存使用监控 ===
 
     // 获取页面性能指标
@@ -503,10 +476,11 @@ test.describe('完整用户游程测试 - 从注册到业务操作', () => {
 
     logTestStep(`DNS查询: ${performanceMetrics.dnsLookup}ms`)
     logTestStep(`TCP连接: ${performanceMetrics.tcpConnect}ms`)
-    logTestStep(`服务器响应: ${performanceMetrics.serverResponse}ms`)
+    logTestStep(`服务器响�? ${performanceMetrics.serverResponse}ms`)
 
     await takeScreenshotWithTimestamp(page, 'performance_monitoring_journey')
   })
 })
+
 
 

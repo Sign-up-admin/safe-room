@@ -140,3 +140,14 @@ export class MembershipRenewalPage {
     return await expiryElement.textContent() || ''
   }
 }
+
+/**
+ * MembershipPage - 会员页面通用类（别名）
+ * 为了向后兼容，提供MembershipPage作为MembershipListPage的别名
+ */
+export class MembershipPage extends MembershipListPage {
+  // 添加selectCard方法以兼容测试代码
+  async selectCard(index = 0): Promise<void> {
+    await this.clickMembershipCard(index)
+  }
+}

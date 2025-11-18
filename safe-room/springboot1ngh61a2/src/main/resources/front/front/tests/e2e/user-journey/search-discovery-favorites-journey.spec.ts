@@ -1,19 +1,14 @@
 import { test, expect } from '@playwright/test'
-import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../../utils/shared-helpers'
+import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../utils/shared-helpers'
 import { UserCenterPage } from '../../utils/page-objects/user-center-page'
 import { mockPaymentFlow } from '../../utils/test-helpers'
 
-test.describe('搜索发现和收藏用户旅程', () => {
-  test.beforeEach(async ({ page }) => {
-    // 使用完整的测试环境设置，包括Mock和Cookie处理
-    await setupTestEnvironment(page)
-    await mockPaymentFlow(page)
-    logTestStep('设置搜索收藏测试环境完成')
+test.describe('搜索发现和收藏用户旅程'设置搜索收藏测试环境完成')
   })
 
   test.describe('搜索发现流程', () => {
     test('应支持完整的搜索发现用户旅程', async ({ page }) => {
-      logTestStep('开始搜索发现完整用户旅程测试')
+      logTestStep('开始搜索发现完整用户旅程测�?)
 
       // 步骤1: 访问首页
       await page.goto('/#/index/home')
@@ -30,31 +25,27 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
         logTestStep('执行课程搜索')
       } else {
-        // 如果没有搜索框，直接导航到课程列表
-        await page.goto('/#/index/jianshenkecheng')
+        // 如果没有搜索框，直接导航到课程列�?        await page.goto('/#/index/jianshenkecheng')
         await page.waitForLoadState('networkidle')
-        logTestStep('导航到课程列表页面')
+        logTestStep('导航到课程列表页�?)
       }
 
       // 步骤3: 浏览搜索结果
       const courseCards = page.locator('.course-card, .card-item, [class*="course"]')
       const courseCount = await courseCards.count()
       expect(courseCount).toBeGreaterThan(0)
-      logTestStep(`浏览到 ${courseCount} 个搜索结果`)
+      logTestStep(`浏览�?${courseCount} 个搜索结果`)
 
-      // 步骤4: 应用筛选条件
-      const filterButtons = page.locator('button:has-text("筛选"), .filter-btn, [class*="filter"]')
+      // 步骤4: 应用筛选条�?      const filterButtons = page.locator('button:has-text("筛�?), .filter-btn, [class*="filter"]')
       if (await filterButtons.count() > 0) {
         await filterButtons.first().click()
 
-        // 选择筛选条件
-        const filterOptions = page.locator('.filter-option, input[type="checkbox"], input[type="radio"]')
+        // 选择筛选条�?        const filterOptions = page.locator('.filter-option, input[type="checkbox"], input[type="radio"]')
         if (await filterOptions.count() > 0) {
           await filterOptions.first().check()
-          logTestStep('应用筛选条件')
+          logTestStep('应用筛选条�?)
 
-          // 等待筛选结果
-          await page.waitForTimeout(500)
+          // 等待筛选结�?          await page.waitForTimeout(500)
           const filteredCount = await courseCards.count()
           logTestStep(`筛选后显示 ${filteredCount} 个结果`)
         }
@@ -67,7 +58,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
         const priceSort = page.locator('option:has-text("价格"), [value*="price"]')
         if (await priceSort.count() > 0) {
           await priceSort.first().click()
-          logTestStep('按价格排序')
+          logTestStep('按价格排�?)
         } else {
           await sortButtons.first().click()
           logTestStep('应用排序')
@@ -99,7 +90,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
         await page.waitForSelector('text=收藏成功, .success-message', { timeout: 3000 }).catch(() => {})
         logTestStep('添加收藏成功')
       } else {
-        logTestStep('未找到收藏按钮')
+        logTestStep('未找到收藏按�?)
       }
 
       // 步骤8: 从详情页预约课程
@@ -108,9 +99,8 @@ test.describe('搜索发现和收藏用户旅程', () => {
         await bookBtn.click()
         logTestStep('从详情页预约课程')
 
-        // 快速预约流程
-        await page.fill('input[placeholder*="姓名"]', '搜索预约用户')
-        await page.fill('input[placeholder*="手机号"]', '13800138000')
+        // 快速预约流�?        await page.fill('input[placeholder*="姓名"]', '搜索预约用户')
+        await page.fill('input[placeholder*="手机�?]', '13800138000')
 
         const submitBtn = page.locator('button:has-text("提交预约")')
         if (await submitBtn.count() > 0) {
@@ -135,17 +125,16 @@ test.describe('搜索发现和收藏用户旅程', () => {
       if (await favoriteItems.count() > 0) {
         const firstFavorite = favoriteItems.first()
 
-        // 点击收藏项查看详情
-        await firstFavorite.click()
+        // 点击收藏项查看详�?        await firstFavorite.click()
         await page.waitForURL(/.*/, { timeout: 3000 })
-        logTestStep('从收藏查看详情')
+        logTestStep('从收藏查看详�?)
 
         // 返回收藏列表
         await page.goBack()
         await userCenter.navigateToTab('favorites')
       }
 
-      logTestStep('搜索发现和收藏完整用户旅程测试完成')
+      logTestStep('搜索发现和收藏完整用户旅程测试完�?)
       await takeScreenshotWithTimestamp(page, 'search_favorites_journey_complete')
     })
 
@@ -155,8 +144,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
       await page.goto('/#/index/home')
       await page.waitForLoadState('networkidle')
 
-      // 测试搜索不同类型的内容
-      const searchScenarios = [
+      // 测试搜索不同类型的内�?      const searchScenarios = [
         { keyword: '健身课程', type: '课程' },
         { keyword: '私教教练', type: '教练' },
         { keyword: '瑜伽', type: '课程类型' }
@@ -173,11 +161,10 @@ test.describe('搜索发现和收藏用户旅程', () => {
           // 验证搜索结果
           const results = page.locator('.search-result, .course-card, .coach-card')
           const resultCount = await results.count()
-          logTestStep(`搜索"${scenario.keyword}"找到 ${resultCount} 个${scenario.type}结果`)
+          logTestStep(`搜索"${scenario.keyword}"找到 ${resultCount} �?{scenario.type}结果`)
 
           if (resultCount > 0) {
-            // 验证结果相关性
-            const firstResult = results.first()
+            // 验证结果相关�?            const firstResult = results.first()
             const resultText = await firstResult.textContent()
             expect(resultText?.toLowerCase()).toContain(scenario.keyword.toLowerCase().split(' ')[0])
           }
@@ -196,26 +183,24 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
       const initialCount = await page.locator('.course-card, .card-item').count()
 
-      // 测试价格范围筛选
-      const priceFilter = page.locator('input[name*="price"], [placeholder*="价格"]')
+      // 测试价格范围筛�?      const priceFilter = page.locator('input[name*="price"], [placeholder*="价格"]')
       if (await priceFilter.count() > 0) {
         await priceFilter.first().fill('0-200')
         await page.waitForTimeout(500)
         const priceFilteredCount = await page.locator('.course-card, .card-item').count()
-        logTestStep(`价格筛选: ${initialCount} -> ${priceFilteredCount}`)
+        logTestStep(`价格筛�? ${initialCount} -> ${priceFilteredCount}`)
       }
 
-      // 测试难度筛选
-      const levelFilter = page.locator('select[name*="level"], [class*="level"] select')
+      // 测试难度筛�?      const levelFilter = page.locator('select[name*="level"], [class*="level"] select')
       if (await levelFilter.count() > 0) {
         await levelFilter.selectOption('初级')
         await page.waitForTimeout(500)
         const levelFilteredCount = await page.locator('.course-card, .card-item').count()
-        logTestStep(`难度筛选: ${initialCount} -> ${levelFilteredCount}`)
+        logTestStep(`难度筛�? ${initialCount} -> ${levelFilteredCount}`)
       }
 
       // 测试排序功能
-      const sortOptions = ['价格从低到高', '价格从高到低', '评分最高', '最热门']
+      const sortOptions = ['价格从低到高', '价格从高到低', '评分最�?, '最热门']
       for (const sortOption of sortOptions) {
         const sortBtn = page.locator(`option:has-text("${sortOption}"), button:has-text("${sortOption}")`)
         if (await sortBtn.count() > 0) {
@@ -268,7 +253,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
   test.describe('收藏管理流程', () => {
     test('应支持完整的收藏管理流程', async ({ page }) => {
-      logTestStep('开始收藏管理完整流程测试')
+      logTestStep('开始收藏管理完整流程测�?)
 
       // 步骤1: 添加多个收藏
       await page.goto('/#/index/jianshenkecheng')
@@ -284,7 +269,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
         if (await favoriteBtn.count() > 0) {
           await favoriteBtn.click()
           await page.waitForTimeout(500) // 等待收藏操作完成
-          logTestStep(`添加第 ${i + 1} 个收藏`)
+          logTestStep(`添加�?${i + 1} 个收藏`)
         }
       }
 
@@ -300,8 +285,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
       // 步骤3: 管理收藏分类
       const categoryTabs = page.locator('.category-tab, .fav-category')
       if (await categoryTabs.count() > 0) {
-        // 切换到不同分类
-        for (let i = 0; i < await categoryTabs.count(); i++) {
+        // 切换到不同分�?        for (let i = 0; i < await categoryTabs.count(); i++) {
           await categoryTabs.nth(i).click()
           await page.waitForTimeout(300)
           const categoryCount = await userCenter.getFavoriteCount()
@@ -316,8 +300,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
         const checkboxes = page.locator('input[type="checkbox"]')
         if (await checkboxes.count() > 2) {
-          // 选择前两个
-          await checkboxes.nth(0).check()
+          // 选择前两�?          await checkboxes.nth(0).check()
           await checkboxes.nth(1).check()
 
           // 执行批量删除
@@ -344,10 +327,9 @@ test.describe('搜索发现和收藏用户旅程', () => {
         // 查看详情
         await firstItem.click()
         await page.waitForURL(/.*/, { timeout: 3000 })
-        logTestStep('从收藏查看详情')
+        logTestStep('从收藏查看详�?)
 
-        // 返回并取消收藏
-        await page.goBack()
+        // 返回并取消收�?        await page.goBack()
         await userCenter.navigateToTab('favorites')
 
         const unfavoriteBtn = firstItem.locator('button:has-text("取消收藏"), .unfavorite-btn')
@@ -358,7 +340,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
           const confirmBtn = page.locator('button:has-text("确认")')
           if (await confirmBtn.count() > 0) {
             await confirmBtn.click()
-            await page.waitForSelector('text=已取消收藏', { timeout: 3000 })
+            await page.waitForSelector('text=已取消收�?, { timeout: 3000 })
             logTestStep('取消收藏成功')
           }
         }
@@ -368,11 +350,10 @@ test.describe('搜索发现和收藏用户旅程', () => {
       await takeScreenshotWithTimestamp(page, 'favorites_management_complete')
     })
 
-    test('应支持收藏分享功能', async ({ page }) => {
-      logTestStep('开始收藏分享功能测试')
+    test('应支持收藏分享功�?, async ({ page }) => {
+      logTestStep('开始收藏分享功能测�?)
 
-      // 添加一个收藏
-      await page.goto('/#/index/jianshenkecheng')
+      // 添加一个收�?      await page.goto('/#/index/jianshenkecheng')
       await page.waitForLoadState('networkidle')
 
       const courseCards = page.locator('.course-card, .card-item')
@@ -411,18 +392,17 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
           logTestStep('收藏分享功能正常')
         } else {
-          logTestStep('不支持收藏分享功能')
+          logTestStep('不支持收藏分享功�?)
         }
       }
 
       await takeScreenshotWithTimestamp(page, 'favorites_sharing')
     })
 
-    test('应支持收藏数据导出', async ({ page }) => {
-      logTestStep('开始收藏数据导出测试')
+    test('应支持收藏数据导�?, async ({ page }) => {
+      logTestStep('开始收藏数据导出测�?)
 
-      // 确保有一些收藏
-      await page.goto('/#/index/jianshenkecheng')
+      // 确保有一些收�?      await page.goto('/#/index/jianshenkecheng')
       await page.waitForLoadState('networkidle')
 
       const courseCards = page.locator('.course-card, .card-item')
@@ -460,17 +440,17 @@ test.describe('搜索发现和收藏用户旅程', () => {
             logTestStep('收藏数据导出成功')
           }
         } else {
-          logTestStep('导出选项不可见')
+          logTestStep('导出选项不可�?)
         }
       } else {
-        logTestStep('不支持收藏数据导出')
+        logTestStep('不支持收藏数据导�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'favorites_export')
     })
 
-    test('应验证收藏状态同步', async ({ page }) => {
-      logTestStep('开始收藏状态同步测试')
+    test('应验证收藏状态同�?, async ({ page }) => {
+      logTestStep('开始收藏状态同步测�?)
 
       // 在列表页添加收藏
       await page.goto('/#/index/jianshenkecheng')
@@ -484,7 +464,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
         if (await favoriteBtn.count() > 0) {
           await favoriteBtn.click()
           await page.waitForSelector('text=收藏成功', { timeout: 3000 }).catch(() => {})
-          logTestStep('列表页添加收藏')
+          logTestStep('列表页添加收�?)
         }
       }
 
@@ -497,14 +477,13 @@ test.describe('搜索发现和收藏用户旅程', () => {
       expect(favoriteCount).toBeGreaterThan(0)
       logTestStep(`收藏状态同步正常，显示 ${favoriteCount} 个收藏`)
 
-      // 刷新页面验证持久化
-      await page.reload()
+      // 刷新页面验证持久�?      await page.reload()
       await userCenter.expectLoaded()
       await userCenter.navigateToTab('favorites')
 
       const afterReloadCount = await userCenter.getFavoriteCount()
       expect(afterReloadCount).toBe(favoriteCount)
-      logTestStep('收藏数据持久化正常')
+      logTestStep('收藏数据持久化正�?)
 
       await takeScreenshotWithTimestamp(page, 'favorites_sync')
     })
@@ -544,18 +523,17 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
           // 填写预约信息
           await page.fill('input[placeholder*="姓名"]', '收藏预约用户')
-          await page.fill('input[placeholder*="手机号"]', '13800138000')
+          await page.fill('input[placeholder*="手机�?]', '13800138000')
 
           // 提交预约
           const submitBtn = page.locator('button:has-text("提交预约")')
           if (await submitBtn.count() > 0) {
             await submitBtn.click()
             await page.waitForSelector('text=预约成功', { timeout: 5000 })
-            logTestStep('从收藏直接预约成功')
+            logTestStep('从收藏直接预约成�?)
           }
         } else {
-          // 如果没有直接预约按钮，点击查看详情
-          await firstItem.click()
+          // 如果没有直接预约按钮，点击查看详�?          await firstItem.click()
           await page.waitForURL(/.*/, { timeout: 3000 })
 
           // 在详情页预约
@@ -563,13 +541,13 @@ test.describe('搜索发现和收藏用户旅程', () => {
           if (await detailBookBtn.count() > 0) {
             await detailBookBtn.click()
             await page.fill('input[placeholder*="姓名"]', '收藏详情预约用户')
-            await page.fill('input[placeholder*="手机号"]', '13800138001')
+            await page.fill('input[placeholder*="手机�?]', '13800138001')
 
             const submitBtn = page.locator('button:has-text("提交预约")')
             if (await submitBtn.count() > 0) {
               await submitBtn.click()
               await page.waitForSelector('text=预约成功', { timeout: 5000 })
-              logTestStep('从收藏详情预约成功')
+              logTestStep('从收藏详情预约成�?)
             }
           }
         }
@@ -581,8 +559,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
     test('应支持从收藏直接购买会员', async ({ page }) => {
       logTestStep('开始从收藏直接购买会员测试')
 
-      // 添加会员卡收藏（如果支持）
-      await page.goto('/#/index/huiyuanka')
+      // 添加会员卡收藏（如果支持�?      await page.goto('/#/index/huiyuanka')
       await page.waitForLoadState('networkidle')
 
       const membershipCards = page.locator('.membership-card, .card-item')
@@ -591,7 +568,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
         if (await favoriteBtn.count() > 0) {
           await favoriteBtn.click()
           await page.waitForTimeout(500)
-          logTestStep('添加会员卡收藏')
+          logTestStep('添加会员卡收�?)
         }
       }
 
@@ -613,14 +590,14 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
             // 填写购买信息
             await page.fill('input[placeholder*="姓名"]', '收藏会员购买用户')
-            await page.fill('input[placeholder*="手机号"]', '13800138002')
+            await page.fill('input[placeholder*="手机�?]', '13800138002')
 
             // 提交购买
             const submitBtn = page.locator('button:has-text("确认支付")')
             if (await submitBtn.count() > 0) {
               await submitBtn.click()
               await page.waitForSelector('text=支付成功', { timeout: 5000 })
-              logTestStep('从收藏直接购买会员成功')
+              logTestStep('从收藏直接购买会员成�?)
             }
             break
           }
@@ -631,7 +608,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
     })
   })
 
-  test.describe('性能和可用性测试', () => {
+  test.describe('性能和可用性测�?, () => {
     test('应监控搜索和收藏性能', async ({ page }) => {
       logTestStep('开始搜索和收藏性能监控')
 
@@ -652,11 +629,10 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
         const searchTime = searchResultsTime - searchStartTime
         logTestStep(`搜索响应时间: ${searchTime}ms`)
-        expect(searchTime).toBeLessThan(3000) // 搜索不超过3秒
-      }
+        expect(searchTime).toBeLessThan(3000) // 搜索不超�?�?      }
 
       const pageLoadTime = Date.now() - startTime
-      logTestStep(`页面总加载时间: ${pageLoadTime}ms`)
+      logTestStep(`页面总加载时�? ${pageLoadTime}ms`)
 
       // 测试收藏操作性能
       const courseCards = page.locator('.course-card, .card-item')
@@ -670,24 +646,21 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
           const favoriteTime = Date.now() - favoriteStartTime
           logTestStep(`收藏操作时间: ${favoriteTime}ms`)
-          expect(favoriteTime).toBeLessThan(2000) // 收藏操作不超过2秒
-        }
+          expect(favoriteTime).toBeLessThan(2000) // 收藏操作不超�?�?        }
       }
 
       await takeScreenshotWithTimestamp(page, 'performance_search_favorites')
     })
 
-    test('应支持响应式搜索和收藏', async ({ page }) => {
-      logTestStep('开始响应式搜索和收藏测试')
+    test('应支持响应式搜索和收�?, async ({ page }) => {
+      logTestStep('开始响应式搜索和收藏测�?)
 
-      // 测试移动端
-      await page.setViewportSize({ width: 375, height: 667 })
+      // 测试移动�?      await page.setViewportSize({ width: 375, height: 667 })
 
       await page.goto('/#/index/home')
       await page.waitForLoadState('networkidle')
 
-      // 测试移动端搜索
-      const mobileSearch = page.locator('input[placeholder*="搜索"], .mobile-search')
+      // 测试移动端搜�?      const mobileSearch = page.locator('input[placeholder*="搜索"], .mobile-search')
       if (await mobileSearch.count() > 0) {
         await mobileSearch.fill('瑜伽')
         await page.keyboard.press('Enter')
@@ -695,19 +668,17 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
         const mobileResults = page.locator('.course-card, .search-result')
         const mobileCount = await mobileResults.count()
-        logTestStep(`移动端搜索结果: ${mobileCount} 个`)
+        logTestStep(`移动端搜索结�? ${mobileCount} 个`)
       }
 
-      // 测试移动端收藏操作
-      const userCenter = new UserCenterPage(page)
+      // 测试移动端收藏操�?      const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
 
       const mobileFavorites = await userCenter.getFavoriteCount()
-      logTestStep(`移动端收藏显示: ${mobileFavorites} 个`)
+      logTestStep(`移动端收藏显�? ${mobileFavorites} 个`)
 
-      // 测试平板端
-      await page.setViewportSize({ width: 768, height: 1024 })
+      // 测试平板�?      await page.setViewportSize({ width: 768, height: 1024 })
       await page.reload()
       await page.waitForLoadState('networkidle')
 
@@ -719,7 +690,7 @@ test.describe('搜索发现和收藏用户旅程', () => {
 
         const tabletResults = page.locator('.course-card, .search-result')
         const tabletCount = await tabletResults.count()
-        logTestStep(`平板端搜索结果: ${tabletCount} 个`)
+        logTestStep(`平板端搜索结�? ${tabletCount} 个`)
       }
 
       await takeScreenshotWithTimestamp(page, 'responsive_search_favorites')
@@ -731,18 +702,16 @@ test.describe('搜索发现和收藏用户旅程', () => {
       await page.goto('/#/index/home')
       await page.waitForLoadState('networkidle')
 
-      // 测试空搜索
-      const searchInput = page.locator('input[placeholder*="搜索"], .search-input')
+      // 测试空搜�?      const searchInput = page.locator('input[placeholder*="搜索"], .search-input')
       if (await searchInput.count() > 0) {
         await searchInput.fill('')
         await page.keyboard.press('Enter')
         await page.waitForTimeout(500)
 
-        // 验证空搜索处理
-        const results = page.locator('.search-result, .course-card')
+        // 验证空搜索处�?        const results = page.locator('.search-result, .course-card')
         const resultCount = await results.count()
         if (resultCount === 0) {
-          logTestStep('空搜索正确处理')
+          logTestStep('空搜索正确处�?)
         }
       }
 

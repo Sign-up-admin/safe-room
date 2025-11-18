@@ -9,49 +9,49 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     name: 'Login',
     component: () => import('@/views/login.vue'),
-    meta: { title: '登录', requiresAuth: false }
+    meta: { title: '登录' }
   },
   {
     path: '/password-login',
     name: 'PasswordLogin',
     component: () => import('@/views/password-login.vue'),
-    meta: { title: '账号密码登录', requiresAuth: false }
+    meta: { title: '账号密码登录' }
   },
   {
     path: '/register',
     name: 'Register',
     component: () => import('@/views/register.vue'),
-    meta: { title: '注册', requiresAuth: false }
+    meta: { title: '注册' }
   },
   {
     path: '/home',
     name: 'Home',
     component: () => import('@/views/home.vue'),
-    meta: { title: '首页', requiresAuth: true }
+    meta: { title: '首页' }
   },
   {
     path: '/center',
     name: 'Center',
     component: () => import('@/views/center.vue'),
-    meta: { title: '个人中心', requiresAuth: true }
+    meta: { title: '个人中心' }
   },
   {
     path: '/updatePassword',
     name: 'UpdatePassword',
     component: () => import('@/views/update-password.vue'),
-    meta: { title: '修改密码', requiresAuth: true }
+    meta: { title: '修改密码' }
   },
   {
     path: '/yonghu',
     name: 'Yonghu',
     component: () => import('@/views/modules/yonghu/list.vue'),
-    meta: { title: '用户管理', requiresAuth: true }
+    meta: { title: '用户管理' }
   },
   {
     path: '/jianshenjiaolian',
     name: 'Jianshenjiaolian',
     component: () => import('@/views/modules/jianshenjiaolian/list.vue'),
-    meta: { title: '健身教练管理', requiresAuth: true }
+    meta: { title: '健身教练管理' }
   },
   {
     path: '/404',
@@ -64,4 +64,5 @@ export const routes: RouteRecordRaw[] = [
     redirect: '/404'
   }
 ]
+
 

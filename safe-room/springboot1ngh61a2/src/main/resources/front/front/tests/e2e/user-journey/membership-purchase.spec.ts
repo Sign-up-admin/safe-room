@@ -8,31 +8,31 @@ import {
   logStep,
   assertElement,
   assertUrl
-} from '../../utils/shared-helpers'
+} from '../utils/shared-helpers'
 import {
   mockPaymentFlow,
   mockCaptcha,
   simulateNetworkDelay
 } from '../../utils/test-helpers'
 
-test.describe('Front 会员卡购买完整流程', () => {
+test.describe('Front 会员卡购买完整流�?, () => {
   test.beforeEach(async ({ page }) => {
     // 使用完整的测试环境设置，包括Mock和Cookie处理
     await setupTestEnvironment(page)
     await mockPaymentFlow(page)
-    logStep('设置会员卡购买测试环境完成')
+    logStep('设置会员卡购买测试环境完�?)
   })
 
-  test('会员卡购买完整流程 - 月卡', async ({ page }) => {
-    logStep('开始月卡购买测试')
+  test('会员卡购买完整流�?- 月卡', async ({ page }) => {
+    logStep('开始月卡购买测�?)
 
-    // 步骤1: 访问会员卡页面
+    // 步骤1: 访问会员卡页�?
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
-    await assertElement(page, 'text=会员卡, text=套餐')
-    logStep('访问会员卡页面')
+    await assertElement(page, 'text=会员�? text=套餐')
+    logStep('访问会员卡页�?)
 
-    // 步骤2: 浏览会员卡类型
+    // 步骤2: 浏览会员卡类�?
     const membershipCards = page.locator('.membership-card, .card-item, [class*="membership"]')
     const cardCount = await membershipCards.count()
     expect(cardCount).toBeGreaterThan(0)
@@ -49,15 +49,15 @@ test.describe('Front 会员卡购买完整流程', () => {
       logStep('选择第一个会员卡')
     }
 
-    // 步骤3: 验证会员卡详情
+    // 步骤3: 验证会员卡详�?
     await page.waitForSelector('.card-details, .membership-details, .detail-modal', { timeout: 3000 })
 
-    // 检查价格显示
+    // 检查价格显�?
     const priceElement = page.locator('.price, .card-price, [class*="price"]')
     if (await priceElement.count() > 0) {
       const priceText = await priceElement.first().textContent()
       expect(priceText).toMatch(/\d+/) // 确保包含数字
-      logStep(`会员卡价格: ${priceText}`)
+      logStep(`会员卡价�? ${priceText}`)
     }
 
     // 步骤4: 点击购买按钮
@@ -76,16 +76,16 @@ test.describe('Front 会员卡购买完整流程', () => {
 
     // 填写个人信息
     await page.fill('input[name="xingming"], input[placeholder*="姓名"]', purchaseInfo.name)
-    await page.fill('input[name="shouji"], input[placeholder*="手机号"], input[placeholder*="电话"]', purchaseInfo.phone)
+    await page.fill('input[name="shouji"], input[placeholder*="手机�?], input[placeholder*="电话"]', purchaseInfo.phone)
 
     // 身份证（如果需要）
-    const idCardInput = page.locator('input[name="shenfenzheng"], input[placeholder*="身份证"]')
+    const idCardInput = page.locator('input[name="shenfenzheng"], input[placeholder*="身份�?]')
     if (await idCardInput.count() > 0) {
       await idCardInput.fill(purchaseInfo.idCard)
     }
 
-    // 处理验证码
-    const captchaInput = page.locator('input[placeholder*="验证码"], input[name="captcha"]')
+    // 处理验证�?
+    const captchaInput = page.locator('input[placeholder*="验证�?], input[name="captcha"]')
     if (await captchaInput.count() > 0) {
       await captchaInput.fill('1234')
     }
@@ -102,13 +102,13 @@ test.describe('Front 会员卡购买完整流程', () => {
     // 步骤7: 选择支付方式
     await page.waitForSelector('.payment-methods, .pay-methods, [class*="payment"]')
 
-    // 选择支付宝支付
-    const alipayButton = page.locator('button:has-text("支付宝"), [data-payment="alipay"]').first()
+    // 选择支付宝支�?
+    const alipayButton = page.locator('button:has-text("支付�?), [data-payment="alipay"]').first()
     if (await alipayButton.count() > 0) {
       await alipayButton.click()
-      logStep('选择支付宝支付')
+      logStep('选择支付宝支�?)
     } else {
-      // 选择第一个支付方式
+      // 选择第一个支付方�?
       const paymentMethods = page.locator('.payment-method, [class*="payment"]')
       if (await paymentMethods.count() > 0) {
         await paymentMethods.first().click()
@@ -123,7 +123,7 @@ test.describe('Front 会员卡购买完整流程', () => {
 
     // 步骤9: 验证支付成功
     try {
-      // 等待支付成功页面或消息
+      // 等待支付成功页面或消�?
       await page.waitForSelector('text=支付成功, text=购买成功, .success-message', { timeout: 10000 })
       logStep('支付成功')
 
@@ -143,8 +143,8 @@ test.describe('Front 会员卡购买完整流程', () => {
     await takeScreenshot(page, 'membership_purchase_complete')
   })
 
-  test('会员卡购买 - 季卡支付流程', async ({ page }) => {
-    logStep('开始季卡购买测试')
+  test('会员卡购�?- 季卡支付流程', async ({ page }) => {
+    logStep('开始季卡购买测�?)
 
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
@@ -161,9 +161,9 @@ test.describe('Front 会员卡购买完整流程', () => {
       logStep('选择季卡')
     }
 
-    // 快速购买流程
+    // 快速购买流�?
     await page.fill('input[placeholder*="姓名"]', '季卡用户')
-    await page.fill('input[placeholder*="手机号"]', '13800138001')
+    await page.fill('input[placeholder*="手机�?]', '13800138001')
 
     // 选择微信支付
     const wechatButton = page.locator('button:has-text("微信"), [data-payment="wechat"]').first()
@@ -183,8 +183,8 @@ test.describe('Front 会员卡购买完整流程', () => {
     await takeScreenshot(page, 'quarterly_membership_purchase')
   })
 
-  test('会员卡购买 - 年卡完整流程', async ({ page }) => {
-    logStep('开始年卡购买测试')
+  test('会员卡购�?- 年卡完整流程', async ({ page }) => {
+    logStep('开始年卡购买测�?)
 
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
@@ -195,7 +195,7 @@ test.describe('Front 会员卡购买完整流程', () => {
       await yearlyCard.click()
       logStep('选择年卡')
     } else {
-      // 选择最后一个（通常是价格最高的）
+      // 选择最后一个（通常是价格最高的�?
       const cards = page.locator('.membership-card, .card-item')
       const cardCount = await cards.count()
       await cards.nth(cardCount - 1).click()
@@ -204,8 +204,8 @@ test.describe('Front 会员卡购买完整流程', () => {
 
     // 填写详细信息
     await page.fill('input[placeholder*="姓名"]', '年卡会员')
-    await page.fill('input[placeholder*="手机号"]', '13800138002')
-    await page.fill('input[placeholder*="身份证"]', '110101199001011235')
+    await page.fill('input[placeholder*="手机�?]', '13800138002')
+    await page.fill('input[placeholder*="身份�?]', '110101199001011235')
 
     // 选择银联支付
     const unionpayButton = page.locator('button:has-text("银联"), [data-payment="unionpay"]').first()
@@ -236,19 +236,19 @@ test.describe('Front 会员卡购买完整流程', () => {
     await takeScreenshot(page, 'yearly_membership_purchase')
   })
 
-  test('会员卡购买失败场景', async ({ page }) => {
+  test('会员卡购买失败场�?, async ({ page }) => {
     logStep('开始会员卡购买失败测试')
 
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
 
-    // 选择会员卡
+    // 选择会员�?
     const cards = page.locator('.membership-card, .card-item')
     await cards.first().click()
 
-    // 填写信息但使用无效支付方式
+    // 填写信息但使用无效支付方�?
     await page.fill('input[placeholder*="姓名"]', '失败测试用户')
-    await page.fill('input[placeholder*="手机号"]', '13800138003')
+    await page.fill('input[placeholder*="手机�?]', '13800138003')
 
     // 模拟支付失败
     await page.route('**/pay/**', async (route) => {
@@ -266,13 +266,13 @@ test.describe('Front 会员卡购买完整流程', () => {
     await page.click('button:has-text("确认支付")')
 
     // 验证失败处理
-    await page.waitForSelector('text=支付失败, text=请重试, .error-message', { timeout: 5000 })
+    await page.waitForSelector('text=支付失败, text=请重�? .error-message', { timeout: 5000 })
     logStep('支付失败正确处理')
 
     await takeScreenshot(page, 'membership_purchase_failure')
   })
 
-  test('会员卡购买表单验证', async ({ page }) => {
+  test('会员卡购买表单验�?, async ({ page }) => {
     logStep('开始会员卡购买表单验证测试')
 
     await page.goto('/#/index/huiyuanka')
@@ -283,7 +283,7 @@ test.describe('Front 会员卡购买完整流程', () => {
     await cards.first().click()
     await page.click('button:has-text("购买")')
 
-    // 尝试提交空表单
+    // 尝试提交空表�?
     const submitButton = page.locator('button[type="submit"], button:has-text("提交")').first()
     await submitButton.click()
 
@@ -295,12 +295,12 @@ test.describe('Front 会员卡购买完整流程', () => {
     expect(errorCount).toBeGreaterThan(0)
     logStep(`表单验证发现 ${errorCount} 个错误`)
 
-    // 验证手机号格式
-    await page.fill('input[placeholder*="手机号"]', 'invalid-phone')
+    // 验证手机号格�?
+    await page.fill('input[placeholder*="手机�?]', 'invalid-phone')
     await submitButton.click()
 
     await page.waitForTimeout(500)
-    logStep('手机号格式验证完成')
+    logStep('手机号格式验证完�?)
 
     await takeScreenshot(page, 'membership_form_validation')
   })
@@ -311,22 +311,22 @@ test.describe('Front 会员卡购买完整流程', () => {
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
 
-    // 选择会员卡
+    // 选择会员�?
     const cards = page.locator('.membership-card, .card-item')
     await cards.first().click()
 
     // 填写购买信息
-    await page.fill('input[placeholder*="姓名"]', '优惠券用户')
-    await page.fill('input[placeholder*="手机号"]', '13800138004')
+    await page.fill('input[placeholder*="姓名"]', '优惠券用�?)
+    await page.fill('input[placeholder*="手机�?]', '13800138004')
 
     // 检查是否有优惠券选项
     const couponSection = page.locator('.coupon, .discount, [class*="coupon"]')
     if (await couponSection.count() > 0) {
-      // 选择优惠券
+      // 选择优惠�?
       const couponOption = page.locator('.coupon-item, .coupon-option').first()
       if (await couponOption.count() > 0) {
         await couponOption.click()
-        logStep('使用优惠券')
+        logStep('使用优惠�?)
 
         // 验证价格变化
         const originalPrice = page.locator('.original-price, .old-price')
@@ -347,12 +347,12 @@ test.describe('Front 会员卡购买完整流程', () => {
     await page.click('button:has-text("确认支付")')
     await page.waitForSelector('text=支付成功', { timeout: 5000 })
 
-    logStep('优惠券购买完成')
+    logStep('优惠券购买完�?)
     await takeScreenshot(page, 'membership_with_coupon')
   })
 
-  test('会员卡购买网络延迟测试', async ({ page }) => {
-    logStep('开始网络延迟购买测试')
+  test('会员卡购买网络延迟测�?, async ({ page }) => {
+    logStep('开始网络延迟购买测�?)
 
     // 设置网络延迟
     await simulateNetworkDelay(page, 3000)
@@ -360,25 +360,25 @@ test.describe('Front 会员卡购买完整流程', () => {
     await page.goto('/#/index/huiyuanka')
     await waitForPage(page)
 
-    // 快速操作
+    // 快速操�?
     const cards = page.locator('.membership-card, .card-item')
     await cards.first().click()
 
     await page.fill('input[placeholder*="姓名"]', '延迟测试用户')
-    await page.fill('input[placeholder*="手机号"]', '13800138005')
+    await page.fill('input[placeholder*="手机�?]', '13800138005')
 
-    // 记录开始时间
+    // 记录开始时�?
     const startTime = Date.now()
 
     await page.click('button:has-text("确认支付")')
 
-    // 等待支付成功（应该比正常情况更慢）
+    // 等待支付成功（应该比正常情况更慢�?
     await page.waitForSelector('text=支付成功', { timeout: 15000 })
 
     const endTime = Date.now()
     const duration = endTime - startTime
 
-    expect(duration).toBeGreaterThan(3000) // 应该至少有3秒延迟
+    expect(duration).toBeGreaterThan(3000) // 应该至少�?秒延�?
     logStep(`网络延迟测试完成，耗时: ${duration}ms`)
 
     await takeScreenshot(page, 'membership_delay_test')
@@ -395,15 +395,15 @@ test.describe('Front 会员卡购买完整流程', () => {
     const loadTime = Date.now() - startTime
     logStep(`页面加载时间: ${loadTime}ms`)
 
-    // 选择会员卡
+    // 选择会员�?
     const cards = page.locator('.membership-card, .card-item')
     await cards.first().click()
 
     // 填写信息
     await page.fill('input[placeholder*="姓名"]', '性能测试用户')
-    await page.fill('input[placeholder*="手机号"]', '13800138006')
+    await page.fill('input[placeholder*="手机�?]', '13800138006')
 
-    // 记录购买开始时间
+    // 记录购买开始时�?
     const purchaseStartTime = Date.now()
 
     await page.click('button:has-text("确认支付")')
@@ -413,8 +413,8 @@ test.describe('Front 会员卡购买完整流程', () => {
     logStep(`购买流程耗时: ${purchaseTime}ms`)
 
     // 验证性能指标
-    expect(loadTime).toBeLessThan(5000) // 页面加载不超过5秒
-    expect(purchaseTime).toBeLessThan(10000) // 购买流程不超过10秒
+    expect(loadTime).toBeLessThan(5000) // 页面加载不超�?�?
+    expect(purchaseTime).toBeLessThan(10000) // 购买流程不超�?0�?
 
     await takeScreenshot(page, 'membership_performance_test')
   })

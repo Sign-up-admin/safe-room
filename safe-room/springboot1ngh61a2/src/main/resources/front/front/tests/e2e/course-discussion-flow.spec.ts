@@ -11,10 +11,7 @@ test.describe('Course Discussion Flow', () => {
 
   test('should display discussion interface correctly', async ({ page }) => {
     // Check main heading
-    await expect(page.locator('h1').filter({ hasText: '课程讨论区' })).toBeVisible()
-
-    // Check search input
-    const searchInput = page.locator('.hero-actions input[placeholder*="搜索"]')
+    await expect(page.locator('h1').filter({ hasText: '课程讨论'.hero-actions input[placeholder*="搜索"]')
     await expect(searchInput).toBeVisible()
 
     // Check filter buttons

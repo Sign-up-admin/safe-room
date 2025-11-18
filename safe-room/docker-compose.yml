@@ -126,6 +126,57 @@ services:
     networks:
       - fitness_gym_network
 
+  # 前端E2E测试服务 - 用户端
+  front-e2e:
+    build:
+      context: ./springboot1ngh61a2/src/main/resources/front/front
+      dockerfile: Dockerfile.e2e
+    container_name: fitness_gym_front_e2e
+    profiles:
+      - e2e
+    environment:
+      # 后端API地址（由用户控制，默认连接到宿主机）
+      BACKEND_URL: ${BACKEND_URL:-http://host.docker.internal:8080}
+      # 前端地址（如果前端也在宿主机运行）
+      E2E_BASE_URL: ${FRONT_E2E_BASE_URL:-http://host.docker.internal:8082}
+      E2E_NO_SERVER: "true"
+      CI: "true"
+    volumes:
+      # 挂载测试报告目录
+      - ./test-reports/front:/app/playwright-report
+    extra_hosts:
+      # 支持Linux/Mac/Windows Docker Desktop访问宿主机
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fitness_gym_network
+    # 不自动重启，测试完成后退出
+    restart: "no"
+
+  # 前端E2E测试服务 - 管理端
+  admin-e2e:
+    build:
+      context: ./springboot1ngh61a2/src/main/resources/admin/admin
+      dockerfile: Dockerfile.e2e
+    container_name: fitness_gym_admin_e2e
+    profiles:
+      - e2e
+    environment:
+      # 后端API地址（由用户控制，默认连接到宿主机）
+      BACKEND_URL: ${BACKEND_URL:-http://host.docker.internal:8080}
+      # 管理端前端地址（如果前端也在宿主机运行）
+      FRONTEND_URL: ${ADMIN_E2E_BASE_URL:-http://host.docker.internal:5173}
+      CI: "true"
+    volumes:
+      # 挂载测试报告目录
+      - ./test-reports/admin:/app/playwright-report
+    extra_hosts:
+      # 支持Linux/Mac/Windows Docker Desktop访问宿主机
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fitness_gym_network
+    # 不自动重启，测试完成后退出
+    restart: "no"
+
 volumes:
   postgres_data:
     driver: local

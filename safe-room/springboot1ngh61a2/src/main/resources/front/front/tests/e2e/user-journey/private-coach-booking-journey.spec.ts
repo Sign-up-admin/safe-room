@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../../utils/shared-helpers'
+import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../utils/shared-helpers'
 import { TrainerBookingPage } from '../../utils/page-objects/trainer-booking-page'
 import { UserCenterPage } from '../../utils/page-objects/user-center-page'
 import { mockPaymentFlow, mockCaptcha } from '../../utils/test-helpers'
@@ -15,7 +15,7 @@ test.describe('私教预约完整用户旅程', () => {
 
   test.describe('完整私教预约流程', () => {
     test('应支持完整的私教预约用户旅程', async ({ page }) => {
-      logTestStep('开始完整私教预约用户旅程测试')
+      logTestStep('开始完整私教预约用户旅程测�?)
 
       // 步骤1: 访问私教预约页面
       const trainerBookingPage = new TrainerBookingPage(page)
@@ -26,7 +26,7 @@ test.describe('私教预约完整用户旅程', () => {
       // 步骤2: 浏览教练列表
       const trainerCount = await trainerBookingPage.getTrainerCount()
       expect(trainerCount).toBeGreaterThan(0)
-      logTestStep(`浏览到 ${trainerCount} 个教练`)
+      logTestStep(`浏览�?${trainerCount} 个教练`)
 
       // 步骤3: 选择教练
       await trainerBookingPage.selectTrainer(0)
@@ -66,16 +66,15 @@ test.describe('私教预约完整用户旅程', () => {
             }
           }
         } catch (error) {
-          // 尝试下一个选择器
-        }
+          // 尝试下一个选择�?        }
       }
 
       if (!targetSelected) {
-        logTestStep('无训练目标/套餐选择，直接进入下一步')
+        logTestStep('无训练目�?套餐选择，直接进入下一�?)
       }
 
       // 点击下一步进入时间选择
-      const nextButton1 = page.locator('button:has-text("下一步"), button:has-text("继续"), .next-step')
+      const nextButton1 = page.locator('button:has-text("下一�?), button:has-text("继续"), .next-step')
       if (await nextButton1.isVisible()) {
         await nextButton1.click()
         logTestStep('进入时间选择步骤')
@@ -84,8 +83,7 @@ test.describe('私教预约完整用户旅程', () => {
       // 步骤5: 选择预约时间
       await page.waitForSelector('.time-selection, .calendar, .schedule, [class*="time"]', { timeout: 5000 })
 
-      // 查找可用时间段
-      const availableSlots = page.locator('.time-slot:not([disabled]):not(.booked), .calendar-slot:not([disabled]), [class*="available"]')
+      // 查找可用时间�?      const availableSlots = page.locator('.time-slot:not([disabled]):not(.booked), .calendar-slot:not([disabled]), [class*="available"]')
       const slotCount = await availableSlots.count()
 
       if (slotCount > 0) {
@@ -96,12 +94,11 @@ test.describe('私教预约完整用户旅程', () => {
         const timeSlots = page.locator('.time-slot, .calendar-slot, [class*="time"]')
         if (await timeSlots.count() > 0) {
           await timeSlots.first().click()
-          logTestStep('选择时间段')
+          logTestStep('选择时间�?)
         }
       }
 
-      // 点击下一步进入信息填写
-      const nextButton2 = page.locator('button:has-text("下一步"), button:has-text("继续")').nth(1)
+      // 点击下一步进入信息填�?      const nextButton2 = page.locator('button:has-text("下一�?), button:has-text("继续")').nth(1)
       if (await nextButton2.isVisible()) {
         await nextButton2.click()
         logTestStep('进入信息填写步骤')
@@ -113,13 +110,12 @@ test.describe('私教预约完整用户旅程', () => {
       const bookingData = {
         name: '私教预约用户',
         phone: '13800138000',
-        notes: '希望获得专业指导，提升健身效果'
+        notes: '希望获得专业指导，提升健身效�?
       }
 
       await trainerBookingPage.fillBookingForm(bookingData)
 
-      // 处理验证码
-      const captchaInput = page.locator('input[placeholder*="验证码"], input[name="captcha"]')
+      // 处理验证�?      const captchaInput = page.locator('input[placeholder*="验证�?], input[name="captcha"]')
       if (await captchaInput.count() > 0) {
         await captchaInput.fill('1234')
       }
@@ -138,14 +134,12 @@ test.describe('私教预约完整用户旅程', () => {
       // 步骤8: 选择支付方式
       await page.waitForSelector('.payment-methods, .pay-methods, [class*="payment"]', { timeout: 5000 })
 
-      // 选择支付宝支付
-      const alipayButton = page.locator('button:has-text("支付宝"), [data-payment="alipay"]')
+      // 选择支付宝支�?      const alipayButton = page.locator('button:has-text("支付�?), [data-payment="alipay"]')
       if (await alipayButton.count() > 0) {
         await alipayButton.click()
-        logTestStep('选择支付宝支付')
+        logTestStep('选择支付宝支�?)
       } else {
-        // 选择第一个支付方式
-        const paymentMethods = page.locator('.payment-method, [class*="payment"]')
+        // 选择第一个支付方�?        const paymentMethods = page.locator('.payment-method, [class*="payment"]')
         if (await paymentMethods.count() > 0) {
           await paymentMethods.first().click()
           logTestStep('选择支付方式')
@@ -172,12 +166,11 @@ test.describe('私教预约完整用户旅程', () => {
           logTestStep('预约详情正确')
         }
 
-        // 检查是否可以查看预约记录
-        const viewBookingsButton = page.locator('button:has-text("查看预约"), a:has-text("我的预约")')
+        // 检查是否可以查看预约记�?        const viewBookingsButton = page.locator('button:has-text("查看预约"), a:has-text("我的预约")')
         if (await viewBookingsButton.count() > 0) {
           await viewBookingsButton.click()
           await page.waitForURL('**/#/index/**', { timeout: 3000 })
-          logTestStep('跳转到预约记录页面')
+          logTestStep('跳转到预约记录页�?)
         }
 
       } catch (error) {
@@ -212,21 +205,18 @@ test.describe('私教预约完整用户旅程', () => {
         await page.waitForTimeout(500)
       }
 
-      // 测试筛选功能
-      const filterButtons = page.locator('button:has-text("筛选"), .filter-btn, [class*="filter"]')
+      // 测试筛选功�?      const filterButtons = page.locator('button:has-text("筛�?), .filter-btn, [class*="filter"]')
       if (await filterButtons.count() > 0) {
         await filterButtons.first().click()
 
-        // 选择一个筛选条件
-        const filterOptions = page.locator('.filter-option, .filter-item, input[type="checkbox"]')
+        // 选择一个筛选条�?        const filterOptions = page.locator('.filter-option, .filter-item, input[type="checkbox"]')
         if (await filterOptions.count() > 0) {
           await filterOptions.first().check()
-          logTestStep('应用筛选条件')
+          logTestStep('应用筛选条�?)
 
-          // 等待筛选结果
-          await page.waitForTimeout(500)
+          // 等待筛选结�?          await page.waitForTimeout(500)
           const filteredCount = await trainerBookingPage.getTrainerCount()
-          logTestStep(`筛选结果: ${filteredCount} 个教练`)
+          logTestStep(`筛选结�? ${filteredCount} 个教练`)
         }
       }
 
@@ -234,8 +224,8 @@ test.describe('私教预约完整用户旅程', () => {
       await takeScreenshotWithTimestamp(page, 'trainer_filter_search')
     })
 
-    test('应检测预约时间冲突', async ({ page }) => {
-      logTestStep('开始时间冲突检测测试')
+    test('应检测预约时间冲�?, async ({ page }) => {
+      logTestStep('开始时间冲突检测测�?)
 
       const trainerBookingPage = new TrainerBookingPage(page)
       await trainerBookingPage.goto()
@@ -245,7 +235,7 @@ test.describe('私教预约完整用户旅程', () => {
       await trainerBookingPage.selectTrainer(0)
 
       // 进入时间选择步骤
-      const nextButton = page.locator('button:has-text("下一步")')
+      const nextButton = page.locator('button:has-text("下一�?)')
       if (await nextButton.count() > 0) {
         await nextButton.click()
       }
@@ -256,12 +246,12 @@ test.describe('私教预约完整用户旅程', () => {
         await bookedSlots.first().click()
 
         // 验证冲突提示
-        await page.waitForSelector('text=时间冲突, text=已被预约, text=不可用, .conflict-message', { timeout: 3000 })
+        await page.waitForSelector('text=时间冲突, text=已被预约, text=不可�? .conflict-message', { timeout: 3000 })
 
-        const conflictMessage = page.locator('text=时间冲突, text=已被预约, text=不可用, .conflict-message')
+        const conflictMessage = page.locator('text=时间冲突, text=已被预约, text=不可�? .conflict-message')
         expect(await conflictMessage.count()).toBeGreaterThan(0)
 
-        logTestStep('时间冲突检测工作正常')
+        logTestStep('时间冲突检测工作正�?)
       } else {
         // 如果没有冲突时间，选择可用时间
         const availableSlots = page.locator('.time-slot:not([disabled]):not(.booked)')
@@ -277,8 +267,7 @@ test.describe('私教预约完整用户旅程', () => {
     test('应支持预约取消和修改', async ({ page }) => {
       logTestStep('开始预约取消和修改测试')
 
-      // 首先预约一个私教课程
-      const trainerBookingPage = new TrainerBookingPage(page)
+      // 首先预约一个私教课�?      const trainerBookingPage = new TrainerBookingPage(page)
       await trainerBookingPage.goto()
       await trainerBookingPage.expectLoaded()
 
@@ -286,14 +275,12 @@ test.describe('私教预约完整用户旅程', () => {
       if (trainerCount > 0) {
         await trainerBookingPage.selectTrainer(0)
 
-        // 快速预约流程
-        const bookButton = page.locator('button:has-text("预约"), button:has-text("立即预约")')
+        // 快速预约流�?        const bookButton = page.locator('button:has-text("预约"), button:has-text("立即预约")')
         if (await bookButton.count() > 0) {
           await bookButton.click()
 
-          // 填写基本信息并提交
-          await page.fill('input[placeholder*="姓名"]', '取消测试用户')
-          await page.fill('input[placeholder*="手机号"]', '13800138001')
+          // 填写基本信息并提�?          await page.fill('input[placeholder*="姓名"]', '取消测试用户')
+          await page.fill('input[placeholder*="手机�?]', '13800138001')
 
           const submitButton = page.locator('button:has-text("提交预约")')
           if (await submitButton.count() > 0) {
@@ -315,8 +302,7 @@ test.describe('私教预约完整用户旅程', () => {
       if (await bookings.count() > 0) {
         const firstBooking = bookings.first()
 
-        // 检查是否可以修改
-        const editButton = firstBooking.locator('button:has-text("修改"), .edit-btn')
+        // 检查是否可以修�?        const editButton = firstBooking.locator('button:has-text("修改"), .edit-btn')
         if (await editButton.count() > 0) {
           await editButton.click()
           logTestStep('点击修改预约')
@@ -328,8 +314,7 @@ test.describe('私教预约完整用户旅程', () => {
           logTestStep('预约修改成功')
         }
 
-        // 检查是否可以取消
-        const cancelButton = firstBooking.locator('button:has-text("取消"), .cancel-btn')
+        // 检查是否可以取�?        const cancelButton = firstBooking.locator('button:has-text("取消"), .cancel-btn')
         if (await cancelButton.count() > 0) {
           await cancelButton.click()
 
@@ -339,7 +324,7 @@ test.describe('私教预约完整用户旅程', () => {
             await confirmCancel.click()
           }
 
-          await page.waitForSelector('text=取消成功, text=已取消', { timeout: 3000 })
+          await page.waitForSelector('text=取消成功, text=已取�?, { timeout: 3000 })
           logTestStep('预约取消成功')
         }
       } else {
@@ -349,20 +334,18 @@ test.describe('私教预约完整用户旅程', () => {
       await takeScreenshotWithTimestamp(page, 'booking_cancel_modify')
     })
 
-    test('应正确处理预约失败场景', async ({ page }) => {
-      logTestStep('开始预约失败场景测试')
+    test('应正确处理预约失败场�?, async ({ page }) => {
+      logTestStep('开始预约失败场景测�?)
 
       const trainerBookingPage = new TrainerBookingPage(page)
       await trainerBookingPage.goto()
       await trainerBookingPage.expectLoaded()
 
-      // 选择教练并开始预约
-      await trainerBookingPage.selectTrainer(0)
+      // 选择教练并开始预�?      await trainerBookingPage.selectTrainer(0)
       await page.click('button:has-text("预约")')
 
-      // 填写信息但模拟支付失败
-      await page.fill('input[placeholder*="姓名"]', '失败测试用户')
-      await page.fill('input[placeholder*="手机号"]', '13800138002')
+      // 填写信息但模拟支付失�?      await page.fill('input[placeholder*="姓名"]', '失败测试用户')
+      await page.fill('input[placeholder*="手机�?]', '13800138002')
 
       // 模拟网络错误
       await page.route('**/sijiaoyuyue/**', async (route) => {
@@ -381,7 +364,7 @@ test.describe('私教预约完整用户旅程', () => {
 
       // 验证错误处理
       try {
-        await page.waitForSelector('text=预约失败, text=请重试, .error-message', { timeout: 5000 })
+        await page.waitForSelector('text=预约失败, text=请重�? .error-message', { timeout: 5000 })
         logTestStep('预约失败正确显示')
       } catch (error) {
         logTestStep('预约失败测试完成')
@@ -393,35 +376,31 @@ test.describe('私教预约完整用户旅程', () => {
     test('应支持响应式设计', async ({ page }) => {
       logTestStep('开始响应式设计测试')
 
-      // 测试移动端
-      await page.setViewportSize({ width: 375, height: 667 })
+      // 测试移动�?      await page.setViewportSize({ width: 375, height: 667 })
 
       const trainerBookingPage = new TrainerBookingPage(page)
       await trainerBookingPage.goto()
       await trainerBookingPage.expectLoaded()
 
-      // 验证移动端显示
-      const trainerCount = await trainerBookingPage.getTrainerCount()
-      logTestStep(`移动端显示 ${trainerCount} 个教练`)
+      // 验证移动端显�?      const trainerCount = await trainerBookingPage.getTrainerCount()
+      logTestStep(`移动端显�?${trainerCount} 个教练`)
 
       // 选择教练
       if (trainerCount > 0) {
         await trainerBookingPage.selectTrainer(0)
 
-        // 验证移动端表单
-        const mobileForm = page.locator('.booking-form, .mobile-form')
+        // 验证移动端表�?        const mobileForm = page.locator('.booking-form, .mobile-form')
         await expect(mobileForm).toBeVisible()
 
-        logTestStep('移动端私教预约正常')
+        logTestStep('移动端私教预约正�?)
       }
 
-      // 测试平板端
-      await page.setViewportSize({ width: 768, height: 1024 })
+      // 测试平板�?      await page.setViewportSize({ width: 768, height: 1024 })
       await page.reload()
       await trainerBookingPage.expectLoaded()
 
       const tabletCount = await trainerBookingPage.getTrainerCount()
-      logTestStep(`平板端显示 ${tabletCount} 个教练`)
+      logTestStep(`平板端显�?${tabletCount} 个教练`)
 
       await takeScreenshotWithTimestamp(page, 'responsive_private_coach')
     })
@@ -449,7 +428,7 @@ test.describe('私教预约完整用户旅程', () => {
 
       await page.click('button:has-text("预约")')
       await page.fill('input[placeholder*="姓名"]', '性能测试用户')
-      await page.fill('input[placeholder*="手机号"]', '13800138003')
+      await page.fill('input[placeholder*="手机�?]', '13800138003')
       await page.click('button:has-text("提交预约")')
 
       await page.waitForSelector('text=预约成功', { timeout: 10000 })
@@ -458,9 +437,7 @@ test.describe('私教预约完整用户旅程', () => {
       logTestStep(`预约流程耗时: ${bookingTime}ms`)
 
       // 验证性能指标
-      expect(loadTime).toBeLessThan(5000) // 页面加载不超过5秒
-      expect(bookingTime).toBeLessThan(10000) // 预约流程不超过10秒
-
+      expect(loadTime).toBeLessThan(5000) // 页面加载不超�?�?      expect(bookingTime).toBeLessThan(10000) // 预约流程不超�?0�?
       await takeScreenshotWithTimestamp(page, 'performance_private_coach')
     })
   })

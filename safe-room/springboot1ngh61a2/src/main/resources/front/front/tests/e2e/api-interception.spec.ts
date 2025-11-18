@@ -24,12 +24,10 @@ test.describe('API Interception and Mocking Tests', () => {
     ])
   })
 
-  test.describe('API请求拦截和验证', () => {
-    test('应正确拦截和验证登录API请求', async ({ page }) => {
+  test.describe('API请求拦截和验证'应正确拦截和验证登录API请求', async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
-      // 导航到登录页面
-      await page.goto('/#/login')
+      // 导航到登录页�?      await page.goto('/#/login')
 
       // 填写登录表单
       await page.fill('input[name="yonghuzhanghao"]', 'testuser')
@@ -58,8 +56,7 @@ test.describe('API Interception and Mocking Tests', () => {
     test('应正确拦截和验证课程列表API请求', async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
-      // 导航到课程页面
-      await page.goto('/#/courses')
+      // 导航到课程页�?      await page.goto('/#/courses')
 
       // 等待API调用
       const courseRequest = await mockManager.waitForApiCall('**/jianshenkecheng/**', {
@@ -92,17 +89,15 @@ test.describe('API Interception and Mocking Tests', () => {
         url: /profile|user|session/
       })
 
-      // 验证至少有一个认证请求
-      expect(authRequests.length).toBeGreaterThan(0)
+      // 验证至少有一个认证请�?      expect(authRequests.length).toBeGreaterThan(0)
 
-      // 验证请求头包含认证信息（如果适用）
-      const authRequest = authRequests[0]
+      // 验证请求头包含认证信息（如果适用�?      const authRequest = authRequests[0]
       expect(authRequest.headers).toBeDefined()
     })
   })
 
   test.describe('网络场景测试', () => {
-    test('应在成功用户旅程场景下正常工作', async ({ page }) => {
+    test('应在成功用户旅程场景下正常工�?, async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
       // 设置成功场景
@@ -133,7 +128,7 @@ test.describe('API Interception and Mocking Tests', () => {
       await mockManager.removeNetworkScenario('successful_user_journey')
     })
 
-    test('应处理网络故障场景', async ({ page }) => {
+    test('应处理网络故障场�?, async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
       // 设置故障场景
@@ -146,17 +141,16 @@ test.describe('API Interception and Mocking Tests', () => {
       await page.click('button:has-text("登录")')
 
       // 验证错误处理
-      await expect(page.locator('text=服务器内部错误, .error-message')).toBeVisible()
+      await expect(page.locator('text=服务器内部错�? .error-message')).toBeVisible()
 
       // 清理场景
       await mockManager.removeNetworkScenario('network_failures')
     })
 
-    test('应处理慢速网络场景', async ({ page }) => {
+    test('应处理慢速网络场�?, async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
-      // 设置慢速网络场景
-      await mockManager.setupNetworkScenario(NetworkScenarios.SLOW_NETWORK)
+      // 设置慢速网络场�?      await mockManager.setupNetworkScenario(NetworkScenarios.SLOW_NETWORK)
 
       const startTime = Date.now()
 
@@ -169,13 +163,12 @@ test.describe('API Interception and Mocking Tests', () => {
       const loadTime = Date.now() - startTime
 
       // 验证加载时间在预期范围内（慢速网络）
-      expect(loadTime).toBeGreaterThan(2000) // 至少2秒
-
+      expect(loadTime).toBeGreaterThan(2000) // 至少2�?
       // 清理场景
       await mockManager.removeNetworkScenario('slow_network')
     })
 
-    test('应处理离线场景', async ({ page }) => {
+    test('应处理离线场�?, async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
       // 设置离线场景
@@ -184,15 +177,14 @@ test.describe('API Interception and Mocking Tests', () => {
       // 尝试访问需要网络的页面
       await page.goto('/#/courses')
 
-      // 验证离线状态处理
-      await expect(page.locator('text=网络连接失败, text=离线模式')).toBeVisible()
+      // 验证离线状态处�?      await expect(page.locator('text=网络连接失败, text=离线模式')).toBeVisible()
 
       // 恢复网络
       await page.context().setOffline(false)
     })
   })
 
-  test.describe('API性能和负载测试', () => {
+  test.describe('API性能和负载测�?, () => {
     test('应测试API响应时间', async ({ page }) => {
       const responseTime = await ApiTestingUtils.measureApiResponseTime(
         page,
@@ -200,8 +192,7 @@ test.describe('API Interception and Mocking Tests', () => {
       )
 
       // 验证响应时间在合理范围内
-      expect(responseTime).toBeLessThan(5000) // 5秒以内
-      console.log(`API response time: ${responseTime}ms`)
+      expect(responseTime).toBeLessThan(5000) // 5秒以�?      console.log(`API response time: ${responseTime}ms`)
     })
 
     test('应测试API并发性能', async ({ page }) => {
@@ -213,8 +204,7 @@ test.describe('API Interception and Mocking Tests', () => {
       console.log('Concurrency test results:', concurrencyResult)
 
       // 验证并发性能
-      expect(concurrencyResult.successRate).toBeGreaterThan(0.8) // 80% 成功率
-      expect(concurrencyResult.averageTime).toBeLessThan(10000) // 平均响应时间
+      expect(concurrencyResult.successRate).toBeGreaterThan(0.8) // 80% 成功�?      expect(concurrencyResult.averageTime).toBeLessThan(10000) // 平均响应时间
     })
 
     test('应测试API负载能力', async ({ page }) => {
@@ -227,9 +217,7 @@ test.describe('API Interception and Mocking Tests', () => {
       console.log('Load test results:', loadResult)
 
       // 验证负载能力
-      expect(loadResult.requestsPerSecond).toBeGreaterThan(1) // 至少1个请求/秒
-      expect(loadResult.errors).toBeLessThan(5) // 错误少于5个
-    })
+      expect(loadResult.requestsPerSecond).toBeGreaterThan(1) // 至少1个请�?�?      expect(loadResult.errors).toBeLessThan(5) // 错误少于5�?    })
   })
 
   test.describe('API故障注入测试', () => {
@@ -271,7 +259,7 @@ test.describe('API Interception and Mocking Tests', () => {
       await page.goto('/#/courses')
 
       // 验证错误处理
-      await expect(page.locator('text=服务不可用, text=系统错误')).toBeVisible()
+      await expect(page.locator('text=服务不可�? text=系统错误')).toBeVisible()
     })
 
     test('应处理API数据损坏故障', async ({ page }) => {
@@ -292,7 +280,7 @@ test.describe('API Interception and Mocking Tests', () => {
     })
   })
 
-  test.describe('API请求日志和分析', () => {
+  test.describe('API请求日志和分�?, () => {
     test('应记录和分析API请求日志', async ({ page }) => {
       const mockManager = createApiMockManager(page)
 
@@ -346,8 +334,7 @@ test.describe('API Interception and Mocking Tests', () => {
       // 验证请求分布合理
       expect(getRequests.length).toBeGreaterThan(postRequests.length)
 
-      // 验证关键API被调用
-      const hasLoginApi = requestLog.some(log => log.url.includes('login'))
+      // 验证关键API被调�?      const hasLoginApi = requestLog.some(log => log.url.includes('login'))
       const hasCourseApi = requestLog.some(log => log.url.includes('jianshenkecheng'))
 
       expect(hasLoginApi).toBe(true)
@@ -367,7 +354,7 @@ test.describe('API Interception and Mocking Tests', () => {
           await route.fulfill({
             status: 500,
             contentType: 'application/json',
-            body: JSON.stringify({ code: 500, msg: '临时服务器错误' })
+            body: JSON.stringify({ code: 500, msg: '临时服务器错�? })
           })
         } else {
           await route.fulfill({
@@ -390,15 +377,13 @@ test.describe('API Interception and Mocking Tests', () => {
       }
 
       // 验证最终成功（如果前端有重试机制）
-      // 注意：这取决于实际前端实现
-      expect(attemptCount).toBeGreaterThanOrEqual(3)
+      // 注意：这取决于实际前端实�?      expect(attemptCount).toBeGreaterThanOrEqual(3)
     })
 
     test('应测试API缓存机制', async ({ page }) => {
       let requestCount = 0
 
-      // 设置API响应并计数请求次数
-      await page.route('**/jianshenkecheng/**', async (route) => {
+      // 设置API响应并计数请求次�?      await page.route('**/jianshenkecheng/**', async (route) => {
         requestCount++
         await route.fulfill({
           status: 200,
@@ -424,8 +409,7 @@ test.describe('API Interception and Mocking Tests', () => {
       }
 
       // 如果有缓存，请求次数应该减少
-      // 注意：这取决于前端是否实现缓存
-      console.log(`Total API requests: ${requestCount}`)
+      // 注意：这取决于前端是否实现缓�?      console.log(`Total API requests: ${requestCount}`)
       expect(requestCount).toBeDefined()
     })
 
@@ -468,20 +452,16 @@ test.describe('API Interception and Mocking Tests', () => {
       await page.goto('/#/courses')
       await page.waitForLoadState('networkidle')
 
-      // 验证第一页数据
-      const courseItems = page.locator('.course-card, [data-testid*="course"]')
+      // 验证第一页数�?      const courseItems = page.locator('.course-card, [data-testid*="course"]')
       await expect(courseItems).toHaveCount(10)
 
-      // 如果有分页控件，测试下一页
-      const nextButton = page.locator('button:has-text("下一页"), .pagination .next')
+      // 如果有分页控件，测试下一�?      const nextButton = page.locator('button:has-text("下一�?), .pagination .next')
       if (await nextButton.isVisible()) {
         await nextButton.click()
         await page.waitForLoadState('networkidle')
 
-        // 验证第二页数据
-        const secondPageItems = page.locator('.course-card, [data-testid*="course"]')
-        await expect(secondPageItems).toHaveCount(10) // 应该还有10个项目
-      }
+        // 验证第二页数�?        const secondPageItems = page.locator('.course-card, [data-testid*="course"]')
+        await expect(secondPageItems).toHaveCount(10) // 应该还有10个项�?      }
     })
   })
 })

@@ -5,10 +5,7 @@ test.describe('Complete Business Workflow Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Setup comprehensive mocks for all business scenarios
     await setupCompleteFrontMock(page)
-    logTestStep('设置完整的业务流程测试环境')
-  })
-
-  test.describe('用户注册到会员购买的完整流程', () => {
+    logTestStep('设置完整的业务流程测试环境'用户注册到会员购买的完整流程', () => {
     test('应完成从注册到会员购买的完整用户旅程', async ({ page }) => {
       // 1. 用户注册
       await page.goto('/#/register')
@@ -33,8 +30,7 @@ test.describe('Complete Business Workflow Tests', () => {
       await expect(page.locator('text=注册成功')).toBeVisible({ timeout: 5000 })
       logTestStep('用户注册成功')
 
-      // 2. 自动登录或手动登录
-      if (page.url().includes('/login')) {
+      // 2. 自动登录或手动登�?      if (page.url().includes('/login')) {
         await page.fill('input[name="yonghuzhanghao"]', username)
         await page.fill('input[type="password"]', password)
         await page.click('button:has-text("登录")')
@@ -48,8 +44,7 @@ test.describe('Complete Business Workflow Tests', () => {
       await page.goto('/#/courses')
       await page.waitForLoadState('networkidle')
 
-      // 选择第一个课程
-      const firstCourse = page.locator('.course-card, [data-testid*="course-card"]').first()
+      // 选择第一个课�?      const firstCourse = page.locator('.course-card, [data-testid*="course-card"]').first()
       await expect(firstCourse).toBeVisible()
       await firstCourse.click()
 
@@ -76,17 +71,14 @@ test.describe('Complete Business Workflow Tests', () => {
         logTestStep('课程预约成功')
       }
 
-      // 5. 浏览会员卡
-      await page.goto('/#/membership')
+      // 5. 浏览会员�?      await page.goto('/#/membership')
       await page.waitForLoadState('networkidle')
 
-      // 选择会员卡
-      const membershipCard = page.locator('.membership-card, [data-testid*="membership-card"]').first()
+      // 选择会员�?      const membershipCard = page.locator('.membership-card, [data-testid*="membership-card"]').first()
       await expect(membershipCard).toBeVisible()
       await membershipCard.click()
 
-      // 购买会员卡
-      const buyButton = page.locator('button:has-text("购买"), [data-testid*="purchase-button"]').first()
+      // 购买会员�?      const buyButton = page.locator('button:has-text("购买"), [data-testid*="purchase-button"]').first()
       if (await buyButton.isVisible()) {
         await buyButton.click()
 
@@ -94,22 +86,21 @@ test.describe('Complete Business Workflow Tests', () => {
         await expect(page.locator('.payment-form, [data-testid*="payment-form"]')).toBeVisible()
 
         // 选择支付方式
-        await page.click('button:has-text("支付宝"), [data-testid*="payment-alipay"]')
+        await page.click('button:has-text("支付�?), [data-testid*="payment-alipay"]')
 
         // 确认支付
         await page.click('button:has-text("确认支付"), [data-testid*="confirm-payment"]')
 
         // 验证支付成功
         await expect(page.locator('text=支付成功')).toBeVisible()
-        logTestStep('会员卡购买成功')
+        logTestStep('会员卡购买成�?)
       }
 
       // 6. 查看个人中心
       await page.goto('/#/profile')
       await page.waitForLoadState('networkidle')
 
-      // 验证会员状态
-      await expect(page.locator('text=会员, .membership-status')).toBeVisible()
+      // 验证会员状�?      await expect(page.locator('text=会员, .membership-status')).toBeVisible()
       logTestStep('个人中心验证成功')
 
       // 截图记录完整流程
@@ -117,7 +108,7 @@ test.describe('Complete Business Workflow Tests', () => {
     })
   })
 
-  test.describe('教练预约和沟通流程', () => {
+  test.describe('教练预约和沟通流�?, () => {
     test('应完成教练预约到沟通的完整流程', async ({ page }) => {
       // 登录用户
       await page.goto('/#/login')
@@ -167,19 +158,17 @@ test.describe('Complete Business Workflow Tests', () => {
         // 验证聊天界面打开
         await expect(page.locator('.chat-interface, [data-testid*="chat-interface"]')).toBeVisible()
 
-        // 发送消息
-        await page.fill('[data-testid*="chat-input"], .chat-input', '您好，我想咨询一下训练计划')
-        await page.click('[data-testid*="send-button"], button:has-text("发送")')
+        // 发送消�?        await page.fill('[data-testid*="chat-input"], .chat-input', '您好，我想咨询一下训练计�?)
+        await page.click('[data-testid*="send-button"], button:has-text("发�?)')
 
-        // 验证消息发送成功
-        await expect(page.locator('.message.sent, [data-testid*="sent-message"]')).toBeVisible()
-        logTestStep('教练沟通成功')
+        // 验证消息发送成�?        await expect(page.locator('.message.sent, [data-testid*="sent-message"]')).toBeVisible()
+        logTestStep('教练沟通成�?)
       }
     })
   })
 
-  test.describe('设备预约和管理流程', () => {
-    test('应完成设备预约到归还的完整流程', async ({ page }) => {
+  test.describe('设备预约和管理流�?, () => {
+    test('应完成设备预约到归还的完整流�?, async ({ page }) => {
       // 登录用户
       await page.goto('/#/login')
       await page.fill('input[name="yonghuzhanghao"]', 'testuser')
@@ -228,8 +217,7 @@ test.describe('Complete Business Workflow Tests', () => {
       await expect(page.locator('text=设备预约, .equipment-booking')).toBeVisible()
       logTestStep('预约记录查看成功')
 
-      // 4. 模拟设备归还（如果有归还功能）
-      const returnButton = page.locator('button:has-text("归还"), [data-testid*="return-equipment"]').first()
+      // 4. 模拟设备归还（如果有归还功能�?      const returnButton = page.locator('button:has-text("归还"), [data-testid*="return-equipment"]').first()
       if (await returnButton.isVisible()) {
         await returnButton.click()
         await page.click('button:has-text("确认归还"), [data-testid*="confirm-return"]')
@@ -241,8 +229,8 @@ test.describe('Complete Business Workflow Tests', () => {
     })
   })
 
-  test.describe('内容消费和互动流程', () => {
-    test('应完成内容浏览、收藏和分享的完整流程', async ({ page }) => {
+  test.describe('内容消费和互动流�?, () => {
+    test('应完成内容浏览、收藏和分享的完整流�?, async ({ page }) => {
       // 登录用户
       await page.goto('/#/login')
       await page.fill('input[name="yonghuzhanghao"]', 'testuser')
@@ -255,8 +243,7 @@ test.describe('Complete Business Workflow Tests', () => {
       await page.goto('/#/news')
       await page.waitForLoadState('networkidle')
 
-      // 选择一篇资讯
-      const firstNews = page.locator('.news-item, [data-testid*="news-article"]').first()
+      // 选择一篇资�?      const firstNews = page.locator('.news-item, [data-testid*="news-article"]').first()
       await expect(firstNews).toBeVisible()
       await firstNews.click()
 
@@ -287,8 +274,7 @@ test.describe('Complete Business Workflow Tests', () => {
       await expect(page.locator('.favorite-item, [data-testid*="favorite-item"]')).toBeVisible()
       logTestStep('收藏列表查看成功')
 
-      // 3. 分享内容（如果有分享功能）
-      const shareButton = page.locator('button:has-text("分享"), [data-testid*="share-button"]').first()
+      // 3. 分享内容（如果有分享功能�?      const shareButton = page.locator('button:has-text("分享"), [data-testid*="share-button"]').first()
       if (await shareButton.isVisible()) {
         await shareButton.click()
 
@@ -302,8 +288,8 @@ test.describe('Complete Business Workflow Tests', () => {
     })
   })
 
-  test.describe('会员续费和升级流程', () => {
-    test('应完成会员续费和升级的完整流程', async ({ page }) => {
+  test.describe('会员续费和升级流�?, () => {
+    test('应完成会员续费和升级的完整流�?, async ({ page }) => {
       // 登录用户
       await page.goto('/#/login')
       await page.fill('input[name="yonghuzhanghao"]', 'testuser')
@@ -312,8 +298,7 @@ test.describe('Complete Business Workflow Tests', () => {
 
       await expect(page.locator('[data-testid*="user-info"]')).toBeVisible()
 
-      // 1. 查看当前会员状态
-      await page.goto('/#/profile')
+      // 1. 查看当前会员状�?      await page.goto('/#/profile')
       await page.waitForLoadState('networkidle')
 
       // 验证会员信息显示
@@ -334,7 +319,7 @@ test.describe('Complete Business Workflow Tests', () => {
         await page.click('button:has-text("确认续费"), [data-testid*="confirm-renewal"]')
 
         // 完成支付
-        await page.click('button:has-text("支付宝支付"), [data-testid*="payment-alipay"]')
+        await page.click('button:has-text("支付宝支�?), [data-testid*="payment-alipay"]')
         await page.click('button:has-text("确认支付"), [data-testid*="confirm-payment"]')
 
         // 验证续费成功
@@ -355,7 +340,7 @@ test.describe('Complete Business Workflow Tests', () => {
 
         // 完成升级支付
         await page.click('button:has-text("确认升级"), [data-testid*="confirm-upgrade"]')
-        await page.click('button:has-text("支付宝支付"), [data-testid*="payment-alipay"]')
+        await page.click('button:has-text("支付宝支�?), [data-testid*="payment-alipay"]')
         await page.click('button:has-text("确认支付"), [data-testid*="confirm-payment"]')
 
         // 验证升级成功
@@ -365,8 +350,8 @@ test.describe('Complete Business Workflow Tests', () => {
     })
   })
 
-  test.describe('投诉和反馈流程', () => {
-    test('应完成投诉提交和处理反馈的完整流程', async ({ page }) => {
+  test.describe('投诉和反馈流�?, () => {
+    test('应完成投诉提交和处理反馈的完整流�?, async ({ page }) => {
       // 登录用户
       await page.goto('/#/login')
       await page.fill('input[name="yonghuzhanghao"]', 'testuser')
@@ -385,11 +370,10 @@ test.describe('Complete Business Workflow Tests', () => {
       // 填写投诉表单
       await page.selectOption('select[name="complaintType"], [data-testid*="complaint-type"]', 'service')
       await page.fill('textarea[name="complaintContent"], [data-testid*="complaint-content"]',
-        '服务态度不够友好，希望得到改善')
+        '服务态度不够友好，希望得到改�?)
       await page.fill('input[name="contactPhone"], [data-testid*="contact-phone"]', '13800138000')
 
-      // 上传图片（如果有）
-      const uploadInput = page.locator('input[type="file"], [data-testid*="complaint-upload"]')
+      // 上传图片（如果有�?      const uploadInput = page.locator('input[type="file"], [data-testid*="complaint-upload"]')
       if (await uploadInput.isVisible()) {
         // 这里可以上传测试图片
         // await uploadInput.setInputFiles('path/to/test/image.jpg')

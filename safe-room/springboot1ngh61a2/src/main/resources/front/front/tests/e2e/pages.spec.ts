@@ -16,13 +16,13 @@ test.describe('Front primary pages', () => {
   })
 
   test.afterEach(async ({ page }) => {
-    // 停止性能监控并生成报告
+    // 停止性能监控并生成报�?
     if (performanceMonitor) {
       const report = await performanceMonitor.stopMonitoring()
       console.log(`📊 页面性能报告: ${report.testName}`)
       console.log(`   页面加载时间: ${report.metrics.pageLoad.load}ms`)
       console.log(`   DOM内容加载: ${report.metrics.pageLoad.domContentLoaded}ms`)
-      console.log(`   网络请求数: ${report.metrics.network.totalRequests}`)
+      console.log(`   网络请求�? ${report.metrics.network.totalRequests}`)
       if (report.violations.length > 0) {
         console.warn(`⚠️ 性能违规: ${report.violations.length} 项`)
       }

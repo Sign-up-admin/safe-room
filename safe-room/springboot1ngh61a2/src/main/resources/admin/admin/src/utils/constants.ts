@@ -3,7 +3,7 @@
  */
 
 // API基础URL
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/springboot1ngh61a2'
 
 // 用户角色
 export const USER_ROLES = {
@@ -33,5 +33,6 @@ export const PAGE_TITLES = {
   CENTER: '个人中心',
   UPDATE_PASSWORD: '修改密码'
 } as const
+
 
 

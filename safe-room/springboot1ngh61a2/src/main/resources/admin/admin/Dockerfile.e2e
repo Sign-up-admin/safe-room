@@ -1,0 +1,26 @@
+# Admin E2E测试 Dockerfile
+FROM mcr.microsoft.com/playwright:v1.56.1-jammy
+
+WORKDIR /app
+
+# 安装Node.js依赖
+COPY package*.json ./
+RUN npm ci
+
+# 如果package.json中没有playwright，则安装它
+RUN npm list @playwright/test || npm install --save-dev @playwright/test@^1.56.1
+
+# 复制源代码
+COPY . .
+
+# 安装Playwright浏览器
+RUN npx playwright install --with-deps chromium
+
+# 设置环境变量
+ENV CI=true
+ENV FRONTEND_URL=${FRONTEND_URL:-http://host.docker.internal:5173}
+ENV BACKEND_URL=${BACKEND_URL:-http://host.docker.internal:8080}
+
+# 默认运行所有e2e测试
+CMD ["npm", "run", "test:e2e"]
+

@@ -19,5 +19,6 @@ declare module 'vue' {
     ModernCard: typeof import('./src/components/common/ModernCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
   }
 }

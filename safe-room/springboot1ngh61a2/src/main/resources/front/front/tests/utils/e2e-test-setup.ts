@@ -7,9 +7,11 @@
 
 import { Page, TestInfo } from '@playwright/test'
 import { setupTestEnvironment, logTestStep } from './shared-helpers'
-import { applyCommonMock, SCENARIO_NAMES } from './mock-manager'
+import { applyCommonMock } from './mock-manager'
+import { SCENARIO_NAMES } from './mock-presets'
 import { seedFrontSession, mockFrontApi } from './test-helpers'
-import { mockAdminApi, seedAdminSession } from '../../admin/admin/tests/utils/test-helpers'
+// 注意：admin相关的mock功能已移除，因为admin项目是独立的
+// import { mockAdminApi, seedAdminSession } from '../../admin/admin/tests/utils/test-helpers'
 
 // ========== 测试场景类型定义 ==========
 
@@ -141,8 +143,9 @@ export async function setupTestScenario(
     await seedFrontSession(page)
     await logTestStep('前端用户会话已设置')
   } else if (scenario.session === 'admin') {
-    await seedAdminSession(page)
-    await logTestStep('管理端用户会话已设置')
+    // 注意：admin会话设置已移除，因为admin项目是独立的
+    // await seedAdminSession(page)
+    await logTestStep('管理端用户会话设置已跳过（admin项目独立）')
   }
 
   // 执行额外设置

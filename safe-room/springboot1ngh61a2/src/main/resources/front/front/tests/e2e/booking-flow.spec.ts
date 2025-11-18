@@ -2,7 +2,7 @@
  * 预约流程E2E测试
  *
  * 测试完整的课程预约用户旅程，包括课程选择、时间选择、预约确认等步骤
- * 验证预约流程的完整性和稳定性
+ * 验证预约流程的完整性和稳定�?
  */
 
 import { test, expect } from '@playwright/test'
@@ -27,7 +27,7 @@ test.describe('预约流程E2E测试', () => {
     testId = isolation.testId
     cleanupData = isolation.cleanup
 
-    // 使用预设的预约场景设置，包含完整的Mock和会话配置
+    // 使用预设的预约场景设置，包含完整的Mock和会话配�?
     await setupBookingScenario(page)
   })
 
@@ -39,14 +39,10 @@ test.describe('预约流程E2E测试', () => {
   })
 
   test('课程预约完整流程', async ({ page }) => {
-    await logTestStep('开始课程预约完整流程测试')
-
-    try {
-      // 步骤1: 选择课程
-      await logTestStep('步骤1: 选择课程')
+    await logTestStep('开始课程预约完整流程测试'步骤1: 选择课程')
       await expect(page.locator('text=选择课程')).toBeVisible({ timeout: 10000 })
 
-      // 使用稳定的data-testid选择器
+      // 使用稳定的data-testid选择�?
       const courseList = page.getByTestId(selectors.courses.listContainer)
       await waitForElementReady(courseList)
 
@@ -68,11 +64,11 @@ test.describe('预约流程E2E测试', () => {
         await logTestStep('导航到课程页面并选择课程')
       }
 
-      // 点击下一步 - 使用稳定的data-testid选择器
+      // 点击下一�?- 使用稳定的data-testid选择�?
       const nextButton = page.getByTestId(selectors.booking.nextButton)
       await waitForElementReady(nextButton)
       await nextButton.click()
-      await logTestStep('点击下一步按钮')
+      await logTestStep('点击下一步按�?)
 
       // 步骤2: 选择时间
       await logTestStep('步骤2: 选择时间')
@@ -82,7 +78,7 @@ test.describe('预约流程E2E测试', () => {
       const timeCalendar = page.getByTestId(selectors.booking.timeCalendar)
       await waitForElementReady(timeCalendar)
 
-      // 使用稳定的时间选择器
+      // 使用稳定的时间选择�?
       const timeSlots = page.getByTestId(/^time-slot-/)
       const availableSlots = timeSlots.filter({ hasNot: page.locator('[disabled]') })
       const slotCount = await availableSlots.count()
@@ -96,11 +92,11 @@ test.describe('预约流程E2E测试', () => {
         throw new Error('无法选择预约时间')
       }
 
-      // 点击下一步
+      // 点击下一�?
       const nextButton2 = page.getByTestId(selectors.booking.nextButton)
       await waitForElementReady(nextButton2)
       await nextButton2.click()
-      await logTestStep('点击第二个下一步按钮')
+      await logTestStep('点击第二个下一步按�?)
 
       // 步骤3: 填写信息
       await logTestStep('步骤3: 填写信息')
@@ -110,13 +106,13 @@ test.describe('预约流程E2E测试', () => {
       const bookingForm = page.getByTestId(selectors.booking.infoForm)
       await waitForElementReady(bookingForm)
 
-      // 使用隔离的测试用户数据
+      // 使用隔离的测试用户数�?
       const testUser = testData.createUser(testId, {
         username: `booking_test_user_${Date.now()}`,
         phone: `138001${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`
       })
 
-      // 使用稳定的data-testid选择器填写表单
+      // 使用稳定的data-testid选择器填写表�?
       const nameInput = page.getByTestId(selectors.booking.nameInput)
       await waitForElementReady(nameInput)
       await nameInput.fill(testUser.username)
@@ -125,7 +121,7 @@ test.describe('预约流程E2E测试', () => {
       const phoneInput = page.getByTestId(selectors.booking.phoneInput)
       await waitForElementReady(phoneInput)
       await phoneInput.fill(testUser.phone!)
-      await logTestStep('填写手机号')
+      await logTestStep('填写手机�?)
 
       // 勾选协议复选框
       const agreementCheckbox = page.getByTestId(selectors.booking.agreementCheckbox)
@@ -166,7 +162,7 @@ test.describe('预约流程E2E测试', () => {
     }
   })
 
-  test('冲突检测功能', async ({ page }) => {
+  test('冲突检测功�?, async ({ page }) => {
     // 选择课程
     const courseCards = page.locator('.coach-card, [class*="course-card"]')
     if (await courseCards.count() > 0) {
@@ -175,13 +171,13 @@ test.describe('预约流程E2E测试', () => {
     }
 
     // 进入时间选择步骤
-    const nextButton = page.locator('button:has-text("下一步")').first()
+    const nextButton = page.locator('button:has-text("下一�?)').first()
     if (await nextButton.isEnabled()) {
       await nextButton.click()
       await page.waitForTimeout(500)
     }
 
-    // 查找冲突时间段
+    // 查找冲突时间�?
     const conflictSlots = page.locator('.calendar-slot--conflict')
     if (await conflictSlots.count() > 0) {
       await conflictSlots.first().click()
@@ -205,8 +201,8 @@ test.describe('预约流程E2E测试', () => {
       await waitForElementStable(coachCards.first())
     }
 
-    // 步骤2: 选择目标和套餐
-    const nextButton = page.locator('button:has-text("下一步")').first()
+    // 步骤2: 选择目标和套�?
+    const nextButton = page.locator('button:has-text("下一�?)').first()
     if (await nextButton.isEnabled()) {
       await nextButton.click()
       await waitForPageFullyLoaded(page)
@@ -220,7 +216,7 @@ test.describe('预约流程E2E测试', () => {
     }
 
     // 步骤3: 选择时间
-    const nextButton2 = page.locator('button:has-text("下一步")').nth(1)
+    const nextButton2 = page.locator('button:has-text("下一�?)').nth(1)
     if (await nextButton2.isEnabled()) {
       await nextButton2.click()
       await waitForPageFullyLoaded(page)
@@ -234,14 +230,14 @@ test.describe('预约流程E2E测试', () => {
     }
 
     // 步骤4: 确认支付
-    const nextButton3 = page.locator('button:has-text("下一步")').nth(2)
+    const nextButton3 = page.locator('button:has-text("下一�?)').nth(2)
     if (await nextButton3.isEnabled()) {
       await nextButton3.click()
       await waitForPageFullyLoaded(page)
     }
 
     await expect(page.locator('text=确认预约')).toBeVisible()
-    await page.fill('input[placeholder*="姓名"], input[placeholder*="联系人"]', '测试用户')
+    await page.fill('input[placeholder*="姓名"], input[placeholder*="联系�?]', '测试用户')
     await page.fill('input[placeholder*="手机"], input[placeholder*="电话"]', '13800138000')
     await page.check('input[type="checkbox"]')
 
@@ -283,8 +279,8 @@ test.describe('预约流程E2E测试', () => {
       })
     }
 
-    // 验证支付状态显示
-    await expect(page.locator('text=等待支付结果, text=支付中')).toBeVisible()
+    // 验证支付状态显�?
+    await expect(page.locator('text=等待支付结果, text=支付�?)).toBeVisible()
   })
 })
 

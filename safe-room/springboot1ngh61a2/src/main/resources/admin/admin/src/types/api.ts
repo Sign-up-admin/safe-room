@@ -30,3 +30,4 @@ export interface RegisterResponse extends ApiResponse {
 export type ListResponse<T> = ApiResponse<PaginationResponse<T>>
 
 
+

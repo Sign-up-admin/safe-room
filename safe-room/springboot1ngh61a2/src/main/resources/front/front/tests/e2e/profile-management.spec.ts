@@ -2,7 +2,7 @@
  * 个人资料管理E2E测试
  *
  * 测试用户个人资料的查看、编辑、头像上传等功能
- * 验证用户资料管理的完整性和数据一致性
+ * 验证用户资料管理的完整性和数据一致�?
  */
 
 import { test, expect } from '@playwright/test'
@@ -12,27 +12,22 @@ import { UserCenterPage } from '../utils/page-objects/user-center-page'
 
 test.describe('个人资料管理模块测试', () => {
   test.beforeEach(async ({ page }) => {
-    // 使用用户资料管理场景设置，包含相关的Mock和会话配置
+    // 使用用户资料管理场景设置，包含相关的Mock和会话配�?
     await setupUserProfileScenario(page)
   })
 
   test.describe('用户中心页面访问', () => {
-    test('应正确显示用户中心页面', async ({ page }) => {
-      const userCenter = new UserCenterPage(page)
-      await userCenter.goto()
-      await userCenter.expectLoaded()
-
-      logTestStep('用户中心页面加载成功')
+    test('应正确显示用户中心页面'用户中心页面加载成功')
     })
 
-    test('应显示用户基本信息', async ({ page }) => {
+    test('应显示用户基本信�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
 
       // 验证基本用户信息显示
       await expect(page.locator('text=欢迎, text=您好')).toBeVisible()
 
-      // 验证头像或用户名称存在
+      // 验证头像或用户名称存�?
       await expect(page.locator('.avatar, .user-avatar, .profile-pic')).toBeVisible()
 
       logTestStep('用户基本信息显示正常')
@@ -40,7 +35,7 @@ test.describe('个人资料管理模块测试', () => {
   })
 
   test.describe('个人信息编辑', () => {
-    test('应支持编辑基本信息', async ({ page }) => {
+    test('应支持编辑基本信�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('profile')
@@ -62,7 +57,7 @@ test.describe('个人资料管理模块测试', () => {
       logTestStep('个人信息编辑成功')
     })
 
-    test('应支持头像上传', async ({ page }) => {
+    test('应支持头像上�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('profile')
@@ -70,7 +65,7 @@ test.describe('个人资料管理模块测试', () => {
       // 点击头像上传按钮
       await page.locator('.avatar-upload, .change-avatar').click()
 
-      // 这里可以模拟文件上传，如果有文件输入框的话
+      // 这里可以模拟文件上传，如果有文件输入框的�?
       const fileInput = page.locator('input[type="file"]')
       if (await fileInput.isVisible()) {
         // 上传一个测试图片（如果有的话）
@@ -81,7 +76,7 @@ test.describe('个人资料管理模块测试', () => {
       }
     })
 
-    test('应验证表单必填字段', async ({ page }) => {
+    test('应验证表单必填字�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('profile')
@@ -102,11 +97,11 @@ test.describe('个人资料管理模块测试', () => {
       if (errorCount > 0) {
         logTestStep(`表单验证发现 ${errorCount} 个错误`)
       } else {
-        logTestStep('表单验证检查完成')
+        logTestStep('表单验证检查完�?)
       }
     })
 
-    test('应支持取消编辑操作', async ({ page }) => {
+    test('应支持取消编辑操�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('profile')
@@ -114,7 +109,7 @@ test.describe('个人资料管理模块测试', () => {
       // 点击编辑按钮
       await page.locator('button:has-text("编辑"), .edit-btn').click()
 
-      // 修改一些信息
+      // 修改一些信�?
       await page.locator('input[name*="name"], input[placeholder*="姓名"]').fill('临时修改')
 
       // 点击取消按钮
@@ -126,7 +121,7 @@ test.describe('个人资料管理模块测试', () => {
   })
 
   test.describe('预约记录管理', () => {
-    test('应正确显示预约记录', async ({ page }) => {
+    test('应正确显示预约记�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('bookings')
@@ -136,17 +131,17 @@ test.describe('个人资料管理模块测试', () => {
       logTestStep(`显示 ${bookingCount} 条预约记录`)
     })
 
-    test('应支持预约详情查看', async ({ page }) => {
+    test('应支持预约详情查�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('bookings')
 
-      // 点击第一条预约记录
+      // 点击第一条预约记�?
       const bookingItems = page.locator('.booking-item, .reservation-item')
       if (await bookingItems.count() > 0) {
         await bookingItems.first().click()
 
-        // 验证详情页面或弹窗出现
+        // 验证详情页面或弹窗出�?
         await page.waitForSelector('.booking-detail, .reservation-detail, .detail-modal', { timeout: 3000 }).catch(() => {})
 
         logTestStep('预约详情查看成功')
@@ -155,7 +150,7 @@ test.describe('个人资料管理模块测试', () => {
       }
     })
 
-    test('应支持预约取消操作', async ({ page }) => {
+    test('应支持预约取消操�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('bookings')
@@ -164,7 +159,7 @@ test.describe('个人资料管理模块测试', () => {
       const countBefore = await userCenter.getBookingCount()
 
       if (countBefore > 0) {
-        // 取消第一条预约
+        // 取消第一条预�?
         await userCenter.cancelBooking(0)
 
         // 验证取消成功提示
@@ -182,7 +177,7 @@ test.describe('个人资料管理模块测试', () => {
   })
 
   test.describe('会员信息查看', () => {
-    test('应正确显示会员信息', async ({ page }) => {
+    test('应正确显示会员信�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('membership')
@@ -191,7 +186,7 @@ test.describe('个人资料管理模块测试', () => {
       const membershipInfo = await userCenter.getMembershipInfo()
 
       if (membershipInfo) {
-        logTestStep(`会员信息: ${membershipInfo.type} - 到期时间: ${membershipInfo.expiryDate} - 状态: ${membershipInfo.status}`)
+        logTestStep(`会员信息: ${membershipInfo.type} - 到期时间: ${membershipInfo.expiryDate} - 状�? ${membershipInfo.status}`)
       } else {
         logTestStep('会员信息获取失败或无会员信息')
       }
@@ -203,18 +198,18 @@ test.describe('个人资料管理模块测试', () => {
       await userCenter.navigateToTab('membership')
 
       // 查找续费按钮
-      const renewButton = page.locator('button:has-text("续费"), button:has-text("充值"), .renew-btn')
+      const renewButton = page.locator('button:has-text("续费"), button:has-text("充�?), .renew-btn')
       if (await renewButton.isVisible()) {
         await renewButton.click()
         logTestStep('会员续费入口正常')
       } else {
-        logTestStep('未找到续费入口')
+        logTestStep('未找到续费入�?)
       }
     })
   })
 
-  test.describe('收藏夹管理', () => {
-    test('应正确显示收藏内容', async ({ page }) => {
+  test.describe('收藏夹管�?, () => {
+    test('应正确显示收藏内�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -224,7 +219,7 @@ test.describe('个人资料管理模块测试', () => {
       logTestStep(`显示 ${favoriteCount} 个收藏项`)
     })
 
-    test('应支持收藏项目查看', async ({ page }) => {
+    test('应支持收藏项目查�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -234,7 +229,7 @@ test.describe('个人资料管理模块测试', () => {
       if (await favoriteItems.count() > 0) {
         await favoriteItems.first().click()
 
-        // 验证跳转到详情页面
+        // 验证跳转到详情页�?
         await page.waitForURL(/.*/, { timeout: 3000 })
         logTestStep('收藏项目查看成功')
       } else {
@@ -244,7 +239,7 @@ test.describe('个人资料管理模块测试', () => {
   })
 
   test.describe('消息中心', () => {
-    test('应正确显示消息列表', async ({ page }) => {
+    test('应正确显示消息列�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('messages')
@@ -254,7 +249,7 @@ test.describe('个人资料管理模块测试', () => {
       logTestStep(`显示 ${messageCount} 条消息`)
     })
 
-    test('应支持消息标记已读', async ({ page }) => {
+    test('应支持消息标记已�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('messages')
@@ -265,14 +260,14 @@ test.describe('个人资料管理模块测试', () => {
         await unreadMessages.first().click()
         logTestStep('消息标记已读成功')
       } else {
-        logTestStep('无未读消息')
+        logTestStep('无未读消�?)
       }
     })
   })
 
-  test.describe('响应式设计测试', () => {
-    test('应在移动端正确显示个人中心', async ({ page }) => {
-      // 设置移动端视口
+  test.describe('响应式设计测�?, () => {
+    test('应在移动端正确显示个人中�?, async ({ page }) => {
+      // 设置移动端视�?
       await page.setViewportSize({ width: 375, height: 667 })
 
       const userCenter = new UserCenterPage(page)
@@ -281,11 +276,11 @@ test.describe('个人资料管理模块测试', () => {
 
       // 验证移动端布局
       await userCenter.navigateToTab('profile')
-      logTestStep('移动端个人中心显示正常')
+      logTestStep('移动端个人中心显示正�?)
     })
 
     test('应在平板端优化布局', async ({ page }) => {
-      // 设置平板端视口
+      // 设置平板端视�?
       await page.setViewportSize({ width: 768, height: 1024 })
 
       const userCenter = new UserCenterPage(page)
@@ -300,8 +295,8 @@ test.describe('个人资料管理模块测试', () => {
     })
   })
 
-  test.describe('数据完整性验证', () => {
-    test('应验证用户信息完整性', async ({ page }) => {
+  test.describe('数据完整性验�?, () => {
+    test('应验证用户信息完整�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
 
@@ -312,7 +307,7 @@ test.describe('个人资料管理模块测试', () => {
       logTestStep('用户信息数据完整')
     })
 
-    test('应验证预约记录数据结构', async ({ page }) => {
+    test('应验证预约记录数据结�?, async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('bookings')

@@ -25,15 +25,16 @@ class PhasedE2EExecutionManager {
             preparation: {
                 id: 'preparation',
                 name: '准备阶段',
-                description: '环境准备、依赖安装、数据库重置',
+                description: '环境准备、依赖安装（后端环境由用户控制）',
                 order: 1,
                 concurrency: 1, // 串行执行
                 timeout: 300000, // 5分钟
                 tasks: [
                     { name: 'check-environment', type: 'system', priority: 'high' },
-                    { name: 'install-dependencies', type: 'system', priority: 'high' },
-                    { name: 'reset-database', type: 'system', priority: 'high' },
-                    { name: 'start-services', type: 'system', priority: 'high' }
+                    { name: 'install-dependencies', type: 'system', priority: 'high' }
+                    // 注意：数据库和后端服务由用户控制，不再由脚本管理
+                    // { name: 'reset-database', type: 'system', priority: 'high' },
+                    // { name: 'start-services', type: 'system', priority: 'high' }
                 ],
                 successCriteria: 'all_tasks_pass',
                 failureAction: 'stop_all'
@@ -98,13 +99,14 @@ class PhasedE2EExecutionManager {
             cleanup: {
                 id: 'cleanup',
                 name: '清理阶段',
-                description: '测试数据清理、环境重置',
+                description: '测试数据清理、报告生成（服务由用户控制）',
                 order: 5,
                 concurrency: 1,
                 timeout: 180000, // 3分钟
                 tasks: [
                     { name: 'cleanup-test-data', type: 'system', priority: 'high' },
-                    { name: 'stop-services', type: 'system', priority: 'high' },
+                    // 注意：服务停止由用户控制，不再由脚本管理
+                    // { name: 'stop-services', type: 'system', priority: 'high' },
                     { name: 'generate-final-report', type: 'system', priority: 'high' }
                 ],
                 successCriteria: 'best_effort',
@@ -376,18 +378,19 @@ class PhasedE2EExecutionManager {
             case 'install-dependencies':
                 await this.installDependencies(context.projects);
                 break;
-            case 'reset-database':
-                await this.resetDatabase();
-                break;
-            case 'start-services':
-                await this.startServices();
-                break;
+            // 注意：以下任务已移除，因为后端环境由用户控制
+            // case 'reset-database':
+            //     await this.resetDatabase();
+            //     break;
+            // case 'start-services':
+            //     await this.startServices();
+            //     break;
             case 'cleanup-test-data':
                 await this.cleanupTestData();
                 break;
-            case 'stop-services':
-                await this.stopServices();
-                break;
+            // case 'stop-services':
+            //     await this.stopServices();
+            //     break;
             case 'generate-final-report':
                 await this.generateFinalReport(context);
                 break;
@@ -658,9 +661,10 @@ class PhasedE2EExecutionManager {
 
         const checks = [
             { name: 'Node.js', command: 'node --version', required: true },
-            { name: 'npm', command: 'npm --version', required: true },
-            { name: 'Java', command: 'java -version', required: true },
-            { name: 'Maven', command: 'mvn --version', required: true }
+            { name: 'npm', command: 'npm --version', required: true }
+            // 注意：Java和Maven检查已移除，因为后端由用户通过Docker控制
+            // { name: 'Java', command: 'java -version', required: false },
+            // { name: 'Maven', command: 'mvn --version', required: false }
         ];
 
         let allPassed = true;
@@ -679,19 +683,18 @@ class PhasedE2EExecutionManager {
             }
         }
 
-        // 检查端口可用性
-        const ports = [8080, 8081, 8082, 5173, 3000];
-        for (const port of ports) {
-            try {
-                const result = await this.runCommand(`netstat -an | find ":${port} "`, { ignoreErrors: true });
-                if (result) {
-                    console.warn(`⚠️ 端口 ${port} 可能已被占用`);
-                } else {
-                    console.log(`✅ 端口 ${port} 可用`);
-                }
-            } catch (error) {
-                // 忽略端口检查错误
+        // 检查后端连接性（不检查端口占用，因为服务由用户控制）
+        console.log('💡 提示：后端环境由用户通过Docker控制，请确保后端服务已启动');
+        try {
+            const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+            const response = await this.runCommand(`curl -f ${backendUrl}/actuator/health`, { ignoreErrors: true, timeout: 5000 });
+            if (response) {
+                console.log(`✅ 后端服务连接正常 (${backendUrl})`);
+            } else {
+                console.warn(`⚠️ 无法连接到后端服务 (${backendUrl})，请确保Docker后端已启动`);
             }
+        } catch (error) {
+            console.warn(`⚠️ 后端服务连接检查失败，请确保Docker后端已启动`);
         }
 
         if (!allPassed) {
@@ -736,147 +739,23 @@ class PhasedE2EExecutionManager {
 
     /**
      * 重置测试数据库
+     * 注意：此方法已禁用，数据库由用户通过Docker控制
      */
     async resetDatabase() {
-        console.log('🗄️ 重置测试数据库...');
-
-        try {
-            // 停止数据库服务（如果正在运行）
-            await this.runCommand('powershell.exe -ExecutionPolicy Bypass -File stop-db.ps1', { ignoreErrors: true });
-
-            // 等待服务停止
-            await new Promise(resolve => setTimeout(resolve, 5000));
-
-            // 启动数据库
-            await this.runCommand('powershell.exe -ExecutionPolicy Bypass -File start-db.ps1');
-
-            // 等待数据库启动
-            await new Promise(resolve => setTimeout(resolve, 10000));
-
-            // 清理测试数据
-            await this.runCommand('powershell.exe -ExecutionPolicy Bypass -File reset-admin-password.ps1');
-
-            // 验证数据库连接 - 使用 pg_isready
-            const testConnection = await this.runCommand('docker exec fitness_gym_postgres pg_isready -U postgres -d fitness_gym', { ignoreErrors: true });
-            if (testConnection.includes('accepting connections')) {
-                console.log('✅ 数据库连接验证成功');
-            } else {
-                console.warn('⚠️ 数据库连接验证失败，但继续执行');
-            }
-
-            console.log('✅ 数据库重置完成');
-
-        } catch (error) {
-            console.error(`❌ 数据库重置失败: ${error.message}`);
-            throw error;
-        }
+        console.log('⚠️ 数据库重置功能已禁用，数据库由用户通过Docker控制');
+        console.log('💡 请确保您的Docker后端环境已正确启动并运行');
+        // 不再执行数据库重置操作，因为后端环境由用户控制
     }
 
     /**
      * 启动测试服务
+     * 注意：此方法已禁用，后端和前端服务由用户控制
      */
     async startServices() {
-        console.log('🚀 启动测试服务...');
-
-        try {
-            // 启动后端服务
-            console.log('🚀 启动后端服务...');
-            const backendJob = spawn('powershell.exe', ['-ExecutionPolicy', 'Bypass', '-File', 'start-all.ps1'], {
-                stdio: 'pipe',
-                detached: true
-            });
-
-            // 等待后端服务启动
-            console.log('⏳ 等待后端服务启动...');
-            let backendReady = false;
-            let attempts = 0;
-            const maxAttempts = 30; // 最多等待5分钟
-
-            while (!backendReady && attempts < maxAttempts) {
-                try {
-                    await new Promise(resolve => setTimeout(resolve, 10000)); // 每10秒检查一次
-                    attempts++;
-
-                    // 检查多个可能的端点
-                    const endpoints = [
-                        'curl -f http://localhost:8080/actuator/health',
-                        'curl -f http://localhost:8080/api/health',
-                        'curl -f http://localhost:8080/health',
-                        'curl -f http://localhost:8080/'
-                    ];
-
-                    for (const endpoint of endpoints) {
-                        try {
-                            const response = await this.runCommand(endpoint, { ignoreErrors: true, timeout: 5000 });
-                            if (response && (response.includes('status') || response.includes('200') || response.includes('OK') || response.includes('success'))) {
-                                backendReady = true;
-                                console.log(`✅ 后端服务启动成功 (端点: ${endpoint})`);
-                                break;
-                            }
-                        } catch (e) {
-                            // 继续尝试下一个端点
-                        }
-                    }
-                } catch (error) {
-                    console.log(`⏳ 后端服务启动中... (尝试 ${attempts}/${maxAttempts})`);
-                }
-            }
-
-            if (!backendReady) {
-                throw new Error('后端服务启动超时');
-            }
-
-            // 启动前端服务
-            console.log('🚀 启动前端服务...');
-            const projects = ['admin', 'front'];
-
-            for (const project of projects) {
-                const projectPath = `springboot1ngh61a2/src/main/resources/${project}/${project}`;
-                const port = project === 'admin' ? '8081' : '8082';
-
-                console.log(`🚀 启动 ${project} 前端服务 (端口 ${port})...`);
-
-                const frontendProcess = spawn('npm', ['run', 'dev', '--', '--host', '0.0.0.0', '--port', port], {
-                    cwd: projectPath,
-                    stdio: 'pipe',
-                    detached: true
-                });
-
-                // 等待前端服务启动
-                let frontendReady = false;
-                let frontendAttempts = 0;
-                const maxFrontendAttempts = 20; // 最多等待2分钟
-
-                while (!frontendReady && frontendAttempts < maxFrontendAttempts) {
-                    try {
-                        await new Promise(resolve => setTimeout(resolve, 6000)); // 每6秒检查一次
-                        frontendAttempts++;
-
-                        const response = await this.runCommand(
-                            `curl -f http://localhost:${port}`,
-                            { ignoreErrors: true, timeout: 3000 }
-                        );
-
-                        if (response) {
-                            frontendReady = true;
-                            console.log(`✅ ${project} 前端服务启动成功 (端口 ${port})`);
-                        }
-                    } catch (error) {
-                        console.log(`⏳ ${project} 前端服务启动中... (尝试 ${frontendAttempts}/${maxFrontendAttempts})`);
-                    }
-                }
-
-                if (!frontendReady) {
-                    console.warn(`⚠️ ${project} 前端服务启动可能失败，继续执行测试`);
-                }
-            }
-
-            console.log('✅ 所有服务启动完成');
-
-        } catch (error) {
-            console.error(`❌ 服务启动失败: ${error.message}`);
-            throw error;
-        }
+        console.log('⚠️ 服务启动功能已禁用，后端和前端服务由用户控制');
+        console.log('💡 请确保您的Docker后端环境已正确启动并运行');
+        console.log('💡 请确保前端服务已启动（如果playwright配置中E2E_NO_SERVER=false）');
+        // 不再执行服务启动操作，因为环境由用户控制
     }
 
     /**
@@ -923,35 +802,12 @@ class PhasedE2EExecutionManager {
 
     /**
      * 停止测试服务
+     * 注意：此方法已禁用，服务由用户控制
      */
     async stopServices() {
-        console.log('🛑 停止测试服务...');
-
-        try {
-            // 停止后端服务
-            await this.runCommand('powershell.exe -ExecutionPolicy Bypass -File stop-all.ps1', { ignoreErrors: true });
-
-            // 停止前端服务进程
-            const projects = ['admin', 'front'];
-            for (const project of projects) {
-                const port = project === 'admin' ? '8081' : '8082';
-                try {
-                    // 查找并终止占用端口的进程
-                    await this.runCommand(`for /f "tokens=5" %a in ('netstat -ano ^| find ":${port} "') do taskkill /f /pid %a`, { ignoreErrors: true });
-                } catch (error) {
-                    // 忽略进程终止错误
-                }
-            }
-
-            // 等待服务完全停止
-            await new Promise(resolve => setTimeout(resolve, 5000));
-
-            console.log('✅ 服务停止完成');
-
-        } catch (error) {
-            console.warn(`⚠️ 服务停止部分失败: ${error.message}`);
-            // 不抛出错误，因为停止失败通常不影响后续操作
-        }
+        console.log('⚠️ 服务停止功能已禁用，服务由用户控制');
+        console.log('💡 请手动停止您的Docker后端和前端服务');
+        // 不再执行服务停止操作，因为环境由用户控制
     }
 
     /**

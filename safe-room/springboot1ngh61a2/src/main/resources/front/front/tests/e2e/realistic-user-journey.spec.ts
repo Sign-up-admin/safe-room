@@ -5,8 +5,7 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
     await page.goto('/')
     await expect(page).toHaveURL('/#/index/home')
 
-    // 验证页面标题或主要元素
-    await expect(page.locator('h1').or(page.locator('.hero-title')).or(page.locator('text=健身房')).first()).toBeVisible()
+    // 验证页面标题或主要元�?    await expect(page.locator('h1').or(page.locator('.hero-title')).or(page.locator('text=健身�?)).first()).toBeVisible()
   })
 
   test('should navigate to login page and verify form elements', async ({ page }) => {
@@ -42,8 +41,7 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
     // 尝试导航到个人中心（可能需要登录）
     try {
       await page.goto('/#/index/center')
-      // 如果成功访问，验证页面元素
-      await expect(page.locator('text=个人中心').or(page.locator('.center-content')).or(page.locator('h2')).first()).toBeVisible()
+      // 如果成功访问，验证页面元�?      await expect(page.locator('text=个人中心').or(page.locator('.center-content')).or(page.locator('h2')).first()).toBeVisible()
     } catch (e) {
       // 如果需要登录，重定向到登录页面是正常的
       expect(page.url()).toMatch(/\/login/)
@@ -59,11 +57,9 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
         await page.goto(path)
         const currentURL = page.url()
 
-        // 如果成功访问课程页面，验证基本元素
-        if (!currentURL.includes('/login')) {
+        // 如果成功访问课程页面，验证基本元�?        if (!currentURL.includes('/login')) {
           await expect(page.locator('text=课程').or(page.locator('.course-list')).or(page.locator('.course-item')).first()).toBeVisible()
-          break // 找到可访问的课程页面就停止
-        }
+          break // 找到可访问的课程页面就停�?        }
       } catch (e) {
         // 继续尝试其他路径
         continue
@@ -72,8 +68,7 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
   })
 
   test('should handle membership cards if accessible', async ({ page }) => {
-    // 尝试访问会员卡相关页面
-    const membershipPaths = ['#/index/huiyuanka', '#/membership', '#/index/huiyuankagoumai']
+    // 尝试访问会员卡相关页�?    const membershipPaths = ['#/index/huiyuanka', '#/membership', '#/index/huiyuankagoumai']
 
     for (const path of membershipPaths) {
       try {
@@ -105,8 +100,7 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
     const navMenu = page.locator('nav').or(page.locator('.nav-menu')).or(page.locator('.menu')).first()
 
     if (await navMenu.isVisible()) {
-      // 如果有导航菜单，验证菜单项
-      await expect(navMenu.locator('a').or(navMenu.locator('button')).first()).toBeVisible()
+      // 如果有导航菜单，验证菜单�?      await expect(navMenu.locator('a').or(navMenu.locator('button')).first()).toBeVisible()
     }
   })
 
@@ -139,8 +133,7 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
     await page.goBack()
     await expect(page).toHaveURL('/#/index/home')
 
-    // 测试浏览器前进
-    await page.goForward()
+    // 测试浏览器前�?    await page.goForward()
     await expect(page.url()).toMatch(/\/login/)
 
     // 测试页面刷新
@@ -148,5 +141,6 @@ test.describe('Realistic User Journey Based on Actual App Structure', () => {
     await expect(page.url()).toMatch(/\/login/)
   })
 })
+
 
 

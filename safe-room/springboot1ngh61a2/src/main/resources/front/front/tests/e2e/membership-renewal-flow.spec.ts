@@ -11,10 +11,7 @@ test.describe('Membership Renewal Flow', () => {
 
   test('should display membership renewal interface correctly', async ({ page }) => {
     // Check main heading
-    await expect(page.locator('h1').filter({ hasText: '续费倒计时' })).toBeVisible()
-
-    // Check countdown visual
-    const countdownRing = page.locator('.countdown-ring')
+    await expect(page.locator('h1').filter({ hasText: '续费倒计时'.countdown-ring')
     await expect(countdownRing).toBeVisible()
 
     // Check renewal cards

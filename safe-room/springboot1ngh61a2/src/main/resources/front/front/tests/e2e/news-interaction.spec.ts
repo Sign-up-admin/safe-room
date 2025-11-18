@@ -10,18 +10,7 @@ test.describe('新闻资讯交互模块测试', () => {
   })
 
   test.describe('新闻列表浏览', () => {
-    test('应正确显示新闻列表', async ({ page }) => {
-      const newsPage = new NewsListPage(page)
-      await newsPage.goto()
-      await newsPage.expectLoaded()
-
-      // 验证至少有一个新闻
-      const newsCount = await newsPage.getNewsCount()
-      expect(newsCount).toBeGreaterThan(0)
-      logTestStep(`验证新闻列表显示 ${newsCount} 条新闻`)
-    })
-
-    test('应支持新闻搜索功能', async ({ page }) => {
+    test('应正确显示新闻列表'应支持新闻搜索功�?, async ({ page }) => {
       const newsPage = new NewsListPage(page)
       await newsPage.goto()
       await newsPage.expectLoaded()
@@ -31,10 +20,10 @@ test.describe('新闻资讯交互模块测试', () => {
 
       // 验证搜索结果
       const newsCount = await newsPage.getNewsCount()
-      logTestStep(`搜索"HIIT"后显示 ${newsCount} 条新闻`)
+      logTestStep(`搜索"HIIT"后显�?${newsCount} 条新闻`)
     })
 
-    test('应验证新闻卡片信息完整性', async ({ page }) => {
+    test('应验证新闻卡片信息完整�?, async ({ page }) => {
       const newsPage = new NewsListPage(page)
       await newsPage.goto()
       await newsPage.expectLoaded()
@@ -48,18 +37,18 @@ test.describe('新闻资讯交互模块测试', () => {
       expect(author).toBeTruthy()
       expect(date).toBeTruthy()
 
-      logTestStep(`新闻卡片信息: ${title} - 作者: ${author} - 日期: ${date}`)
+      logTestStep(`新闻卡片信息: ${title} - 作�? ${author} - 日期: ${date}`)
     })
   })
 
   test.describe('新闻详情阅读', () => {
-    test('应正确显示新闻详情', async ({ page }) => {
-      // 先访问新闻列表
+    test('应正确显示新闻详�?, async ({ page }) => {
+      // 先访问新闻列�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.expectLoaded()
 
-      // 点击第一个新闻
+      // 点击第一个新�?
       await newsListPage.clickNewsCard(0)
 
       // 验证详情页面
@@ -75,11 +64,11 @@ test.describe('新闻资讯交互模块测试', () => {
       expect(content).toBeTruthy()
       expect(author).toBeTruthy()
 
-      logTestStep(`新闻详情: ${title} - 作者: ${author}`)
+      logTestStep(`新闻详情: ${title} - 作�? ${author}`)
     })
 
-    test('应支持新闻点赞功能', async ({ page }) => {
-      // 导航到新闻详情
+    test('应支持新闻点赞功�?, async ({ page }) => {
+      // 导航到新闻详�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -94,17 +83,17 @@ test.describe('新闻资讯交互模块测试', () => {
       await newsDetailPage.clickLikeButton()
 
       // 验证点赞成功提示
-      await page.waitForSelector('text=点赞成功, text=已点赞, .success-message', { timeout: 5000 }).catch(() => {})
+      await page.waitForSelector('text=点赞成功, text=已点�? .success-message', { timeout: 5000 }).catch(() => {})
 
       // 验证点赞数量增加
       const likeCountAfter = await newsDetailPage.getLikeCount()
       expect(likeCountAfter).toBeGreaterThanOrEqual(likeCountBefore)
 
-      logTestStep(`点赞功能正常，点赞数从 ${likeCountBefore} 增加到 ${likeCountAfter}`)
+      logTestStep(`点赞功能正常，点赞数�?${likeCountBefore} 增加�?${likeCountAfter}`)
     })
 
-    test('应支持新闻分享功能', async ({ page }) => {
-      // 导航到新闻详情
+    test('应支持新闻分享功�?, async ({ page }) => {
+      // 导航到新闻详�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -115,7 +104,7 @@ test.describe('新闻资讯交互模块测试', () => {
       // 点击分享按钮并选择微信分享
       await newsDetailPage.shareNews('wechat')
 
-      // 验证分享弹窗或提示出现
+      // 验证分享弹窗或提示出�?
       const shareDialog = page.locator('.share-dialog, .social-share-popup, text=分享成功')
       const hasShareDialog = await shareDialog.count() > 0
 
@@ -128,8 +117,8 @@ test.describe('新闻资讯交互模块测试', () => {
   })
 
   test.describe('新闻评论交互', () => {
-    test('应支持发表评论', async ({ page }) => {
-      // 导航到新闻详情
+    test('应支持发表评�?, async ({ page }) => {
+      // 导航到新闻详�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -160,8 +149,8 @@ test.describe('新闻资讯交互模块测试', () => {
       logTestStep('评论发表成功')
     })
 
-    test('应支持回复评论', async ({ page }) => {
-      // 先发表一个评论
+    test('应支持回复评�?, async ({ page }) => {
+      // 先发表一个评�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -178,8 +167,8 @@ test.describe('新闻资讯交互模块测试', () => {
       await commentPage.submitComment()
       await page.waitForTimeout(1000) // 等待评论提交完成
 
-      // 回复第一条评论
-      const replyContent = '感谢你的分享！'
+      // 回复第一条评�?
+      const replyContent = '感谢你的分享�?
       await commentPage.replyToComment(0, replyContent)
 
       // 验证回复成功
@@ -192,8 +181,8 @@ test.describe('新闻资讯交互模块测试', () => {
       logTestStep('评论回复功能正常')
     })
 
-    test('应验证评论表单验证', async ({ page }) => {
-      // 导航到评论页面
+    test('应验证评论表单验�?, async ({ page }) => {
+      // 导航到评论页�?
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -205,17 +194,17 @@ test.describe('新闻资讯交互模块测试', () => {
       const commentPage = new NewsCommentPage(page)
       await commentPage.expectLoaded()
 
-      // 尝试提交空评论
+      // 尝试提交空评�?
       await commentPage.submitComment()
 
       // 验证表单验证错误
-      const errorMessages = page.locator('.error-message, .el-form-item__error, text=必填, text=不能为空, text=请输入评论内容')
+      const errorMessages = page.locator('.error-message, .el-form-item__error, text=必填, text=不能为空, text=请输入评论内�?)
       const errorCount = await errorMessages.count()
 
       if (errorCount > 0) {
         logTestStep(`评论表单验证发现 ${errorCount} 个错误`)
       } else {
-        logTestStep('评论表单验证检查完成')
+        logTestStep('评论表单验证检查完�?)
       }
     })
 
@@ -232,13 +221,13 @@ test.describe('新闻资讯交互模块测试', () => {
       const commentPage = new NewsCommentPage(page)
       await commentPage.expectLoaded()
 
-      // 发表第一条评论
-      await commentPage.writeComment('第一条评论')
+      // 发表第一条评�?
+      await commentPage.writeComment('第一条评�?)
       await commentPage.submitComment()
       await page.waitForTimeout(500)
 
-      // 发表第二条评论
-      await commentPage.writeComment('第二条评论')
+      // 发表第二条评�?
+      await commentPage.writeComment('第二条评�?)
       await commentPage.submitComment()
       await page.waitForTimeout(500)
 
@@ -257,28 +246,28 @@ test.describe('新闻资讯交互模块测试', () => {
     })
   })
 
-  test.describe('新闻数据完整性', () => {
-    test('应验证新闻卡片包含必要信息', async ({ page }) => {
+  test.describe('新闻数据完整�?, () => {
+    test('应验证新闻卡片包含必要信�?, async ({ page }) => {
       const newsPage = new NewsListPage(page)
       await newsPage.goto()
       await newsPage.expectLoaded()
 
-      // 检查第一个新闻卡片是否包含必要元素
+      // 检查第一个新闻卡片是否包含必要元�?
       const firstCard = page.locator('.news-card, .news-item').first()
 
       // 验证包含标题
       await expect(firstCard.locator('h3, .news-title')).toBeVisible()
 
-      // 验证包含作者信息
+      // 验证包含作者信�?
       await expect(firstCard.locator('.author, .news-author')).toBeVisible()
 
       // 验证包含发布时间
       await expect(firstCard.locator('.date, .publish-date')).toBeVisible()
 
-      logTestStep('验证新闻卡片信息完整性')
+      logTestStep('验证新闻卡片信息完整�?)
     })
 
-    test('应验证新闻详情页信息完整性', async ({ page }) => {
+    test('应验证新闻详情页信息完整�?, async ({ page }) => {
       const newsListPage = new NewsListPage(page)
       await newsListPage.goto()
       await newsListPage.clickNewsCard(0)
@@ -292,13 +281,13 @@ test.describe('新闻资讯交互模块测试', () => {
       // 验证互动按钮存在
       await expect(page.locator('.like-btn, .comment-btn')).toBeVisible()
 
-      logTestStep('验证新闻详情页信息完整性')
+      logTestStep('验证新闻详情页信息完整�?)
     })
   })
 
-  test.describe('响应式设计测试', () => {
-    test('应在移动端正确显示新闻列表', async ({ page }) => {
-      // 设置移动端视口
+  test.describe('响应式设计测�?, () => {
+    test('应在移动端正确显示新闻列�?, async ({ page }) => {
+      // 设置移动端视�?
       await page.setViewportSize({ width: 375, height: 667 })
 
       const newsPage = new NewsListPage(page)
@@ -309,11 +298,11 @@ test.describe('新闻资讯交互模块测试', () => {
       const newsCount = await newsPage.getNewsCount()
       expect(newsCount).toBeGreaterThan(0)
 
-      logTestStep('验证移动端新闻列表显示')
+      logTestStep('验证移动端新闻列表显�?)
     })
 
-    test('应在平板端支持新闻交互', async ({ page }) => {
-      // 设置平板端视口
+    test('应在平板端支持新闻交�?, async ({ page }) => {
+      // 设置平板端视�?
       await page.setViewportSize({ width: 768, height: 1024 })
 
       const newsPage = new NewsListPage(page)
@@ -327,7 +316,7 @@ test.describe('新闻资讯交互模块测试', () => {
       const title = await newsDetailPage.getNewsTitle()
       expect(title).toBeTruthy()
 
-      logTestStep('验证平板端新闻交互功能')
+      logTestStep('验证平板端新闻交互功�?)
     })
   })
 })

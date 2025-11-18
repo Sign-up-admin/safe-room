@@ -19,7 +19,7 @@ test.describe('Front CRUD modules', () => {
 
   test('renders private class booking list', async ({ page }) => {
     await page.goto('/#/index/sijiaoyuyue')
-    await expect(page.getByText('燃脂私教课')).toBeVisible()
+    await expect(page.getByText('燃脂私教�?)).toBeVisible()
   })
 })
 

@@ -131,9 +131,17 @@ const form = reactive({
   password: ''
 })
 
+// 表单数据监听已移除，避免控制台噪音
+
 const handleLogin = async () => {
+  console.log('登录表单数据:', { username: form.username, password: form.password, passwordLength: form.password.length })
+
   if (!form.username || !form.password) {
-    errorMessage.value = '请输入账号和密码'
+    const missing = []
+    if (!form.username) missing.push('账号')
+    if (!form.password) missing.push('密码')
+    errorMessage.value = `请输入${missing.join('和')}`
+    console.error('验证失败:', { missing, formData: { username: form.username, passwordLength: form.password.length } })
     return
   }
 
@@ -141,23 +149,31 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    const response = await request.post<{ token?: string; role?: string }>('/user/login', {
+    console.log('开始API调用...')
+    const response = await request.post<{ token?: string; role?: string }>('/users/login', {
       username: form.username,
       password: form.password
     })
+    console.log('API响应:', response)
 
     if (response.code === 0) {
-      const token = (response.data as any)?.token || (response as any).token
+      const token = (response as any).token
+      console.log('获取到token:', token ? '成功' : '失败')
+
       if (token) {
         localStorage.setItem(STORAGE_KEYS.TOKEN, token)
         await userStore.initUser()
+        console.log('用户状态初始化完成')
       }
 
       ElMessage.success('登录成功')
+      console.log('准备跳转到主页...')
 
       const redirect = router.currentRoute.value.query.redirect as string
+      console.log('跳转目标:', redirect || '/home')
       router.push(redirect || '/home')
     } else {
+      console.error('登录失败:', response.msg)
       errorMessage.value = response.msg || '登录失败'
     }
   } catch (error: any) {

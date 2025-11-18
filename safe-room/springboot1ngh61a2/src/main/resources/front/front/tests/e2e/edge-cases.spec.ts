@@ -10,8 +10,7 @@ test.describe('边缘情况测试', () => {
     await expect(page).toHaveURL(/#\/login/)
   })
 
-  test('网络失败时显示错误提示', async ({ page }) => {
-    await page.route('**/login**', async (route) => {
+  test('网络失败时显示错误提示'**/login**', async (route) => {
       await route.abort('failed')
     })
 
@@ -37,21 +36,19 @@ test.describe('边缘情况测试', () => {
     await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
-    // 只填写密码，用户名留空
-    await page.getByLabel('密码', { exact: false }).fill('123456')
+    // 只填写密码，用户名留�?    await page.getByLabel('密码', { exact: false }).fill('123456')
     await page.getByRole('button', { name: '登录' }).click()
 
     await expect(page.getByText(/用户名不能为空|账号不能为空/)).toBeVisible()
   })
 
-  test('表单验证 - 空密码', async ({ page }) => {
+  test('表单验证 - 空密�?, async ({ page }) => {
     await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
 
     await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
-    // 只填写用户名，密码留空
-    await page.getByLabel('账号').fill('user01')
+    // 只填写用户名，密码留�?    await page.getByLabel('账号').fill('user01')
     await page.getByRole('button', { name: '登录' }).click()
 
     await expect(page.getByText(/密码不能为空/)).toBeVisible()
@@ -70,11 +67,11 @@ test.describe('边缘情况测试', () => {
     const submitButton = page.getByRole('button', { name: /注册|提交/ })
     if (await submitButton.isEnabled()) {
       await submitButton.click()
-      await expect(page.getByText(/邮箱格式无效|邮箱格式不正确/)).toBeVisible()
+      await expect(page.getByText(/邮箱格式无效|邮箱格式不正�?)).toBeVisible()
     }
   })
 
-  test('页面刷新后状态保持', async ({ page }) => {
+  test('页面刷新后状态保�?, async ({ page }) => {
     await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
 
     await page.goto('/#/login')
@@ -88,8 +85,7 @@ test.describe('边缘情况测试', () => {
     await page.reload()
     await waitForPageFullyLoaded(page)
 
-    // 验证表单被清空（正常行为）
-    const usernameInput = page.getByLabel('账号')
+    // 验证表单被清空（正常行为�?    const usernameInput = page.getByLabel('账号')
     const passwordInput = page.getByLabel('密码', { exact: false })
 
     await expect(usernameInput).toHaveValue('')
@@ -102,14 +98,12 @@ test.describe('边缘情况测试', () => {
     await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
-    // 快速连续点击登录按钮多次
-    const loginButton = page.getByRole('button', { name: '登录' })
+    // 快速连续点击登录按钮多�?    const loginButton = page.getByRole('button', { name: '登录' })
 
     await page.getByLabel('账号').fill('user01')
     await page.getByLabel('密码', { exact: false }).fill('123456')
 
-    // 连续点击3次
-    await loginButton.click()
+    // 连续点击3�?    await loginButton.click()
     await loginButton.click()
     await loginButton.click()
 
@@ -120,8 +114,7 @@ test.describe('边缘情况测试', () => {
   test('浏览器后退前进导航', async ({ page }) => {
     await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
 
-    // 访问登录页
-    await page.goto('/#/login')
+    // 访问登录�?    await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
     // 登录
@@ -158,12 +151,11 @@ test.describe('边缘情况测试', () => {
     await page.goto('/#/index/center')
     await waitForPageFullyLoaded(page)
 
-    // 应该被重定向到登录页或显示超时提示
-    const currentUrl = page.url()
+    // 应该被重定向到登录页或显示超时提�?    const currentUrl = page.url()
     expect(currentUrl).toMatch(/#\/login|session.*expired|timeout/)
   })
 
-  test('大文件上传处理', async ({ page }) => {
+  test('大文件上传处�?, async ({ page }) => {
     await page.goto('/#/index/upload')
     await waitForPageFullyLoaded(page)
 

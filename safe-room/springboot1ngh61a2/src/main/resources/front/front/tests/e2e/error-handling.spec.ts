@@ -1,23 +1,19 @@
 import { test, expect } from '@playwright/test'
-import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../../utils/shared-helpers'
+import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../utils/shared-helpers'
 import { FrontLoginPage, FrontRegisterPage } from '../../utils/page-objects/front-pages'
 import { CourseListPage, CourseDetailPage, CourseBookingPage } from '../../utils/page-objects/course-page'
 import { MembershipPage } from '../../utils/page-objects/membership-page'
 
-test.describe('错误处理和边界情况测试', () => {
-  test.beforeEach(async ({ page }) => {
-    await setupTestEnvironment(page)
-    logTestStep('设置错误处理测试环境')
+test.describe('错误处理和边界情况测试'设置错误处理测试环境')
   })
 
   test.describe('网络错误处理', () => {
-    test('应正确处理登录时的网络超时', async ({ page }) => {
-      logTestStep('开始测试登录网络超时')
+    test('应正确处理登录时的网络超�?, async ({ page }) => {
+      logTestStep('开始测试登录网络超�?)
 
       // 模拟网络超时
       await page.route('**/yonghu/login', async (route) => {
-        await new Promise(resolve => setTimeout(resolve, 35000)) // 超过30秒超时
-        await route.fulfill({
+        await new Promise(resolve => setTimeout(resolve, 35000)) // 超过30秒超�?        await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({ code: 0, msg: '登录成功' })
@@ -41,17 +37,16 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'network_timeout_error')
     })
 
-    test('应正确处理API服务不可用', async ({ page }) => {
-      logTestStep('开始测试API服务不可用')
+    test('应正确处理API服务不可�?, async ({ page }) => {
+      logTestStep('开始测试API服务不可�?)
 
-      // 模拟服务不可用
-      await page.route('**/jianshenkecheng/**', async (route) => {
+      // 模拟服务不可�?      await page.route('**/jianshenkecheng/**', async (route) => {
         await route.fulfill({
           status: 503,
           contentType: 'application/json',
           body: JSON.stringify({
             code: 503,
-            msg: '服务暂时不可用，请稍后重试'
+            msg: '服务暂时不可用，请稍后重�?
           })
         })
       })
@@ -60,23 +55,22 @@ test.describe('错误处理和边界情况测试', () => {
       await coursePage.goto()
 
       // 等待错误提示
-      const errorMessage = page.locator('text=服务暂时不可用, text=网络错误, .error-message')
+      const errorMessage = page.locator('text=服务暂时不可�? text=网络错误, .error-message')
       const hasServiceError = await errorMessage.count() > 0
 
       if (hasServiceError) {
-        logTestStep('服务不可用错误正确显示')
+        logTestStep('服务不可用错误正确显�?)
       } else {
-        logTestStep('服务不可用测试完成')
+        logTestStep('服务不可用测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'service_unavailable_error')
     })
 
-    test('应正确处理网络连接中断', async ({ page }) => {
-      logTestStep('开始测试网络连接中断')
+    test('应正确处理网络连接中�?, async ({ page }) => {
+      logTestStep('开始测试网络连接中�?)
 
-      // 先加载页面
-      const coursePage = new CourseListPage(page)
+      // 先加载页�?      const coursePage = new CourseListPage(page)
       await coursePage.goto()
 
       // 模拟网络连接中断
@@ -118,7 +112,7 @@ test.describe('错误处理和边界情况测试', () => {
 
   test.describe('表单验证错误处理', () => {
     test('应验证注册表单的必填字段', async ({ page }) => {
-      logTestStep('开始测试注册表单必填字段验证')
+      logTestStep('开始测试注册表单必填字段验�?)
 
       const registerPage = new FrontRegisterPage(page)
       await registerPage.goto()
@@ -127,11 +121,11 @@ test.describe('错误处理和边界情况测试', () => {
       await registerPage.submitRegistration()
 
       // 验证必填字段错误提示
-      const requiredErrors = page.locator('.error-message, .el-form-item__error, text=必填, text=不能为空, text=请输入')
+      const requiredErrors = page.locator('.error-message, .el-form-item__error, text=必填, text=不能为空, text=请输�?)
       const errorCount = await requiredErrors.count()
 
       expect(errorCount).toBeGreaterThan(0)
-      logTestStep(`必填字段验证工作正常，发现 ${errorCount} 个错误提示`)
+      logTestStep(`必填字段验证工作正常，发�?${errorCount} 个错误提示`)
 
       await takeScreenshotWithTimestamp(page, 'registration_validation_errors')
     })
@@ -142,8 +136,7 @@ test.describe('错误处理和边界情况测试', () => {
       const registerPage = new FrontRegisterPage(page)
       await registerPage.goto()
 
-      // 填写无效手机号
-      await registerPage.fillRegistrationForm({
+      // 填写无效手机�?      await registerPage.fillRegistrationForm({
         username: 'phone_test_user',
         password: 'TestPass123!',
         confirmPassword: 'TestPass123!',
@@ -153,30 +146,27 @@ test.describe('错误处理和边界情况测试', () => {
 
       await registerPage.submitRegistration()
 
-      // 验证手机号格式错误
-      const phoneError = page.locator('text=手机号格式不正确, text=请输入正确的手机号, text=手机号码格式错误')
+      // 验证手机号格式错�?      const phoneError = page.locator('text=手机号格式不正确, text=请输入正确的手机�? text=手机号码格式错误')
       const hasPhoneError = await phoneError.count() > 0
 
       if (hasPhoneError) {
-        logTestStep('手机号格式错误正确提示')
+        logTestStep('手机号格式错误正确提�?)
       } else {
-        logTestStep('手机号格式验证测试完成')
+        logTestStep('手机号格式验证测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'phone_format_validation_error')
     })
 
-    test('应验证密码强度要求', async ({ page }) => {
-      logTestStep('开始测试密码强度验证')
+    test('应验证密码强度要�?, async ({ page }) => {
+      logTestStep('开始测试密码强度验�?)
 
       const registerPage = new FrontRegisterPage(page)
       await registerPage.goto()
 
-      // 填写弱密码
-      await registerPage.fillRegistrationForm({
+      // 填写弱密�?      await registerPage.fillRegistrationForm({
         username: 'weak_password_user',
-        password: '123', // 弱密码
-        confirmPassword: '123',
+        password: '123', // 弱密�?        confirmPassword: '123',
         phone: '13800138000',
         name: '测试用户'
       })
@@ -184,7 +174,7 @@ test.describe('错误处理和边界情况测试', () => {
       await registerPage.submitRegistration()
 
       // 验证密码强度错误
-      const passwordError = page.locator('text=密码强度不足, text=密码太弱, text=密码至少需要')
+      const passwordError = page.locator('text=密码强度不足, text=密码太弱, text=密码至少需�?)
       const hasPasswordError = await passwordError.count() > 0
 
       if (hasPasswordError) {
@@ -213,12 +203,11 @@ test.describe('错误处理和边界情况测试', () => {
 
       await registerPage.submitRegistration()
 
-      // 验证密码不匹配错误
-      const confirmError = page.locator('text=密码不匹配, text=两次密码不一致, text=确认密码不正确')
+      // 验证密码不匹配错�?      const confirmError = page.locator('text=密码不匹�? text=两次密码不一�? text=确认密码不正�?)
       const hasConfirmError = await confirmError.count() > 0
 
       if (hasConfirmError) {
-        logTestStep('密码确认不匹配错误正确提示')
+        logTestStep('密码确认不匹配错误正确提�?)
       } else {
         logTestStep('密码确认匹配验证测试完成')
       }
@@ -226,8 +215,8 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'password_confirmation_mismatch_error')
     })
 
-    test('应验证预约表单的冲突检测', async ({ page }) => {
-      logTestStep('开始测试预约时间冲突检测')
+    test('应验证预约表单的冲突检�?, async ({ page }) => {
+      logTestStep('开始测试预约时间冲突检�?)
 
       const courseListPage = new CourseListPage(page)
       await courseListPage.goto()
@@ -237,7 +226,7 @@ test.describe('错误处理和边界情况测试', () => {
       await courseDetailPage.clickBookButton()
 
       const bookingPage = new CourseBookingPage(page)
-      await bookingPage.selectTimeSlot('09:00-10:00') // Mock中09:00已被预约
+      await bookingPage.selectTimeSlot('09:00-10:00') // Mock�?9:00已被预约
 
       await bookingPage.fillBookingForm({
         name: '冲突测试用户',
@@ -248,13 +237,13 @@ test.describe('错误处理和边界情况测试', () => {
       await bookingPage.submitBooking()
 
       // 验证冲突提示
-      const conflictMessage = page.locator('text=时间冲突, text=已被预约, text=不可用, text=该时间段已有预约')
+      const conflictMessage = page.locator('text=时间冲突, text=已被预约, text=不可�? text=该时间段已有预约')
       const hasConflict = await conflictMessage.count() > 0
 
       if (hasConflict) {
-        logTestStep('预约时间冲突正确检测')
+        logTestStep('预约时间冲突正确检�?)
       } else {
-        logTestStep('预约冲突检测测试完成')
+        logTestStep('预约冲突检测测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'booking_conflict_error')
@@ -272,7 +261,7 @@ test.describe('错误处理和边界情况测试', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             code: 409,
-            msg: '用户名已存在，请选择其他用户名'
+            msg: '用户名已存在，请选择其他用户�?
           })
         })
       })
@@ -281,8 +270,7 @@ test.describe('错误处理和边界情况测试', () => {
       await registerPage.goto()
 
       await registerPage.fillRegistrationForm({
-        username: 'existinguser', // 已存在的用户名
-        password: 'TestPass123!',
+        username: 'existinguser', // 已存在的用户�?        password: 'TestPass123!',
         confirmPassword: 'TestPass123!',
         phone: '13800138000',
         name: '测试用户'
@@ -290,21 +278,20 @@ test.describe('错误处理和边界情况测试', () => {
 
       await registerPage.submitRegistration()
 
-      // 验证重复用户名错误
-      const duplicateError = page.locator('text=用户名已存在, text=账号已注册, .error-message')
+      // 验证重复用户名错�?      const duplicateError = page.locator('text=用户名已存在, text=账号已注�? .error-message')
       const hasDuplicateError = await duplicateError.count() > 0
 
       if (hasDuplicateError) {
-        logTestStep('重复用户名错误正确提示')
+        logTestStep('重复用户名错误正确提�?)
       } else {
-        logTestStep('重复用户名验证测试完成')
+        logTestStep('重复用户名验证测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'duplicate_username_error')
     })
 
-    test('应正确处理无效登录凭据', async ({ page }) => {
-      logTestStep('开始测试无效登录凭据')
+    test('应正确处理无效登录凭�?, async ({ page }) => {
+      logTestStep('开始测试无效登录凭�?)
 
       // 模拟登录失败
       await page.route('**/yonghu/login', async (route) => {
@@ -324,7 +311,7 @@ test.describe('错误处理和边界情况测试', () => {
       await loginPage.login('invaliduser', 'wrongpassword')
 
       // 验证登录失败提示
-      const loginError = page.locator('text=用户名或密码错误, text=登录失败, text=账号不存在')
+      const loginError = page.locator('text=用户名或密码错误, text=登录失败, text=账号不存�?)
       const hasLoginError = await loginError.count() > 0
 
       if (hasLoginError) {
@@ -336,8 +323,8 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'invalid_credentials_error')
     })
 
-    test('应正确处理权限不足错误', async ({ page }) => {
-      logTestStep('开始测试权限不足错误')
+    test('应正确处理权限不足错�?, async ({ page }) => {
+      logTestStep('开始测试权限不足错�?)
 
       // 模拟权限不足
       await page.route('**/admin/**', async (route) => {
@@ -346,16 +333,15 @@ test.describe('错误处理和边界情况测试', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             code: 403,
-            msg: '权限不足，拒绝访问'
+            msg: '权限不足，拒绝访�?
           })
         })
       })
 
-      // 尝试访问管理员页面
-      await page.goto('/#/admin/dashboard')
+      // 尝试访问管理员页�?      await page.goto('/#/admin/dashboard')
 
       // 验证权限错误提示
-      const permissionError = page.locator('text=权限不足, text=拒绝访问, text=无权限')
+      const permissionError = page.locator('text=权限不足, text=拒绝访问, text=无权�?)
       const hasPermissionError = await permissionError.count() > 0
 
       if (hasPermissionError) {
@@ -369,8 +355,8 @@ test.describe('错误处理和边界情况测试', () => {
   })
 
   test.describe('数据验证错误处理', () => {
-    test('应正确处理无效数据格式', async ({ page }) => {
-      logTestStep('开始测试无效数据格式')
+    test('应正确处理无效数据格�?, async ({ page }) => {
+      logTestStep('开始测试无效数据格�?)
 
       // 模拟返回无效JSON
       await page.route('**/jianshenkecheng/**', async (route) => {
@@ -400,8 +386,7 @@ test.describe('错误处理和边界情况测试', () => {
     test('应正确处理空数据响应', async ({ page }) => {
       logTestStep('开始测试空数据响应')
 
-      // 模拟返回空数据
-      await page.route('**/jianshenkecheng/**', async (route) => {
+      // 模拟返回空数�?      await page.route('**/jianshenkecheng/**', async (route) => {
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -416,14 +401,13 @@ test.describe('错误处理和边界情况测试', () => {
       const coursePage = new CourseListPage(page)
       await coursePage.goto()
 
-      // 验证空数据处理
-      const noDataMessage = page.locator('text=暂无数据, text=没有找到, text=空')
+      // 验证空数据处�?      const noDataMessage = page.locator('text=暂无数据, text=没有找到, text=�?)
       const hasNoData = await noDataMessage.count() > 0
 
       if (hasNoData) {
-        logTestStep('空数据响应正确处理')
+        logTestStep('空数据响应正确处�?)
       } else {
-        logTestStep('空数据处理测试完成')
+        logTestStep('空数据处理测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'empty_data_response')
@@ -449,11 +433,11 @@ test.describe('错误处理和边界情况测试', () => {
       await coursePage.goto()
 
       // 验证数据类型错误处理
-      const typeError = page.locator('text=数据格式错误, text=类型不匹配, .error-message')
+      const typeError = page.locator('text=数据格式错误, text=类型不匹�? .error-message')
       const hasTypeError = await typeError.count() > 0
 
       if (hasTypeError) {
-        logTestStep('数据类型不匹配错误正确处理')
+        logTestStep('数据类型不匹配错误正确处�?)
       } else {
         logTestStep('数据类型验证测试完成')
       }
@@ -463,8 +447,8 @@ test.describe('错误处理和边界情况测试', () => {
   })
 
   test.describe('用户体验错误处理', () => {
-    test('应正确处理页面加载失败', async ({ page }) => {
-      logTestStep('开始测试页面加载失败')
+    test('应正确处理页面加载失�?, async ({ page }) => {
+      logTestStep('开始测试页面加载失�?)
 
       // 模拟页面资源加载失败
       await page.route('**/*.{js,css}', async (route) => {
@@ -490,13 +474,12 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'page_load_failure')
     })
 
-    test('应正确处理浏览器兼容性问题', async ({ page }) => {
-      logTestStep('开始测试浏览器兼容性')
+    test('应正确处理浏览器兼容性问�?, async ({ page }) => {
+      logTestStep('开始测试浏览器兼容�?)
 
       // 模拟不支持的API
       await page.addInitScript(() => {
-        // 禁用某些现代API来模拟旧浏览器
-        Object.defineProperty(navigator, 'serviceWorker', {
+        // 禁用某些现代API来模拟旧浏览�?        Object.defineProperty(navigator, 'serviceWorker', {
           value: undefined,
           configurable: true
         })
@@ -505,24 +488,22 @@ test.describe('错误处理和边界情况测试', () => {
       await page.goto('/#/index/home')
       await page.waitForLoadState('domcontentloaded')
 
-      // 验证兼容性处理
-      const compatibilityWarning = page.locator('text=浏览器版本过低, text=不支持此浏览器')
+      // 验证兼容性处�?      const compatibilityWarning = page.locator('text=浏览器版本过�? text=不支持此浏览�?)
       const hasCompatibilityWarning = await compatibilityWarning.count() > 0
 
       if (hasCompatibilityWarning) {
-        logTestStep('浏览器兼容性问题正确提示')
+        logTestStep('浏览器兼容性问题正确提�?)
       } else {
-        logTestStep('浏览器兼容性测试完成')
+        logTestStep('浏览器兼容性测试完�?)
       }
 
       await takeScreenshotWithTimestamp(page, 'browser_compatibility_error')
     })
 
-    test('应正确处理离线状态', async ({ page }) => {
-      logTestStep('开始测试离线状态处理')
+    test('应正确处理离线状�?, async ({ page }) => {
+      logTestStep('开始测试离线状态处�?)
 
-      // 先加载页面
-      await page.goto('/#/index/home')
+      // 先加载页�?      await page.goto('/#/index/home')
       await page.waitForLoadState('domcontentloaded')
 
       // 模拟网络离线
@@ -532,13 +513,13 @@ test.describe('错误处理和边界情况测试', () => {
       await page.reload()
 
       // 验证离线处理
-      const offlineMessage = page.locator('text=网络连接失败, text=离线状态, text=无网络连接')
+      const offlineMessage = page.locator('text=网络连接失败, text=离线状�? text=无网络连�?)
       const hasOfflineMessage = await offlineMessage.count() > 0
 
       if (hasOfflineMessage) {
-        logTestStep('离线状态正确处理')
+        logTestStep('离线状态正确处�?)
       } else {
-        logTestStep('离线状态测试完成')
+        logTestStep('离线状态测试完�?)
       }
 
       // 恢复网络连接
@@ -548,17 +529,15 @@ test.describe('错误处理和边界情况测试', () => {
     })
   })
 
-  test.describe('并发和竞态条件错误处理', () => {
-    test('应正确处理并发请求冲突', async ({ page }) => {
-      logTestStep('开始测试并发请求冲突')
+  test.describe('并发和竞态条件错误处�?, () => {
+    test('应正确处理并发请求冲�?, async ({ page }) => {
+      logTestStep('开始测试并发请求冲�?)
 
-      // 模拟并发请求导致的冲突
-      let requestCount = 0
+      // 模拟并发请求导致的冲�?      let requestCount = 0
       await page.route('**/kechengyuyue/**', async (route) => {
         requestCount++
         if (requestCount > 1) {
-          // 第二个请求返回冲突
-          await route.fulfill({
+          // 第二个请求返回冲�?          await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
@@ -567,8 +546,7 @@ test.describe('错误处理和边界情况测试', () => {
             })
           })
         } else {
-          // 第一个请求成功
-          await route.fulfill({
+          // 第一个请求成�?          await route.fulfill({
             status: 200,
             contentType: 'application/json',
             body: JSON.stringify({
@@ -595,15 +573,14 @@ test.describe('错误处理和边界情况测试', () => {
         notes: '测试并发请求'
       })
 
-      // 快速连续提交两次
-      await bookingPage.submitBooking()
+      // 快速连续提交两�?      await bookingPage.submitBooking()
 
       // 立即再次提交
       await page.waitForTimeout(100)
       await bookingPage.submitBooking()
 
       // 验证并发冲突处理
-      const conflictMessage = page.locator('text=操作过于频繁, text=请稍后再试, .error-message')
+      const conflictMessage = page.locator('text=操作过于频繁, text=请稍后再�? .error-message')
       const hasConflict = await conflictMessage.count() > 0
 
       if (hasConflict) {
@@ -615,8 +592,8 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'concurrent_request_conflict')
     })
 
-    test('应正确处理会话过期', async ({ page }) => {
-      logTestStep('开始测试会话过期处理')
+    test('应正确处理会话过�?, async ({ page }) => {
+      logTestStep('开始测试会话过期处�?)
 
       // 模拟会话过期
       await page.route('**/yonghu/session', async (route) => {
@@ -625,7 +602,7 @@ test.describe('错误处理和边界情况测试', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             code: 401,
-            msg: '会话已过期，请重新登录'
+            msg: '会话已过期，请重新登�?
           })
         })
       })
@@ -634,11 +611,10 @@ test.describe('错误处理和边界情况测试', () => {
       await page.goto('/#/center')
 
       // 验证会话过期处理
-      const sessionExpired = page.locator('text=会话已过期, text=请重新登录, text=登录已过期')
+      const sessionExpired = page.locator('text=会话已过�? text=请重新登�? text=登录已过�?)
       const hasSessionExpired = await sessionExpired.count() > 0
 
-      // 检查是否自动跳转到登录页
-      const currentUrl = page.url()
+      // 检查是否自动跳转到登录�?      const currentUrl = page.url()
       const redirectedToLogin = currentUrl.includes('/login') || currentUrl.includes('/#/login')
 
       if (hasSessionExpired || redirectedToLogin) {
@@ -651,5 +627,6 @@ test.describe('错误处理和边界情况测试', () => {
     })
   })
 })
+
 
 

@@ -18,7 +18,16 @@ const isProd = process.env.NODE_ENV === 'production'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => {
+            // 将 SVG 渐变元素标记为自定义元素，避免 Vue 将其解析为组件
+            return /^(radialgradient|lineargradient|radialGradient|linearGradient)$/i.test(tag)
+          },
+        },
+      },
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver()],
       imports: ['vue', 'vue-router', 'pinia'],

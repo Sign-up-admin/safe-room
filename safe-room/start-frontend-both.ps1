@@ -66,68 +66,65 @@ function Start-FrontendService {
     return $process
 }
 
-try {
-    Write-Log "=== 启动前端前台和后台 ===" "INFO"
-    
-    # 检查 Node.js 和 npm
-    try {
-        $nodeVersion = node --version 2>&1
-        $npmVersion = npm --version 2>&1
-        Write-Log "Node.js 版本: $nodeVersion, npm 版本: $npmVersion" "INFO"
-    } catch {
-        Write-Log "错误: Node.js 或 npm 未安装或不在 PATH 中" "ERROR"
-        Write-Host "请先安装 Node.js: https://nodejs.org/" -ForegroundColor Red
-        exit 1
-    }
-    
-    $processes = @{}
-    
-    # 启动前台 (Front)
-    $frontPath = Join-Path $scriptRoot "springboot1ngh61a2\src\main\resources\front\front"
-    $frontLog = Join-Path $logDir "front-vite-$timestamp.log"
-    $frontProcess = Start-FrontendService -Name "前台 (Front)" -Path $frontPath -Port 8082 -LogFile $frontLog
-    if ($frontProcess) {
-        $processes["front"] = $frontProcess
-    }
-    
-    # 启动后台 (Admin)
-    $adminPath = Join-Path $scriptRoot "springboot1ngh61a2\src\main\resources\admin\admin"
-    $adminLog = Join-Path $logDir "admin-vite-$timestamp.log"
-    $adminProcess = Start-FrontendService -Name "后台 (Admin)" -Path $adminPath -Port 8081 -LogFile $adminLog
-    if ($adminProcess) {
-        $processes["admin"] = $adminProcess
-    }
-    
-    if ($processes.Count -eq 0) {
-        Write-Log "错误: 未能启动任何前端服务" "ERROR"
-        exit 1
-    }
-    
-    Write-Log "所有前端服务已启动！" "INFO"
-    Write-Log "前台访问地址: http://localhost:8082" "INFO"
-    Write-Log "后台访问地址: http://localhost:8081" "INFO"
-    Write-Log "日志文件保存在: $logDir" "INFO"
-    Write-Log "按 Ctrl+C 停止服务，或关闭对应的 PowerShell 窗口" "INFO"
-    
-    # 保存进程信息
-    $processInfo = @{
-        createdAt = (Get-Date).ToString('s')
-        processes = @{}
-    }
-    foreach ($key in $processes.Keys) {
-        $processInfo.processes[$key] = @{
-            pid = $processes[$key].Id
-            port = if ($key -eq "front") { 8082 } else { 8081 }
-        }
-    }
-    $processInfoPath = Join-Path $logDir "frontend-processes-$timestamp.json"
-    $processInfo | ConvertTo-Json -Depth 5 | Set-Content $processInfoPath
-    Write-Log "进程信息已保存到: $processInfoPath" "INFO"
-}
+# 主程序
+Write-Log "=== 启动前端前台和后台 ===" "INFO"
 
+# 检查 Node.js 和 npm
+try {
+    $nodeVersion = node --version 2>&1
+    $npmVersion = npm --version 2>&1
+    Write-Log "Node.js 版本: $nodeVersion, npm 版本: $npmVersion" "INFO"
+}
 catch {
-    Write-Log "启动过程中发生错误: $($_.Exception.Message)" "ERROR"
-    Write-Host $_.Exception.StackTrace -ForegroundColor Red
+    Write-Log "错误: Node.js 或 npm 未安装或不在 PATH 中" "ERROR"
+    Write-Host "请先安装 Node.js: https://nodejs.org/" -ForegroundColor Red
     exit 1
 }
+
+$processes = @{}
+
+# 启动前台 (Front)
+$frontPath = Join-Path $scriptRoot "springboot1ngh61a2\src\main\resources\front\front"
+$frontLog = Join-Path $logDir "front-vite-$timestamp.log"
+$frontProcess = Start-FrontendService -Name "前台 (Front)" -Path $frontPath -Port 8082 -LogFile $frontLog
+if ($frontProcess) {
+    $processes["front"] = $frontProcess
+}
+
+# 启动后台 (Admin)
+$adminPath = Join-Path $scriptRoot "springboot1ngh61a2\src\main\resources\admin\admin"
+$adminLog = Join-Path $logDir "admin-vite-$timestamp.log"
+$adminProcess = Start-FrontendService -Name "后台 (Admin)" -Path $adminPath -Port 8081 -LogFile $adminLog
+if ($adminProcess) {
+    $processes["admin"] = $adminProcess
+}
+
+if ($processes.Count -eq 0) {
+    Write-Log "错误: 未能启动任何前端服务" "ERROR"
+    exit 1
+}
+
+Write-Log "所有前端服务已启动！" "INFO"
+Write-Log "前台访问地址: http://localhost:8082" "INFO"
+Write-Log "后台访问地址: http://localhost:8081" "INFO"
+Write-Log "日志文件保存在: $logDir" "INFO"
+Write-Log "按 Ctrl+C 停止服务，或关闭对应的 PowerShell 窗口" "INFO"
+
+# 保存进程信息
+$processInfo = @{
+    createdAt = (Get-Date).ToString('s')
+    processes = @{}
+}
+foreach ($key in $processes.Keys) {
+    $processInfo.processes[$key] = @{
+        pid = $processes[$key].Id
+        port = if ($key -eq "front") { 8082 } else { 8081 }
+    }
+}
+$processInfoPath = Join-Path $logDir "frontend-processes-$timestamp.json"
+$processInfo | ConvertTo-Json -Depth 5 | Set-Content $processInfoPath
+Write-Log "进程信息已保存到: $processInfoPath" "INFO"
+
+# 等待一下让服务完全启动
+Start-Sleep -Seconds 2
 

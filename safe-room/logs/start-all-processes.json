@@ -1,9 +1,9 @@
 {
-    "admin":  {
-                  "port":  8081,
-                  "pid":  4012,
-                  "log":  "C:\\safe-room\\logs\\admin-vite-20251115_195422.log"
-              },
-    "log":  "C:\\safe-room\\logs\\start-all-20251115_195422.log",
-    "createdAt":  "2025-11-15T19:54:24"
+    "backend":  {
+                    "port":  8080,
+                    "pid":  6384,
+                    "log":  "C:\\safe-room-git\\safe-room\\logs\\backend-20251118_122604.log"
+                },
+    "log":  "C:\\safe-room-git\\safe-room\\logs\\start-all-20251118_122604.log",
+    "createdAt":  "2025-11-18T12:26:04"
 }

@@ -6,8 +6,7 @@ test.describe('Complete User Journey', () => {
     await page.goto('/')
     await expect(page).toHaveTitle(/健身房|Gym/i)
 
-    // 2. 导航到注册页面
-    await page.goto('/#/register')
+    // 2. 导航到注册页�?    await page.goto('/#/register')
     await expect(page.locator('form[data-testid*="register"]')).toBeVisible()
 
     // 3. 填写注册表单
@@ -48,12 +47,10 @@ test.describe('Complete User Journey', () => {
     // 2. 验证登录成功
     await expect(page).toHaveURL(/\/dashboard|\/home/)
 
-    // 3. 导航到课程列表
-    await page.goto('/#/courses')
+    // 3. 导航到课程列�?    await page.goto('/#/courses')
     await expect(page.locator('[data-testid*="course-list"]')).toBeVisible()
 
-    // 4. 选择一个课程
-    const firstCourse = page.locator('[data-testid*="course-item"]').first()
+    // 4. 选择一个课�?    const firstCourse = page.locator('[data-testid*="course-item"]').first()
     await expect(firstCourse).toBeVisible()
     await firstCourse.click()
 
@@ -74,8 +71,7 @@ test.describe('Complete User Journey', () => {
     // 9. 验证预约成功
     await expect(page.locator('[data-testid*="booking-success"]')).toBeVisible()
 
-    // 10. 检查个人预约记录
-    await page.goto('/#/profile')
+    // 10. 检查个人预约记�?    await page.goto('/#/profile')
     await expect(page.locator('[data-testid*="my-bookings"]')).toContainText('预约成功')
   })
 
@@ -90,11 +86,10 @@ test.describe('Complete User Journey', () => {
     await page.goto('/#/membership')
     await expect(page.locator('[data-testid*="membership-cards"]')).toBeVisible()
 
-    // 3. 选择会员卡
-    const membershipCard = page.locator('[data-testid*="membership-card"]').first()
+    // 3. 选择会员�?    const membershipCard = page.locator('[data-testid*="membership-card"]').first()
     await membershipCard.click()
 
-    // 4. 选择会员卡类型/时长
+    // 4. 选择会员卡类�?时长
     await page.click('[data-testid*="select-plan"]')
 
     // 5. 进入支付流程
@@ -111,8 +106,7 @@ test.describe('Complete User Journey', () => {
     // 8. 验证支付成功
     await expect(page.locator('[data-testid*="payment-success"]')).toBeVisible()
 
-    // 9. 检查会员状态更新
-    await page.goto('/#/profile')
+    // 9. 检查会员状态更�?    await page.goto('/#/profile')
     await expect(page.locator('[data-testid*="membership-status"]')).toContainText('活跃')
   })
 
@@ -167,10 +161,10 @@ test.describe('Complete User Journey', () => {
     // 5. 验证更新成功
     await expect(page.locator('[data-testid*="update-success"]')).toBeVisible()
 
-    // 6. 验证信息已更新
-    await expect(page.locator('input[data-testid*="nickname"]')).toHaveValue('测试用户')
+    // 6. 验证信息已更�?    await expect(page.locator('input[data-testid*="nickname"]')).toHaveValue('测试用户')
     await expect(page.locator('input[data-testid*="phone"]')).toHaveValue('13800138000')
   })
 })
+
 
 

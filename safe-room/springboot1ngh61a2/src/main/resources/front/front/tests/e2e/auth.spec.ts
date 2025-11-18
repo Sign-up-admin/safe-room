@@ -34,10 +34,10 @@ test.describe('Front authentication', () => {
 
   test('logs in successfully with valid credentials', async ({ page }) => {
     await stabilityEnhancer.executeStableAction(async () => {
-      // 使用预设的登录成功场景
+      // 使用预设的登录成功场�?
       await applyCommonMock(page, SCENARIO_NAMES.LOGIN_SUCCESS)
 
-      // 使用隔离的测试用户数据
+      // 使用隔离的测试用户数�?
       const testUser = testData.createUser(testId, {
         username: 'login_test_user',
         password: '123456'
@@ -74,27 +74,24 @@ test.describe('Front authentication', () => {
   })
 
   test('shows error message when credentials are invalid', async ({ page }) => {
-    // 使用预设的登录失败场景
+    // 使用预设的登录失败场�?
     await applyCommonMock(page, SCENARIO_NAMES.LOGIN_FAILURE)
 
     await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
-    // 使用稳定的data-testid选择器
+    // 使用稳定的data-testid选择�?
     await page.getByTestId(selectors.login.usernameInput()).fill('wrong-user')
     await page.getByTestId(selectors.login.passwordInput()).fill('wrong-pass')
     await page.getByTestId(selectors.login.submitButton()).click()
 
     // 等待错误消息出现
     await expect(page.getByTestId(selectors.login.errorMessage)).toBeVisible()
-    await expect(page.getByTestId(selectors.login.errorMessage)).toContainText('账号或密码错误')
-  })
-
-  test('navigates to register page', async ({ page }) => {
+    await expect(page.getByTestId(selectors.login.errorMessage)).toContainText('账号或密码错误'navigates to register page', async ({ page }) => {
     await page.goto('/#/login')
     await waitForPageFullyLoaded(page)
 
-    // 使用稳定的data-testid选择器
+    // 使用稳定的data-testid选择�?
     await page.getByTestId(selectors.login.registerLink).click()
     await expect(page).toHaveURL(/#\/register/)
   })
