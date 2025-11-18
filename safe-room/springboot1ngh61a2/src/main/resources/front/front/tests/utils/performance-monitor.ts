@@ -349,9 +349,7 @@ export class PerformanceMonitor {
       requestBreakdown[req.type]++
     })
 
-    const slowestRequest = completedRequests.reduce((slowest, req) => {
-      return req.responseTime > (slowest?.responseTime || 0) ? req : slowest
-    }, null as any)
+    const slowestRequest = completedRequests.reduce((slowest, req) => req.responseTime > (slowest?.responseTime || 0) ? req : slowest, null as any)
 
     return {
       totalRequests: completedRequests.length,
@@ -603,9 +601,7 @@ export const performance = {
   /**
    * 创建性能监控器
    */
-  createMonitor: (page: Page, testId: string, testName: string, thresholds?: Partial<PerformanceThresholds>) => {
-    return new PerformanceMonitor(page, testId, testName, thresholds)
-  },
+  createMonitor: (page: Page, testId: string, testName: string, thresholds?: Partial<PerformanceThresholds>) => new PerformanceMonitor(page, testId, testName, thresholds),
 
   /**
    * 生成性能摘要报告

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -56,7 +57,7 @@ public final class MockDataGenerator {
      */
     public static BigDecimal randomBigDecimal(double min, double max) {
         double value = min + (max - min) * RANDOM.nextDouble();
-        return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
     }
 
     /**

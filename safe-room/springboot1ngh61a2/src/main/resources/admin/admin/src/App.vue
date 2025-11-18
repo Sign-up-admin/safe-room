@@ -20,8 +20,5 @@ onMounted(() => {
 </script>
 
 <style>
-#app {
-  min-height: 100vh;
-  width: 100%;
-}
+/* App 容器样式已在 main.scss 中统一定义，这里不再重复 */
 </style>

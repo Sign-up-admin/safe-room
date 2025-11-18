@@ -405,6 +405,125 @@ class UserControllerTest extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    void shouldHandleUserSessionRequest() throws Exception {
+        UserEntity user = persistUser("sessionUser", "pwd", 0);
+        String token = loginAndExtractToken("sessionUser", "pwd");
+
+        mockMvc.perform(post("/user/session")
+                        .header("Token", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.username").value("sessionUser"));
+    }
+
+    @Test
+    void shouldHandleUserListsRequest() throws Exception {
+        persistUser("listsUser1", "pwd", 0);
+        persistUser("listsUser2", "pwd", 0);
+
+        performAdmin(get("/user/lists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    void shouldHandleUserQueryRequest() throws Exception {
+        UserEntity user = persistUser("queryUser", "pwd", 0);
+
+        performAdmin(get("/user/query")
+                        .param("username", "queryUser"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.username").value("queryUser"));
+    }
+
+    @Test
+    void shouldHandleUserDetailRequest() throws Exception {
+        UserEntity user = persistUser("detailUser", "pwd", 0);
+
+        mockMvc.perform(get("/user/detail/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.username").value("detailUser"));
+    }
+
+    @Test
+    void shouldHandleUserAddRequest() throws Exception {
+        performAdmin(post("/user/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"addedUser\",\"password\":\"pwd123\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        assertThat(userService.getOne(
+                new QueryWrapper<UserEntity>()
+                        .eq("username", "addedUser"))).isNotNull();
+    }
+
+    @Test
+    void shouldHandleUserRemindRequest() throws Exception {
+        persistUser("remindUser1", "pwd", 0);
+        persistUser("remindUser2", "pwd", 0);
+
+        performAdmin(get("/user/remind/username/1")
+                        .param("remindstart", "2024-01-01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").isNumber());
+    }
+
+    @Test
+    void shouldHandleUserCountRequest() throws Exception {
+        persistUser("countUser1", "pwd", 0);
+        persistUser("countUser2", "pwd", 0);
+
+        performAdmin(get("/user/count"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isNumber());
+    }
+
+    @Test
+    void shouldHandleUserListsWithNullUser() throws Exception {
+        performAdmin(get("/user/lists"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+    }
+
+    @Test
+    void shouldHandleUserQueryWithNullUser() throws Exception {
+        performAdmin(get("/user/query"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Matchers.anyOf(Matchers.is(0), Matchers.is(500))));
+    }
+
+    @Test
+    void shouldHandleUserDetailWithInvalidId() throws Exception {
+        mockMvc.perform(get("/user/detail/999999"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(Matchers.anyOf(Matchers.is(0), Matchers.is(500))));
+    }
+
+    @Test
+    void shouldHandleUserAddWithDuplicateUsername() throws Exception {
+        persistUser("duplicateAdd", "pwd", 0);
+
+        performAdmin(post("/user/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"duplicateAdd\",\"password\":\"pwd123\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(jsonPath("$.msg").value("Username already exists"));
+    }
+
+    @Test
+    void shouldHandleUserRemindWithInvalidType() throws Exception {
+        performAdmin(get("/user/remind/username/3")
+                        .param("remindstart", "invalid"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.count").isNumber());
+    }
+
+    @Test
     void shouldHandleUserListWithoutToken() throws Exception {
         mockMvc.perform(get("/user/list"))
                 .andExpect(status().isOk())

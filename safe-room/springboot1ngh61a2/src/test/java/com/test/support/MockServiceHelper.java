@@ -127,7 +127,7 @@ public final class MockServiceHelper {
                                                  String username, String password, UserEntity user) {
         // 配置根据用户名查询用户
         QueryWrapper<UserEntity> wrapper = new QueryWrapper<UserEntity>().eq("username", username);
-        when(userService.getOne(wrapper)).thenReturn(user);
+        when(userService.getOne(wrapper, false)).thenReturn(user);
 
         log.debug("Mocked user service login scenario for username: {}", username);
     }
@@ -147,7 +147,7 @@ public final class MockServiceHelper {
     public static void setupYonghuServiceLoginMock(IService<YonghuEntity> yonghuService,
                                                   String username, String password, YonghuEntity user) {
         QueryWrapper<YonghuEntity> wrapper = new QueryWrapper<YonghuEntity>().eq("yonghuzhanghao", username);
-        when(yonghuService.getOne(wrapper)).thenReturn(user);
+        when(yonghuService.getOne(wrapper, false)).thenReturn(user);
 
         log.debug("Mocked yonghu service login scenario for username: {}", username);
     }
@@ -167,7 +167,7 @@ public final class MockServiceHelper {
     public static void setupUsersServiceLoginMock(IService<UsersEntity> usersService,
                                                  String username, String password, UsersEntity user) {
         QueryWrapper<UsersEntity> wrapper = new QueryWrapper<UsersEntity>().eq("username", username);
-        when(usersService.getOne(wrapper)).thenReturn(user);
+        when(usersService.getOne(wrapper, false)).thenReturn(user);
 
         log.debug("Mocked users service login scenario for username: {}", username);
     }
@@ -275,7 +275,7 @@ public final class MockServiceHelper {
         user.setId(1L);
         user.setYonghuzhanghao(username);
         QueryWrapper<YonghuEntity> userWrapper = new QueryWrapper<YonghuEntity>().eq("yonghuzhanghao", username);
-        when(yonghuService.getOne(userWrapper)).thenReturn(user);
+        when(yonghuService.getOne(userWrapper, false)).thenReturn(user);
 
         // Mock课程存在
         JianshenkechengEntity course = new JianshenkechengEntity();
@@ -301,7 +301,7 @@ public final class MockServiceHelper {
         user.setId(1L);
         user.setYonghuzhanghao(username);
         QueryWrapper<YonghuEntity> userWrapper = new QueryWrapper<YonghuEntity>().eq("yonghuzhanghao", username);
-        when(yonghuService.getOne(userWrapper)).thenReturn(user);
+        when(yonghuService.getOne(userWrapper, false)).thenReturn(user);
 
         // Mock会员卡存在
         HuiyuankaEntity card = new HuiyuankaEntity();
@@ -346,6 +346,7 @@ public final class MockServiceHelper {
     /**
      * 为所有基础Service配置默认Mock行为
      */
+    @SuppressWarnings("unchecked")
     public static void setupDefaultServiceMocks(IService<?>... services) {
         for (IService<?> service : services) {
             String serviceName = service.getClass().getSimpleName().replace("Service", "").toLowerCase();

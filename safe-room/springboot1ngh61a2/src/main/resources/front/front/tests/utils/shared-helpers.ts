@@ -3,6 +3,84 @@ import fs from 'fs'
 import path from 'path'
 
 /**
+ * 模态对话框处理工具
+ */
+export class ModalHandler {
+  /**
+   * 处理常见的模态对话框
+   */
+  static async handleCommonModals(page: Page): Promise<void> {
+    try {
+      // 查找常见的模态对话框关闭按钮
+      const closeSelectors = [
+        '[class*="close"]',
+        '[class*="dialog"] [aria-label*="关闭"]',
+        '[class*="modal"] [aria-label*="关闭"]',
+        'button:has-text("关闭")',
+        'button:has-text("取消")',
+        '.el-dialog__headerbtn',
+        '.el-message-box__btns button'
+      ];
+
+      for (const selector of closeSelectors) {
+        try {
+          const closeButton = page.locator(selector).first();
+          const isVisible = await closeButton.isVisible().catch(() => false);
+          if (isVisible) {
+            await closeButton.click({ timeout: 2000 });
+            console.log(`✅ 关闭了模态对话框: ${selector}`);
+            await page.waitForTimeout(500);
+            break;
+          }
+        } catch (e) {
+          // 继续尝试下一个选择器
+        }
+      }
+
+      // 处理遮罩层
+      const overlaySelectors = [
+        '.el-overlay',
+        '.el-modal__mask',
+        '.v-modal',
+        '[class*="overlay"]'
+      ];
+
+      for (const selector of overlaySelectors) {
+        try {
+          const overlay = page.locator(selector).first();
+          const isVisible = await overlay.isVisible().catch(() => false);
+          if (isVisible) {
+            // 点击遮罩层外部关闭模态框
+            await overlay.click({ position: { x: 1, y: 1 }, timeout: 2000 });
+            console.log(`✅ 点击遮罩层关闭模态框`);
+            await page.waitForTimeout(500);
+            break;
+          }
+        } catch (e) {
+          // 继续
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ 处理模态对话框时出现问题:', error.message);
+    }
+  }
+
+  /**
+   * 等待模态对话框消失
+   */
+  static async waitForModalToDisappear(page: Page, timeout = 10000): Promise<void> {
+    try {
+      await page.waitForFunction(() => {
+        const modals = document.querySelectorAll('.el-dialog, .el-message-box, [role="dialog"]');
+        return modals.length === 0;
+      }, { timeout });
+    } catch (error) {
+      console.warn('⚠️ 等待模态对话框消失超时');
+    }
+  }
+}
+
+/**
  * 通用等待工具
  */
 export class WaitUtils {
@@ -1541,6 +1619,16 @@ export async function setupTestEnvironment(page: Page): Promise<void> {
     }
   )
 
+  // Add modal dialog handler
+  await page.addLocatorHandler(
+    page.locator('.el-dialog, .el-message-box, [role="dialog"]'),
+    async () => {
+      console.log('🎯 检测到模态对话框，尝试处理...')
+      await ModalHandler.handleCommonModals(page)
+      await ModalHandler.waitForModalToDisappear(page, 3000)
+    }
+  )
+
   // Handle any cookie dialogs that appear
   page.on('dialog', async (dialog) => {
     console.log(`Dialog detected: ${dialog.message()}`)
@@ -1549,6 +1637,13 @@ export async function setupTestEnvironment(page: Page): Promise<void> {
 
   // Wait for page to be ready
   await page.waitForLoadState('domcontentloaded')
+
+  // Final modal cleanup after page load
+  try {
+    await ModalHandler.handleCommonModals(page)
+  } catch (error) {
+    console.warn('⚠️ 页面加载后的模态对话框清理失败:', error.message)
+  }
 }
 
 /**

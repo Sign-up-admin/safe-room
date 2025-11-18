@@ -986,7 +986,7 @@ export class EnhancedTestMonitor {
   /**
    * 记录性能指标
    */
-  recordPerformance(testName: string, metricName: string, value: number, unit: string = 'ms') {
+  recordPerformance(testName: string, metricName: string, value: number, unit = 'ms') {
     const performanceEntry = {
       testName,
       metricName,
@@ -1140,7 +1140,7 @@ export class EnhancedTestMonitor {
   /**
    * 导出报告到文件
    */
-  async exportReport(filePath: string = './test-results/enhanced-report.json') {
+  async exportReport(filePath = './test-results/enhanced-report.json') {
     const report = this.generateReport()
 
     try {

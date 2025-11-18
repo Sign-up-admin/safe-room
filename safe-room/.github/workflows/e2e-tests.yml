@@ -1,0 +1,289 @@
+name: Frontend E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/front/**'
+      - 'springboot1ngh61a2/src/main/resources/admin/**'
+      - '.github/workflows/e2e-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'springboot1ngh61a2/src/main/resources/front/**'
+      - 'springboot1ngh61a2/src/main/resources/admin/**'
+
+env:
+  NODE_VERSION: '18'
+  PLAYWRIGHT_VERSION: '1.56.1'
+
+jobs:
+  frontend-e2e-tests:
+    name: Frontend E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+        browser: [chromium]
+        include:
+          - browser: firefox
+            shard: 1
+          - browser: webkit
+            shard: 1
+
+    services:
+      # 后端服务
+      backend:
+        image: openjdk:17-jdk-slim
+        ports:
+          - 8080:8080
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        options: >-
+          --health-cmd "curl -f http://localhost:8080/actuator/health || exit 1"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+
+      # 数据库服务
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'springboot1ngh61a2/src/main/resources/front/front/package-lock.json'
+
+    - name: Cache Playwright browsers
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-
+
+    - name: Install dependencies
+      working-directory: springboot1ngh61a2/src/main/resources/front/front
+      run: npm ci
+
+    - name: Install Playwright browsers
+      working-directory: springboot1ngh61a2/src/main/resources/front/front
+      run: npx playwright install --with-deps
+
+    - name: Wait for backend
+      run: |
+        timeout 300 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 5; done'
+
+    - name: Run E2E tests
+      working-directory: springboot1ngh61a2/src/main/resources/front/front
+      env:
+        E2E_BASE_URL: http://localhost:5173
+        BACKEND_URL: http://localhost:8080
+        NODE_ENV: ci
+        CI: true
+      run: |
+        npm run test:e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }} --project=${{ matrix.browser }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.browser }}-${{ matrix.shard }}
+        path: |
+          springboot1ngh61a2/src/main/resources/front/front/test-results/
+          springboot1ngh61a2/src/main/resources/front/front/playwright-report/
+
+    - name: Upload screenshots on failure
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: screenshots-${{ matrix.browser }}-${{ matrix.shard }}
+        path: springboot1ngh61a2/src/main/resources/front/front/test-results/screenshots/
+
+  admin-e2e-tests:
+    name: Admin E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      backend:
+        image: openjdk:17-jdk-slim
+        ports:
+          - 8080:8080
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        options: >-
+          --health-cmd "curl -f http://localhost:8080/actuator/health || exit 1"
+          --health-interval 30s
+          --health-timeout 10s
+          --health-retries 5
+
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'springboot1ngh61a2/src/main/resources/admin/admin/package-lock.json'
+
+    - name: Install dependencies
+      working-directory: springboot1ngh61a2/src/main/resources/admin/admin
+      run: npm ci
+
+    - name: Install Playwright
+      working-directory: springboot1ngh61a2/src/main/resources/admin/admin
+      run: npx playwright install chromium
+
+    - name: Wait for backend
+      run: |
+        timeout 300 bash -c 'until curl -f http://localhost:8080/actuator/health; do sleep 5; done'
+
+    - name: Run Admin E2E tests
+      working-directory: springboot1ngh61a2/src/main/resources/admin/admin
+      env:
+        FRONTEND_URL: http://localhost:5173
+        BACKEND_URL: http://localhost:8080
+        NODE_ENV: ci
+        CI: true
+      run: npm run test:e2e
+
+    - name: Upload admin test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: admin-test-results
+        path: |
+          springboot1ngh61a2/src/main/resources/admin/admin/test-results/
+          springboot1ngh61a2/src/main/resources/admin/admin/playwright-report/
+
+  test-summary:
+    name: Test Summary Report
+    runs-on: ubuntu-latest
+    needs: [frontend-e2e-tests, admin-e2e-tests]
+    if: always()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Download test results
+      uses: actions/download-artifact@v3
+      with:
+        path: test-results
+
+    - name: Generate test summary
+      run: |
+        # 合并和分析测试结果
+        node scripts/generate-test-summary.js
+
+    - name: Upload test summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-summary
+        path: test-summary-report/
+
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs')
+          const summary = JSON.parse(fs.readFileSync('test-summary-report/summary.json', 'utf8'))
+
+          const comment = `
+          ## 🧪 测试结果摘要
+
+          ### 前端E2E测试
+          - ✅ 通过: ${summary.frontend.passed}
+          - ❌ 失败: ${summary.frontend.failed}
+          - ⏭️ 跳过: ${summary.frontend.skipped}
+          - 📊 通过率: ${summary.frontend.successRate}%
+
+          ### 管理后台E2E测试
+          - ✅ 通过: ${summary.admin.passed}
+          - ❌ 失败: ${summary.admin.failed}
+          - ⏭️ 跳过: ${summary.admin.skipped}
+          - 📊 通过率: ${summary.admin.successRate}%
+
+          ### 性能指标
+          - 🏃 总执行时间: ${summary.performance.totalDuration}s
+          - 📈 代码覆盖率: ${summary.coverage.overall}%
+
+          ${summary.recommendations.length > 0 ? '### 💡 优化建议\n' + summary.recommendations.map(r => `- ${r}`).join('\n') : ''}
+
+          [📋 查看详细报告](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          `
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          })
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [test-summary]
+    if: always()
+
+    steps:
+    - name: Download test summary
+      uses: actions/download-artifact@v3
+      with:
+        name: test-summary
+        path: test-summary
+
+    - name: Quality gate check
+      run: |
+        # 检查质量门禁条件
+        node scripts/quality-gate.js
+
+    - name: Create quality badge
+      run: |
+        # 根据测试结果生成质量徽章
+        node scripts/generate-quality-badge.js

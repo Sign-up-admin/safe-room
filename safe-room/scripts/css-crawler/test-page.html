@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puppeteer测试页面</title>
+    <link rel="stylesheet" href="test-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            background-color: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .button {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #005f6b;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>Puppeteer CSS 爬虫测试页面</h1>
+        </div>
+
+        <div class="test-card">
+            <h2>欢迎测试 Puppeteer 爬虫功能</h2>
+            <p>这是一个简单的测试页面，用于验证 CSS 爬虫是否能正确提取样式信息。</p>
+
+            <button class="test-button" onclick="alert('Hello Puppeteer!')">点击测试</button>
+        </div>
+
+        <div class="test-card">
+            <h3>功能测试</h3>
+            <ul>
+                <li>外部CSS文件加载</li>
+                <li>内联样式处理</li>
+                <li>元素样式提取</li>
+                <li>响应式设计</li>
+            </ul>
+        </div>
+
+        <div class="hidden">
+            这个内容是隐藏的，应该不会被爬虫检测到。
+        </div>
+    </div>
+
+    <script>
+        console.log("Puppeteer测试页面已加载");
+    </script>
+</body>
+</html>

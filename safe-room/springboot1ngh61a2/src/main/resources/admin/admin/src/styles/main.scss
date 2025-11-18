@@ -6,27 +6,60 @@
 @import './variables';
 @import './mixins';
 
-// 基础重置和全局样式
-* {
+// ========== 全局重置 ==========
+// 只保留一次 reset，避免重复定义
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+// ========== HTML 基础样式 ==========
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  // 确保 html 至少填满视口高度
+  min-height: 100%;
+  height: 100%;
 }
 
+// ========== Body 基础样式 ==========
+// 合并所有 body 规则，避免重复定义和覆盖
 body {
-  font-family: var(--font-family-primary);
-  font-size: var(--font-size-body-md);
-  line-height: var(--line-height-normal);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
-  transition: background-color var(--duration-200) var(--ease-in-out),
-              color var(--duration-200) var(--ease-in-out);
+  // 字体设置
+  font-family: var(--font-family-primary, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-size: var(--font-size-body-md, 1rem);
+  line-height: var(--line-height-normal, 1.5);
+  
+  // 颜色设置
+  color: var(--color-text-primary, #111827);
+  background-color: var(--color-bg-primary, #ffffff);
+  
+  // 字体渲染优化
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  // 过渡动画
+  transition: background-color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out),
+              color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out);
+  
+  // 布局设置 - 确保 body 至少填满视口高度
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+// ========== App 容器样式 ==========
+#app {
+  min-height: 100vh;
+  width: 100%;
+  // 如果内容不足，确保容器填满视口
+  display: flex;
+  flex-direction: column;
 }
 
 // 链接样式

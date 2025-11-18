@@ -42,6 +42,8 @@ function getTimeoutConfig(testInfo: any) {
   }
 }
 
+console.log('Final baseURL:', baseURL)
+
 export default defineConfig({
   testDir: path.resolve(__dirname, 'tests/e2e'),
   fullyParallel: process.env.E2E_PARALLEL === 'true' ? true : false, // 根据环境变量控制是否并行，默认串行（适合笔记本）
@@ -51,6 +53,22 @@ export default defineConfig({
   },
   workers: process.env.CI ? 3 : 6, // 控制并发worker数量，用户前端测试较多，允许更多并发
   reporter: process.env.CI ? [['github'], ['html', { outputFolder: 'playwright-report' }]] : [['list'], ['html', { open: 'never' }]],
+
+  // Test filtering and grouping
+  grep: process.env.TEST_GREP || /.*/,
+  grepInvert: process.env.TEST_GREP_INVERT,
+
+  // Test dependencies and retries with smart retry logic
+  dependencies: ['setup'], // Run setup tests first
+
+  // Enhanced expect configuration
+  expect: {
+    timeout: 20_000, // 增加断言超时时间
+    toHaveScreenshot: {
+      threshold: 0.1, // Allow 10% difference for visual regression
+      maxDiffPixelRatio: 0.05, // Maximum diff pixel ratio
+    },
+  },
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -82,6 +100,7 @@ export default defineConfig({
     },
   },
   projects: [
+    // 桌面浏览器测试
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -93,6 +112,73 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+    },
+
+    // 移动端浏览器测试
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+    {
+      name: 'mobile-safari',
+      use: { ...devices['iPhone 12'] },
+    },
+    {
+      name: 'tablet-chrome',
+      use: { ...devices['iPad Pro'] },
+    },
+    {
+      name: 'tablet-safari',
+      use: { ...devices['iPad'] },
+    },
+
+    // 兼容性测试（针对特定场景）
+    {
+      name: 'chromium-headless',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: true,
+        // 专门用于CI环境的快速测试
+        viewport: { width: 1920, height: 1080 },
+      },
+    },
+    {
+      name: 'chromium-slow-network',
+      use: {
+        ...devices['Desktop Chrome'],
+        // 模拟慢速网络环境
+        launchOptions: {
+          args: ['--disable-web-security', '--disable-features=VizDisplayCompositor'],
+        },
+        contextOptions: {
+          // 模拟3G网络速度
+          permissions: [],
+        },
+      },
+    },
+
+    // 特定功能测试
+    {
+      name: 'accessibility',
+      use: {
+        ...devices['Desktop Chrome'],
+        // 无障碍测试配置
+        launchOptions: {
+          args: ['--enable-accessibility-object-model'],
+        },
+      },
+      testMatch: '**/*accessibility*.spec.ts',
+    },
+    {
+      name: 'performance',
+      use: {
+        ...devices['Desktop Chrome'],
+        // 性能测试配置
+        launchOptions: {
+          args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'],
+        },
+      },
+      testMatch: '**/*performance*.spec.ts',
     },
   ],
 

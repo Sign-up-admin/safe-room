@@ -261,7 +261,6 @@ const handleRoleChange = () => {
   if (formRef.value) {
     formRef.value.resetFields()
   }
-  form.role = form.role
 }
 
 const handleSubmit = async () => {

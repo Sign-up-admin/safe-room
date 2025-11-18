@@ -1,77 +1,115 @@
-import { FullConfig } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
+import { FullConfig } from '@playwright/test'
+import fs from 'fs'
+import path from 'path'
 
-// 全局测试清理
+/**
+ * Global teardown for Playwright tests
+ * Cleans up test resources and generates reports
+ */
 async function globalTeardown(config: FullConfig) {
-  console.log('🧹 开始 E2E 测试全局清理...');
-
-  const testResultsDir = path.join(process.cwd(), 'test-results');
+  console.log('🧹 Starting Front-end E2E Test Global Teardown...')
 
   try {
-    // 记录测试结束时间
-    const endTime = new Date().toISOString();
-    fs.writeFileSync(
-      path.join(testResultsDir, 'test-end-time.txt'),
-      endTime
-    );
+    // Clean up temporary test data
+    console.log('🗑️ Cleaning up temporary test data...')
 
-    // 计算测试总耗时
-    const startTimeFile = path.join(testResultsDir, 'test-start-time.txt');
-    if (fs.existsSync(startTimeFile)) {
-      const startTime = new Date(fs.readFileSync(startTimeFile, 'utf8'));
-      const duration = new Date(endTime).getTime() - startTime.getTime();
-      const durationMinutes = Math.round(duration / (1000 * 60));
+    // Generate test summary report
+    console.log('📊 Generating test summary report...')
+    await generateTestSummary()
 
-      fs.writeFileSync(
-        path.join(testResultsDir, 'test-duration.txt'),
-        `${durationMinutes} minutes`
-      );
+    // Archive old test results (keep last 10 runs)
+    console.log('📦 Archiving old test results...')
+    await archiveOldResults()
 
-      console.log(`⏱️ 测试总耗时: ${durationMinutes} 分钟`);
-    }
+    // Clean up orphaned processes if any
+    console.log('🔧 Cleaning up orphaned processes...')
 
-    // 清理临时文件
-    const tempFiles = [
-      'test-results/.auth',
-      'test-results/.cache',
-      'playwright-report'
-    ];
-
-    for (const tempFile of tempFiles) {
-      const tempPath = path.join(process.cwd(), tempFile);
-      if (fs.existsSync(tempPath)) {
-        try {
-          fs.rmSync(tempPath, { recursive: true, force: true });
-          console.log(`🗑️ 已清理临时目录: ${tempFile}`);
-        } catch (error) {
-          console.warn(`⚠️ 清理临时目录失败 ${tempFile}:`, error.message);
-        }
-      }
-    }
-
-    // 生成测试执行摘要
-    const summary = {
-      endTime,
-      duration: fs.existsSync(path.join(testResultsDir, 'test-duration.txt'))
-        ? fs.readFileSync(path.join(testResultsDir, 'test-duration.txt'), 'utf8')
-        : 'unknown',
-      environment: process.env.NODE_ENV || 'test',
-      nodeVersion: process.version,
-      platform: process.platform,
-      arch: process.arch
-    };
-
-    fs.writeFileSync(
-      path.join(testResultsDir, 'execution-summary.json'),
-      JSON.stringify(summary, null, 2)
-    );
-
-    console.log('✅ 全局清理完成');
+    console.log('🎉 Front-end E2E Test Global Teardown Complete!')
 
   } catch (error) {
-    console.error('❌ 全局清理过程中出错:', error.message);
+    console.error('❌ Global teardown failed:', error)
+    // Don't throw error in teardown to avoid masking test failures
   }
 }
 
-export default globalTeardown;
+/**
+ * Generate test summary report
+ */
+async function generateTestSummary() {
+  const resultsDir = path.join(process.cwd(), 'test-results')
+  const summaryPath = path.join(resultsDir, 'test-summary.json')
+
+  try {
+    const summary = {
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeVersion: process.version,
+        platform: process.platform,
+        arch: process.arch,
+        cwd: process.cwd(),
+      },
+      configuration: {
+        baseUrl: process.env.E2E_BASE_URL,
+        backendUrl: process.env.BACKEND_URL,
+        headless: process.env.CI ? true : false,
+        parallel: process.env.E2E_PARALLEL === 'true',
+      },
+      cleanup: {
+        status: 'completed',
+        timestamp: new Date().toISOString(),
+      }
+    }
+
+    fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2))
+    console.log(`✅ Test summary saved to: ${summaryPath}`)
+  } catch (error) {
+    console.warn('⚠️ Failed to generate test summary:', error.message)
+  }
+}
+
+/**
+ * Archive old test results
+ */
+async function archiveOldResults() {
+  const resultsDir = path.join(process.cwd(), 'test-results')
+  const archiveDir = path.join(resultsDir, 'archive')
+
+  try {
+    // Create archive directory if it doesn't exist
+    if (!fs.existsSync(archiveDir)) {
+      fs.mkdirSync(archiveDir, { recursive: true })
+    }
+
+    // Get all test result directories
+    const items = fs.readdirSync(resultsDir)
+      .filter(item => {
+        const itemPath = path.join(resultsDir, item)
+        return fs.statSync(itemPath).isDirectory() &&
+               item !== 'archive' &&
+               item.startsWith('run-')
+      })
+      .sort()
+      .reverse() // Most recent first
+
+    // Keep only last 10 runs, archive the rest
+    if (items.length > 10) {
+      const toArchive = items.slice(10)
+
+      for (const item of toArchive) {
+        const sourcePath = path.join(resultsDir, item)
+        const targetPath = path.join(archiveDir, item)
+
+        try {
+          fs.renameSync(sourcePath, targetPath)
+          console.log(`📦 Archived: ${item}`)
+        } catch (error) {
+          console.warn(`⚠️ Failed to archive ${item}:`, error.message)
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to archive old results:', error.message)
+  }
+}
+
+export default globalTeardown

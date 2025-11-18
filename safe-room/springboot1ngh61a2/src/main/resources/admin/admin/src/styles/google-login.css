@@ -1,0 +1,273 @@
+/* Google Material Design 登录页面样式 - 从参考文件提取 */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+/* 基础样式 */
+.eC9N2e {
+  font-family: 'Google Sans', 'Roboto', 'Noto Sans Myanmar UI', 'Noto Sans Khmer', Arial, sans-serif;
+}
+
+/* 主容器 */
+.dJRqtd {
+  display: block;
+  height: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+  background-color: var(--gm3-sys-color-surface-container-lowest, #fff);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  padding-bottom: 24px;
+  position: relative;
+  padding-top: 96px;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.UXFQgc {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.qWK5J {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* 卡片容器 */
+.i3HiPd {
+  background: var(--gm3-sys-color-surface-container-low, #f8fafd);
+  min-height: 80px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 48px 40px 36px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.i3HiPd:not(.S7S4N) {
+  display: flex;
+}
+
+/* 标题区域 */
+.Y9aYob {
+  margin-bottom: 16px;
+}
+
+.Y9aYob:empty + .F4tG3e {
+  margin-top: 0;
+}
+
+.IzwVE {
+  color: #1f1f1f;
+  color: var(--gm3-sys-color-on-surface, #1f1f1f);
+  font-family: 'Google Sans', 'Roboto', 'Noto Sans Myanmar UI', 'Noto Sans Khmer', Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: 0rem;
+  line-height: 1.3333;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.XQ6hEf {
+  color: var(--gm3-sys-color-on-surface-variant, #444746);
+  font-family: 'Google Sans', 'Roboto', 'Noto Sans Myanmar UI', 'Noto Sans Khmer', Arial, sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: 0rem;
+  line-height: 1.5rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* 表单区域 */
+.F4tG3e {
+  margin-bottom: 16px;
+  margin-top: 4px;
+}
+
+.F4tG3e:only-child {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* 错误提示 */
+.Xq8bDe {
+  background: var(--gm3-sys-color-error-container, #f9dedc);
+  border-radius: 4px;
+  padding: 12px 16px;
+}
+
+.Xq8bDe .xHr6Xe {
+  color: var(--gm3-sys-color-on-error-container, #c5221f);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 输入框组 */
+.Em2Ord {
+  margin-bottom: 16px;
+}
+
+.r4WGQb {
+  position: relative;
+}
+
+/* 标签 */
+.no7ij {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid;
+  height: 48px;
+  left: 0;
+  padding: 0 16px;
+  position: absolute;
+  right: 0;
+  top: 4px;
+  border-color: #c4c7c5;
+  border-color: var(--gm3-sys-color-outline-variant, #c4c7c5);
+  pointer-events: none;
+}
+
+.WHUyzc {
+  color: var(--gm3-sys-color-on-surface-variant, #444746);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4285714286;
+  letter-spacing: 0rem;
+}
+
+/* 输入框 */
+.whsOnd {
+  background-color: transparent;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  color: #202124;
+  font-size: 16px;
+  height: 56px;
+  margin: 0;
+  padding: 13px 15px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.whsOnd:hover {
+  border-color: #80868b;
+}
+
+.whsOnd:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 1px #1a73e8;
+}
+
+.whsOnd::placeholder {
+  color: #80868b;
+}
+
+.zHQkBf {
+  padding-right: 40px;
+}
+
+/* 按钮 */
+.VfPpkd-LgbsSe {
+  font-family: 'Google Sans', 'Roboto', 'Noto Sans Myanmar UI', 'Noto Sans Khmer', Arial, sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.0107142857em;
+  font-weight: 500;
+  text-transform: none;
+  transition: border-color 280ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 24px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  width: 100%;
+  height: 48px;
+}
+
+.Jskylb {
+  background: #0b57d0;
+  background-color: var(--gm3-sys-color-primary, #0b57d0);
+  color: #fff;
+  color: var(--gm3-sys-color-on-primary, #fff);
+}
+
+.Jskylb:not(:disabled):hover {
+  background: #1557b0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.Jskylb:not(:disabled):active {
+  background: #1557b0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.Jskylb:disabled {
+  background: #f1f3f4;
+  color: #80868b;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.VfPpkd-vQzf8d {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* 链接 */
+.RDsYTb {
+  color: #444746;
+  color: var(--gm3-sys-color-on-surface-variant, #444746);
+  font-family: 'Google Sans', 'Roboto', 'Noto Sans Myanmar UI', 'Noto Sans Khmer', Arial, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0rem;
+  line-height: 1.4285714286;
+  margin-top: 32px;
+  text-align: center;
+}
+
+.D9CCrb {
+  color: #0b57d0;
+  color: var(--gm3-sys-color-primary, #0b57d0);
+  text-decoration: none;
+}
+
+.D9CCrb:hover {
+  text-decoration: underline;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .i3HiPd {
+    padding: 32px 24px 28px;
+  }
+
+  .IzwVE {
+    font-size: 1.25rem;
+  }
+
+  .XQ6hEf {
+    font-size: 0.875rem;
+  }
+}
+

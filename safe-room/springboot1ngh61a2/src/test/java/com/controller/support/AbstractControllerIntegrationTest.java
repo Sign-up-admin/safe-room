@@ -45,7 +45,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Note: Transactional support removed to allow token persistence for authentication tests
 // @Transactional
 // @Rollback
-@Testcontainers
 public abstract class AbstractControllerIntegrationTest {
 
     @Value("${test.containers.enabled:false}")
@@ -53,11 +52,17 @@ public abstract class AbstractControllerIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractControllerIntegrationTest.class);
 
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13")
-            .withDatabaseName("testdb")
-            .withUsername("test")
-            .withPassword("test123");
+    // Only initialize container if Testcontainers are enabled
+    static PostgreSQLContainer<?> postgres;
+
+    static {
+        if (Boolean.parseBoolean(System.getProperty("test.containers.enabled", "false"))) {
+            postgres = new PostgreSQLContainer<>("postgres:13")
+                    .withDatabaseName("testdb")
+                    .withUsername("test")
+                    .withPassword("test123");
+        }
+    }
 
     @DynamicPropertySource
     static void configureDatabase(DynamicPropertyRegistry registry) {

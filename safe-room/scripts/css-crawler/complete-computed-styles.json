@@ -1,0 +1,20 @@
+{
+  ".test-header": "元素未找到: .test-header",
+  ".test-card": "元素未找到: .test-card",
+  ".test-button": "元素未找到: .test-button",
+  "body": {
+    "background-color": "rgba(0, 0, 0, 0)",
+    "color": "rgb(0, 0, 0)",
+    "font-family": "\"Noto Sans SC\"",
+    "font-size": "16px",
+    "padding": "0px",
+    "margin": "8px",
+    "border": "0px none rgb(0, 0, 0)",
+    "border-radius": "0px",
+    "width": "1904px",
+    "height": "763.2px",
+    "display": "block",
+    "position": "static",
+    "text-align": "start"
+  }
+}

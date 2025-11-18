@@ -1,108 +1,84 @@
-import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+/**
+ * 路由配置入口文件
+ * 统一管理路由配置和路由守卫
+ */
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { tokenStorage } from '@/utils/secureStorage'
+import storage from '@/utils/storage'
+import { routes } from './routes'
 
-// 路由配置
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    redirect: '/home'
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/login.vue'),
-    meta: { title: '登录', requiresAuth: false }
-  },
-  {
-    path: '/register',
-    name: 'Register',
-    component: () => import('@/views/register.vue'),
-    meta: { title: '注册', requiresAuth: false }
-  },
-  {
-    path: '/',
-    component: () => import('@/views/index.vue'),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'home',
-        name: 'Home',
-        component: () => import('@/views/home.vue'),
-        meta: { title: '首页', requiresAuth: true }
-      },
-      {
-        path: 'center',
-        name: 'Center',
-        component: () => import('@/views/center.vue'),
-        meta: { title: '个人中心', requiresAuth: true }
-      },
-      {
-        path: 'updatePassword',
-        name: 'UpdatePassword',
-        component: () => import('@/views/update-password.vue'),
-        meta: { title: '修改密码', requiresAuth: true }
-      },
-      {
-        path: 'yonghu',
-        name: 'Yonghu',
-        component: () => import('@/views/modules/yonghu/list.vue'),
-        meta: { title: '用户管理', requiresAuth: true }
-      },
-      {
-        path: 'jianshenjiaolian',
-        name: 'Jianshenjiaolian',
-        component: () => import('@/views/modules/jianshenjiaolian/list.vue'),
-        meta: { title: '健身教练管理', requiresAuth: true }
-      }
-    ]
-  },
-  {
-    path: '/404',
-    name: 'NotFound',
-    component: () => import('@/views/404.vue'),
-    meta: { title: '页面未找到' }
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404'
-  }
-]
-
+/**
+ * 创建路由实例
+ */
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0 }
-    }
-  }
 })
 
-// 路由守卫
-router.beforeEach((to, from, next) => {
-  const userStore = useUserStore()
+/**
+ * 公开路由路径列表（无需认证）
+ */
+const PUBLIC_ROUTES = ['/login', '/password-login', '/register', '/forgot-password', '/reset-password', '/error']
+
+/**
+ * 检查是否是公开路由
+ */
+function isPublicRoute(path: string): boolean {
+  return PUBLIC_ROUTES.some(route => path === route || path.startsWith(route + '/'))
+}
+
+/**
+ * 获取Token（优先从secureStorage获取，其次从localStorage获取）
+ * 确保能读取到刚设置的token
+ */
+function getToken(): string | null {
+  // 优先从secureStorage获取（带过期时间检查）
+  const secureToken = tokenStorage.getToken()
+  if (secureToken) {
+    return secureToken
+  }
   
-  // 初始化用户信息
-  if (!userStore.isAuthenticated) {
-    userStore.initUser()
+  // 向后兼容，从localStorage获取
+  const legacyToken = storage.get('Token')
+  if (legacyToken) {
+    return legacyToken
   }
+  
+  return null
+}
 
-  // 设置页面标题
-  if (to.meta.title) {
-    document.title = `${to.meta.title} - 健身房管理系统后台`
-  }
-
-  // 权限检查
-  if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.name === 'Login' && userStore.isAuthenticated) {
-    // 已登录用户访问登录页，重定向到首页
-    next({ name: 'Home' })
-  } else {
+/**
+ * 路由守卫：权限验证
+ */
+router.beforeEach((to, _from, next) => {
+  // 检查是否是公开路由
+  if (isPublicRoute(to.path)) {
+    // 如果已登录，访问登录页时重定向到首页
+    const token = getToken()
+    if (token && (to.path === '/login' || to.path === '/password-login')) {
+      next('/')
+      return
+    }
     next()
+    return
   }
+
+  // 检查Token是否存在且有效
+  const token = getToken()
+
+  if (!token) {
+    // 未登录，清除所有存储并重定向到登录页
+    tokenStorage.clearToken()
+    storage.remove('Token')
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }, // 保存原始路径，登录后可以跳转回来
+    })
+    return
+  }
+
+  // Token存在，允许访问
+  next()
 })
 
 export default router

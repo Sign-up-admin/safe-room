@@ -16,7 +16,28 @@
 // 简单的Mock版本管理实现
 export const mockVersionManager = {
   getCurrentVersion: () => '1.0.0',
-  checkVersion: () => true
+  checkVersion: () => true,
+  getLatestVersion: () => '1.0.0',
+  createSuccessResponse: (data: any) => ({
+    code: 0,
+    msg: 'success',
+    data
+  }),
+  createErrorResponse: (message: string, code = 1) => ({
+    code,
+    msg: message
+  }),
+  createPaginationResponse: (data: any[], total: number, page: number, size: number) => ({
+    code: 0,
+    msg: 'success',
+    data: {
+      list: data,
+      total,
+      page,
+      size,
+      totalPages: Math.ceil(total / size)
+    }
+  })
 }
 
 export const initializeMockVersionManager = () => Promise.resolve()

@@ -113,7 +113,7 @@ class YonghuServiceImplTest {
         user.setXingbie(gender);
         user.setShoujihaoma(phone);
         user.setMima("password123");
-        user.setId(new Date().getTime() + testDataEntities.size());
+        user.setId(com.utils.TestDataFactory.nextId());
         return user;
     }
 

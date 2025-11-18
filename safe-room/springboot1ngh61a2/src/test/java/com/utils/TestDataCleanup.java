@@ -77,8 +77,15 @@ public final class TestDataCleanup {
                         entitiesToDelete.size(), prefix, fieldName);
             }
         } catch (Exception e) {
-            log.error("Error during cleanup by prefix: service={}, fieldName={}, prefix={}",
-                    service.getClass().getSimpleName(), fieldName, prefix, e);
+            // 如果字段不存在，跳过清理并记录调试信息
+            if (e.getMessage() != null &&
+                (e.getMessage().contains("not found") || e.getMessage().contains("does not exist"))) {
+                log.debug("Field '{}' not found in service '{}', skipping cleanup for prefix '{}'",
+                         fieldName, service.getClass().getSimpleName(), prefix);
+            } else {
+                log.error("Error during cleanup by prefix: service={}, fieldName={}, prefix={}",
+                         service.getClass().getSimpleName(), fieldName, prefix, e);
+            }
         }
     }
 

@@ -1,53 +1,80 @@
-import { chromium, FullConfig } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
+import { chromium, FullConfig } from '@playwright/test'
+import fs from 'fs'
+import path from 'path'
 
-// 全局测试设置
+/**
+ * Global setup for Playwright tests
+ * Prepares test environment and creates necessary resources
+ */
 async function globalSetup(config: FullConfig) {
-  console.log('🚀 开始 E2E 测试全局设置...');
+  console.log('🚀 Starting Front-end E2E Test Global Setup...')
 
-  // 创建测试结果目录
-  const testResultsDir = path.join(process.cwd(), 'test-results');
-  if (!fs.existsSync(testResultsDir)) {
-    fs.mkdirSync(testResultsDir, { recursive: true });
-  }
+  try {
+    // Create test directories
+    const dirs = [
+      'test-results',
+      'test-results/screenshots',
+      'test-results/videos',
+      'test-results/traces',
+      'test-results/reports'
+    ]
 
-  // 创建覆盖率目录
-  const coverageDir = path.join(process.cwd(), 'coverage-e2e');
-  if (!fs.existsSync(coverageDir)) {
-    fs.mkdirSync(coverageDir, { recursive: true });
-  }
+    dirs.forEach(dir => {
+      const fullPath = path.join(process.cwd(), dir)
+      if (!fs.existsSync(fullPath)) {
+        fs.mkdirSync(fullPath, { recursive: true })
+        console.log(`📁 Created directory: ${dir}`)
+      }
+    })
 
-  // 预热浏览器（可选，用于CI环境）
-  if (process.env.CI) {
-    console.log('🔥 CI环境：预热浏览器...');
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
-
+    // Verify backend connectivity
+    console.log('🔍 Checking backend connectivity...')
     try {
-      // 访问应用首页进行预热
-      await page.goto(config.projects[0].use.baseURL || 'http://localhost:8082', {
-        waitUntil: 'networkidle',
-        timeout: 30000
-      });
+      const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080'
+      const response = await fetch(`${backendUrl}/actuator/health`, {
+        timeout: 10000,
+      })
 
-      console.log('✅ 浏览器预热完成');
+      if (response.ok) {
+        console.log('✅ Backend is healthy')
+      } else {
+        console.warn('⚠️ Backend health check failed, tests will use mocks')
+      }
     } catch (error) {
-      console.warn('⚠️ 浏览器预热失败，但不影响测试继续:', error.message);
-    } finally {
-      await page.close();
-      await browser.close();
+      console.warn('⚠️ Backend connectivity check failed, tests will use mocks')
     }
+
+    // Pre-warm browser for faster test execution
+    console.log('🔄 Pre-warming browser...')
+    const browser = await chromium.launch()
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 720 },
+      userAgent: 'E2E-Test-Prewarm/1.0',
+    })
+
+    // Visit frontend to ensure it's accessible
+    const frontendUrl = config.use?.baseURL || 'http://localhost:5173'
+    try {
+      const page = await context.newPage()
+      await page.goto(frontendUrl, { waitUntil: 'networkidle', timeout: 30000 })
+      console.log('✅ Frontend is accessible')
+      await page.close()
+    } catch (error) {
+      console.warn('⚠️ Frontend accessibility check failed:', error.message)
+    }
+
+    await context.close()
+    await browser.close()
+
+    // Setup test data cleanup script
+    console.log('🗄️ Preparing test data cleanup...')
+
+    console.log('🎉 Front-end E2E Test Global Setup Complete!')
+
+  } catch (error) {
+    console.error('❌ Global setup failed:', error)
+    throw error
   }
-
-  // 记录测试开始时间
-  const startTime = new Date().toISOString();
-  fs.writeFileSync(
-    path.join(testResultsDir, 'test-start-time.txt'),
-    startTime
-  );
-
-  console.log('✅ 全局设置完成，开始时间:', startTime);
 }
 
-export default globalSetup;
+export default globalSetup

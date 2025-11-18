@@ -1,7 +1,7 @@
 # Fitness Gym API Documentation
 
 > **Version**: 1.0.0
-> **Generated**: 2025-11-17T16:33:15.882Z
+> **Generated**: 2025-11-18T02:32:36.952Z
 > **Base URL**: `http://localhost:8080/springboot1ngh61a2`
 
 ## Table of Contents

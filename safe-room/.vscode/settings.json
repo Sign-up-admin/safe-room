@@ -3,10 +3,10 @@
     "java.configuration.updateBuildConfiguration":  "interactive",
     "git.path":  "C:\\Users\\李\\AppData\\Local\\GitHubDesktop\\app-3.5.4\\resources\\app\\git\\cmd\\git.exe",
     
-    // ========== 全面禁用自动跟踪和监视 ==========
+    // ========== 文件系统监视配置（修复冲突问题）==========
     
-    // 文件系统监视 - 完全关闭
-    "files.watchFiles": "off",
+    // 文件系统监视 - 启用以检测磁盘文件变化，避免冲突提示
+    "files.watchFiles": "default",
     "files.useExperimentalFileWatcher": false,
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -28,14 +28,16 @@
         "**/*.tmp": true
     },
     
-    // 自动保存 - 完全禁用
-    "files.autoSave": "off",
-    "files.autoSaveDelay": 0,
-    "files.hotExit": "off",
+    // 自动保存 - 启用以确保文件写入磁盘（关键修复）
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 500,
+    "files.hotExit": "onExit",
     
-    // 文件冲突解决 - 强制覆盖磁盘文件，避免冲突提示
+    // 文件冲突解决 - 自动覆盖磁盘文件（编辑器版本优先）
+    // 这样可以避免大量冲突提示，同时确保编辑器的修改被保存
     "files.saveConflictResolution": "overwriteFileOnDisk",
-    "files.participants.timeout": 0,
+    // 文件参与者超时（已在下面设置）
+    // "files.participants.timeout": 5000,
     "files.trimTrailingWhitespace": false,
     "files.insertFinalNewline": false,
     "files.trimFinalNewlines": false,
@@ -46,9 +48,9 @@
     "files.readonlyExclude": {},
     "files.readonlyFromPermissions": false,
     
-    // 自动刷新 - 完全禁用
-    "files.refreshOnWindowFocus": false,
-    "files.refreshOnActivate": false,
+    // 自动刷新 - 启用以同步磁盘文件状态
+    "files.refreshOnWindowFocus": true,
+    "files.refreshOnActivate": true,
     "explorer.autoReveal": false,
     "explorer.fileNesting.enabled": false,
     
@@ -168,13 +170,13 @@
     
     // ========== 防止文件冲突的额外设置 ==========
     
-    // 禁用文件备份和恢复
-    "files.backup": false,
-    "files.restoreUndoStack": false,
+    // 启用文件备份以确保数据安全（但不会阻止写入）
+    "files.backup": true,
+    "files.restoreUndoStack": true,
     
-    // 禁用文件系统事件监听
-    "files.useTrash": false,
-    "files.enableTrash": false,
+    // 启用文件系统事件监听以确保文件写入
+    "files.useTrash": true,
+    "files.enableTrash": true,
     
     // 禁用文件关联检查
     "files.associations": {},
@@ -184,23 +186,63 @@
     "files.autoGuessEncoding": false,
     "files.encoding": "utf8",
     
-    // 禁用文件大小限制检查
-    "files.maxMemoryForLargeFilesMB": 4096,
+    // 文件大小限制（已在下面设置）
+    // "files.maxMemoryForLargeFilesMB": 4096,
     
     // 禁用编辑器自动重新加载
     "editor.detectIndentation": false,
     "editor.autoIndent": "none",
     "editor.formatOnSaveMode": "off",
     
-    // 禁用文件内容提供者
-    "workbench.editor.closeOnFileDelete": false,
-    "workbench.editor.closeOnFileMove": false,
-    "workbench.editor.revealIfOpen": false,
+    // 文件内容提供者设置 - 优化文件操作行为
+    "workbench.editor.closeOnFileDelete": true,
+    "workbench.editor.closeOnFileMove": true,
+    "workbench.editor.revealIfOpen": true,
     
-    // 禁用文件系统提供者
-    "files.simpleDialog.enable": true,
+    // 文件系统提供者设置（已在下面设置）
+    // "files.simpleDialog.enable": true,
     "files.dialog.defaultPath": "",
     
-    // 禁用文件时间戳检查
-    "files.preserveFileTimestamps": false
+    // 文件时间戳检查 - 允许修改时间戳以确保文件真正写入
+    "files.preserveFileTimestamps": false,
+    
+    // ========== 强制文件写入磁盘的关键设置 ==========
+    
+    // 确保文件立即写入磁盘，不使用缓存
+    // 注意：files.useTrash 和 files.enableTrash 已在上面设置
+    
+    // 禁用可能导致缓存问题的预览模式（已在上面设置，此处仅作说明）
+    // workbench.editor.enablePreview 和 workbench.editor.enablePreviewFromQuickOpen 已在上面设置为 false
+    
+    // 确保保存时立即写入（已在上面设置）
+    // files.saveConflictResolution 已在上面设置为 "overwriteFileOnDisk"（自动覆盖，避免冲突提示）
+    
+    // 文件系统提供者设置 - 确保直接写入（已在上面设置）
+    // files.simpleDialog.enable 已在上面设置为 true
+    
+    // 文件参与者超时设置（已在上面设置为 5000ms）
+    
+    // ========== 额外的文件写入优化设置 ==========
+    
+    // 确保文件系统操作立即执行，不使用延迟写入
+    "files.maxMemoryForLargeFilesMB": 4096,
+    
+    // 禁用可能导致文件写入延迟的优化
+    "files.enableWatcherPolling": false,
+    
+    // 确保文件保存时立即刷新到磁盘
+    "files.saveDelay": 0,
+    
+    // 工作区信任设置 - 确保文件操作权限
+    "security.workspace.trust.enabled": true,
+    "security.workspace.trust.untrustedFiles": "prompt",
+    
+    // 文件系统提供者 - 使用原生文件系统以确保可靠性
+    "files.simpleDialog.enable": true,
+    
+    // 禁用可能导致文件写入问题的实验性功能
+    "files.experimental.trimOnSave": false,
+    
+    // 确保文件保存时不会因为其他操作而延迟
+    "files.participants.timeout": 5000
 }

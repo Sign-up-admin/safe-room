@@ -32,9 +32,7 @@ export function withRetry(options: RetryOptions = {}) {
 
     descriptor.value = async function(...args: any[]) {
       const retryHandler = new RetryHandler(options)
-      return await retryHandler.execute(async () => {
-        return await method.apply(this, args)
-      }, `${target.constructor.name}.${propertyName}`)
+      return await retryHandler.execute(async () => await method.apply(this, args), `${target.constructor.name}.${propertyName}`)
     }
   }
 }
@@ -59,7 +57,7 @@ export class RetryHandler {
   /**
    * 执行带重试的函数
    */
-  async execute<T>(fn: () => Promise<T>, operationName: string = 'operation'): Promise<T> {
+  async execute<T>(fn: () => Promise<T>, operationName = 'operation'): Promise<T> {
     let lastError: Error
 
     for (let attempt = 0; attempt <= this.options.maxRetries; attempt++) {
