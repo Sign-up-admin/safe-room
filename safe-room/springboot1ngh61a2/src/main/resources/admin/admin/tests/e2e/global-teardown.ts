@@ -1,4 +1,3 @@
-import { testConfig } from './test-config';
 
 /**
  * Global teardown for P2P integration tests

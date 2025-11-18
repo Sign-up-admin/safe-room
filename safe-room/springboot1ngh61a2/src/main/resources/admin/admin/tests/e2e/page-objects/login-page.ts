@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 import { BasePage } from './base-page';
-import { testConfig } from '../test-config';
 
 /**
  * Login Page Object for admin authentication

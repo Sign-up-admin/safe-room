@@ -15,7 +15,7 @@ test.beforeAll(async () => {
  */
 test.describe('P2P-001: 完整的管理员登录和仪表板访问流程', () => {
   let loginPage: LoginPage;
-  let dashboardPage: DashboardPage;
+  let _dashboardPage: DashboardPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -48,32 +48,32 @@ test.describe('P2P-001: 完整的管理员登录和仪表板访问流程', () =>
     await expect(page).not.toHaveURL(/\/login/);
 
     // 验证仪表板加载
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
 
     // 验证欢迎信息
-    const welcomeMessage = await dashboardPage.getWelcomeMessage();
+    const welcomeMessage = await _dashboardPage.getWelcomeMessage();
     expect(welcomeMessage).toBeTruthy();
 
     console.log('✅ 管理员登录成功');
   });
 
-  test('应该正确加载仪表板数据', async ({ page }) => {
+  test('应该正确加载仪表板数据', async ({ page: _page }) => {
     console.log('📊 测试仪表板数据加载');
 
     await loginPage.navigateToLogin();
     await loginPage.loginAsAdmin();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
 
     // 验证用户数量显示
-    const userCount = await dashboardPage.getUserCount();
+    const userCount = await _dashboardPage.getUserCount();
     expect(userCount).toBeGreaterThanOrEqual(0);
 
     // 验证课程数量显示
-    const courseCount = await dashboardPage.getCourseCount();
+    const courseCount = await _dashboardPage.getCourseCount();
     expect(courseCount).toBeGreaterThanOrEqual(0);
 
     // 验证仪表板卡片数据
-    const dashboardCards = await dashboardPage.getDashboardCards();
+    const dashboardCards = await _dashboardPage.getDashboardCards();
     expect(dashboardCards.length).toBeGreaterThan(0);
 
     console.log(`✅ 仪表板数据显示正常 - 用户: ${userCount}, 课程: ${courseCount}`);
@@ -99,10 +99,10 @@ test.describe('P2P-001: 完整的管理员登录和仪表板访问流程', () =>
 
     await loginPage.navigateToLogin();
     await loginPage.loginAsAdmin();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
 
     // 执行登出
-    await dashboardPage.logout();
+    await _dashboardPage.logout();
 
     // 验证返回登录页面
     await expect(page).toHaveURL(/\/login/);
@@ -117,7 +117,7 @@ test.describe('P2P-001: 完整的管理员登录和仪表板访问流程', () =>
  */
 test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
   let loginPage: LoginPage;
-  let dashboardPage: DashboardPage;
+  let _dashboardPage: DashboardPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -126,13 +126,13 @@ test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
     // 登录管理员账户
     await loginPage.navigateToLogin();
     await loginPage.loginAsAdmin();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
   });
 
   test('应该能够查看用户列表', async ({ page }) => {
     console.log('📋 测试用户列表查看');
 
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToUsers();
 
     // 验证用户列表页面加载
     await expect(page).toHaveURL(/\/users/);
@@ -150,7 +150,7 @@ test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
   test('应该能够创建新用户', async ({ page }) => {
     console.log('➕ 测试用户创建');
 
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToUsers();
 
     // 点击创建用户按钮
     await page.click('[data-testid="create-user-button"]');
@@ -177,7 +177,7 @@ test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
   test('应该能够更新用户信息', async ({ page }) => {
     console.log('✏️ 测试用户信息更新');
 
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToUsers();
 
     // 找到测试用户并点击编辑
     const testUserRow = page.locator('[data-testid="user-row"]').filter({
@@ -202,7 +202,7 @@ test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
   test('应该能够删除用户', async ({ page }) => {
     console.log('🗑️ 测试用户删除');
 
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToUsers();
 
     // 找到测试用户并点击删除
     const testUserRow = page.locator('[data-testid="user-row"]').filter({
@@ -227,7 +227,7 @@ test.describe('P2P-002: 用户管理模块的完整CRUD操作', () => {
  */
 test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
   let loginPage: LoginPage;
-  let dashboardPage: DashboardPage;
+  let _dashboardPage: DashboardPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -236,13 +236,13 @@ test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
     // 登录管理员账户
     await loginPage.navigateToLogin();
     await loginPage.loginAsAdmin();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
   });
 
   test('应该能够查看课程列表', async ({ page }) => {
     console.log('📚 测试课程列表查看');
 
-    await dashboardPage.navigateToCourses();
+    await _dashboardPage.navigateToCourses();
 
     // 验证课程列表页面加载
     await expect(page).toHaveURL(/\/courses/);
@@ -256,7 +256,7 @@ test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
   test('应该能够创建新课程', async ({ page }) => {
     console.log('📝 测试课程创建');
 
-    await dashboardPage.navigateToCourses();
+    await _dashboardPage.navigateToCourses();
 
     // 点击创建课程按钮
     await page.click('[data-testid="create-course-button"]');
@@ -283,7 +283,7 @@ test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
   test('应该能够查看课程详情', async ({ page }) => {
     console.log('👁️ 测试课程详情查看');
 
-    await dashboardPage.navigateToCourses();
+    await _dashboardPage.navigateToCourses();
 
     // 点击查看课程详情
     const courseRow = page.locator('[data-testid="course-row"]').first();
@@ -300,7 +300,7 @@ test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
   test('应该能够更新课程信息', async ({ page }) => {
     console.log('🔄 测试课程信息更新');
 
-    await dashboardPage.navigateToCourses();
+    await _dashboardPage.navigateToCourses();
 
     // 找到测试课程并点击编辑
     const testCourseRow = page.locator('[data-testid="course-row"]').filter({
@@ -328,14 +328,12 @@ test.describe('P2P-003: 课程管理模块的完整业务流程', () => {
  */
 test.describe('P2P-004: 系统性能和稳定性测试', () => {
   let loginPage: LoginPage;
-  let dashboardPage: DashboardPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
-    dashboardPage = new DashboardPage(page);
   });
 
-  test('应该在合理时间内完成登录', async ({ page }) => {
+  test('应该在合理时间内完成登录', async ({ page: _page }) => {
     console.log('⚡ 测试登录性能');
 
     const startTime = Date.now();
@@ -367,7 +365,7 @@ test.describe('P2P-004: 系统性能和稳定性测试', () => {
 
     try {
       // 并发执行登录操作
-      const loginPromises = pages.map(async (page, index) => {
+      const loginPromises = pages.map(async (page, _index) => {
         const login = new LoginPage(page);
         await login.navigateToLogin();
         await login.loginAsAdmin();
@@ -397,7 +395,7 @@ test.describe('P2P-004: 系统性能和稳定性测试', () => {
     await loginPage.loginAsAdmin();
 
     // 应该显示网络错误或重试选项
-    const errorVisible = await page.locator('[data-testid="network-error"]').isVisible().catch(() => false);
+    // const errorVisible = await page.locator('[data-testid="network-error"]').isVisible().catch(() => false);
 
     // 恢复网络连接
     await page.context().setOffline(false);
@@ -458,7 +456,7 @@ test.describe('P2P-005: 错误处理和边界情况测试', () => {
  */
 test.describe('P2P-006: 数据一致性和完整性测试', () => {
   let loginPage: LoginPage;
-  let dashboardPage: DashboardPage;
+  let _dashboardPage: DashboardPage;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -466,23 +464,23 @@ test.describe('P2P-006: 数据一致性和完整性测试', () => {
 
     await loginPage.navigateToLogin();
     await loginPage.loginAsAdmin();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
   });
 
   test('应该保持页面刷新后的数据一致性', async ({ page }) => {
     console.log('🔄 测试数据一致性');
 
     // 获取初始数据
-    const initialUserCount = await dashboardPage.getUserCount();
-    const initialCourseCount = await dashboardPage.getCourseCount();
+    const initialUserCount = await _dashboardPage.getUserCount();
+    const initialCourseCount = await _dashboardPage.getCourseCount();
 
     // 刷新页面
     await page.reload();
-    await dashboardPage.waitForDashboardLoad();
+    await _dashboardPage.waitForDashboardLoad();
 
     // 验证数据一致性
-    const refreshedUserCount = await dashboardPage.getUserCount();
-    const refreshedCourseCount = await dashboardPage.getCourseCount();
+    const refreshedUserCount = await _dashboardPage.getUserCount();
+    const refreshedCourseCount = await _dashboardPage.getCourseCount();
 
     expect(refreshedUserCount).toBe(initialUserCount);
     expect(refreshedCourseCount).toBe(initialCourseCount);
@@ -494,7 +492,7 @@ test.describe('P2P-006: 数据一致性和完整性测试', () => {
     console.log('📄 测试跨页面数据状态');
 
     // 在仪表板创建用户
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToUsers();
     await page.click('[data-testid="create-user-button"]');
 
     const testUsername = `cross_page_test_${Date.now()}`;
@@ -504,8 +502,8 @@ test.describe('P2P-006: 数据一致性和完整性测试', () => {
     await page.click('[data-testid="submit-user"]');
 
     // 返回仪表板
-    await dashboardPage.navigateToCourses();
-    await dashboardPage.navigateToUsers();
+    await _dashboardPage.navigateToCourses();
+    await _dashboardPage.navigateToUsers();
 
     // 验证用户仍然存在
     await expect(page.locator(`text=${testUsername}`)).toBeVisible();

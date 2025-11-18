@@ -10,14 +10,14 @@
  */
 function get<T = any>(key: string): T | null {
   try {
-    const item = localStorage.getItem(key)
+    const item = localStorage.getItem(key);
     if (item === null) {
-      return null
+      return null;
     }
-    return JSON.parse(item)
+    return JSON.parse(item);
   } catch (error) {
-    console.warn(`Failed to parse stored value for key "${key}":`, error)
-    return null
+    console.warn(`Failed to parse stored value for key "${key}":`, error);
+    return null;
   }
 }
 
@@ -28,9 +28,9 @@ function get<T = any>(key: string): T | null {
  */
 function set<T = any>(key: string, value: T): void {
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`Failed to store value for key "${key}":`, error)
+    console.error(`Failed to store value for key "${key}":`, error);
   }
 }
 
@@ -39,14 +39,14 @@ function set<T = any>(key: string, value: T): void {
  * @param key 存储键
  */
 function remove(key: string): void {
-  localStorage.removeItem(key)
+  localStorage.removeItem(key);
 }
 
 /**
  * 清空所有存储
  */
 function clear(): void {
-  localStorage.clear()
+  localStorage.clear();
 }
 
 /**
@@ -55,7 +55,7 @@ function clear(): void {
  * @returns 是否存在
  */
 function has(key: string): boolean {
-  return localStorage.getItem(key) !== null
+  return localStorage.getItem(key) !== null;
 }
 
 /**
@@ -63,14 +63,14 @@ function has(key: string): boolean {
  * @returns 键的数组
  */
 function keys(): string[] {
-  const keys: string[] = []
+  const keys: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
+    const key = localStorage.key(i);
     if (key) {
-      keys.push(key)
+      keys.push(key);
     }
   }
-  return keys
+  return keys;
 }
 
 // 默认导出storage对象
@@ -80,8 +80,7 @@ const storage = {
   remove,
   clear,
   has,
-  keys
-}
+  keys,
+};
 
-export default storage
-
+export default storage;

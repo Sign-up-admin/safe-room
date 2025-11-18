@@ -15,30 +15,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
 interface Props {
-  title?: string
-  elevated?: boolean
-  outlined?: boolean
+  title?: string;
+  elevated?: boolean;
+  outlined?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   elevated: false,
-  outlined: false
-})
+  outlined: false,
+});
 
 const cardClasses = computed(() => [
-  'modern-card',
+  "modern-card",
   {
-    'modern-card--elevated': props.elevated,
-    'modern-card--outlined': props.outlined
-  }
-])
+    "modern-card--elevated": props.elevated,
+    "modern-card--outlined": props.outlined,
+  },
+]);
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/mixins';
+@import "@/styles/mixins";
 
 .modern-card {
   @include card();
@@ -79,6 +79,3 @@ const cardClasses = computed(() => [
   border-top: 1px solid var(--color-border-light);
 }
 </style>
-
-
-

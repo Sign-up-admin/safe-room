@@ -5,8 +5,15 @@
 
     <!-- 关闭按钮 -->
     <button class="close-button" @click="handleClose" title="关闭">
-      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="close-icon">
-        <path d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"/>
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+        class="close-icon"
+      >
+        <path
+          d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"
+        />
       </svg>
     </button>
 
@@ -156,7 +163,7 @@
               :loading="loading"
               @click="handleSubmit"
             >
-              {{ loading ? '注册中...' : '提交注册' }}
+              {{ loading ? "注册中..." : "提交注册" }}
             </el-button>
           </el-form-item>
 
@@ -173,146 +180,147 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { ROLE_OPTIONS } from '@/utils/constants'
-import { request } from '@/utils/api'
-import type { RegisterFormData, UserRole } from '@/types/user'
+import { ref, reactive, computed } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { ROLE_OPTIONS } from "@/utils/constants";
+import type { RegisterFormData, UserRole } from "@/types/user";
 
-const router = useRouter()
+const router = useRouter();
 
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const roleOptions = ROLE_OPTIONS
+const formRef = ref<FormInstance>();
+const loading = ref(false);
+const roleOptions = ROLE_OPTIONS;
 
 const form = reactive<RegisterFormData & Record<string, any>>({
-  role: 'yonghu' as UserRole,
-  username: '',
-  password: '',
-  password2: '',
-  name: '',
-  phone: '',
+  role: "yonghu" as UserRole,
+  username: "",
+  password: "",
+  password2: "",
+  name: "",
+  phone: "",
   // 会员用户字段
-  yonghuzhanghao: '',
-  mima: '',
-  mima2: '',
-  yonghuxingming: '',
-  shoujihaoma: '',
+  yonghuzhanghao: "",
+  mima: "",
+  mima2: "",
+  yonghuxingming: "",
+  shoujihaoma: "",
   // 健身教练字段
-  jiaoliangonghao: '',
-  jiaolianxingming: '',
-  lianxidianhua: ''
-})
+  jiaoliangonghao: "",
+  jiaolianxingming: "",
+  lianxidianhua: "",
+});
 
 // 密码确认验证
-const validatePasswordConfirm = (_rule: any, value: any, callback: Function) => {
+const validatePasswordConfirm = (
+  _rule: any,
+  value: any,
+  callback: Function,
+) => {
   if (!value) {
-    callback(new Error('请再次输入密码'))
+    callback(new Error("请再次输入密码"));
   } else if (value !== form.mima) {
-    callback(new Error('两次密码输入不一致'))
+    callback(new Error("两次密码输入不一致"));
   } else {
-    callback()
+    callback();
   }
-}
+};
 
 const rules = computed<FormRules>(() => {
   const baseRules: FormRules = {
-    role: [
-      { required: true, message: '请选择注册角色', trigger: 'change' }
-    ],
+    role: [{ required: true, message: "请选择注册角色", trigger: "change" }],
     mima: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
-      { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+      { required: true, message: "请输入密码", trigger: "blur" },
+      { min: 6, message: "密码长度至少6位", trigger: "blur" },
     ],
     mima2: [
-      { required: true, message: '请再次输入密码', trigger: 'blur' },
-      { validator: validatePasswordConfirm, trigger: 'blur' }
-    ]
-  }
+      { required: true, message: "请再次输入密码", trigger: "blur" },
+      { validator: validatePasswordConfirm, trigger: "blur" },
+    ],
+  };
 
-  if (form.role === 'yonghu') {
+  if (form.role === "yonghu") {
     return {
       ...baseRules,
       yonghuzhanghao: [
-        { required: true, message: '请输入用户账号', trigger: 'blur' }
+        { required: true, message: "请输入用户账号", trigger: "blur" },
       ],
       yonghuxingming: [
-        { required: true, message: '请输入姓名', trigger: 'blur' }
-      ]
-    }
-  } else if (form.role === 'jianshenjiaolian') {
+        { required: true, message: "请输入姓名", trigger: "blur" },
+      ],
+    };
+  } else if (form.role === "jianshenjiaolian") {
     return {
       ...baseRules,
       jiaoliangonghao: [
-        { required: true, message: '请输入教练工号', trigger: 'blur' }
+        { required: true, message: "请输入教练工号", trigger: "blur" },
       ],
       jiaolianxingming: [
-        { required: true, message: '请输入教练姓名', trigger: 'blur' }
-      ]
-    }
+        { required: true, message: "请输入教练姓名", trigger: "blur" },
+      ],
+    };
   }
 
-  return baseRules
-})
+  return baseRules;
+});
 
 const handleRoleChange = () => {
   // 切换角色时清空表单
   if (formRef.value) {
-    formRef.value.resetFields()
+    formRef.value.resetFields();
   }
-}
+};
 
 const handleSubmit = async () => {
-  if (!formRef.value) return
+  if (!formRef.value) return;
 
   await formRef.value.validate(async (valid) => {
-    if (!valid) return
+    if (!valid) return;
 
-    loading.value = true
+    loading.value = true;
     try {
       // 准备提交数据
       const submitData: Record<string, any> = {
-        mima: form.mima
-      }
+        mima: form.mima,
+      };
 
-      if (form.role === 'yonghu') {
-        submitData.yonghuzhanghao = form.yonghuzhanghao
-        submitData.yonghuxingming = form.yonghuxingming
+      if (form.role === "yonghu") {
+        submitData.yonghuzhanghao = form.yonghuzhanghao;
+        submitData.yonghuxingming = form.yonghuxingming;
         if (form.shoujihaoma) {
-          submitData.shoujihaoma = form.shoujihaoma
+          submitData.shoujihaoma = form.shoujihaoma;
         }
-      } else if (form.role === 'jianshenjiaolian') {
-        submitData.jiaoliangonghao = form.jiaoliangonghao
-        submitData.jiaolianxingming = form.jiaolianxingming
+      } else if (form.role === "jianshenjiaolian") {
+        submitData.jiaoliangonghao = form.jiaoliangonghao;
+        submitData.jiaolianxingming = form.jiaolianxingming;
         if (form.lianxidianhua) {
-          submitData.lianxidianhua = form.lianxidianhua
+          submitData.lianxidianhua = form.lianxidianhua;
         }
       }
 
       // TODO: 调用注册API
       // await request.post(`/${form.role}/register`, submitData)
-      
+
       // 临时模拟注册成功
-      ElMessage.success('注册成功，请登录')
+      ElMessage.success("注册成功，请登录");
       setTimeout(() => {
-        router.push('/login')
-      }, 1500)
+        router.push("/login");
+      }, 1500);
     } catch (error: any) {
-      ElMessage.error(error.message || '注册失败，请重试')
+      ElMessage.error(error.message || "注册失败，请重试");
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  })
-}
+  });
+};
 
 const handleClose = () => {
-  router.push('/login')
-}
+  router.push("/login");
+};
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/mixins';
+@import "@/styles/mixins";
 
 .auth-page {
   position: relative;
@@ -399,13 +407,15 @@ const handleClose = () => {
   }
 
   :deep(.el-form-item__label::before) {
-    content: '*';
+    content: "*";
     color: var(--color-danger-500);
     margin-right: 4px;
   }
 
-  :deep(.el-form-item__label:has(+ .el-form-item__content .modern-select))::before {
-    content: '';
+  :deep(
+    .el-form-item__label:has(+ .el-form-item__content .modern-select)
+  )::before {
+    content: "";
   }
 }
 

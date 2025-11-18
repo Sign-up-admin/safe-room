@@ -3,7 +3,10 @@
     <!-- 背景层 -->
     <div class="login-background">
       <div class="absolute size-full bg-none bg-background-150"></div>
-      <div class="absolute size-full bg-gradient-authentication-light dark:bg-gradient-authentication-dark" style="opacity: 1;"></div>
+      <div
+        class="absolute size-full bg-gradient-authentication-light dark:bg-gradient-authentication-dark"
+        style="opacity: 1"
+      ></div>
     </div>
 
     <!-- 关闭按钮 -->
@@ -14,8 +17,15 @@
         title="关闭"
         @click="handleClose"
       >
-        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="dismiss-icon">
-          <path d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"></path>
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          class="dismiss-icon"
+        >
+          <path
+            d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"
+          ></path>
         </svg>
       </button>
     </div>
@@ -23,10 +33,11 @@
     <!-- 主要内容区域 -->
     <div class="login-content">
       <div class="login-container">
-        <h1 class="login-title">{{ displayedText }}<span class="cursor" :class="{ 'blink': isTyping }">|</span></h1>
-        <p class="login-subtitle">
-          创建账户或登录以保存所有对话记录并生成图像
-        </p>
+        <h1 class="login-title">
+          {{ displayedText
+          }}<span class="cursor" :class="{ blink: isTyping }">|</span>
+        </h1>
+        <p class="login-subtitle">创建账户或登录以保存所有对话记录并生成图像</p>
 
         <div class="login-buttons">
           <button
@@ -35,8 +46,19 @@
             title="使用账号密码登录"
             @click="router.push('/password-login')"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="social-icon">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="social-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
             </svg>
             使用账号密码登录
           </button>
@@ -47,7 +69,12 @@
             title="使用微软账号登录"
             @click="handleSocialLogin('microsoft')"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 25 24" class="social-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 25 24"
+              class="social-icon"
+            >
               <path fill="#F25022" d="M12.05 3H3.5v8.55h8.55V3Z"></path>
               <path fill="#7FBA00" d="M21.5 3h-8.55v8.55h8.55V3Z"></path>
               <path fill="#00A4EF" d="M12.05 12.45H3.5V21h8.55v-8.55Z"></path>
@@ -62,8 +89,15 @@
             title="使用Apple账号登录"
             @click="handleSocialLogin('apple')"
           >
-            <svg viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="social-icon">
-              <path d="M16.289 7.53846C17.3723 7.53846 18.7302 6.8061 19.5389 5.82962C20.2712 4.94469 20.8053 3.70884 20.8053 2.47298C20.8053 2.30515 20.79 2.13732 20.7595 2C19.5541 2.04577 18.1047 2.80865 17.235 3.8309C16.5484 4.60903 15.9229 5.82963 15.9229 7.08074C15.9229 7.26383 15.9534 7.44692 15.9686 7.50795C16.0449 7.5232 16.167 7.53846 16.289 7.53846ZM12.4747 26C13.9547 26 14.6107 25.0083 16.4569 25.0083C18.3335 25.0083 18.7455 25.9695 20.3933 25.9695C22.0106 25.9695 23.0939 24.4743 24.1161 23.0095C25.2604 21.3312 25.7334 19.6834 25.7639 19.6071C25.6571 19.5766 22.5599 18.3102 22.5599 14.7552C22.5599 11.6732 25.0011 10.2848 25.1384 10.178C23.5211 7.85887 21.0646 7.79784 20.3933 7.79784C18.5777 7.79784 17.0977 8.89638 16.167 8.89638C15.16 8.89638 13.8326 7.85887 12.2611 7.85887C9.27061 7.85887 6.23438 10.3306 6.23438 14.9994C6.23438 17.8983 7.36343 20.965 8.75186 22.9485C9.94194 24.6268 10.9794 26 12.4747 26Z"></path>
+            <svg
+              viewBox="0 0 32 32"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              class="social-icon"
+            >
+              <path
+                d="M16.289 7.53846C17.3723 7.53846 18.7302 6.8061 19.5389 5.82962C20.2712 4.94469 20.8053 3.70884 20.8053 2.47298C20.8053 2.30515 20.79 2.13732 20.7595 2C19.5541 2.04577 18.1047 2.80865 17.235 3.8309C16.5484 4.60903 15.9229 5.82963 15.9229 7.08074C15.9229 7.26383 15.9534 7.44692 15.9686 7.50795C16.0449 7.5232 16.167 7.53846 16.289 7.53846ZM12.4747 26C13.9547 26 14.6107 25.0083 16.4569 25.0083C18.3335 25.0083 18.7455 25.9695 20.3933 25.9695C22.0106 25.9695 23.0939 24.4743 24.1161 23.0095C25.2604 21.3312 25.7334 19.6834 25.7639 19.6071C25.6571 19.5766 22.5599 18.3102 22.5599 14.7552C22.5599 11.6732 25.0011 10.2848 25.1384 10.178C23.5211 7.85887 21.0646 7.79784 20.3933 7.79784C18.5777 7.79784 17.0977 8.89638 16.167 8.89638C15.16 8.89638 13.8326 7.85887 12.2611 7.85887C9.27061 7.85887 6.23438 10.3306 6.23438 14.9994C6.23438 17.8983 7.36343 20.965 8.75186 22.9485C9.94194 24.6268 10.9794 26 12.4747 26Z"
+              ></path>
             </svg>
             使用Apple账号登录
           </button>
@@ -74,70 +108,86 @@
             title="使用Google账号登录"
             @click="handleSocialLogin('google')"
           >
-            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="social-icon">
-              <path d="M29.546 13.667H16.6074V19.1073H24.0425C23.6865 20.781 22.7411 22.2039 21.3419 23.1773V26.6204H25.6809C28.2662 24.1829 29.754 20.5792 29.754 16.3183C29.754 15.4014 29.6798 14.5178 29.546 13.667Z" fill="#4285F4"></path>
-              <path d="M25.6811 26.6202L24.1728 25.4233L21.3422 23.1771C20.0963 24.0439 18.4918 24.5553 16.6077 24.5553C13.0066 24.5553 9.94929 22.0813 8.84297 18.7412H4.37549V22.2862C6.62805 26.8602 11.2579 29.9995 16.6077 29.9995C20.3024 29.9995 23.4137 28.7583 25.6811 26.6202Z" fill="#34A853"></path>
-              <path d="M8.84338 18.7412C8.55701 17.8759 8.39918 16.9539 8.39918 16C8.39918 15.0465 8.55701 14.1245 8.84338 13.2592V9.71387H4.37549C3.44448 11.6046 2.91699 13.7387 2.91699 16C2.91699 18.2617 3.44448 20.3958 4.37549 22.2865L8.84338 18.7412Z" fill="#FBBC05"></path>
-              <path d="M21.9211 9.56791L25.7683 5.64882C23.3952 3.38751 20.301 2 16.6078 2C11.258 2 6.62807 5.13939 4.37549 9.71335L8.843 13.2583C9.94932 9.91789 13.0066 7.44426 16.6078 7.44426C18.6489 7.44426 20.4778 8.1629 21.9211 9.56791Z" fill="#EA4335"></path>
+            <svg
+              viewBox="0 0 32 32"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="social-icon"
+            >
+              <path
+                d="M29.546 13.667H16.6074V19.1073H24.0425C23.6865 20.781 22.7411 22.2039 21.3419 23.1773V26.6204H25.6809C28.2662 24.1829 29.754 20.5792 29.754 16.3183C29.754 15.4014 29.6798 14.5178 29.546 13.667Z"
+                fill="#4285F4"
+              ></path>
+              <path
+                d="M25.6811 26.6202L24.1728 25.4233L21.3422 23.1771C20.0963 24.0439 18.4918 24.5553 16.6077 24.5553C13.0066 24.5553 9.94929 22.0813 8.84297 18.7412H4.37549V22.2862C6.62805 26.8602 11.2579 29.9995 16.6077 29.9995C20.3024 29.9995 23.4137 28.7583 25.6811 26.6202Z"
+                fill="#34A853"
+              ></path>
+              <path
+                d="M8.84338 18.7412C8.55701 17.8759 8.39918 16.9539 8.39918 16C8.39918 15.0465 8.55701 14.1245 8.84338 13.2592V9.71387H4.37549C3.44448 11.6046 2.91699 13.7387 2.91699 16C2.91699 18.2617 3.44448 20.3958 4.37549 22.2865L8.84338 18.7412Z"
+                fill="#FBBC05"
+              ></path>
+              <path
+                d="M21.9211 9.56791L25.7683 5.64882C23.3952 3.38751 20.301 2 16.6078 2C11.258 2 6.62807 5.13939 4.37549 9.71335L8.843 13.2583C9.94932 9.91789 13.0066 7.44426 16.6078 7.44426C18.6489 7.44426 20.4778 8.1629 21.9211 9.56791Z"
+                fill="#EA4335"
+              ></path>
             </svg>
             使用Google账号登录
           </button>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 
-const router = useRouter()
+const router = useRouter();
 
-const displayedText = ref('')
-const isTyping = ref(true)
+const displayedText = ref("");
+const isTyping = ref(true);
 
-const fullText = '时刻准备着'
+const fullText = "时刻准备着";
 
 // 打字机效果
 const typeWriter = () => {
-  let index = 0
-  isTyping.value = true
-  
+  let index = 0;
+  isTyping.value = true;
+
   const type = () => {
     if (index < fullText.length) {
-      displayedText.value += fullText.charAt(index)
-      index++
-      setTimeout(type, 150) // 每个字符间隔150ms
+      displayedText.value += fullText.charAt(index);
+      index++;
+      setTimeout(type, 150); // 每个字符间隔150ms
     } else {
-      isTyping.value = false
+      isTyping.value = false;
     }
-  }
-  
-  type()
-}
+  };
+
+  type();
+};
 
 onMounted(() => {
-  typeWriter()
-})
+  typeWriter();
+});
 
 const handleClose = () => {
-  router.push('/')
-}
+  router.push("/");
+};
 
 const handleSocialLogin = (provider: string) => {
-  ElMessage.info(`${provider}登录功能开发中`)
-}
+  ElMessage.info(`${provider}登录功能开发中`);
+};
 </script>
 
 <style>
-@import '@/styles/copilot-reference.css';
+@import "@/styles/copilot-reference.css";
 </style>
 
 <style scoped lang="scss">
-@import '@/styles/variables';
+@import "@/styles/variables";
 
 .login-page {
   position: relative;
@@ -253,10 +303,12 @@ const handleSocialLogin = (provider: string) => {
 }
 
 @keyframes blink {
-  0%, 50% {
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+  51%,
+  100% {
     opacity: 0;
   }
 }

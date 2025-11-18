@@ -88,31 +88,49 @@
 // 响应式断点
 @mixin respond-to($breakpoint) {
   @if $breakpoint == sm {
-    @media (min-width: 640px) { @content; }
+    @media (min-width: 640px) {
+      @content;
+    }
   }
   @if $breakpoint == md {
-    @media (min-width: 768px) { @content; }
+    @media (min-width: 768px) {
+      @content;
+    }
   }
   @if $breakpoint == lg {
-    @media (min-width: 1024px) { @content; }
+    @media (min-width: 1024px) {
+      @content;
+    }
   }
   @if $breakpoint == xl {
-    @media (min-width: 1280px) { @content; }
+    @media (min-width: 1280px) {
+      @content;
+    }
   }
   @if $breakpoint == 2xl {
-    @media (min-width: 1536px) { @content; }
+    @media (min-width: 1536px) {
+      @content;
+    }
   }
 }
 
 // 动画关键帧
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes slideInUp {
@@ -160,8 +178,12 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // 动画类
@@ -203,6 +225,3 @@
     transition-duration: 0.01ms !important;
   }
 }
-
-
-

@@ -3,8 +3,8 @@
  * 引入变量、混入和基础样式
  */
 
-@import './variables';
-@import './mixins';
+@import "./variables";
+@import "./mixins";
 
 // ========== 全局重置 ==========
 // 只保留一次 reset，避免重复定义
@@ -30,22 +30,31 @@ html {
 // 合并所有 body 规则，避免重复定义和覆盖
 body {
   // 字体设置
-  font-family: var(--font-family-primary, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-family: var(
+    --font-family-primary,
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif
+  );
   font-size: var(--font-size-body-md, 1rem);
   line-height: var(--line-height-normal, 1.5);
-  
+
   // 颜色设置
   color: var(--color-text-primary, #111827);
   background-color: var(--color-bg-primary, #ffffff);
-  
+
   // 字体渲染优化
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   // 过渡动画
-  transition: background-color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out),
-              color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out);
-  
+  transition:
+    background-color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out),
+    color var(--duration-200, 200ms) var(--ease-in-out, ease-in-out);
+
   // 布局设置 - 确保 body 至少填满视口高度
   min-height: 100%;
   height: 100%;
@@ -95,7 +104,12 @@ select {
 }
 
 // 标题样式
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
@@ -103,12 +117,24 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: var(--space-4);
 }
 
-h1 { font-size: var(--font-size-display-xl); }
-h2 { font-size: var(--font-size-display-lg); }
-h3 { font-size: var(--font-size-display-md); }
-h4 { font-size: var(--font-size-display-sm); }
-h5 { font-size: var(--font-size-body-lg); }
-h6 { font-size: var(--font-size-body-md); }
+h1 {
+  font-size: var(--font-size-display-xl);
+}
+h2 {
+  font-size: var(--font-size-display-lg);
+}
+h3 {
+  font-size: var(--font-size-display-md);
+}
+h4 {
+  font-size: var(--font-size-display-sm);
+}
+h5 {
+  font-size: var(--font-size-body-lg);
+}
+h6 {
+  font-size: var(--font-size-body-md);
+}
 
 // 容器样式
 .container {

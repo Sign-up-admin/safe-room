@@ -6,7 +6,7 @@
         <h1 v-if="!isCollapse" class="logo">健身房管理系统</h1>
         <h1 v-else class="logo-collapsed">GYM</h1>
       </div>
-      
+
       <el-menu
         :default-active="activeMenu"
         :collapse="isCollapse"
@@ -18,22 +18,22 @@
           <el-icon><HomeFilled /></el-icon>
           <template #title>首页</template>
         </el-menu-item>
-        
+
         <el-menu-item index="/yonghu">
           <el-icon><UserFilled /></el-icon>
           <template #title>用户管理</template>
         </el-menu-item>
-        
+
         <el-menu-item index="/jianshenjiaolian">
           <el-icon><Avatar /></el-icon>
           <template #title>健身教练</template>
         </el-menu-item>
-        
+
         <el-menu-item index="/center">
           <el-icon><UserFilled /></el-icon>
           <template #title>个人中心</template>
         </el-menu-item>
-        
+
         <el-menu-item index="/updatePassword">
           <el-icon><Lock /></el-icon>
           <template #title>修改密码</template>
@@ -52,19 +52,23 @@
             @click="toggleSidebar"
           />
         </div>
-        
+
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               <el-avatar :size="32" :icon="UserFilled" />
-              <span class="username">{{ userStore.displayName || '管理员' }}</span>
+              <span class="username">{{
+                userStore.displayName || "管理员"
+              }}</span>
               <el-icon class="el-icon--right"><arrow-down /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="center">个人中心</el-dropdown-item>
                 <el-dropdown-item command="password">修改密码</el-dropdown-item>
-                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item divided command="logout"
+                  >退出登录</el-dropdown-item
+                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -80,8 +84,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   HomeFilled,
   UserFilled,
@@ -89,52 +93,52 @@ import {
   Lock,
   Fold,
   Expand,
-  ArrowDown
-} from '@element-plus/icons-vue'
-import { useUserStore } from '@/stores/user'
-import { logout } from '@/utils/auth'
-import { ElMessage } from 'element-plus'
+  ArrowDown,
+} from "@element-plus/icons-vue";
+import { useUserStore } from "@/stores/user";
+import { logout } from "@/utils/auth";
+import { ElMessage } from "element-plus";
 
-const route = useRoute()
-const router = useRouter()
-const userStore = useUserStore()
+const route = useRoute();
+const router = useRouter();
+const userStore = useUserStore();
 
-const isCollapse = ref(false)
+const isCollapse = ref(false);
 
 const activeMenu = computed(() => {
-  return route.path
-})
+  return route.path;
+});
 
 const toggleSidebar = () => {
-  isCollapse.value = !isCollapse.value
-}
+  isCollapse.value = !isCollapse.value;
+};
 
 const handleCommand = (command: string) => {
   switch (command) {
-    case 'center':
-      router.push('/center')
-      break
-    case 'password':
-      router.push('/updatePassword')
-      break
-    case 'logout':
-      logout()
-      ElMessage.success('已退出登录')
-      router.push('/login')
-      break
+    case "center":
+      router.push("/center");
+      break;
+    case "password":
+      router.push("/updatePassword");
+      break;
+    case "logout":
+      logout();
+      ElMessage.success("已退出登录");
+      router.push("/login");
+      break;
   }
-}
+};
 
 onMounted(() => {
   // 检查用户是否已登录
   if (!userStore.isAuthenticated) {
-    router.push('/login')
+    router.push("/login");
   }
-})
+});
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/mixins';
+@import "@/styles/mixins";
 
 .admin-layout {
   height: 100vh;

@@ -3,7 +3,10 @@
     <!-- 背景层 -->
     <div class="login-background">
       <div class="absolute size-full bg-none bg-background-150"></div>
-      <div class="absolute size-full bg-gradient-authentication-light dark:bg-gradient-authentication-dark" style="opacity: 1;"></div>
+      <div
+        class="absolute size-full bg-gradient-authentication-light dark:bg-gradient-authentication-dark"
+        style="opacity: 1"
+      ></div>
     </div>
 
     <!-- 关闭按钮 -->
@@ -14,8 +17,15 @@
         title="关闭"
         @click="handleClose"
       >
-        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" class="dismiss-icon">
-          <path d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"></path>
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+          class="dismiss-icon"
+        >
+          <path
+            d="M4.39705 4.55379L4.46967 4.46967C4.73594 4.2034 5.1526 4.1792 5.44621 4.39705L5.53033 4.46967L12 10.939L18.4697 4.46967C18.7626 4.17678 19.2374 4.17678 19.5303 4.46967C19.8232 4.76256 19.8232 5.23744 19.5303 5.53033L13.061 12L19.5303 18.4697C19.7966 18.7359 19.8208 19.1526 19.6029 19.4462L19.5303 19.5303C19.2641 19.7966 18.8474 19.8208 18.5538 19.6029L18.4697 19.5303L12 13.061L5.53033 19.5303C5.23744 19.8232 4.76256 19.8232 4.46967 19.5303C4.17678 19.2374 4.17678 18.7626 4.46967 18.4697L10.939 12L4.46967 5.53033C4.2034 5.26406 4.1792 4.8474 4.39705 4.55379L4.46967 4.46967L4.39705 4.55379Z"
+          ></path>
         </svg>
       </button>
     </div>
@@ -24,9 +34,7 @@
     <div class="login-content">
       <div class="login-container">
         <h1 class="login-title">账号密码登录</h1>
-        <p class="login-subtitle">
-          请输入您的账号和密码以继续
-        </p>
+        <p class="login-subtitle">请输入您的账号和密码以继续</p>
 
         <!-- 错误提示 -->
         <div v-if="errorMessage" class="error-message">
@@ -68,12 +76,41 @@
                 @click="showPassword = !showPassword"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
               >
-                <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="password-icon">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                <svg
+                  v-if="showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  class="password-icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                  />
                 </svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="password-icon">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  class="password-icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
                 </svg>
               </button>
             </div>
@@ -81,21 +118,19 @@
 
           <!-- 操作按钮区域 -->
           <div class="form-actions">
-            <router-link to="/login" class="back-link">
-              ← 返回
-            </router-link>
-            <a href="#" class="forgot-link" @click.prevent="handleForgotPassword">
+            <router-link to="/login" class="back-link"> ← 返回 </router-link>
+            <a
+              href="#"
+              class="forgot-link"
+              @click.prevent="handleForgotPassword"
+            >
               忘记密码？
             </a>
           </div>
 
           <!-- 登录按钮 -->
-          <button
-            type="submit"
-            class="login-button"
-            :disabled="loading"
-          >
-            {{ loading ? '登录中...' : '登录' }}
+          <button type="submit" class="login-button" :disabled="loading">
+            {{ loading ? "登录中..." : "登录" }}
           </button>
         </form>
 
@@ -112,92 +147,102 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { request } from '@/utils/api'
-import { STORAGE_KEYS } from '@/utils/constants'
-import { useUserStore } from '@/stores/user'
+import { ref, reactive } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { request } from "@/utils/api";
+import { STORAGE_KEYS } from "@/utils/constants";
+import { useUserStore } from "@/stores/user";
 
-const router = useRouter()
-const userStore = useUserStore()
+const router = useRouter();
+const userStore = useUserStore();
 
-const loading = ref(false)
-const errorMessage = ref('')
-const showPassword = ref(false)
+const loading = ref(false);
+const errorMessage = ref("");
+const showPassword = ref(false);
 
 const form = reactive({
-  username: '',
-  password: ''
-})
+  username: "",
+  password: "",
+});
 
 // 表单数据监听已移除，避免控制台噪音
 
 const handleLogin = async () => {
-  console.log('登录表单数据:', { username: form.username, password: form.password, passwordLength: form.password.length })
+  console.log("登录表单数据:", {
+    username: form.username,
+    password: form.password,
+    passwordLength: form.password.length,
+  });
 
   if (!form.username || !form.password) {
-    const missing = []
-    if (!form.username) missing.push('账号')
-    if (!form.password) missing.push('密码')
-    errorMessage.value = `请输入${missing.join('和')}`
-    console.error('验证失败:', { missing, formData: { username: form.username, passwordLength: form.password.length } })
-    return
+    const missing = [];
+    if (!form.username) missing.push("账号");
+    if (!form.password) missing.push("密码");
+    errorMessage.value = `请输入${missing.join("和")}`;
+    console.error("验证失败:", {
+      missing,
+      formData: {
+        username: form.username,
+        passwordLength: form.password.length,
+      },
+    });
+    return;
   }
 
-  errorMessage.value = ''
-  loading.value = true
+  errorMessage.value = "";
+  loading.value = true;
 
   try {
-    console.log('开始API调用...')
-    const response = await request.post<{ token?: string; role?: string }>('/users/login', {
-      username: form.username,
-      password: form.password
-    })
-    console.log('API响应:', response)
+    console.log("开始API调用...");
+    const response = await request.post<{ token?: string; role?: string }>(
+      "/users/login",
+      {
+        username: form.username,
+        password: form.password,
+      },
+    );
+    console.log("API响应:", response);
 
-    if (response.code === 0) {
-      const token = (response as any).token
-      console.log('获取到token:', token ? '成功' : '失败')
+    // 假设成功响应包含token
+    if (response.token) {
+      console.log("获取到token:", "成功");
+      localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
+      await userStore.initUser();
+      console.log("用户状态初始化完成");
 
-      if (token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, token)
-        await userStore.initUser()
-        console.log('用户状态初始化完成')
-      }
+      ElMessage.success("登录成功");
+      console.log("准备跳转到主页...");
 
-      ElMessage.success('登录成功')
-      console.log('准备跳转到主页...')
-
-      const redirect = router.currentRoute.value.query.redirect as string
-      console.log('跳转目标:', redirect || '/home')
-      router.push(redirect || '/home')
+      const redirect = router.currentRoute.value.query.redirect as string;
+      console.log("跳转目标:", redirect || "/home");
+      router.push(redirect || "/home");
     } else {
-      console.error('登录失败:', response.msg)
-      errorMessage.value = response.msg || '登录失败'
+      console.error("登录失败:", "未获取到token");
+      errorMessage.value = "登录失败，请检查账号密码";
     }
   } catch (error: any) {
-    errorMessage.value = error.message || '登录失败，请检查账号密码'
+    errorMessage.value = error.message || "登录失败，请检查账号密码";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const handleClose = () => {
-  router.push('/login')
-}
+  router.push("/login");
+};
 
 const handleForgotPassword = () => {
-  ElMessage.info('忘记密码功能开发中')
-}
+  ElMessage.info("忘记密码功能开发中");
+};
 </script>
 
 <style>
-@import '@/styles/copilot-reference.css';
+@import "@/styles/copilot-reference.css";
 </style>
 
 <style scoped lang="scss">
-@import '@/styles/variables';
+@import "@/styles/variables";
 
 .password-login-page {
   position: relative;

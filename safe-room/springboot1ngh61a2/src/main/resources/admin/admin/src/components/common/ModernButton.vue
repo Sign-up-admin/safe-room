@@ -5,7 +5,9 @@
     @click="handleClick"
   >
     <el-icon v-if="loading" class="loading-icon"><Loading /></el-icon>
-    <el-icon v-else-if="icon" class="button-icon"><component :is="icon" /></el-icon>
+    <el-icon v-else-if="icon" class="button-icon"
+      ><component :is="icon"
+    /></el-icon>
     <span v-if="$slots.default || text" class="button-text">
       <slot>{{ text }}</slot>
     </span>
@@ -13,44 +15,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Loading } from '@element-plus/icons-vue'
+import { computed } from "vue";
+import { Loading } from "@element-plus/icons-vue";
 
 interface Props {
-  type?: 'primary' | 'secondary' | 'ghost' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
-  icon?: any
-  loading?: boolean
-  disabled?: boolean
-  text?: string
+  type?: "primary" | "secondary" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
+  icon?: any;
+  loading?: boolean;
+  disabled?: boolean;
+  text?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'primary',
-  size: 'md',
+  type: "primary",
+  size: "md",
   loading: false,
-  disabled: false
-})
+  disabled: false,
+});
 
 const emit = defineEmits<{
-  click: [event: MouseEvent]
-}>()
+  click: [event: MouseEvent];
+}>();
 
 const buttonClasses = computed(() => [
-  'modern-button',
+  "modern-button",
   `modern-button--${props.type}`,
-  `modern-button--${props.size}`
-])
+  `modern-button--${props.size}`,
+]);
 
 const handleClick = (event: MouseEvent) => {
   if (!props.disabled && !props.loading) {
-    emit('click', event)
+    emit("click", event);
   }
-}
+};
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/mixins';
+@import "@/styles/mixins";
 
 .modern-button {
   @include button-base();
@@ -147,6 +149,3 @@ const handleClick = (event: MouseEvent) => {
   }
 }
 </style>
-
-
-

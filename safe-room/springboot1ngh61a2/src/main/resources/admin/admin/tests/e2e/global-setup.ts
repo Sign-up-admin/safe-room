@@ -1,4 +1,4 @@
-import { chromium, Browser, BrowserContext } from '@playwright/test';
+import { chromium } from '@playwright/test';
 import { testConfig } from './test-config';
 
 /**

@@ -7,18 +7,19 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    ElAlert: typeof import('element-plus/es')['ElAlert']
+    Composer: typeof import('./src/components/Composer.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
-    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    Launcher: typeof import('./src/components/Launcher.vue')['default']
+    MainContent: typeof import('./src/components/MainContent.vue')['default']
     ModernButton: typeof import('./src/components/common/ModernButton.vue')['default']
     ModernCard: typeof import('./src/components/common/ModernCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Sidebar: typeof import('./src/components/layout/Sidebar.vue')['default']
+    Sidebar: typeof import('./src/components/Sidebar.vue')['default']
   }
 }

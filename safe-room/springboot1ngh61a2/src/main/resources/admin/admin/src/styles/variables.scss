@@ -5,14 +5,121 @@
 
 :root {
   // ========== 色彩系统 ==========
-  
+
+  // Microsoft Copilot 颜色系统
+  --color-caramel-100: 255 251 248;
+  --color-caramel-150: 254 243 234;
+  --color-caramel-200: 254 230 212;
+  --color-caramel-250: 253 213 182;
+  --color-caramel-300: 248 188 140;
+  --color-caramel-350: 226 156 97;
+  --color-caramel-400: 202 125 54;
+  --color-caramel-450: 162 90 2;
+  --color-caramel-550: 138 75 1;
+  --color-caramel-600: 127 68 0;
+  --color-caramel-650: 107 57 0;
+  --color-caramel-700: 88 47 3;
+  --color-caramel-750: 66 38 13;
+  --color-caramel-800: 50 31 15;
+  --color-caramel-850: 36 24 13;
+  --color-caramel-900: 24 16 10;
+  --color-cocoa-100: 255 251 248;
+  --color-cocoa-150: 255 243 234;
+  --color-cocoa-200: 246 232 221;
+  --color-cocoa-250: 235 219 206;
+  --color-cocoa-300: 218 198 183;
+  --color-cocoa-350: 193 169 150;
+  --color-cocoa-400: 168 140 118;
+  --color-cocoa-450: 135 103 78;
+  --color-cocoa-550: 116 87 64;
+  --color-cocoa-600: 106 79 57;
+  --color-cocoa-650: 89 66 47;
+  --color-cocoa-700: 73 54 38;
+  --color-cocoa-750: 58 42 30;
+  --color-cocoa-800: 45 33 23;
+  --color-cocoa-850: 34 24 17;
+  --color-cocoa-900: 23 16 10;
+  --color-midnight-100: 251 252 254;
+  --color-midnight-150: 241 245 255;
+  --color-midnight-200: 228 235 255;
+  --color-midnight-250: 209 221 255;
+  --color-midnight-300: 183 201 254;
+  --color-midnight-350: 151 171 234;
+  --color-midnight-400: 121 143 212;
+  --color-midnight-450: 83 105 182;
+  --color-midnight-550: 68 88 160;
+  --color-midnight-600: 62 80 145;
+  --color-midnight-650: 53 68 121;
+  --color-midnight-700: 44 56 96;
+  --color-midnight-750: 35 44 73;
+  --color-midnight-800: 28 35 56;
+  --color-midnight-850: 21 26 40;
+  --color-midnight-900: 14 17 27;
+  --color-slate-100: 251 252 254;
+  --color-slate-150: 241 245 255;
+  --color-slate-200: 229 235 250;
+  --color-slate-250: 215 222 239;
+  --color-slate-300: 194 202 223;
+  --color-slate-350: 164 173 200;
+  --color-slate-400: 135 145 176;
+  --color-slate-450: 98 109 143;
+  --color-slate-550: 82 92 123;
+  --color-slate-600: 74 84 113;
+  --color-slate-650: 62 71 96;
+  --color-slate-700: 51 58 78;
+  --color-slate-750: 40 45 62;
+  --color-slate-800: 31 36 49;
+  --color-slate-850: 23 26 37;
+  --color-slate-900: 15 17 25;
+  --color-stone-100: 255 251 248;
+  --color-stone-150: 248 244 241;
+  --color-stone-200: 239 234 231;
+  --color-stone-250: 226 221 217;
+  --color-stone-300: 207 201 197;
+  --color-stone-350: 179 173 168;
+  --color-stone-400: 152 145 139;
+  --color-stone-450: 116 109 104;
+  --color-stone-550: 99 92 87;
+  --color-stone-600: 90 84 79;
+  --color-stone-650: 76 70 66;
+  --color-stone-700: 63 57 53;
+  --color-stone-750: 50 45 41;
+  --color-stone-800: 39 35 32;
+  --color-stone-850: 29 26 23;
+  --color-stone-900: 20 17 14;
+  --color-system-green-250: 216 236 163;
+  --color-system-green-350: 111 195 102;
+  --color-system-green-400: 75 168 73;
+  --color-system-green-550: 18 115 35;
+  --color-system-green-650: 4 88 25;
+  --color-system-green-750: 0 61 15;
+  --color-system-green-800: 0 48 12;
+  --color-system-red-200: 255 235 236;
+  --color-system-red-250: 255 214 215;
+  --color-system-red-300: 255 172 176;
+  --color-system-red-350: 250 129 139;
+  --color-system-red-400: 216 104 114;
+  --color-system-red-450: 184 80 91;
+  --color-system-red-550: 153 58 69;
+  --color-system-red-600: 137 47 59;
+  --color-system-red-650: 118 39 50;
+  --color-system-red-850: 51 12 17;
+  --color-system-blue-350: 120 176 255;
+  --color-system-blue-550: 1 89 186;
+  --color-system-teal-250: 157 238 244;
+  --color-system-teal-550: 2 107 112;
+
+  // Clip Path 变量
+  --clip-path-squircle-16: polygon(0px 32px,.078px 20.2712px,.3127px 16.0785px,.7058px 13.0122px,1.2605px 10.5458px,1.9817px 8.4842px,2.8766px 6.7314px,3.9554px 5.233px,5.233px 3.9554px,6.7314px 2.8766px,8.4842px 1.9817px,10.5458px 1.2605px,13.0122px .7058px,16.0785px .3127px,20.2712px .078px,32px 0px, calc(100% - 32px) 0px, calc(100% - 19.9074px) .0896px, calc(100% - 15.5906px) .3591px, calc(100% - 12.4422px) .8109px, calc(100% - 9.9208px) 1.4493px, calc(100% - 7.8262px) 2.2809px, calc(100% - 6.0604px) 3.3157px, calc(100% - 4.5682px) 4.5682px, calc(100% - 3.3157px) 6.0604px, calc(100% - 2.2809px) 7.8262px, calc(100% - 1.4493px) 9.9208px, calc(100% - .8109px) 12.4422px, calc(100% - .3591px) 15.5906px, calc(100% - .0896px) 19.9074px,100% 32px,100% calc(100% - 32px) , calc(100% - .0896px) calc(100% - 19.9074px) , calc(100% - .3591px) calc(100% - 15.5906px) , calc(100% - .8109px) calc(100% - 12.4422px) , calc(100% - 1.4493px) calc(100% - 9.9208px) , calc(100% - 2.2809px) calc(100% - 7.8262px) , calc(100% - 3.3157px) calc(100% - 6.0604px) , calc(100% - 4.5682px) calc(100% - 4.5682px) , calc(100% - 6.0604px) calc(100% - 3.3157px) , calc(100% - 7.8262px) calc(100% - 2.2809px) , calc(100% - 9.9208px) calc(100% - 1.4493px) , calc(100% - 12.4422px) calc(100% - .8109px) , calc(100% - 15.5906px) calc(100% - .3591px) , calc(100% - 19.9074px) calc(100% - .0896px) , calc(100% - 32px) 100%,32px 100%,19.9074px calc(100% - .0896px) ,15.5906px calc(100% - .3591px) ,12.4422px calc(100% - .8109px) ,9.9208px calc(100% - 1.4493px) ,7.8262px calc(100% - 2.2809px) ,6.0604px calc(100% - 3.3157px) ,4.5682px calc(100% - 4.5682px) ,3.3157px calc(100% - 6.0604px) ,2.2809px calc(100% - 7.8262px) ,1.4493px calc(100% - 9.9208px) ,.8109px calc(100% - 12.4422px) ,.3591px calc(100% - 15.5906px) ,.0896px calc(100% - 19.9074px) ,0px calc(100% - 32px) ,0px calc(100% - 32px) ,0px calc(92.3077% - 27.0769px) ,0px calc(84.6154% - 22.1538px) ,0px calc(76.9231% - 17.2308px) ,0px calc(69.2308% - 12.3077px) ,0px calc(61.5385% - 7.3846px) ,0px calc(53.8462% - 2.4615px) ,0px calc(46.1538% + 2.4615px) ,0px calc(38.4615% + 7.3846px) ,0px calc(30.7692% + 12.3077px) ,0px calc(23.0769% + 17.2308px) ,0px calc(15.3846% + 22.1538px) ,0px calc(7.6923% + 27.0769px) ,0px 32px);
+  --clip-path-squircle-stroke-16: polygon(0px 32px,.078px 20.2712px,.3127px 16.0785px,.7058px 13.0122px,1.2605px 10.5458px,1.9817px 8.4842px,2.8766px 6.7314px,3.9554px 5.233px,5.233px 3.9554px,6.7314px 2.8766px,8.4842px 1.9817px,10.5458px 1.2605px,13.0122px .7058px,16.0785px .3127px,20.2712px .078px,32px 0px, calc(100% - 32px) 0px, calc(100% - 19.9074px) .0896px, calc(100% - 15.5906px) .3591px, calc(100% - 12.4422px) .8109px, calc(100% - 9.9208px) 1.4493px, calc(100% - 7.8262px) 2.2809px, calc(100% - 6.0604px) 3.3157px, calc(100% - 4.5682px) 4.5682px, calc(100% - 3.3157px) 6.0604px, calc(100% - 2.2809px) 7.8262px, calc(100% - 1.4493px) 9.9208px, calc(100% - .8109px) 12.4422px, calc(100% - .3591px) 15.5906px, calc(100% - .0896px) 19.9074px,100% 32px,100% calc(100% - 32px) , calc(100% - .0896px) calc(100% - 19.9074px) , calc(100% - .3591px) calc(100% - 15.5906px) , calc(100% - .8109px) calc(100% - 12.4422px) , calc(100% - 1.4493px) calc(100% - 9.9208px) , calc(100% - 2.2809px) calc(100% - 7.8262px) , calc(100% - 3.3157px) calc(100% - 6.0604px) , calc(100% - 4.5682px) calc(100% - 4.5682px) , calc(100% - 6.0604px) calc(100% - 3.3157px) , calc(100% - 7.8262px) calc(100% - 2.2809px) , calc(100% - 9.9208px) calc(100% - 1.4493px) , calc(100% - 12.4422px) calc(100% - .8109px) , calc(100% - 15.5906px) calc(100% - .3591px) , calc(100% - 19.9074px) calc(100% - .0896px) , calc(100% - 32px) 100%,32px 100%,19.9074px calc(100% - .0896px) ,15.5906px calc(100% - .3591px) ,12.4422px calc(100% - .8109px) ,9.9208px calc(100% - 1.4493px) ,7.8262px calc(100% - 2.2809px) ,6.0604px calc(100% - 3.3157px) ,4.5682px calc(100% - 4.5682px) ,3.3157px calc(100% - 6.0604px) ,2.2809px calc(100% - 7.8262px) ,1.4493px calc(100% - 9.9208px) ,.8109px calc(100% - 12.4422px) ,.3591px calc(100% - 15.5906px) ,.0896px calc(100% - 19.9074px) ,0px calc(100% - 32px) ,0px calc(100% - 32px) ,0px calc(92.3077% - 27.0769px) ,0px calc(84.6154% - 22.1538px) ,0px calc(76.9231% - 17.2308px) ,0px calc(69.2308% - 12.3077px) ,0px calc(61.5385% - 7.3846px) ,0px calc(53.8462% - 2.4615px) ,0px calc(46.1538% + 2.4615px) ,0px calc(38.4615% + 7.3846px) ,0px calc(30.7692% + 12.3077px) ,0px calc(23.0769% + 17.2308px) ,0px calc(15.3846% + 22.1538px) ,0px calc(7.6923% + 27.0769px) ,0px 32px,1px 31px,1px calc(7.6923% + 26.2308px) ,1px calc(15.3846% + 21.4615px) ,1px calc(23.0769% + 16.6923px) ,1px calc(30.7692% + 11.9231px) ,1px calc(38.4615% + 7.1538px) ,1px calc(46.1538% + 2.3846px) ,1px calc(53.8462% - 2.3846px) ,1px calc(61.5385% - 7.1538px) ,1px calc(69.2308% - 11.9231px) ,1px calc(76.9231% - 16.6923px) ,1px calc(84.6154% - 21.4615px) ,1px calc(92.3077% - 26.2308px) ,1px calc(100% - 31px) ,1px calc(100% - 31px) ,1.084px calc(100% - 19.6632px) ,1.3367px calc(100% - 15.6162px) ,1.7602px calc(100% - 12.6646px) ,2.3587px calc(100% - 10.3008px) ,3.1384px calc(100% - 8.3371px) ,4.1084px calc(100% - 6.6816px) ,5.2827px calc(100% - 5.2827px) ,6.6816px calc(100% - 4.1084px) ,8.3371px calc(100% - 3.1384px) ,10.3008px calc(100% - 2.3587px) ,12.6646px calc(100% - 1.7602px) ,15.6162px calc(100% - 1.3367px) ,19.6632px calc(100% - 1.084px) ,31px calc(100% - 1px) , calc(100% - 31px) calc(100% - 1px) , calc(100% - 19.6632px) calc(100% - 1.084px) , calc(100% - 15.6162px) calc(100% - 1.3367px) , calc(100% - 12.6646px) calc(100% - 1.7602px) , calc(100% - 10.3008px) calc(100% - 2.3587px) , calc(100% - 8.3371px) calc(100% - 3.1384px) , calc(100% - 6.6816px) calc(100% - 4.1084px) , calc(100% - 5.2827px) calc(100% - 5.2827px) , calc(100% - 4.1084px) calc(100% - 6.6816px) , calc(100% - 3.1384px) calc(100% - 8.3371px) , calc(100% - 2.3587px) calc(100% - 10.3008px) , calc(100% - 1.7602px) calc(100% - 12.6646px) , calc(100% - 1.3367px) calc(100% - 15.6162px) , calc(100% - 1.084px) calc(100% - 19.6632px) , calc(100% - 1px) calc(100% - 31px) , calc(100% - 1px) 47px, calc(100% - 1.1288px) 29.6169px, calc(100% - 1.5162px) 23.4115px, calc(100% - 2.1657px) 18.8857px, calc(100% - 3.0834px) 15.2612px, calc(100% - 4.2788px) 12.2502px, calc(100% - 5.7663px) 9.7118px, calc(100% - 7.5668px) 7.5668px, calc(100% - 9.7118px) 5.7663px, calc(100% - 12.2502px) 4.2788px, calc(100% - 15.2612px) 3.0834px, calc(100% - 18.8857px) 2.1657px, calc(100% - 23.4115px) 1.5162px, calc(100% - 29.6169px) 1.1288px, calc(100% - 47px) 1px,47px 1px,30.1398px 1.1122px,24.1128px 1.4495px,19.705px 2.0146px,16.1596px 2.812px,13.1961px 3.8487px,10.6764px 5.1351px,8.5225px 6.6859px,6.6859px 8.5225px,5.1351px 10.6764px,3.8487px 13.1961px,2.812px 16.1596px,2.0146px 19.705px,1.4495px 24.1128px,1.1122px 30.1398px,1px 47px);
+
   // 主色调 - 蓝色系
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
   --color-primary-200: #bfdbfe;
   --color-primary-300: #93c5fd;
   --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;  // 主色
+  --color-primary-500: #3b82f6; // 主色
   --color-primary-600: #2563eb;
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
@@ -20,48 +127,65 @@
 
   // 成功色 - 绿色系
   --color-success-50: #f0fdf4;
-  --color-success-500: #22c55e;  // 主成功色
+  --color-success-500: #22c55e; // 主成功色
   --color-success-600: #16a34a;
 
   // 警告色 - 橙色系
   --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;  // 主警告色
+  --color-warning-500: #f59e0b; // 主警告色
   --color-warning-600: #d97706;
 
   // 危险色 - 红色系
   --color-danger-50: #fef2f2;
-  --color-danger-500: #ef4444;  // 主危险色
+  --color-danger-500: #ef4444; // 主危险色
   --color-danger-600: #dc2626;
 
   // 语义色彩
-  --color-text-primary: #111827;      // 主要文字
-  --color-text-secondary: #6b7280;    // 次要文字
-  --color-text-tertiary: #9ca3af;     // 辅助文字
-  --color-text-inverse: #ffffff;      // 深色背景上的文字
+  --color-text-primary: #111827; // 主要文字
+  --color-text-secondary: #6b7280; // 次要文字
+  --color-text-tertiary: #9ca3af; // 辅助文字
+  --color-text-inverse: #ffffff; // 深色背景上的文字
 
-  --color-bg-primary: #ffffff;        // 主要背景
-  --color-bg-secondary: #f9fafb;      // 次要背景
-  --color-bg-tertiary: #f3f4f6;       // 辅助背景
+  --color-bg-primary: #ffffff; // 主要背景
+  --color-bg-secondary: #f9fafb; // 次要背景
+  --color-bg-tertiary: #f3f4f6; // 辅助背景
   --color-bg-overlay: rgba(0, 0, 0, 0.5); // 遮罩层
 
-  --color-border-light: #f3f4f6;      // 浅边框
-  --color-border-medium: #d1d5db;     // 中等边框
-  --color-border-dark: #9ca3af;       // 深边框
+  --color-border-light: #f3f4f6; // 浅边框
+  --color-border-medium: #d1d5db; // 中等边框
+  --color-border-dark: #9ca3af; // 深边框
 
   // 渐变色彩
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-  --gradient-bg-auth: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 50%, #fafbfc 100%);
-  --gradient-bg-dashboard: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
-  --gradient-bg-card: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  --gradient-bg-auth: linear-gradient(
+    135deg,
+    #fafbfc 0%,
+    #f5f7fa 50%,
+    #fafbfc 100%
+  );
+  --gradient-bg-dashboard: linear-gradient(
+    135deg,
+    #f093fb 0%,
+    #f5576c 50%,
+    #4facfe 100%
+  );
+  --gradient-bg-card: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
 
   // ========== 字体系统 ==========
-  
-  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', monospace;
-  --font-family-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-family-primary:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono:
+    "JetBrains Mono", "Fira Code", "SF Mono", Monaco, "Cascadia Code", monospace;
+  --font-family-display:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --font-size-display-2xl: clamp(2.5rem, 5vw, 4rem);
   --font-size-display-xl: clamp(2rem, 4vw, 3rem);
@@ -88,40 +212,40 @@
   --line-height-loose: 2;
 
   // ========== 间距系统 ==========
-  
+
   --space-px: 1px;
   --space-0: 0;
-  --space-1: 0.25rem;    // 4px
-  --space-2: 0.5rem;     // 8px
-  --space-3: 0.75rem;    // 12px
-  --space-4: 1rem;       // 16px
-  --space-5: 1.25rem;    // 20px
-  --space-6: 1.5rem;     // 24px
-  --space-8: 2rem;       // 32px
-  --space-10: 2.5rem;    // 40px
-  --space-12: 3rem;      // 48px
-  --space-16: 4rem;      // 64px
-  --space-20: 5rem;      // 80px
-  --space-24: 6rem;      // 96px
-  --space-32: 8rem;      // 128px
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem; // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem; // 24px
+  --space-8: 2rem; // 32px
+  --space-10: 2.5rem; // 40px
+  --space-12: 3rem; // 48px
+  --space-16: 4rem; // 64px
+  --space-20: 5rem; // 80px
+  --space-24: 6rem; // 96px
+  --space-32: 8rem; // 128px
 
-  --container-xs: 20rem;     // 320px
-  --container-sm: 24rem;     // 384px
-  --container-md: 28rem;     // 448px
-  --container-lg: 32rem;    // 512px
-  --container-xl: 36rem;    // 576px
-  --container-2xl: 42rem;   // 672px
+  --container-xs: 20rem; // 320px
+  --container-sm: 24rem; // 384px
+  --container-md: 28rem; // 448px
+  --container-lg: 32rem; // 512px
+  --container-xl: 36rem; // 576px
+  --container-2xl: 42rem; // 672px
 
   // ========== 圆角系统 ==========
-  
+
   --radius-none: 0;
-  --radius-sm: 0.125rem;    // 2px
-  --radius-md: 0.375rem;    // 6px
-  --radius-lg: 0.5rem;      // 8px
-  --radius-xl: 0.75rem;     // 12px
-  --radius-2xl: 1rem;       // 16px
-  --radius-3xl: 1.5rem;     // 24px
-  --radius-full: 9999px;    // 完全圆角
+  --radius-sm: 0.125rem; // 2px
+  --radius-md: 0.375rem; // 6px
+  --radius-lg: 0.5rem; // 8px
+  --radius-xl: 0.75rem; // 12px
+  --radius-2xl: 1rem; // 16px
+  --radius-3xl: 1.5rem; // 24px
+  --radius-full: 9999px; // 完全圆角
 
   --radius-button: var(--radius-xl);
   --radius-card: var(--radius-2xl);
@@ -129,13 +253,16 @@
   --radius-modal: var(--radius-2xl);
 
   // ========== 阴影系统 ==========
-  
+
   --shadow-none: 0 0 #0000;
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
   --shadow-highlight: 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -147,8 +274,16 @@
   --shadow-danger-xs: 0 1px 2px 0 rgba(239, 68, 68, 0.05);
   --shadow-danger-sm: 0 1px 3px 0 rgba(239, 68, 68, 0.1);
 
+  // ========== 背景色彩系统 ==========
+
+  // 背景色变量（用于Tailwind渐变类）
+  --color-background-100: var(--color-stone-100);
+  --color-background-150: var(--color-midnight-100);
+  --color-background-200: var(--color-stone-200);
+  --color-background-400: var(--color-stone-400);
+
   // ========== 动画系统 ==========
-  
+
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -171,7 +306,7 @@
   --duration-1000: 1000ms;
 
   // ========== 响应式断点 ==========
-  
+
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
@@ -179,7 +314,7 @@
   --breakpoint-2xl: 1536px;
 
   // ========== Z-index层级 ==========
-  
+
   --z-index-base: 0;
   --z-index-dropdown: 1000;
   --z-index-sticky: 1020;
@@ -196,7 +331,12 @@
   --color-bg-secondary: #f9fafb;
   --color-text-primary: #111827;
   --color-text-secondary: #6b7280;
-  --gradient-bg-auth: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 50%, #fafbfc 100%);
+  --gradient-bg-auth: linear-gradient(
+    135deg,
+    #fafbfc 0%,
+    #f5f7fa 50%,
+    #fafbfc 100%
+  );
 }
 
 // 深色主题
@@ -206,4 +346,10 @@
   --color-text-primary: #f9fafb;
   --color-text-secondary: #d1d5db;
   --gradient-bg-auth: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+
+  // 背景色变量（用于Tailwind渐变类）
+  --color-background-100: var(--color-midnight-100);
+  --color-background-150: var(--color-midnight-100);
+  --color-background-200: var(--color-midnight-200);
+  --color-background-400: var(--color-midnight-600);
 }
