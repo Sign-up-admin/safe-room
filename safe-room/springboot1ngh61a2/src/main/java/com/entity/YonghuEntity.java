@@ -49,7 +49,7 @@ public class YonghuEntity<T> implements Serializable {
 	/**
 	 * Primary key id
 	 */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 	/**
 	 * User account

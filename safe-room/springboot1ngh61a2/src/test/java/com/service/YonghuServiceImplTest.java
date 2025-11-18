@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ class YonghuServiceImplTest {
     @Autowired
     private YonghuService yonghuService;
 
+    @Autowired(required = false)
+    private JdbcTemplate jdbcTemplate;
+
     // 测试数据管理
     private List<YonghuEntity> testDataEntities = new ArrayList<>();
     private List<Long> testDataIds = new ArrayList<>();
@@ -44,6 +48,9 @@ class YonghuServiceImplTest {
     @BeforeEach
     void setUpTestData() {
         // Setting up test data for YonghuServiceImplTest
+
+        // 重置H2数据库的ID序列，确保每个测试开始时序列是干净的
+        resetH2Sequence();
 
         // 创建基础测试数据
         createTestUsers();
@@ -214,6 +221,38 @@ class YonghuServiceImplTest {
             // Test data cleanup verification failed
         } else {
             // Test data cleanup verification passed
+        }
+    }
+
+    /**
+     * 重置H2数据库的ID序列，避免主键冲突
+     * H2使用IDENTITY列，需要重置序列值
+     * 在测试开始前重置，确保每个测试都有干净的序列状态
+     */
+    private void resetH2Sequence() {
+        if (jdbcTemplate != null) {
+            try {
+                // 获取当前yonghu表的最大ID，如果表为空则从1开始
+                Long maxId = jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(id), 0) FROM yonghu", Long.class);
+                
+                // H2的IDENTITY列重置语法
+                // 使用ALTER TABLE ... ALTER COLUMN ... RESTART WITH
+                // 重置到maxId+1，确保下一个插入的ID不会冲突
+                jdbcTemplate.execute(
+                    "ALTER TABLE yonghu ALTER COLUMN id RESTART WITH " + (maxId + 1));
+            } catch (Exception e) {
+                // 如果重置失败，尝试备用方法
+                try {
+                    // 备用方法：直接设置序列值（如果H2支持）
+                    jdbcTemplate.execute(
+                        "SET @IDENTITY_SEED = (SELECT COALESCE(MAX(id), 0) + 1 FROM yonghu)");
+                } catch (Exception e2) {
+                    // 如果都失败，记录但不影响测试
+                    // 某些情况下序列可能已经正确，或者需要其他方式重置
+                    // 测试可能会因为ID冲突而失败，但这是可以接受的
+                }
+            }
         }
     }
 

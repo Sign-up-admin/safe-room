@@ -65,6 +65,13 @@ logging:
     org.h2: WARN
     com.zaxxer.hikari: WARN
 
+# MyBatis-Plus test configuration
+mybatis-plus:
+  global-config:
+    db-config:
+      # 测试环境使用AUTO，让H2数据库自动生成ID
+      id-type: AUTO
+
 # Test-specific configurations
 test:
   authentication:

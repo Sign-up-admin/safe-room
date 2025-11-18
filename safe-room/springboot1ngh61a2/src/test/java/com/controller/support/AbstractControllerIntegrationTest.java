@@ -183,7 +183,13 @@ public abstract class AbstractControllerIntegrationTest {
 
     protected ResultActions performAdmin(MockHttpServletRequestBuilder builder) throws Exception {
         if (skipAuthentication) {
-            return mockMvc.perform(builder);
+            // 即使跳过认证，也设置必要的session属性，避免Controller中的NullPointerException
+            // 这些属性通常在AuthorizationInterceptor中通过Token验证后设置
+            return mockMvc.perform(builder
+                    .sessionAttr("tableName", "users")
+                    .sessionAttr("userId", 1L)
+                    .sessionAttr("username", "admin")
+                    .sessionAttr("role", "管理员"));
         }
         String token = adminToken();
         log.debug("Using admin token for request: token length={}", token != null ? token.length() : 0);
@@ -192,7 +198,12 @@ public abstract class AbstractControllerIntegrationTest {
 
     protected ResultActions performMember(MockHttpServletRequestBuilder builder) throws Exception {
         if (skipAuthentication) {
-            return mockMvc.perform(builder);
+            // 即使跳过认证，也设置必要的session属性，避免Controller中的NullPointerException
+            return mockMvc.perform(builder
+                    .sessionAttr("tableName", "yonghu")
+                    .sessionAttr("userId", 1L)
+                    .sessionAttr("username", "user01")
+                    .sessionAttr("role", "会员"));
         }
         String token = memberToken();
         log.debug("Using member token for request: token length={}", token != null ? token.length() : 0);

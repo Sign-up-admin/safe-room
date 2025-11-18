@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.controller.support.AbstractControllerIntegrationTest;
 import com.entity.ConfigEntity;
 import com.service.ConfigService;
@@ -80,6 +81,14 @@ class ConfigControllerTest extends AbstractControllerIntegrationTest {
         ConfigEntity newConfig = createTestConfig(uniqueName, "测试配置值");
         // 确保ID为null，让数据库自动生成
         newConfig.setId(null);
+
+        // 先检查是否已存在同名配置，如果存在则删除
+        List<ConfigEntity> existing = configService.list(
+            new QueryWrapper<ConfigEntity>()
+                .eq("name", uniqueName));
+        if (!existing.isEmpty()) {
+            existing.forEach(config -> configService.removeById(config.getId()));
+        }
 
         postJson("/config/save", newConfig)
                 .andExpect(status().isOk())
