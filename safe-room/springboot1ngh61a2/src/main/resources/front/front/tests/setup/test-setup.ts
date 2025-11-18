@@ -1,14 +1,16 @@
 import { beforeAll, afterAll, vi } from 'vitest'
 import type { Component } from 'vue'
 import type { MountingOptions } from '@vue/test-utils'
+import type { Router } from 'vue-router'
+import type { ComponentPublicInstance } from 'vue'
 
 // Type declarations for global test helpers
 declare global {
   function flushPromises(): Promise<void>
-  function createWrapper(component: Component, options?: MountingOptions<any>): Promise<any>
-  function createMockStore(initialState?: Record<string, any>): any
-  function createMockRouter(): any
-  function createMockService(methods?: Record<string, any>): any
+  function createWrapper(component: Component, options?: MountingOptions<Record<string, unknown>>): Promise<ComponentPublicInstance>
+  function createMockStore(initialState?: Record<string, unknown>): Record<string, unknown>
+  function createMockRouter(): Partial<Router>
+  function createMockService(methods?: Record<string, unknown>): Record<string, unknown>
   function mockLocalStorage(data?: Record<string, string>): Record<string, string>
   function mockSessionStorage(data?: Record<string, string>): Record<string, string>
   function cleanupTestState(): void
@@ -493,7 +495,7 @@ Object.defineProperty(navigator, 'mediaDevices', {
 global.flushPromises = () => new Promise(setImmediate)
 
 // Vue Test Utils helper
-global.createWrapper = async (component: Component, options: MountingOptions<any> = {}) => {
+global.createWrapper = async (component: Component, options: MountingOptions<Record<string, unknown>> = {}) => {
   const { mount } = await import('@vue/test-utils')
   return mount(component, {
     global: {

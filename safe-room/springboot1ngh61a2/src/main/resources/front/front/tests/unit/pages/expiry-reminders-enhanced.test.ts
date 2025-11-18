@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { getModuleService } from '@/services/crud'
+import type { Router } from 'vue-router'
 
 // Mock the enhanced Vue component
 vi.mock('@/pages/daoqitixing/list.vue', () => ({
@@ -160,7 +161,7 @@ vi.mock('@/pages/daoqitixing/list.vue', () => ({
 import ExpiryReminders from '../../../src/pages/daoqitixing/list.vue'
 
 describe('ExpiryReminders Enhanced Features', () => {
-  let router: any
+  let router: Partial<Router>
   let pinia: any
   let mockService: any
 

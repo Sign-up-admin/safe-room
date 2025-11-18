@@ -500,6 +500,27 @@ const starterPrompts = computed(() => [
 ])
 
 // Methods
+const adjustTextareaHeight = () => {
+  const textarea = textareaRef.value
+  if (textarea) {
+    // Store current scroll position
+    const scrollTop = textarea.scrollTop
+
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto'
+
+    // Calculate new height with constraints
+    const minHeight = 22 // Minimum height in pixels
+    const maxHeight = 200 // Maximum height in pixels
+    const newHeight = Math.max(minHeight, Math.min(textarea.scrollHeight, maxHeight))
+
+    textarea.style.height = newHeight + 'px'
+
+    // Restore scroll position if it was scrolled
+    textarea.scrollTop = scrollTop
+  }
+}
+
 const debouncedAdjustHeight = debounce(adjustTextareaHeight, 100)
 
 const validateInput = () => {
@@ -577,27 +598,6 @@ const handleStarterPrompt = (promptText: string) => {
   nextTick(() => {
     textareaRef.value?.focus()
   })
-}
-
-const adjustTextareaHeight = () => {
-  const textarea = textareaRef.value
-  if (textarea) {
-    // Store current scroll position
-    const scrollTop = textarea.scrollTop
-
-    // Reset height to auto to get the correct scrollHeight
-    textarea.style.height = 'auto'
-
-    // Calculate new height with constraints
-    const minHeight = 22 // Minimum height in pixels
-    const maxHeight = 200 // Maximum height in pixels
-    const newHeight = Math.max(minHeight, Math.min(textarea.scrollHeight, maxHeight))
-
-    textarea.style.height = newHeight + 'px'
-
-    // Restore scroll position if it was scrolled
-    textarea.scrollTop = scrollTop
-  }
 }
 
 // Watch for external model value changes

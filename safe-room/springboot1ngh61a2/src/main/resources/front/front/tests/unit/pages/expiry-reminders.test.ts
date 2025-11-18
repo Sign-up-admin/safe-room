@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { ElMessage } from 'element-plus'
 import ExpiryReminders from '@/pages/daoqitixing/list.vue'
 import { getModuleService } from '@/services/crud'
+import type { Router } from 'vue-router'
 
 // Mock dependencies
 vi.mock('@/services/crud', () => ({
@@ -44,7 +45,7 @@ vi.mock('@/utils/formatters', () => ({
 }))
 
 describe('ExpiryReminders Page', () => {
-  let router: any
+  let router: Partial<Router>
   let pinia: any
   let mockService: any
 

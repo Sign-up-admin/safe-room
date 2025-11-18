@@ -5,6 +5,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { ElMessage } from 'element-plus'
 import CourseDiscussion from '@/pages/discussjianshenkecheng/list.vue'
 import { getModuleService } from '@/services/crud'
+import type { Router } from 'vue-router'
 
 // Mock dependencies
 vi.mock('@/services/crud', () => ({
@@ -49,7 +50,7 @@ vi.mock('@/assets/touxiang.png', () => ({
 }))
 
 describe('CourseDiscussion Page', () => {
-  let router: any
+  let router: Partial<Router>
   let pinia: any
   let mockDiscussService: any
   let mockCourseService: any

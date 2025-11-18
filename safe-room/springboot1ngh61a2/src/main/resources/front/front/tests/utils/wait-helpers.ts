@@ -4,7 +4,7 @@
  * 提供智能等待功能，替换硬编码的waitForTimeout，提高测试稳定性
  */
 
-import { Page, Locator } from '@playwright/test'
+import { Page, Locator, Request, Response } from '@playwright/test'
 
 export interface WaitOptions {
   timeout?: number
@@ -20,7 +20,7 @@ export interface RetryConfig {
   initialDelay: number
   maxDelay: number
   backoffMultiplier: number
-  retryCondition?: (error: any) => boolean
+  retryCondition?: (error: unknown) => boolean
 }
 
 /**
@@ -105,7 +105,7 @@ export async function waitForNetworkIdle(
       setTimeout(checkIdle, interval)
     }
 
-    page.on('request', (request) => {
+    page.on('request', (request: Request) => {
       const url = request.url()
       // 忽略静态资源请求
       if (!url.includes('/api/') && !url.includes('/yonghu/') && !url.includes('/kecheng')) {
@@ -114,7 +114,7 @@ export async function waitForNetworkIdle(
       pendingRequests.add(url)
     })
 
-    page.on('response', (response) => {
+    page.on('response', (response: Response) => {
       const url = response.url()
       pendingRequests.delete(url)
     })
@@ -358,11 +358,11 @@ export enum ErrorType {
  */
 export class CategorizedError extends Error {
   public readonly type: ErrorType
-  public readonly originalError: any
+  public readonly originalError: unknown
   public readonly context?: string
   public readonly retryable: boolean
 
-  constructor(type: ErrorType, message: string, originalError?: any, context?: string) {
+  constructor(type: ErrorType, message: string, originalError?: unknown, context?: string) {
     super(message)
     this.name = 'CategorizedError'
     this.type = type
@@ -379,8 +379,8 @@ export class CategorizedError extends Error {
   /**
    * 从原始错误创建分类错误
    */
-  static fromError(error: any, context?: string): CategorizedError {
-    const message = error.message || String(error)
+  static fromError(error: unknown, context?: string): CategorizedError {
+    const message = (error instanceof Error ? error.message : String(error))
 
     // 网络相关错误
     if (message.includes('net::') || message.includes('NetworkError') || message.includes('fetch')) {
@@ -427,7 +427,7 @@ export async function withSmartRetry<T>(
 ): Promise<T> {
   const { maxRetries, initialDelay, maxDelay, backoffMultiplier, retryCondition } = config
 
-  let lastError: any
+  let lastError: unknown
   let delay = initialDelay
   let categorizedError: CategorizedError | null = null
 

@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { getModuleService } from '@/services/crud'
+import type { Router } from 'vue-router'
 
 // Mock the enhanced Vue component
 vi.mock('@/pages/discussjianshenkecheng/list.vue', () => ({
@@ -210,7 +211,7 @@ vi.mock('@/pages/discussjianshenkecheng/list.vue', () => ({
 import CourseDiscussionAdvanced from '../../../src/pages/discussjianshenkecheng/list.vue'
 
 describe('CourseDiscussion Advanced Features', () => {
-  let router: any
+  let router: Partial<Router>
   let pinia: any
   let mockService: any
 

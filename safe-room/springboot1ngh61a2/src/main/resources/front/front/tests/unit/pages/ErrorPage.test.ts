@@ -112,7 +112,7 @@ describe('ErrorPage.vue', () => {
       })
       
       // Mock route params
-      router.currentRoute.value.params = { code: '500' } as any
+      router.currentRoute.value.params = { code: '500' } as Record<string, string>
       await wrapper.vm.$nextTick()
 
       expect(wrapper.vm.errorCode).toBe('404') // 默认404，因为props.code是undefined且route.params.code在测试中可能不生效

@@ -1,4 +1,5 @@
-import { Page, Route, expect } from '@playwright/test'
+import { Page, Route, Dialog, expect } from '@playwright/test'
+import type { TestInfo } from 'vitest'
 import fs from 'fs'
 import path from 'path'
 
@@ -205,7 +206,7 @@ export class PerformanceUtils {
   static async measureApiResponseTime(page: Page, apiPattern: string): Promise<number[]> {
     const responseTimes: number[] = []
 
-    page.on('response', (response) => {
+    page.on('response', (response: Response) => {
       const url = response.url()
       if (url.includes(apiPattern)) {
         const timing = response.timing()
@@ -284,7 +285,7 @@ export class NetworkUtils {
     const responseKey = pattern.toString()
     this.interceptedResponses.set(responseKey, [])
 
-    page.on('response', (response) => {
+    page.on('response', (response: Response) => {
       const url = response.url()
       if (typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url)) {
         this.interceptedResponses.get(responseKey)?.push({
@@ -647,9 +648,9 @@ export async function clickElement(page: Page, selectors: string | string[], opt
 /**
  * Setup complete front-end mock environment for E2E tests
  */
-export async function setupCompleteFrontMock(page: any): Promise<void> {
+export async function setupCompleteFrontMock(page: Page): Promise<void> {
   // Mock login API
-  await page.route('**/yonghu/login', async (route: any) => {
+  await page.route('**/yonghu/login', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -662,7 +663,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock registration API
-  await page.route('**/yonghu/register', async (route: any) => {
+  await page.route('**/yonghu/register', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -674,7 +675,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock user session API
-  await page.route('**/yonghu/session', async (route: any) => {
+  await page.route('**/yonghu/session', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -691,7 +692,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock course APIs with more comprehensive data
-  await page.route('**/jianshenkecheng/**', async (route: any) => {
+  await page.route('**/jianshenkecheng/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -744,7 +745,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock booking APIs with conflict detection support
-  await page.route('**/kechengyuyue/**', async (route: any) => {
+  await page.route('**/kechengyuyue/**', async (route: Route) => {
     const url = route.request().url()
     const method = route.request().method()
 
@@ -818,7 +819,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock membership card APIs
-  await page.route('**/huiyuanka/**', async (route: any) => {
+  await page.route('**/huiyuanka/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -856,7 +857,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock membership purchase APIs
-  await page.route('**/huiyuankagoumai/**', async (route: any) => {
+  await page.route('**/huiyuankagoumai/**', async (route: Route) => {
     const method = route.request().method()
     
     if (method === 'POST') {
@@ -887,7 +888,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock private coach APIs
-  await page.route('**/jianshenjiaolian/**', async (route: any) => {
+  await page.route('**/jianshenjiaolian/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -931,7 +932,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock private coach booking APIs
-  await page.route('**/sijiaoyuyue/**', async (route: any) => {
+  await page.route('**/sijiaoyuyue/**', async (route: Route) => {
     const method = route.request().method()
     const url = route.request().url()
     
@@ -1001,7 +1002,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock payment APIs
-  await page.route('**/payment/**', async (route: any) => {
+  await page.route('**/payment/**', async (route: Route) => {
     const method = route.request().method()
     
     if (method === 'POST') {
@@ -1036,7 +1037,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock user center APIs
-  await page.route('**/yonghu/info**', async (route: any) => {
+  await page.route('**/yonghu/info**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -1056,7 +1057,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock user favorites APIs
-  await page.route('**/shoucang/**', async (route: any) => {
+  await page.route('**/shoucang/**', async (route: Route) => {
     const method = route.request().method()
     
     if (method === 'GET') {
@@ -1090,7 +1091,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock user messages APIs
-  await page.route('**/xiaoxi/**', async (route: any) => {
+  await page.route('**/xiaoxi/**', async (route: Route) => {
     const method = route.request().method()
 
     if (method === 'GET') {
@@ -1125,7 +1126,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock equipment management APIs (器材管理)
-  await page.route('**/jianshenqicai/**', async (route: any) => {
+  await page.route('**/jianshenqicai/**', async (route: Route) => {
     const method = route.request().method()
     const url = route.request().url()
 
@@ -1217,7 +1218,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock news APIs (新闻资讯)
-  await page.route('**/news/**', async (route: any) => {
+  await page.route('**/news/**', async (route: Route) => {
     const method = route.request().method()
     const url = route.request().url()
 
@@ -1311,7 +1312,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock chat/communication APIs (聊天交流)
-  await page.route('**/liaotian/**', async (route: any) => {
+  await page.route('**/liaotian/**', async (route: Route) => {
     const method = route.request().method()
     const url = route.request().url()
 
@@ -1385,7 +1386,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Alternative chat API endpoints
-  await page.route('**/chat/**', async (route: any) => {
+  await page.route('**/chat/**', async (route: Route) => {
     const method = route.request().method()
 
     if (method === 'GET') {
@@ -1431,7 +1432,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock file upload API
-  await page.route('**/file/upload', async (route: any) => {
+  await page.route('**/file/upload', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -1553,7 +1554,7 @@ export async function setupEnhancedMock(page: Page): Promise<void> {
 /**
  * 测试数据隔离设置
  */
-export async function setupTestDataIsolation(page: Page, testInfo: any): Promise<{
+export async function setupTestDataIsolation(page: Page, testInfo: TestInfo): Promise<{
   testId: string
   dataManager: any
   cleanup: () => Promise<void>
@@ -1576,7 +1577,7 @@ export async function setupTestDataIsolation(page: Page, testInfo: any): Promise
 /**
  * 性能监控设置
  */
-export async function setupPerformanceMonitoring(page: Page, testInfo: any): Promise<{
+export async function setupPerformanceMonitoring(page: Page, testInfo: TestInfo): Promise<{
   monitor: any
   startMonitoring: () => Promise<void>
   stopMonitoring: () => Promise<any>
@@ -1630,7 +1631,7 @@ export async function setupTestEnvironment(page: Page): Promise<void> {
   )
 
   // Handle any cookie dialogs that appear
-  page.on('dialog', async (dialog) => {
+  page.on('dialog', async (dialog: Dialog) => {
     console.log(`Dialog detected: ${dialog.message()}`)
     await dialog.accept()
   })

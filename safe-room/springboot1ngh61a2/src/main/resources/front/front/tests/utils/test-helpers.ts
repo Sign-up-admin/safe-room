@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
 import type { Component } from 'vue'
+import { Page, Route } from '@playwright/test'
 
 // Routes for testing
 const routes = [
@@ -308,9 +309,9 @@ export function mountWithRouteParams<T extends Component>(
 /**
  * Setup complete front-end mock environment for E2E tests
  */
-export async function setupCompleteFrontMock(page: any): Promise<void> {
+export async function setupCompleteFrontMock(page: Page): Promise<void> {
   // Mock login API
-  await page.route('**/yonghu/login', async (route: any) => {
+  await page.route('**/yonghu/login', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -323,7 +324,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock registration API
-  await page.route('**/yonghu/register', async (route: any) => {
+  await page.route('**/yonghu/register', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -335,7 +336,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock user session API
-  await page.route('**/yonghu/session', async (route: any) => {
+  await page.route('**/yonghu/session', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -352,7 +353,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock course APIs
-  await page.route('**/jianshenkecheng/**', async (route: any) => {
+  await page.route('**/jianshenkecheng/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -369,7 +370,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock booking APIs
-  await page.route('**/kechengyuyue/**', async (route: any) => {
+  await page.route('**/kechengyuyue/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -381,7 +382,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
   })
 
   // Mock file upload API
-  await page.route('**/file/upload', async (route: any) => {
+  await page.route('**/file/upload', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -398,7 +399,7 @@ export async function setupCompleteFrontMock(page: any): Promise<void> {
  */
 export async function mockCaptcha(page: any): Promise<void> {
   // Mock captcha verification - always return success
-  await page.route('**/captcha/**', async (route: any) => {
+  await page.route('**/captcha/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -410,7 +411,7 @@ export async function mockCaptcha(page: any): Promise<void> {
   })
 
   // Also mock any captcha images
-  await page.route('**/captcha/image/**', async (route: any) => {
+  await page.route('**/captcha/image/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'image/png',
@@ -423,7 +424,7 @@ export async function mockCaptcha(page: any): Promise<void> {
  * Simulate network delay
  */
 export async function simulateNetworkDelay(page: any, delayMs: number): Promise<void> {
-  await page.route('**/api/**', async (route: any) => {
+  await page.route('**/api/**', async (route: Route) => {
     await new Promise(resolve => setTimeout(resolve, delayMs))
     await route.continue()
   })
@@ -433,7 +434,7 @@ export async function simulateNetworkDelay(page: any, delayMs: number): Promise<
  * Simulate network error
  */
 export async function simulateNetworkError(page: any, statusCode = 500): Promise<void> {
-  await page.route('**/api/**', async (route: any) => {
+  await page.route('**/api/**', async (route: Route) => {
     await route.fulfill({
       status: statusCode,
       contentType: 'application/json',
@@ -453,7 +454,7 @@ export const mockFrontApi = setupCompleteFrontMock
 /**
  * Seed front-end session data
  */
-export async function seedFrontSession(page: any): Promise<void> {
+export async function seedFrontSession(page: Page): Promise<void> {
   // Set up authentication state
   await page.context().addCookies([{
     name: 'token',
@@ -463,7 +464,7 @@ export async function seedFrontSession(page: any): Promise<void> {
   }])
 
   // Mock session endpoint
-  await page.route('**/yonghu/session', async (route: any) => {
+  await page.route('**/yonghu/session', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -485,7 +486,7 @@ export async function seedFrontSession(page: any): Promise<void> {
  */
 export async function mockPaymentFlow(page: any): Promise<void> {
   // Mock payment-related APIs
-  await page.route('**/payment/**', async (route: any) => {
+  await page.route('**/payment/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -502,7 +503,7 @@ export async function mockPaymentFlow(page: any): Promise<void> {
   })
 
   // Mock membership purchase API
-  await page.route('**/huiyuanka/**', async (route: any) => {
+  await page.route('**/huiyuanka/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -514,7 +515,7 @@ export async function mockPaymentFlow(page: any): Promise<void> {
   })
 
   // Mock payment gateway (支付宝/微信等)
-  await page.route('**/pay/**', async (route: any) => {
+  await page.route('**/pay/**', async (route: Route) => {
     await route.fulfill({
       status: 200,
       contentType: 'text/html',
