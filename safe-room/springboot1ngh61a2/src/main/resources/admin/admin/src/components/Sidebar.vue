@@ -1,29 +1,23 @@
 <template>
   <div
-    class="absolute h-full w-0 will-change-auto max-md:bg-sidebar-light max-md:dark:bg-sidebar-dark md:relative md:w-[290px] max-md:z-40"
-    style="width: 290px"
+    class="sidebar-container"
+    :class="{ 'sidebar-mobile-open': isMobileOpen }"
   >
-    <div
-      class="relative w-full bg-sidebar-light dark:bg-sidebar-dark"
-      role="navigation"
-    >
+    <div class="sidebar-content" role="navigation">
       <!-- Sidebar Header -->
-      <div
-        class="pointer-events-none absolute start-0 top-0 w-full py-1.5 pe-2.5 md:py-3 ps-0.5 z-40"
-      >
+      <div class="sidebar-header">
         <div class="relative">
-          <div
-            class="absolute flex min-w-full items-end justify-between p-1 gap-0.5"
-          >
+          <div class="absolute flex min-w-full items-end justify-between p-1 gap-0.5">
             <!-- Copilot Logo Button -->
             <div class="flex w-0 items-center">
               <button
                 type="button"
-                class="text-foreground-800 fill-foreground-800 active:text-foreground-600 active:fill-foreground-600 dark:active:text-foreground-650 dark:active:fill-foreground-650 bg-transparent safe-hover:bg-black/5 active:bg-black/3 dark:safe-hover:bg-white/8 dark:active:bg-white/5 text-sm justify-center min-h-9 min-w-9 px-2.5 py-1 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 pointer-events-auto absolute start-1 top-1 flex items-center gap-2.5 pe-2.5 ps-2"
+                class="nav-button absolute start-1 top-1 flex items-center gap-2.5 pe-2.5 ps-2"
                 title="Go to Copilot home page"
                 role="link"
                 data-testid="sidebar-copilot-brand-button"
                 data-spatial-navigation-autofocus="false"
+                @click="navigateToHome"
               >
                 <svg
                   viewBox="0 0 32 32"
@@ -518,13 +512,246 @@
 </template>
 
 <script setup lang="ts">
-// Sidebar component - handles navigation and conversations
-// This component manages:
-// - Sidebar toggle and navigation
-// - Conversation list
-// - User authentication
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+// 响应式状态
+const isMobileOpen = ref(false)
+const router = useRouter()
+
+// 计算属性
+const isLoggedIn = computed(() => {
+  // TODO: 从userStore获取登录状态
+  return false
+})
+
+// 方法
+const toggleSidebar = () => {
+  isMobileOpen.value = !isMobileOpen.value
+}
+
+const navigateToHome = () => {
+  router.push('/home')
+}
+
+const handleNewChat = () => {
+  // TODO: 实现新对话逻辑
+  console.log('New chat started')
+}
+
+const handleSignIn = () => {
+  router.push('/login')
+}
+
+// 导航菜单配置
+const navigationItems = [
+  {
+    id: 'discover',
+    label: 'Discover',
+    icon: 'search',
+    active: false
+  },
+  {
+    id: 'imagine',
+    label: 'Imagine',
+    icon: 'image',
+    active: false,
+    badge: 'New'
+  },
+  {
+    id: 'library',
+    label: 'Library',
+    icon: 'book',
+    active: false
+  },
+  {
+    id: 'labs',
+    label: 'Labs',
+    icon: 'flask',
+    active: false
+  }
+]
+
+// 模拟对话列表
+const conversations = [
+  {
+    id: '1',
+    title: 'Creating a Custom Image Concept',
+    timestamp: 'Today',
+    active: false
+  }
+]
 </script>
 
 <style scoped>
-/* Sidebar-specific styles */
+.sidebar-container {
+  position: absolute;
+  height: 100%;
+  width: 0;
+  will-change: auto;
+  transition: width 0.3s ease;
+}
+
+.sidebar-container.md\:relative {
+  position: relative;
+  width: 290px;
+}
+
+.sidebar-container.max-md\:z-40 {
+  z-index: 40;
+}
+
+.sidebar-content {
+  position: relative;
+  width: 100%;
+  background: var(--sidebar-bg, #f8f9fa);
+  transition: background-color 0.2s ease;
+}
+
+.dark .sidebar-content {
+  background: var(--sidebar-bg-dark, #1a1a1a);
+}
+
+/* Mobile responsive styles */
+@media (max-width: 767px) {
+  .sidebar-container.sidebar-mobile-open {
+    width: 290px;
+  }
+
+  .sidebar-container {
+    background: var(--sidebar-bg, #f8f9fa);
+  }
+
+  .dark .sidebar-container {
+    background: var(--sidebar-bg-dark, #1a1a1a);
+  }
+}
+
+/* Header section styles */
+.sidebar-header {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.375rem 0.625rem 0.375rem 0.125rem;
+  z-index: 40;
+}
+
+@media (min-width: 768px) {
+  .sidebar-header {
+    padding-top: 0.75rem;
+  }
+}
+
+.sidebar-header .relative {
+  position: relative;
+}
+
+/* Navigation button styles */
+.nav-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  min-width: 2.25rem;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .nav-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-button.w-full {
+  width: 100%;
+  flex-direction: column;
+  padding: 0.5rem;
+  justify-content: flex-start;
+}
+
+/* Conversation styles */
+.conversation-item {
+  position: relative;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  padding: 0.125rem 0.625rem;
+  transition: background-color 0.2s ease;
+}
+
+.conversation-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .conversation-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.conversation-item.active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.dark .conversation-item.active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Footer styles */
+.sidebar-footer {
+  pointer-events: none;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  background: var(--sidebar-bg, #f8f9fa);
+  padding: 0.375rem 0;
+  will-change: transform;
+  z-index: 30;
+}
+
+.dark .sidebar-footer {
+  background: var(--sidebar-bg-dark, #1a1a1a);
+}
+
+.sidebar-footer::before {
+  content: '';
+  position: absolute;
+  top: -2.5rem;
+  height: 2.5rem;
+  width: 100%;
+  background: linear-gradient(to bottom, transparent, var(--sidebar-bg, #f8f9fa));
+  opacity: 0.9;
+}
+
+.dark .sidebar-footer::before {
+  background: linear-gradient(to bottom, transparent, var(--sidebar-bg-dark, #1a1a1a));
+}
+
+.footer-button {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 2.5rem;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .footer-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
 </style>

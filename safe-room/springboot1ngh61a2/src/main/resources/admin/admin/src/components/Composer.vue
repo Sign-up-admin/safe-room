@@ -3,103 +3,65 @@
   <div
     data-testid="composer"
     class="pointer-events-none absolute bottom-0 flex sm:bottom-1/2 sm:translate-y-1/2 sm:pt-36 z-10 w-full max-sm:w-full"
+    role="region"
+    aria-label="Message composer"
+    aria-describedby="composer-description"
   >
+    <!-- Hidden description for screen readers -->
+    <div id="composer-description" class="sr-only">
+      Message input area with file upload, mode selection, and quick action buttons
+    </div>
+
     <input
+      ref="fileInputRef"
       accept=".jpg,.jpeg,.png,.webp,.svg,.txt,.pdf,.docx,.xlsx,.pptx,.json,.xml,.csv,.md,.js,.css,.html,.htm,.xml"
       class="hidden"
       aria-hidden="true"
       type="file"
+      multiple
+      @change="handleFileUpload"
     />
 
     <!-- Main Composer Container -->
     <div
-      class="relative flex w-full flex-col-reverse items-center px-3 sm:flex-col sm:mb-0 mb-4"
-      style="will-change: auto; opacity: 1; transform: none"
+      class="relative flex w-full flex-col-reverse items-center px-3 sm:flex-col sm:mb-0 mb-4 composer-main-container"
     >
       <!-- Input Container -->
       <div
-        class="relative max-h-full min-h-composer min-w-16 max-w-chat rounded-5xl"
-        style="transform: none; transform-origin: 50% 50% 0px; opacity: 1"
+        class="relative max-h-full min-h-composer min-w-16 max-w-chat rounded-5xl composer-input-container"
       >
-        <!-- Shadow Container -->
-        <div
-          class="absolute inset-0"
-          style="
-            border-radius: 32px;
-            box-shadow: rgba(248, 188, 140, 0.18) 0px 16px 48px 0px;
-            transform: none;
-            transform-origin: 50% 50% 0px;
-            opacity: 1;
-          "
-        ></div>
-
         <!-- Main Input Background -->
         <div
-          class="relative shadow-tinted-xl backdrop-blur-2xl backdrop-saturate-200 bg-accent-100/60 dark:bg-muted-200/50"
-          style="
-            border-radius: 32px;
-            box-shadow: rgba(0, 0, 0, 0.08) 0px 16px 24px 0px;
-            transform: none;
-            transform-origin: 50% 50% 0px;
-            opacity: 1;
-          "
+          class="relative shadow-tinted-xl backdrop-blur-2xl backdrop-saturate-200 bg-accent-100/60 dark:bg-muted-200/50 composer-input-background composer-shadow-effect"
         >
           <div
-            class="pointer-events-auto relative flex flex-col overflow-hidden contrast-more:border-2"
+            class="pointer-events-auto relative flex flex-col overflow-hidden contrast-more:border-2 composer-content-container"
             data-testid="composer-content"
-            style="
-              border-radius: 32px;
-              box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset;
-              transform: none;
-              transform-origin: 50% 50% 0px;
-              opacity: 1;
-            "
           >
             <!-- Gradient Background -->
             <div
-              class="relative max-h-full w-expanded-composer max-w-chat bg-gradient-to-b p-1.5 to-background-400/8 from-background-400/5 dark:from-background-200/65 dark:to-background-200/65"
-              style="
-                border-radius: 32px;
-                box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset;
-                transform: none;
-                transform-origin: 50% 50% 0px;
-              "
+              class="relative max-h-full w-expanded-composer max-w-chat bg-gradient-to-b p-1.5 to-background-400/8 from-background-400/5 dark:from-background-200/65 dark:to-background-200/65 composer-gradient-background"
             >
               <!-- Content Background -->
               <div
-                class="bg-white/90 dark:bg-background-100/45"
-                style="
-                  border-radius: 26px;
-                  transform: none;
-                  transform-origin: 50% 50% 0px;
-                "
+                class="bg-white/90 dark:bg-background-100/45 composer-content-background"
               >
                 <div
-                  class="relative flex grow flex-col overflow-hidden before:absolute before:inset-0 before:rounded-3xl before:border-2 before:border-stroke-350 w-auto rounded-3xl contrast-more:border-2 before:opacity-0"
-                  style="transform: none; transform-origin: 50% 50% 0px"
+                  class="relative flex grow flex-col overflow-hidden before:absolute before:inset-0 before:rounded-3xl before:border-2 before:border-stroke-350 w-auto rounded-3xl contrast-more:border-2 before:opacity-0 composer-input-wrapper"
                 >
-                  <!-- Placeholder for expandable content -->
-                  <div
-                    class="w-full h-0"
-                    style="transform: none; transform-origin: 50% 50% 0px"
-                  ></div>
 
                   <!-- Input Area -->
                   <div
-                    class="flex items-end min-h-0 w-auto grow mt-1"
-                    style="transform: none; transform-origin: 50% 50% 0px"
+                    class="flex items-end min-h-0 w-auto grow mt-1 composer-input-area"
                   >
                     <div
-                      class="relative grow overflow-hidden"
-                      style="transform: none; transform-origin: 50% 50% 0px"
+                      class="relative grow overflow-hidden composer-input-relative"
                     >
                       <div
-                        class="relative flex size-full cursor-text overflow-hidden text-black dark:text-white"
-                        style="transform: none; transform-origin: 50% 50% 0px"
+                        class="relative flex size-full cursor-text overflow-hidden text-black dark:text-white composer-input-cursor"
                       >
                         <div
-                          class="flex grow flex-col gap-4 py-user-input"
-                          style="transform: none; transform-origin: 50% 50% 0px"
+                          class="flex grow flex-col gap-4 py-user-input composer-input-flex"
                         >
                           <!-- Scrollable Input Container -->
                           <div
@@ -112,15 +74,25 @@
                                 >Message Copilot</label
                               >
                               <textarea
-                                class="font-ligatures-none inline-block h-user-input w-full resize-none overflow-y-hidden whitespace-pre-wrap bg-transparent align-top outline-none placeholder:text-foreground-450 dark:text-white dark:placeholder:text-foreground-600 text-base-dense"
-                                placeholder="Message Copilot"
+                                ref="textareaRef"
+                                v-model="inputValue"
+                                class="font-ligatures-none inline-block h-user-input w-full resize-none overflow-y-hidden whitespace-pre-wrap bg-transparent align-top outline-none placeholder:text-foreground-450 dark:text-white dark:placeholder:text-foreground-600 text-base-dense composer-textarea"
+                                :placeholder="props.placeholder"
+                                :disabled="props.disabled"
+                                :maxlength="props.maxLength"
+                                :aria-invalid="isOverLimit"
+                                :aria-describedby="showError && errorMessage ? 'composer-error' : undefined"
                                 id="userInput"
                                 role="textbox"
                                 aria-autocomplete="both"
+                                aria-multiline="true"
                                 spellcheck="false"
                                 enterkeyhint="enter"
                                 data-testid="composer-input"
-                                style="height: 22px !important"
+                                @input="handleInput"
+                                @keydown="handleKeydown"
+                                @compositionstart="isComposing = true"
+                                @compositionend="isComposing = false"
                               ></textarea>
                             </div>
                           </div>
@@ -128,34 +100,47 @@
                       </div>
                     </div>
 
-                    <!-- Bottom Controls Spacer -->
+                    <!-- Error Message -->
                     <div
-                      class="relative bottom-0 my-1.5 flex h-9 items-center w-0"
-                    ></div>
+                      v-if="showError && errorMessage"
+                      v-memo="[errorMessage]"
+                      id="composer-error"
+                      class="composer-error-message"
+                      role="alert"
+                      aria-live="polite"
+                    >
+                      {{ errorMessage }}
+                    </div>
+
+                    <!-- Character Counter -->
+                    <div
+                      v-if="props.maxLength && isNearLimit"
+                      v-memo="[characterCount, props.maxLength]"
+                      class="composer-char-counter"
+                    >
+                      {{ characterCount }}/{{ props.maxLength }}
+                    </div>
                   </div>
                 </div>
 
                 <!-- Bottom Controls -->
                 <div
-                  class="relative bottom-0 flex justify-between pb-0.5 pe-2.5 ps-1.5"
-                  style="transform: none; transform-origin: 50% 50% 0px"
+                  class="relative bottom-0 flex justify-between pb-0.5 pe-2.5 ps-1.5 composer-bottom-controls"
                 >
                   <!-- Left Controls -->
                   <div class="flex gap-1">
                     <!-- Home Button -->
                     <div
-                      class="relative shrink-0 my-1 h-9 overflow-hidden"
-                      style="transform: none; transform-origin: 50% 50% 0px"
+                      class="relative shrink-0 my-1 h-9 overflow-hidden composer-home-button"
                     >
                       <button
                         type="button"
-                        class="absolute flex items-center justify-center rounded-xl size-9 p-1 text-foreground-800 fill-foreground-800 active:text-foreground-600 active:fill-foreground-600 dark:active:text-foreground-650 dark:active:fill-foreground-650 bg-transparent safe-hover:bg-black/5 active:bg-black/3 dark:safe-hover:bg-black/30 dark:active:bg-black/20 disabled:active:bg-transparent disabled:active:bg-none"
+                        class="absolute flex items-center justify-center rounded-xl size-9 p-1 text-foreground-800 fill-foreground-800 active:text-foreground-600 active:fill-foreground-600 dark:active:text-foreground-650 dark:active:fill-foreground-650 bg-transparent safe-hover:bg-black/5 active:bg-black/3 dark:safe-hover:bg-black/30 dark:active:bg-black/20 disabled:active:bg-transparent disabled:active:bg-none composer-home-button-element"
                         disabled
                         aria-hidden="true"
                         aria-label="Go to home"
                         title="Go to home"
                         data-testid="home-button"
-                        style="transform: none; transform-origin: 50% 50% 0px"
                       >
                         <svg
                           viewBox="0 0 32 32"
@@ -308,15 +293,10 @@
                           title="Open"
                           data-testid="composer-create-button"
                           data-spatial-navigation-autofocus="false"
+                          @click="fileInputRef?.click()"
                         >
                           <div
-                            class="bg-current forced-color-adjust-none size-6"
-                            style="
-                              mask-image: url(&quot;/static/cmc/assets/add-BTcFT5ig.svg&quot;);
-                              mask-repeat: no-repeat;
-                              mask-position: center center;
-                              mask-size: contain;
-                            "
+                            class="bg-current forced-color-adjust-none size-6 composer-add-icon"
                           ></div>
                         </button>
                       </div>
@@ -330,6 +310,7 @@
                           title="Smart (GPT-5)"
                           data-testid="composer-chat-mode-smart-button"
                           data-spatial-navigation-autofocus="false"
+                          @click="handleModeChange('smart')"
                         >
                           <span elementtiming="composer-input" class="text-sm"
                             >Smart (GPT-5)</span
@@ -349,11 +330,10 @@
 
                       <!-- Hidden Dialog Placeholder -->
                       <dialog
-                        class="fixed inset-0 m-auto rounded-4xl border border-white/10 bg-background-150 text-foreground-800 shadow-xl dark:bg-background-250 backdrop:bg-background-850/30 dark:backdrop:bg-background-150/70"
+                        class="fixed inset-0 m-auto rounded-4xl border border-white/10 bg-background-150 text-foreground-800 shadow-xl dark:bg-background-250 backdrop:bg-background-850/30 dark:backdrop:bg-background-150/70 composer-hidden-dialog"
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="dialog-placeholder"
-                        style="opacity: 0"
                       ></dialog>
                     </div>
                   </div>
@@ -402,89 +382,34 @@
 
       <!-- Starter Prompts -->
       <div
-        class="flex h-[150px] w-full max-w-chat flex-none items-end px-2 sm:flex-initial sm:items-start z-20"
-        style="opacity: 1"
+        class="flex h-[150px] w-full max-w-chat flex-none items-end px-2 sm:flex-initial sm:items-start z-20 composer-starter-prompts"
+        role="region"
+        aria-label="Quick action prompts"
       >
         <div
           class="mx-auto flex w-full flex-col gap-3 px-2 pointer-events-auto sm:mt-8"
         >
           <div
             role="list"
-            class="flex w-full gap-2 px-1 py-1 sm:flex-wrap sm:py-4 scrollbar-container max-h-[110px] overflow-x-auto overflow-y-hidden sm:justify-start"
-            style="opacity: 1"
+            class="flex w-full gap-2 px-1 py-1 sm:flex-wrap sm:py-4 scrollbar-container max-h-[110px] overflow-x-auto overflow-y-hidden sm:justify-start composer-prompts-list"
+            v-memo="[inputValue.length > 0]"
           >
             <!-- Starter Prompt Buttons -->
             <button
+              v-for="(prompt, index) in starterPrompts"
+              :key="prompt.text"
               type="button"
               class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Create an image 1 of 8"
-              data-testid="starter-prompt-create-an-image"
-              data-item-id="create-an-image"
+              role="button"
+              tabindex="0"
+              :aria-label="prompt.label"
+              :data-testid="`starter-prompt-${prompt.text.toLowerCase().replace(/\s+/g, '-')}`"
+              :data-item-id="prompt.text.toLowerCase().replace(/\s+/g, '-')"
+              @click="handleStarterPrompt(prompt.text)"
+              @keydown.enter="handleStarterPrompt(prompt.text)"
+              @keydown.space.prevent="handleStarterPrompt(prompt.text)"
             >
-              <span class="px-1 text-sm">Create an image</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Recommend a product 2 of 8"
-              data-testid="starter-prompt-recommend-a-product"
-              data-item-id="recommend-a-product"
-            >
-              <span class="px-1 text-sm">Recommend a product</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Improve writing 3 of 8"
-              data-testid="starter-prompt-improve-writing"
-              data-item-id="improve-writing"
-            >
-              <span class="px-1 text-sm">Improve writing</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Write a first draft 4 of 8"
-              data-testid="starter-prompt-write-a-first-draft"
-              data-item-id="write-a-first-draft"
-            >
-              <span class="px-1 text-sm">Write a first draft</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Say it with care 5 of 8"
-              data-testid="starter-prompt-say-it-with-care"
-              data-item-id="say-it-with-care"
-            >
-              <span class="px-1 text-sm">Say it with care</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Design a logo 6 of 8"
-              data-testid="starter-prompt-design-a-logo"
-              data-item-id="design-a-logo"
-            >
-              <span class="px-1 text-sm">Design a logo</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Get advice 7 of 8"
-              data-testid="starter-prompt-get-advice"
-              data-item-id="get-advice"
-            >
-              <span class="px-1 text-sm">Get advice</span>
-            </button>
-            <button
-              type="button"
-              class="shadow-none dark:shadow-none relative flex items-center text-sm min-h-10 px-3 py-2 gap-x-2 rounded-xl after:rounded-xl after:absolute after:inset-0 after:pointer-events-none after:border after:border-transparent after:contrast-more:border-2 outline-2 outline-offset-1 focus-visible:z-[1] focus-visible:outline focus-visible:outline-stroke-900 text-foreground-550 active:text-foreground-350 dark:text-foreground-600 active:dark:text-foreground-550 bg-white/30 safe-hover:bg-black/3 active:bg-black/2 dark:bg-black/3 dark:safe-hover:bg-white/5 dark:active:bg-white/3 border-[1px] border-black/8 dark:border-white/8 min-w-fit"
-              aria-label="Starter prompt Draft a text 8 of 8"
-              data-testid="starter-prompt-draft-a-text"
-              data-item-id="draft-a-text"
-            >
-              <span class="px-1 text-sm">Draft a text</span>
+              <span class="px-1 text-sm">{{ prompt.text }}</span>
             </button>
           </div>
         </div>
@@ -494,15 +419,348 @@
 </template>
 
 <script setup lang="ts">
-// Composer component - handles user input and starter prompts
-// This component manages:
-// - Text input area with auto-resize
-// - File upload functionality
-// - Starter prompt buttons
-// - Audio input toggle
-// - Mode selection (Smart, etc.)
+import { ref, nextTick, computed, watch, onMounted } from 'vue'
+
+// Debounce utility function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
+
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
+
+// Props
+interface Props {
+  modelValue?: string
+  placeholder?: string
+  disabled?: boolean
+  maxLength?: number
+  autoFocus?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: '',
+  placeholder: 'Message Copilot',
+  disabled: false,
+  maxLength: 10000,
+  autoFocus: false
+})
+
+// Emits
+const emit = defineEmits<{
+  'update:modelValue': [value: string]
+  'submit': [value: string]
+  'file-upload': [files: FileList]
+  'mode-change': [mode: string]
+}>()
+
+// Reactive data
+const inputValue = ref(props.modelValue)
+const isComposing = ref(false)
+const fileInputRef = ref<HTMLInputElement>()
+const textareaRef = ref<HTMLTextAreaElement>()
+
+// Error handling
+const errorMessage = ref('')
+const isOverLimit = ref(false)
+const showError = ref(false)
+
+// Computed properties
+const canSubmit = computed(() => {
+  return inputValue.value.trim().length > 0 && !props.disabled && !isOverLimit.value
+})
+
+const hasContent = computed(() => {
+  return inputValue.value.trim().length > 0
+})
+
+const characterCount = computed(() => {
+  return inputValue.value.length
+})
+
+const isNearLimit = computed(() => {
+  return props.maxLength && characterCount.value > props.maxLength * 0.9
+})
+
+// Memoized prompts array to avoid recreation
+const starterPrompts = computed(() => [
+  { text: 'Create an image', label: 'Create an image - starter prompt 1 of 8' },
+  { text: 'Recommend a product', label: 'Recommend a product - starter prompt 2 of 8' },
+  { text: 'Improve writing', label: 'Improve writing - starter prompt 3 of 8' },
+  { text: 'Write a first draft', label: 'Write a first draft - starter prompt 4 of 8' },
+  { text: 'Say it with care', label: 'Say it with care - starter prompt 5 of 8' },
+  { text: 'Design a logo', label: 'Design a logo - starter prompt 6 of 8' },
+  { text: 'Get advice', label: 'Get advice - starter prompt 7 of 8' },
+  { text: 'Draft a text', label: 'Draft a text - starter prompt 8 of 8' }
+])
+
+// Methods
+const debouncedAdjustHeight = debounce(adjustTextareaHeight, 100)
+
+const validateInput = () => {
+  const value = inputValue.value
+  isOverLimit.value = props.maxLength ? value.length > props.maxLength : false
+
+  if (isOverLimit.value) {
+    errorMessage.value = `输入内容超过最大长度限制 ${props.maxLength} 个字符`
+    showError.value = true
+  } else if (isNearLimit.value) {
+    errorMessage.value = `即将达到最大长度限制 (${characterCount.value}/${props.maxLength})`
+    showError.value = true
+  } else {
+    errorMessage.value = ''
+    showError.value = false
+  }
+}
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLTextAreaElement
+  const newValue = target.value
+
+  // Prevent input if over limit
+  if (props.maxLength && newValue.length > props.maxLength) {
+    inputValue.value = newValue.substring(0, props.maxLength)
+    target.value = inputValue.value
+  } else {
+    inputValue.value = newValue
+  }
+
+  emit('update:modelValue', inputValue.value)
+  validateInput()
+  debouncedAdjustHeight()
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+  // Only prevent default and submit if Enter is pressed without Shift and not composing
+  if (event.key === 'Enter' && !event.shiftKey && !isComposing.value && canSubmit.value) {
+    event.preventDefault()
+    handleSubmit()
+  }
+}
+
+const handleSubmit = () => {
+  if (!canSubmit.value) return
+
+  const value = inputValue.value.trim()
+  emit('submit', value)
+
+  // Clear input after submit
+  inputValue.value = ''
+  emit('update:modelValue', '')
+  adjustTextareaHeight()
+}
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0) {
+    emit('file-upload', target.files)
+  }
+  // Reset file input
+  target.value = ''
+}
+
+const handleModeChange = (mode: string) => {
+  emit('mode-change', mode)
+}
+
+const handleStarterPrompt = (promptText: string) => {
+  inputValue.value = promptText
+  emit('update:modelValue', promptText)
+  adjustTextareaHeight()
+
+  // Focus textarea after setting value
+  nextTick(() => {
+    textareaRef.value?.focus()
+  })
+}
+
+const adjustTextareaHeight = () => {
+  const textarea = textareaRef.value
+  if (textarea) {
+    // Store current scroll position
+    const scrollTop = textarea.scrollTop
+
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto'
+
+    // Calculate new height with constraints
+    const minHeight = 22 // Minimum height in pixels
+    const maxHeight = 200 // Maximum height in pixels
+    const newHeight = Math.max(minHeight, Math.min(textarea.scrollHeight, maxHeight))
+
+    textarea.style.height = newHeight + 'px'
+
+    // Restore scroll position if it was scrolled
+    textarea.scrollTop = scrollTop
+  }
+}
+
+// Watch for external model value changes
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== inputValue.value) {
+    inputValue.value = newValue
+    nextTick(() => adjustTextareaHeight())
+  }
+})
+
+// Auto focus on mount if requested
+onMounted(() => {
+  if (props.autoFocus) {
+    nextTick(() => {
+      textareaRef.value?.focus()
+    })
+  }
+})
+
+// Expose methods for parent components
+defineExpose({
+  focus: () => textareaRef.value?.focus(),
+  clear: () => {
+    inputValue.value = ''
+    emit('update:modelValue', '')
+    adjustTextareaHeight()
+  }
+})
 </script>
 
 <style scoped>
 /* Composer-specific styles */
+
+/* Main container styles */
+.composer-main-container {
+  will-change: auto;
+  opacity: 1;
+  transform: none;
+}
+
+.composer-input-container {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+  opacity: 1;
+}
+
+.composer-input-background {
+  border-radius: 32px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 16px 24px 0px;
+  transform: none;
+  transform-origin: 50% 50% 0px;
+  opacity: 1;
+}
+
+.composer-shadow-effect {
+  box-shadow: rgba(248, 188, 140, 0.18) 0px 16px 48px 0px, rgba(0, 0, 0, 0.08) 0px 16px 24px 0px;
+}
+
+.composer-content-container {
+  border-radius: 32px;
+  box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset;
+  transform: none;
+  transform-origin: 50% 50% 0px;
+  opacity: 1;
+}
+
+.composer-gradient-background {
+  border-radius: 32px;
+  box-shadow: rgb(255, 255, 255) 0px 0px 0px 1px inset;
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-content-background {
+  border-radius: 26px;
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-input-wrapper {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-placeholder {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-input-area {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-input-relative {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-input-cursor {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-input-flex {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+
+.composer-bottom-controls {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-home-button {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-home-button-element {
+  transform: none;
+  transform-origin: 50% 50% 0px;
+}
+
+.composer-add-icon {
+  mask-image: url("/static/cmc/assets/add-BTcFT5ig.svg");
+  mask-repeat: no-repeat;
+  mask-position: center center;
+  mask-size: contain;
+}
+
+.composer-hidden-dialog {
+  opacity: 0;
+}
+
+.composer-starter-prompts {
+  opacity: 1;
+}
+
+.composer-prompts-list {
+  opacity: 1;
+}
+
+/* Error and validation styles */
+.composer-error-message {
+  @apply mt-2 px-3 py-1 text-xs text-red-600 bg-red-50 border border-red-200 rounded-md dark:text-red-400 dark:bg-red-950 dark:border-red-800;
+}
+
+.composer-char-counter {
+  @apply mt-1 px-3 text-xs text-foreground-500 text-right;
+}
+
+/* Accessibility styles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 </style>

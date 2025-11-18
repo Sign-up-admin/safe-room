@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -51,8 +56,8 @@ export default defineConfig({
   },
 
   /* Global setup and teardown */
-  globalSetup: require.resolve('./tests/e2e/global-setup'),
-  globalTeardown: require.resolve('./tests/e2e/global-teardown'),
+  globalSetup: resolve(__dirname, './tests/e2e/global-setup.ts'),
+  globalTeardown: resolve(__dirname, './tests/e2e/global-teardown.ts'),
 
   /* Test timeout */
   timeout: 60 * 1000,

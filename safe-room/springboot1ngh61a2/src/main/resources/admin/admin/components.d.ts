@@ -14,6 +14,10 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    HomeActions: typeof import('./src/components/home/HomeActions.vue')['default']
+    HomeGreeting: typeof import('./src/components/home/HomeGreeting.vue')['default']
+    HomeHeader: typeof import('./src/components/home/HomeHeader.vue')['default']
+    HomeLayout: typeof import('./src/components/home/HomeLayout.vue')['default']
     Launcher: typeof import('./src/components/Launcher.vue')['default']
     MainContent: typeof import('./src/components/MainContent.vue')['default']
     ModernButton: typeof import('./src/components/common/ModernButton.vue')['default']
@@ -21,5 +25,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
+    SidebarConversations: typeof import('./src/components/sidebar/SidebarConversations.vue')['default']
+    SidebarHeader: typeof import('./src/components/sidebar/SidebarHeader.vue')['default']
+    SidebarNavigation: typeof import('./src/components/sidebar/SidebarNavigation.vue')['default']
   }
 }
