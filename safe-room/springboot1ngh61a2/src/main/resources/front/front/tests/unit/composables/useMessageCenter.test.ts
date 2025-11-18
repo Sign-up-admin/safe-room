@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useMessageCenter } from '@/composables/useMessageCenter'
-import type { MessageEntity } from '@/composables/useMessageCenter'
+import { useMessageCenter, type MessageEntity } from '@/composables/useMessageCenter'
 import { getModuleService } from '@/services/crud'
 import { cleanupTest } from '../../utils/test-helpers'
 

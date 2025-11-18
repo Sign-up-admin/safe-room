@@ -68,19 +68,18 @@ export class SmartWait {
   /**
    * 等待网络空闲（改进版本）
    */
-  async waitForNetworkIdle(options: {
+  waitForNetworkIdle(options: {
     timeout?: number;
     idleTime?: number;
     maxInflightRequests?: number;
   } = {}): Promise<void> {
     const {
       timeout = 30000,
-      idleTime = 500,
-      maxInflightRequests = 0
+      idleTime = 500
     } = options;
 
     return new Promise((resolve, reject) => {
-      let timeoutId: NodeJS.Timeout;
+      const timeoutId: NodeJS.Timeout;
       let lastActivity = Date.now();
 
       const cleanup = () => {

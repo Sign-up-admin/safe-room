@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { ElDialog, ElButton, ElCheckbox } from 'element-plus'
 import CookieConsent from '@/components/CookieConsent.vue'
 
 // Mock localStorage
@@ -26,9 +25,15 @@ describe('CookieConsent.vue', () => {
 
     // Reset localStorage mocks
     localStorageMock.getItem.mockReturnValue(null)
-    localStorageMock.setItem.mockImplementation(() => {})
-    localStorageMock.removeItem.mockImplementation(() => {})
-    localStorageMock.clear.mockImplementation(() => {})
+    localStorageMock.setItem.mockImplementation(() => {
+      // Mock implementation for setItem
+    })
+    localStorageMock.removeItem.mockImplementation(() => {
+      // Mock implementation for removeItem
+    })
+    localStorageMock.clear.mockImplementation(() => {
+      // Mock implementation for clear
+    })
 
     wrapper = await mount(CookieConsent, {
       global: {
@@ -167,7 +172,9 @@ describe('CookieConsent.vue', () => {
   })
 
   it('applies cookie settings correctly', async () => {
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {
+      // Mock implementation for console.log
+    })
 
     const vm = wrapper.vm
     vm.cookieSettings.analytics = true
@@ -192,7 +199,9 @@ describe('CookieConsent.vue', () => {
   })
 
   it('handles invalid JSON in saved settings', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
+      // Mock implementation for console.error
+    })
 
     localStorageMock.getItem
       .mockReturnValueOnce('accepted')

@@ -30,7 +30,7 @@ try {
   const testCommand = `npm run test:new-features`
   console.log(`🔧 执行命令: ${testCommand}\n`)
 
-  const result = execSync(testCommand, {
+  execSync(testCommand, {
     cwd: path.join(__dirname, '..'),
     stdio: 'inherit',
     encoding: 'utf8'

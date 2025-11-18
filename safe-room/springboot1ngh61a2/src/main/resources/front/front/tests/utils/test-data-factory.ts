@@ -7,6 +7,7 @@
 
 import { faker } from '@faker-js/faker'
 import type { User, Course, Booking, PaymentRequest, PaymentResponse } from './mock-data'
+import { initializeFrontendMockData } from './mock-data'
 import {
   registerDataFactory,
   registerEntityFactory,
@@ -16,7 +17,6 @@ import {
   validateData,
   registerDataValidator
 } from '../../../../../../../tests/shared/factory-registry'
-import { initializeFrontendMockData } from './mock-data'
 
 // ========== Builder模式基础类 ==========
 

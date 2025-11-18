@@ -6,7 +6,7 @@ import path from 'path'
  * Global teardown for Playwright tests
  * Cleans up test resources and generates reports
  */
-async function globalTeardown(config: FullConfig) {
+async function globalTeardown(_config: FullConfig) {
   console.log('🧹 Starting Front-end E2E Test Global Teardown...')
 
   try {
@@ -35,7 +35,7 @@ async function globalTeardown(config: FullConfig) {
 /**
  * Generate test summary report
  */
-async function generateTestSummary() {
+function generateTestSummary() {
   const resultsDir = path.join(process.cwd(), 'test-results')
   const summaryPath = path.join(resultsDir, 'test-summary.json')
 
@@ -70,7 +70,7 @@ async function generateTestSummary() {
 /**
  * Archive old test results
  */
-async function archiveOldResults() {
+function archiveOldResults() {
   const resultsDir = path.join(process.cwd(), 'test-results')
   const archiveDir = path.join(resultsDir, 'archive')
 

@@ -21,10 +21,7 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => {
-            // 将 SVG 渐变元素标记为自定义元素，避免 Vue 将其解析为组件
-            return /^(radialgradient|lineargradient|radialGradient|linearGradient)$/i.test(tag)
-          },
+          isCustomElement: (tag) => /^(radialgradient|lineargradient|radialGradient|linearGradient)$/i.test(tag),
         },
       },
     }),

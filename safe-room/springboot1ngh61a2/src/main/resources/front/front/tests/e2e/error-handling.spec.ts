@@ -4,12 +4,15 @@ import { FrontLoginPage, FrontRegisterPage } from '../../utils/page-objects/fron
 import { CourseListPage, CourseDetailPage, CourseBookingPage } from '../../utils/page-objects/course-page'
 import { MembershipPage } from '../../utils/page-objects/membership-page'
 
-test.describe('错误处理和边界情况测试'设置错误处理测试环境')
+test.describe('错误处理和边界情况测试', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupTestEnvironment(page)
+    logTestStep('设置错误处理测试环境')
   })
 
   test.describe('网络错误处理', () => {
     test('应正确处理登录时的网络超�?, async ({ page }) => {
-      logTestStep('开始测试登录网络超�?)
+      logTestStep('开始测试登录网络超时')
 
       // 模拟网络超时
       await page.route('**/yonghu/login', async (route) => {

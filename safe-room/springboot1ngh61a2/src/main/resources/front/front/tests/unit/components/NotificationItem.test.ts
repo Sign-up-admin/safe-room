@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NotificationItem from '@/components/NotificationItem.vue'
 import { NotificationType, NotificationStatus, NotificationChannel } from '@/types/notification'

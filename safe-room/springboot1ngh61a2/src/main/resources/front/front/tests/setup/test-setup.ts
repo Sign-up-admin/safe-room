@@ -1,12 +1,14 @@
 import { beforeAll, afterAll, vi } from 'vitest'
+import type { Component } from 'vue'
+import type { MountingOptions } from '@vue/test-utils'
 
 // Type declarations for global test helpers
 declare global {
   function flushPromises(): Promise<void>
-  function createWrapper(component: any, options?: any): Promise<any>
-  function createMockStore(initialState?: any): any
+  function createWrapper(component: Component, options?: MountingOptions<any>): Promise<any>
+  function createMockStore(initialState?: Record<string, any>): any
   function createMockRouter(): any
-  function createMockService(methods?: any): any
+  function createMockService(methods?: Record<string, any>): any
   function mockLocalStorage(data?: Record<string, string>): Record<string, string>
   function mockSessionStorage(data?: Record<string, string>): Record<string, string>
   function cleanupTestState(): void
@@ -409,7 +411,7 @@ vi.mock('axios', () => ({
 // Mock file and blob APIs
 Object.defineProperty(window, 'File', {
   value: class MockFile {
-    constructor(parts: any[], filename: string, options: any = {}) {
+    constructor(parts: unknown[], filename: string, options: { size?: number; type?: string; lastModified?: number } = {}) {
       this.name = filename
       this.size = options.size || 0
       this.type = options.type || ''
@@ -425,8 +427,8 @@ Object.defineProperty(window, 'File', {
 
 Object.defineProperty(window, 'FileReader', {
   value: class MockFileReader {
-    onload: ((event: any) => void) | null = null
-    onerror: ((event: any) => void) | null = null
+    onload: ((event: ProgressEvent<FileReader>) => void) | null = null
+    onerror: ((event: ProgressEvent<FileReader>) => void) | null = null
     readAsDataURL = vi.fn(() => {
       if (this.onload) {
         this.onload({ target: { result: 'data:image/png;base64,mock' } })
@@ -491,7 +493,7 @@ Object.defineProperty(navigator, 'mediaDevices', {
 global.flushPromises = () => new Promise(setImmediate)
 
 // Vue Test Utils helper
-global.createWrapper = async (component: any, options: any = {}) => {
+global.createWrapper = async (component: Component, options: MountingOptions<any> = {}) => {
   const { mount } = await import('@vue/test-utils')
   return mount(component, {
     global: {
@@ -516,7 +518,7 @@ global.createWrapper = async (component: any, options: any = {}) => {
 }
 
 // Test helper functions
-global.createMockStore = (initialState: any = {}) => ({
+global.createMockStore = (initialState: Record<string, any> = {}) => ({
   ...initialState,
   $subscribe: vi.fn(),
   $patch: vi.fn(),
@@ -540,7 +542,7 @@ global.createMockRouter = () => ({
   }
 })
 
-global.createMockService = (methods: any = {}) => ({
+global.createMockService = (methods: Record<string, any> = {}) => ({
   list: vi.fn().mockResolvedValue({ list: [], total: 0 }),
   detail: vi.fn().mockResolvedValue({}),
   save: vi.fn().mockResolvedValue({}),

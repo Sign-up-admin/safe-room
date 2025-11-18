@@ -43,7 +43,7 @@
     /* Vue specific */
     "types": ["vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx"],
   "exclude": [
     "node_modules",
     "dist",
@@ -59,8 +59,7 @@
     "src/components/FileUpload.vue.js",
     "src/components/img.vue.js",
     "src/components/timeable.vue.js",
-    "src/pages/newstype/NewstypeDetail.vue.js",
-    "tests/**/*"
+    "src/pages/newstype/NewstypeDetail.vue.js"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

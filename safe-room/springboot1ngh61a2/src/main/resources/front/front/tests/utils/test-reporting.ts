@@ -175,7 +175,7 @@ export class TestReporter {
   /**
    * 生成覆盖率报告
    */
-  private async generateCoverageReport(): Promise<CoverageReport> {
+  private generateCoverageReport(): CoverageReport {
     try {
       // 尝试读取覆盖率文件
       const coveragePath = path.join(this.coverageDir, 'coverage-summary.json')
@@ -320,7 +320,7 @@ export class TestReporter {
   /**
    * 生成趋势报告
    */
-  private async generateTrendReport(): Promise<TrendReport> {
+  private generateTrendReport(): TrendReport {
     try {
       const historyPath = path.join(this.reportDir, 'test-history.json')
       const previousRuns = fs.existsSync(historyPath)
@@ -488,7 +488,7 @@ export class TestReporter {
   /**
    * 保存报告
    */
-  private async saveReport(report: TestReport): Promise<void> {
+  private saveReport(report: TestReport): void {
     const reportPath = path.join(this.reportDir, 'comprehensive-report.json')
     const htmlReportPath = path.join(this.reportDir, 'comprehensive-report.html')
 

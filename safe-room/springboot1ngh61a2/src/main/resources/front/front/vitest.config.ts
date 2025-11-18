@@ -28,7 +28,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'happy-dom',
     setupFiles: ['./tests/setup/vitest.setup.ts', './tests/setup/performance.setup.ts'],
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     exclude: [

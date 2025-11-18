@@ -294,7 +294,7 @@ export class TestDataManager {
   }
 
   // 业务场景生成方法
-  private generateUserRegistrationScenario(context: TestContext, scenario: BusinessScenario): UserRegistrationScenario {
+  private generateUserRegistrationScenario(context: TestContext, _scenario: BusinessScenario): UserRegistrationScenario {
     const user = this.generateIsolatedUser({
       role: 'user',
       status: 1
@@ -313,7 +313,7 @@ export class TestDataManager {
     }
   }
 
-  private generateCourseBookingScenario(context: TestContext, scenario: BusinessScenario): CourseBookingScenario {
+  private generateCourseBookingScenario(context: TestContext, _scenario: BusinessScenario): CourseBookingScenario {
     const user = this.generateIsolatedUser()
     const course = this.generateIsolatedCourse()
     const booking = this.generateIsolatedBooking(user.id, course.id)
@@ -335,7 +335,7 @@ export class TestDataManager {
     }
   }
 
-  private generateMembershipPurchaseScenario(context: TestContext, scenario: BusinessScenario): MembershipPurchaseScenario {
+  private generateMembershipPurchaseScenario(context: TestContext, _scenario: BusinessScenario): MembershipPurchaseScenario {
     const user = this.generateIsolatedUser()
     const membership = {
       id: faker.number.int({ min: 1, max: 100 }),
@@ -360,7 +360,7 @@ export class TestDataManager {
     }
   }
 
-  private generateCoachBookingScenario(context: TestContext, scenario: BusinessScenario): CoachBookingScenario {
+  private generateCoachBookingScenario(context: TestContext, _scenario: BusinessScenario): CoachBookingScenario {
     const user = this.generateIsolatedUser()
     const coach = this.generateIsolatedUser({ role: 'coach' })
     const booking = {
@@ -391,7 +391,7 @@ export class TestDataManager {
     }
   }
 
-  private generateCompleteUserJourneyScenario(context: TestContext, scenario: BusinessScenario): CompleteUserJourneyScenario {
+  private generateCompleteUserJourneyScenario(context: TestContext, _scenario: BusinessScenario): CompleteUserJourneyScenario {
     const user = this.generateIsolatedUser()
     const course = this.generateIsolatedCourse()
     const coach = this.generateIsolatedUser({ role: 'coach' })
@@ -552,6 +552,3 @@ export interface BulkDataResult {
   }
 }
 
-// 导入所需的工厂
-import { Course } from './course.factory'
-import { Booking } from './booking.factory'

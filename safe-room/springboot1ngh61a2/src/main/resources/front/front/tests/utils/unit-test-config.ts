@@ -4,12 +4,11 @@
  * 提取重复的mount配置和测试辅助函数，提升测试代码的可维护性
  */
 
-import { mount, VueWrapper, MountingOptions } from '@vue/test-utils'
-import { createApp } from 'vue'
+import { mount, MountingOptions } from '@vue/test-utils'
+import { createApp, type Component } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
-import type { Component } from 'vue'
 
 // ========== 默认路由配置 ==========
 

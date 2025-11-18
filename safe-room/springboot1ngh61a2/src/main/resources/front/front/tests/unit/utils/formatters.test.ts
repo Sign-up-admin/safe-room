@@ -1,93 +1,116 @@
 import { describe, it, expect } from 'vitest'
-import { formatDate } from '../../../src/utils/formatters'
+import {
+  formatDate,
+  formatDateTime,
+  formatCurrency,
+  stripHtml,
+} from '@/utils/formatters'
 
 describe('formatters', () => {
   describe('formatDate', () => {
-    it('should format Date object to YYYY-MM-DD format', () => {
-      const date = new Date('2025-01-15T10:30:00Z')
-      const result = formatDate(date)
-      expect(result).toBe('2025-01-15')
+    it('应该格式化日期字符串', () => {
+      expect(formatDate('2024-01-15')).toBe('2024-01-15')
+      expect(formatDate('2024-01-15T10:30:00Z')).toBe('2024-01-15')
     })
 
-    it('should format ISO string to YYYY-MM-DD format', () => {
-      const dateString = '2025-01-15T10:30:00Z'
-      const result = formatDate(dateString)
-      expect(result).toBe('2025-01-15')
+    it('应该格式化Date对象', () => {
+      const date = new Date('2024-01-15T10:30:00Z')
+      expect(formatDate(date)).toBe('2024-01-15')
     })
 
-    it('should format date string without time', () => {
-      const dateString = '2025-01-15'
-      const result = formatDate(dateString)
-      expect(result).toBe('2025-01-15')
+    it('应该格式化时间戳', () => {
+      const timestamp = new Date('2024-01-15').getTime()
+      expect(formatDate(timestamp)).toBe('2024-01-15')
     })
 
-    it('should handle different date formats', () => {
-      const testCases = [
-        '2025/01/15',
-        '2025-01-15 10:30:00',
-        'January 15, 2025',
-        '2025-01-15T10:30:00.000Z'
-      ]
-
-      testCases.forEach(dateInput => {
-        const result = formatDate(dateInput)
-        expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-      })
+    it('应该处理无效日期', () => {
+      expect(formatDate('invalid')).toBe('--')
+      expect(formatDate('')).toBe('--')
+      expect(formatDate(null as any)).toBe('--')
+      expect(formatDate(undefined)).toBe('--')
     })
 
-    it('should handle invalid date strings gracefully', () => {
-      const invalidDate = 'invalid-date'
-      const result = formatDate(invalidDate)
-      // Should return a valid date string or handle error
-      expect(typeof result).toBe('string')
+    it('应该使用自定义fallback', () => {
+      expect(formatDate('invalid', 'N/A')).toBe('N/A')
+      expect(formatDate(null as any, '无')).toBe('无')
+    })
+  })
+
+  describe('formatDateTime', () => {
+    it('应该格式化日期时间字符串', () => {
+      const result = formatDateTime('2024-01-15T10:30:00Z')
+      expect(result).toContain('2024-01-15')
+      expect(result).toContain('10:30:00')
     })
 
-    it('should handle null and undefined values', () => {
-      expect(() => formatDate(null as any)).not.toThrow()
-      expect(() => formatDate(undefined as any)).not.toThrow()
+    it('应该格式化Date对象', () => {
+      const date = new Date('2024-01-15T10:30:00Z')
+      const result = formatDateTime(date)
+      expect(result).toContain('2024-01-15')
     })
 
-    it('should preserve timezone information correctly', () => {
-      const utcDate = new Date('2025-01-15T00:00:00Z')
-      const result = formatDate(utcDate)
-      expect(result).toBe('2025-01-15')
+    it('应该处理无效日期时间', () => {
+      expect(formatDateTime('invalid')).toBe('--')
+      expect(formatDateTime('')).toBe('--')
+      expect(formatDateTime(null as any)).toBe('--')
     })
 
-    it('should handle leap year dates', () => {
-      const leapYearDate = new Date('2024-02-29T10:30:00Z')
-      const result = formatDate(leapYearDate)
-      expect(result).toBe('2024-02-29')
+    it('应该使用自定义fallback', () => {
+      expect(formatDateTime('invalid', 'N/A')).toBe('N/A')
+    })
+  })
+
+  describe('formatCurrency', () => {
+    it('应该格式化数字为货币', () => {
+      expect(formatCurrency(100)).toBe('¥100.00')
+      expect(formatCurrency(100.5)).toBe('¥100.50')
+      expect(formatCurrency(100.999)).toBe('¥101.00')
     })
 
-    it('should handle edge dates', () => {
-      const startOfYear = new Date('2025-01-01T00:00:00Z')
-      const endOfYear = new Date('2025-12-31T23:59:59Z')
-
-      expect(formatDate(startOfYear)).toBe('2025-01-01')
-      expect(formatDate(endOfYear)).toBe('2025-12-31')
+    it('应该格式化字符串数字', () => {
+      expect(formatCurrency('100')).toBe('¥100.00')
+      expect(formatCurrency('100.5')).toBe('¥100.50')
     })
 
-    it('should be consistent across multiple calls', () => {
-      const date = new Date('2025-01-15T10:30:00Z')
-      const result1 = formatDate(date)
-      const result2 = formatDate(date)
-
-      expect(result1).toBe(result2)
-      expect(result1).toBe('2025-01-15')
+    it('应该处理无效数字', () => {
+      expect(formatCurrency('invalid')).toBe('¥0.00')
+      expect(formatCurrency(null as any)).toBe('¥0.00')
+      expect(formatCurrency(undefined)).toBe('¥0.00')
     })
 
-    it('should handle timezone differences', () => {
-      // Test with different timezone representations
-      const date1 = new Date('2025-01-15T10:30:00+08:00')
-      const date2 = new Date('2025-01-15T02:30:00Z')
+    it('应该支持自定义货币符号', () => {
+      expect(formatCurrency(100, '$')).toBe('$100.00')
+      expect(formatCurrency(100, '€')).toBe('€100.00')
+    })
 
-      // Both should represent the same moment
-      const result1 = formatDate(date1)
-      const result2 = formatDate(date2)
+    it('应该处理负数', () => {
+      expect(formatCurrency(-100)).toBe('¥-100.00')
+    })
+  })
 
-      // Depending on timezone handling, they might be the same or different
-      expect(typeof result1).toBe('string')
-      expect(typeof result2).toBe('string')
+  describe('stripHtml', () => {
+    it('应该移除HTML标签', () => {
+      expect(stripHtml('<p>Hello</p>')).toBe('Hello')
+      expect(stripHtml('<div><span>Test</span></div>')).toBe('Test')
+    })
+
+    it('应该处理多个空格', () => {
+      expect(stripHtml('<p>Hello   World</p>')).toBe('Hello World')
+    })
+
+    it('应该处理空字符串', () => {
+      expect(stripHtml('')).toBe('')
+      expect(stripHtml(null as any)).toBe('')
+      expect(stripHtml(undefined)).toBe('')
+    })
+
+    it('应该处理纯文本', () => {
+      expect(stripHtml('Hello World')).toBe('Hello World')
+    })
+
+    it('应该处理复杂的HTML', () => {
+      const html = '<div class="test"><p>Hello <strong>World</strong></p></div>'
+      expect(stripHtml(html)).toBe('Hello World')
     })
   })
 })
