@@ -1,5 +1,4 @@
-import { Page, Route, Dialog, expect } from '@playwright/test'
-import type { TestInfo } from 'vitest'
+import { Page, Route, expect, TestInfo } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
 
@@ -206,7 +205,7 @@ export class PerformanceUtils {
   static async measureApiResponseTime(page: Page, apiPattern: string): Promise<number[]> {
     const responseTimes: number[] = []
 
-    page.on('response', (response: Response) => {
+    page.on('response', (response) => {
       const url = response.url()
       if (url.includes(apiPattern)) {
         const timing = response.timing()
@@ -237,8 +236,21 @@ export class PerformanceUtils {
       const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint')
       const lcp = performance.getEntriesByType('largest-contentful-paint')[0]
 
-      const fidEntry = performance.getEntriesByType('first-input')[0] as any
-      const clsEntry = performance.getEntriesByType('layout-shift').reduce((sum, entry: any) => sum + (entry.hadRecentInput ? 0 : entry.value), 0)
+      interface FirstInputEntry extends PerformanceEntry {
+        processingStart: number
+        startTime: number
+      }
+
+      interface LayoutShiftEntry extends PerformanceEntry {
+        value: number
+        hadRecentInput: boolean
+      }
+
+      const fidEntry = performance.getEntriesByType('first-input')[0] as FirstInputEntry | undefined
+      const clsEntry = performance.getEntriesByType('layout-shift').reduce((sum, entry) => {
+        const shiftEntry = entry as LayoutShiftEntry
+        return sum + (shiftEntry.hadRecentInput ? 0 : shiftEntry.value)
+      }, 0)
 
       return {
         firstContentfulPaint: fcp ? fcp.startTime : 0,
@@ -254,8 +266,29 @@ export class PerformanceUtils {
  * 网络请求拦截工具
  */
 export class NetworkUtils {
-  private static interceptedRequests: Map<string, any[]> = new Map()
-  private static interceptedResponses: Map<string, any[]> = new Map()
+  /**
+   * 拦截的请求数据接口
+   */
+  interface InterceptedRequest {
+    url: string
+    method: string
+    headers: Record<string, string>
+    postData: string | null
+    timestamp: number
+  }
+
+  /**
+   * 拦截的响应数据接口
+   */
+  interface InterceptedResponse {
+    url: string
+    status: number
+    headers: Record<string, string>
+    timestamp: number
+  }
+
+  private static interceptedRequests: Map<string, InterceptedRequest[]> = new Map()
+  private static interceptedResponses: Map<string, InterceptedResponse[]> = new Map()
 
   /**
    * 拦截并记录请求
@@ -285,7 +318,7 @@ export class NetworkUtils {
     const responseKey = pattern.toString()
     this.interceptedResponses.set(responseKey, [])
 
-    page.on('response', (response: Response) => {
+    page.on('response', (response) => {
       const url = response.url()
       if (typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url)) {
         this.interceptedResponses.get(responseKey)?.push({
@@ -301,14 +334,14 @@ export class NetworkUtils {
   /**
    * 获取拦截的请求
    */
-  static getInterceptedRequests(pattern: string | RegExp = '**'): any[] {
+  static getInterceptedRequests(pattern: string | RegExp = '**'): InterceptedRequest[] {
     return this.interceptedRequests.get(pattern.toString()) || []
   }
 
   /**
    * 获取拦截的响应
    */
-  static getInterceptedResponses(pattern: string | RegExp = '**'): any[] {
+  static getInterceptedResponses(pattern: string | RegExp = '**'): InterceptedResponse[] {
     return this.interceptedResponses.get(pattern.toString()) || []
   }
 
@@ -349,10 +382,39 @@ export class NetworkUtils {
  */
 export class TestDataUtils {
   /**
+   * 测试数据类型接口
+   */
+  interface TestData {
+    user?: {
+      yonghuming: string
+      shouji: string
+      shenfenzheng: string
+    }
+    coach?: {
+      jiaolianxingming: string
+      nianling: number
+      zhuanye: string
+      jingyan: string
+    }
+    course?: {
+      kechengmingcheng: string
+      kechengleixing: string
+      shichang: string
+      jiage: string
+    }
+    booking?: {
+      yonghuming: string
+      kechengmingcheng: string
+      yuyueshijian: string
+      zhuangtai: string
+    }
+  }
+
+  /**
    * 生成随机测试数据（兼容性方法，已废弃，建议使用TestDataManager）
    * @deprecated 使用 TestDataManager.generateIsolatedUser() 等方法
    */
-  static generateRandomData(type: 'user' | 'coach' | 'course' | 'booking'): any {
+  static generateRandomData(type: 'user' | 'coach' | 'course' | 'booking'): TestData {
     const timestamp = Date.now()
     const randomNum = Math.floor(Math.random() * 1000)
 
@@ -480,13 +542,24 @@ export class AssertionUtils {
  * 测试报告工具
  */
 export class ReportUtils {
-  private static testResults: any[] = []
+  /**
+   * 测试步骤接口
+   */
+  interface TestStep {
+    name: string
+    timestamp: string
+    details?: unknown
+    type?: string
+    metrics?: Record<string, unknown>
+  }
+
+  private static testResults: TestStep[] = []
 
   /**
    * 记录测试步骤
    */
-  static logTestStep(stepName: string, details?: any): void {
-    const step = {
+  static logTestStep(stepName: string, details?: unknown): void {
+    const step: TestStep = {
       name: stepName,
       timestamp: new Date().toISOString(),
       details
@@ -498,19 +571,21 @@ export class ReportUtils {
   /**
    * 记录性能指标
    */
-  static logPerformanceMetrics(metrics: any): void {
-    console.log('[PERFORMANCE]', metrics)
-    ReportUtils.testResults.push({
+  static logPerformanceMetrics(metrics: Record<string, unknown>): void {
+    const step: TestStep = {
+      name: 'performance_metrics',
       type: 'performance',
       metrics,
       timestamp: new Date().toISOString()
-    })
+    }
+    console.log('[PERFORMANCE]', metrics)
+    ReportUtils.testResults.push(step)
   }
 
   /**
    * 导出测试结果
    */
-  static exportTestResults(): any[] {
+  static exportTestResults(): TestStep[] {
     return [...ReportUtils.testResults]
   }
 
@@ -1556,7 +1631,7 @@ export async function setupEnhancedMock(page: Page): Promise<void> {
  */
 export async function setupTestDataIsolation(page: Page, testInfo: TestInfo): Promise<{
   testId: string
-  dataManager: any
+  dataManager: TestDataManager
   cleanup: () => Promise<void>
 }> {
   const { TestDataManager } = await import('./test-data-manager')
@@ -1578,9 +1653,9 @@ export async function setupTestDataIsolation(page: Page, testInfo: TestInfo): Pr
  * 性能监控设置
  */
 export async function setupPerformanceMonitoring(page: Page, testInfo: TestInfo): Promise<{
-  monitor: any
+  monitor: PerformanceMonitor
   startMonitoring: () => Promise<void>
-  stopMonitoring: () => Promise<any>
+  stopMonitoring: () => Promise<unknown>
   markCheckpoint: (name: string) => Promise<number>
 }> {
   const { PerformanceMonitor } = await import('./performance-monitor')
@@ -1631,7 +1706,7 @@ export async function setupTestEnvironment(page: Page): Promise<void> {
   )
 
   // Handle any cookie dialogs that appear
-  page.on('dialog', async (dialog: Dialog) => {
+  page.on('dialog', async (dialog) => {
     console.log(`Dialog detected: ${dialog.message()}`)
     await dialog.accept()
   })
@@ -1660,7 +1735,7 @@ export async function takeScreenshotWithTimestamp(page: Page, name: string): Pro
 /**
  * Log test step with consistent formatting
  */
-export function logTestStep(step: string, details?: any): void {
+export function logTestStep(step: string, details?: unknown): void {
   const timestamp = new Date().toISOString().substring(11, 23)
   console.log(`[${timestamp}] ${step}`)
   if (details) {
@@ -1674,7 +1749,7 @@ export function logTestStep(step: string, details?: any): void {
 export async function assertWithDetails(
   condition: boolean | Promise<boolean>,
   message: string,
-  details?: any
+  details?: unknown
 ): Promise<void> {
   const result = await condition
   if (!result) {

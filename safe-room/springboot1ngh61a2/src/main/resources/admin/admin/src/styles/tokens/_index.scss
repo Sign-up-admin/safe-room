@@ -1,0 +1,261 @@
+// =================================
+// Design Token System - Main Entry
+// =================================
+
+// Import all token modules
+@forward 'colors';
+@forward 'typography';
+@forward 'spacing';
+@forward 'borders';
+@forward 'shadows';
+@forward 'animations';
+
+// =================================
+// Semantic Design Tokens
+// =================================
+
+// Layout Tokens
+$layout-max-width: 1200px;
+$layout-sidebar-width: 290px;
+$layout-header-height: 64px;
+$layout-container-padding: 1rem;
+
+// Component Tokens
+$component-border-radius: 0.5rem;
+$component-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$component-transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// Z-Index Scale
+$z-index-base: 0;
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$z-index-toast: 1080;
+
+// =================================
+// CSS Custom Properties (Global)
+// =================================
+
+:root {
+  // Layout
+  --layout-max-width: #{$layout-max-width};
+  --layout-sidebar-width: #{$layout-sidebar-width};
+  --layout-header-height: #{$layout-header-height};
+  --layout-container-padding: #{$layout-container-padding};
+
+  // Components
+  --component-border-radius: #{$component-border-radius};
+  --component-shadow: #{$component-shadow};
+  --component-transition: #{$component-transition};
+
+  // Z-Index Scale
+  --z-index-base: #{$z-index-base};
+  --z-index-dropdown: #{$z-index-dropdown};
+  --z-index-sticky: #{$z-index-sticky};
+  --z-index-fixed: #{$z-index-fixed};
+  --z-index-modal-backdrop: #{$z-index-modal-backdrop};
+  --z-index-modal: #{$z-index-modal};
+  --z-index-popover: #{$z-index-popover};
+  --z-index-tooltip: #{$z-index-tooltip};
+  --z-index-toast: #{$z-index-toast};
+
+  // Breakpoints (for responsive design)
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+// =================================
+// Global Utility Classes
+// =================================
+
+// Display Utilities
+.d-none {
+  display: none !important;
+}
+.d-block {
+  display: block !important;
+}
+.d-inline {
+  display: inline !important;
+}
+.d-inline-block {
+  display: inline-block !important;
+}
+.d-flex {
+  display: flex !important;
+}
+.d-inline-flex {
+  display: inline-flex !important;
+}
+.d-grid {
+  display: grid !important;
+}
+.d-inline-grid {
+  display: inline-grid !important;
+}
+
+// Position Utilities
+.position-static {
+  position: static !important;
+}
+.position-relative {
+  position: relative !important;
+}
+.position-absolute {
+  position: absolute !important;
+}
+.position-fixed {
+  position: fixed !important;
+}
+.position-sticky {
+  position: sticky !important;
+}
+
+// Flex Utilities
+.flex-row {
+  flex-direction: row !important;
+}
+.flex-column {
+  flex-direction: column !important;
+}
+.flex-row-reverse {
+  flex-direction: row-reverse !important;
+}
+.flex-column-reverse {
+  flex-direction: column-reverse !important;
+}
+
+.flex-wrap {
+  flex-wrap: wrap !important;
+}
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
+.flex-wrap-reverse {
+  flex-wrap: wrap-reverse !important;
+}
+
+.justify-start {
+  justify-content: flex-start !important;
+}
+.justify-end {
+  justify-content: flex-end !important;
+}
+.justify-center {
+  justify-content: center !important;
+}
+.justify-between {
+  justify-content: space-between !important;
+}
+.justify-around {
+  justify-content: space-around !important;
+}
+.justify-evenly {
+  justify-content: space-evenly !important;
+}
+
+.items-start {
+  align-items: flex-start !important;
+}
+.items-end {
+  align-items: flex-end !important;
+}
+.items-center {
+  align-items: center !important;
+}
+.items-baseline {
+  align-items: baseline !important;
+}
+.items-stretch {
+  align-items: stretch !important;
+}
+
+// Size Utilities
+.w-full {
+  width: 100% !important;
+}
+.w-auto {
+  width: auto !important;
+}
+.h-full {
+  height: 100% !important;
+}
+.h-auto {
+  height: auto !important;
+}
+.h-screen {
+  height: 100vh !important;
+}
+
+// Overflow Utilities
+.overflow-hidden {
+  overflow: hidden !important;
+}
+.overflow-visible {
+  overflow: visible !important;
+}
+.overflow-scroll {
+  overflow: scroll !important;
+}
+.overflow-auto {
+  overflow: auto !important;
+}
+
+// Cursor Utilities
+.cursor-pointer {
+  cursor: pointer !important;
+}
+.cursor-default {
+  cursor: default !important;
+}
+.cursor-text {
+  cursor: text !important;
+}
+.cursor-move {
+  cursor: move !important;
+}
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+// =================================
+// Design System Helpers
+// =================================
+
+// Container Query Helper
+@mixin container-query($min-width) {
+  @container (min-width: #{$min-width}) {
+    @content;
+  }
+}
+
+// High Contrast Mode Support
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-light: var(--color-text-primary);
+    --color-border-medium: var(--color-text-primary);
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
+
+// Print Styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  * {
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+}

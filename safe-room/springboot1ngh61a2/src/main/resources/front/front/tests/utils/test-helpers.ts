@@ -2,8 +2,62 @@ import { mount, VueWrapper, MountingOptions } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
-import type { Component } from 'vue'
+import type { Component, ComponentPublicInstance } from 'vue'
 import { Page, Route } from '@playwright/test'
+
+// Mock data type interfaces
+interface MockResponse<T = unknown> {
+  data: T
+  status: number
+  statusText: string
+  headers: Record<string, string>
+  config: Record<string, unknown>
+  request: Record<string, unknown>
+}
+
+interface AxiosError extends Error {
+  response?: MockResponse
+  isAxiosError: boolean
+}
+
+interface MockUser {
+  id: number
+  username: string
+  email: string
+  role: string
+  avatar: string
+  createdAt: Date
+}
+
+interface MockBooking {
+  id: number
+  userId: number
+  courseId: number
+  bookingTime: Date
+  status: string
+  notes?: string
+}
+
+interface MockCourse {
+  id: number
+  name: string
+  description: string
+  price: number
+  duration: number
+  category: string
+  instructor: string
+  image: string
+}
+
+interface MockNotification {
+  id: number
+  userId: number
+  title: string
+  content: string
+  type: string
+  read: boolean
+  createdAt: Date
+}
 
 // Routes for testing
 const routes = [
@@ -39,15 +93,15 @@ export function createTestApp() {
  */
 export function mountComponent<T extends Component>(
   component: T,
-  options: MountingOptions<any> = {}
-): VueWrapper {
+  options: MountingOptions<ComponentPublicInstance> = {}
+): VueWrapper<ComponentPublicInstance> {
   const app = createTestApp()
 
   // Set active Pinia instance for stores
   setActivePinia(createPinia())
 
   // Default mounting options
-  const defaultOptions: MountingOptions<any> = {
+  const defaultOptions: MountingOptions<ComponentPublicInstance> = {
     global: {
       plugins: [app],
       stubs: {
@@ -91,7 +145,7 @@ export function mountComponent<T extends Component>(
 /**
  * Create mock API response
  */
-export function createMockResponse(data: any, status = 200, statusText = 'OK') {
+export function createMockResponse<T = unknown>(data: T, status = 200, statusText = 'OK'): MockResponse<T> {
   return {
     data,
     status,
@@ -107,23 +161,23 @@ export function createMockResponse(data: any, status = 200, statusText = 'OK') {
 /**
  * Create mock API error
  */
-export function createMockError(message: string, status = 500, statusText = 'Internal Server Error') {
-  const error = new Error(message)
-  ;(error as any).response = {
+export function createMockError(message: string, status = 500, statusText = 'Internal Server Error'): AxiosError {
+  const error = new Error(message) as AxiosError
+  error.response = {
     data: { message },
     status,
     statusText,
     headers: {},
     config: {}
   }
-  ;(error as any).isAxiosError = true
+  error.isAxiosError = true
   return error
 }
 
 /**
  * Mock API calls for testing
  */
-export function mockApiResponse(url: string, data: any, method = 'get') {
+export function mockApiResponse(url: string, data: unknown, method = 'get') {
   // This would be used with the mocked axios instance
   return {
     url,
@@ -135,7 +189,7 @@ export function mockApiResponse(url: string, data: any, method = 'get') {
 /**
  * Create a mock store instance
  */
-export function createMockStore(initialState = {}) {
+export function createMockStore(initialState: Record<string, unknown> = {}) {
   const pinia = createPinia()
   setActivePinia(pinia)
   return pinia
@@ -151,7 +205,7 @@ export function nextTick(): Promise<void> {
 /**
  * Create mock event
  */
-export function createMockEvent(type: string, options = {}) {
+export function createMockEvent(type: string, options: Record<string, unknown> = {}) {
   return {
     type,
     preventDefault: vi.fn(),
@@ -177,7 +231,7 @@ export function createMockFile(name = 'test.jpg', size = 1024, type = 'image/jpe
 /**
  * Create mock user session
  */
-export function createMockUser(overrides = {}) {
+export function createMockUser(overrides: Partial<MockUser> = {}): MockUser {
   return {
     id: 1,
     username: 'testuser',
@@ -192,7 +246,7 @@ export function createMockUser(overrides = {}) {
 /**
  * Create mock booking data
  */
-export function createMockBooking(overrides = {}) {
+export function createMockBooking(overrides: Partial<MockBooking> = {}): MockBooking {
   return {
     id: 1,
     userId: 1,
@@ -207,7 +261,7 @@ export function createMockBooking(overrides = {}) {
 /**
  * Create mock course data
  */
-export function createMockCourse(overrides = {}) {
+export function createMockCourse(overrides: Partial<MockCourse> = {}): MockCourse {
   return {
     id: 1,
     name: 'Test Course',
@@ -224,7 +278,7 @@ export function createMockCourse(overrides = {}) {
 /**
  * Create mock notification data
  */
-export function createMockNotification(overrides = {}) {
+export function createMockNotification(overrides: Partial<MockNotification> = {}): MockNotification {
   return {
     id: 1,
     userId: 1,
@@ -259,7 +313,7 @@ export function cleanupTest() {
 export function mountAuthenticatedComponent<T extends Component>(
   component: T,
   user = createMockUser(),
-  options: MountingOptions<any> = {}
+  options: MountingOptions<ComponentPublicInstance> = {}
 ) {
   // Mock localStorage to simulate authenticated user
   Object.defineProperty(window, 'localStorage', {
@@ -280,8 +334,8 @@ export function mountAuthenticatedComponent<T extends Component>(
  */
 export function mountWithRouteParams<T extends Component>(
   component: T,
-  params: Record<string, any> = {},
-  options: MountingOptions<any> = {}
+  params: Record<string, string | number> = {},
+  options: MountingOptions<ComponentPublicInstance> = {}
 ) {
   const mergedOptions = {
     ...options,

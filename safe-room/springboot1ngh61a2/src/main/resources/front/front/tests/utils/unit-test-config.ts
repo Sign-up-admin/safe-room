@@ -5,7 +5,7 @@
  */
 
 import { mount, MountingOptions } from '@vue/test-utils'
-import { createApp, type Component } from 'vue'
+import { createApp, type Component, type ComponentPublicInstance } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
@@ -122,8 +122,8 @@ export const COMMON_MOCKS = {
   $te: (key: string) => true,
   $tm: (key: string) => ({}),
   $rt: (key: string) => key,
-  $d: (value: any) => value,
-  $n: (value: any) => String(value),
+  $d: (value: unknown) => value,
+  $n: (value: unknown) => String(value),
 
   // Vue Router mocks
   $router: {
@@ -191,7 +191,7 @@ export function createTestPinia() {
 /**
  * 创建基础的mount选项
  */
-export function createBaseMountOptions(options: MountingOptions<any> = {}): MountingOptions<any> {
+export function createBaseMountOptions(options: MountingOptions<ComponentPublicInstance> = {}): MountingOptions<ComponentPublicInstance> {
   const app = createTestApp()
 
   return {
@@ -215,9 +215,9 @@ export function createBaseMountOptions(options: MountingOptions<any> = {}): Moun
  * 创建带组件stubs的mount选项
  */
 export function createMountOptionsWithStubs(
-  componentStubs: Record<string, any> = {},
-  options: MountingOptions<any> = {}
-): MountingOptions<any> {
+  componentStubs: Record<string, Component | boolean> = {},
+  options: MountingOptions<ComponentPublicInstance> = {}
+): MountingOptions<ComponentPublicInstance> {
   return createBaseMountOptions({
     ...options,
     global: {

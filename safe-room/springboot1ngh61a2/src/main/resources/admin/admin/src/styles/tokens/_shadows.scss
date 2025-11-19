@@ -1,0 +1,210 @@
+// =================================
+// Design Token System - Shadows
+// =================================
+
+// Shadow Scale
+$shadow-none: 0 0 #0000;
+$shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+$shadow-highlight: 0 0 0 1px rgba(255, 255, 255, 0.2);
+
+// Semantic Shadows (context-aware)
+$shadow-card: $shadow-lg;
+$shadow-button: $shadow-sm;
+$shadow-dropdown: $shadow-lg;
+$shadow-modal: $shadow-xl;
+$shadow-tooltip: $shadow-md;
+$shadow-toast: $shadow-lg;
+
+// Themed Shadows
+$shadow-primary-xs: 0 1px 2px 0 rgba(59, 130, 246, 0.05);
+$shadow-primary-sm: 0 1px 3px 0 rgba(59, 130, 246, 0.1);
+$shadow-primary-md: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+$shadow-success-xs: 0 1px 2px 0 rgba(34, 197, 94, 0.05);
+$shadow-success-sm: 0 1px 3px 0 rgba(34, 197, 94, 0.1);
+$shadow-danger-xs: 0 1px 2px 0 rgba(239, 68, 68, 0.05);
+$shadow-danger-sm: 0 1px 3px 0 rgba(239, 68, 68, 0.1);
+
+// Shadow Scale Map for programmatic access
+$shadow-scale: (
+  none: $shadow-none,
+  xs: $shadow-xs,
+  sm: $shadow-sm,
+  md: $shadow-md,
+  lg: $shadow-lg,
+  xl: $shadow-xl,
+  2xl: $shadow-2xl,
+  inner: $shadow-inner,
+  highlight: $shadow-highlight,
+  card: $shadow-card,
+  button: $shadow-button,
+  dropdown: $shadow-dropdown,
+  modal: $shadow-modal,
+  tooltip: $shadow-tooltip,
+  toast: $shadow-toast,
+);
+
+// CSS Custom Properties for Shadows
+:root {
+  // Base Shadow Scale
+  --shadow-none: #{$shadow-none};
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+  --shadow-2xl: #{$shadow-2xl};
+  --shadow-inner: #{$shadow-inner};
+  --shadow-highlight: #{$shadow-highlight};
+
+  // Semantic Shadows
+  --shadow-card: #{$shadow-card};
+  --shadow-button: #{$shadow-button};
+  --shadow-dropdown: #{$shadow-dropdown};
+  --shadow-modal: #{$shadow-modal};
+  --shadow-tooltip: #{$shadow-tooltip};
+  --shadow-toast: #{$shadow-toast};
+
+  // Themed Shadows
+  --shadow-primary-xs: #{$shadow-primary-xs};
+  --shadow-primary-sm: #{$shadow-primary-sm};
+  --shadow-primary-md: #{$shadow-primary-md};
+  --shadow-success-xs: #{$shadow-success-xs};
+  --shadow-success-sm: #{$shadow-success-sm};
+  --shadow-danger-xs: #{$shadow-danger-xs};
+  --shadow-danger-sm: #{$shadow-danger-sm};
+}
+
+// Shadow Utility Functions
+@function shadow($key) {
+  @if map-has-key($shadow-scale, $key) {
+    @return map-get($shadow-scale, $key);
+  } @else {
+    @warn "Shadow key '#{$key}' not found in shadow scale";
+    @return $shadow-none;
+  }
+}
+
+// Shadow Mixins
+@mixin shadow($size) {
+  box-shadow: shadow($size);
+}
+
+@mixin shadow-primary($size: sm) {
+  box-shadow: shadow(primary-#{$size});
+}
+
+@mixin shadow-success($size: sm) {
+  box-shadow: shadow(success-#{$size});
+}
+
+@mixin shadow-danger($size: sm) {
+  box-shadow: shadow(danger-#{$size});
+}
+
+// Shadow Utility Classes
+.shadow-none {
+  box-shadow: var(--shadow-none);
+}
+
+.shadow-xs {
+  box-shadow: var(--shadow-xs);
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-2xl {
+  box-shadow: var(--shadow-2xl);
+}
+
+.shadow-inner {
+  box-shadow: var(--shadow-inner);
+}
+
+.shadow-highlight {
+  box-shadow: var(--shadow-highlight);
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+.shadow-button {
+  box-shadow: var(--shadow-button);
+}
+
+.shadow-dropdown {
+  box-shadow: var(--shadow-dropdown);
+}
+
+.shadow-modal {
+  box-shadow: var(--shadow-modal);
+}
+
+.shadow-tooltip {
+  box-shadow: var(--shadow-tooltip);
+}
+
+.shadow-toast {
+  box-shadow: var(--shadow-toast);
+}
+
+.shadow-primary-xs {
+  box-shadow: var(--shadow-primary-xs);
+}
+
+.shadow-primary-sm {
+  box-shadow: var(--shadow-primary-sm);
+}
+
+.shadow-primary-md {
+  box-shadow: var(--shadow-primary-md);
+}
+
+.shadow-success-xs {
+  box-shadow: var(--shadow-success-xs);
+}
+
+.shadow-success-sm {
+  box-shadow: var(--shadow-success-sm);
+}
+
+.shadow-danger-xs {
+  box-shadow: var(--shadow-danger-xs);
+}
+
+.shadow-danger-sm {
+  box-shadow: var(--shadow-danger-sm);
+}
+
+// High Contrast Mode Support
+@media (prefers-contrast: high) {
+  :root {
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+    --shadow-card: none;
+    --shadow-modal: none;
+  }
+}

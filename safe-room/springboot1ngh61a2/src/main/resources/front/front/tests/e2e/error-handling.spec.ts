@@ -11,12 +11,12 @@ test.describe('错误处理和边界情况测试', () => {
   })
 
   test.describe('网络错误处理', () => {
-    test('应正确处理登录时的网络超�?, async ({ page }) => {
+    test('应正确处理登录时的网络超时', async ({ page }) => {
       logTestStep('开始测试登录网络超时')
 
       // 模拟网络超时
       await page.route('**/yonghu/login', async (route) => {
-        await new Promise(resolve => setTimeout(resolve, 35000)) // 超过30秒超�?        await route.fulfill({
+        await new Promise(resolve => setTimeout(resolve, 35000)) // 超过30秒超时        await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({ code: 0, msg: '登录成功' })
@@ -40,10 +40,10 @@ test.describe('错误处理和边界情况测试', () => {
       await takeScreenshotWithTimestamp(page, 'network_timeout_error')
     })
 
-    test('应正确处理API服务不可�?, async ({ page }) => {
-      logTestStep('开始测试API服务不可�?)
+    test('应正确处理API服务不可用', async ({ page }) => {
+      logTestStep('开始测试API服务不可用')
 
-      // 模拟服务不可�?      await page.route('**/jianshenkecheng/**', async (route) => {
+      // 模拟服务不可用      await page.route('**/jianshenkecheng/**', async (route) => {
         await route.fulfill({
           status: 503,
           contentType: 'application/json',

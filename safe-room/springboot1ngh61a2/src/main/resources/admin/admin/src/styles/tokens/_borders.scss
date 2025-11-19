@@ -1,0 +1,202 @@
+// =================================
+// Design Token System - Borders
+// =================================
+
+// Border Radius Scale
+$border-radius-none: 0;
+$border-radius-sm: 0.125rem;   // 2px
+$border-radius-md: 0.375rem;   // 6px
+$border-radius-lg: 0.5rem;     // 8px
+$border-radius-xl: 0.75rem;    // 12px
+$border-radius-2xl: 1rem;      // 16px
+$border-radius-3xl: 1.5rem;    // 24px
+$border-radius-full: 9999px;   // Fully rounded
+
+// Border Width Scale
+$border-width-none: 0;
+$border-width-thin: 1px;
+$border-width-medium: 2px;
+$border-width-thick: 4px;
+
+// Semantic Border Radius (context-aware)
+$border-radius-button: $border-radius-xl;
+$border-radius-card: $border-radius-2xl;
+$border-radius-input: $border-radius-lg;
+$border-radius-modal: $border-radius-2xl;
+$border-radius-tooltip: $border-radius-md;
+$border-radius-badge: $border-radius-full;
+
+// Border Scale Map for programmatic access
+$border-radius-scale: (
+  none: $border-radius-none,
+  sm: $border-radius-sm,
+  md: $border-radius-md,
+  lg: $border-radius-lg,
+  xl: $border-radius-xl,
+  2xl: $border-radius-2xl,
+  3xl: $border-radius-3xl,
+  full: $border-radius-full,
+);
+
+$border-width-scale: (
+  none: $border-width-none,
+  thin: $border-width-thin,
+  medium: $border-width-medium,
+  thick: $border-width-thick,
+);
+
+// CSS Custom Properties for Borders
+:root {
+  // Border Radius
+  --border-radius-none: #{$border-radius-none};
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+  --border-radius-xl: #{$border-radius-xl};
+  --border-radius-2xl: #{$border-radius-2xl};
+  --border-radius-3xl: #{$border-radius-3xl};
+  --border-radius-full: #{$border-radius-full};
+
+  // Semantic Border Radius
+  --border-radius-button: #{$border-radius-button};
+  --border-radius-card: #{$border-radius-card};
+  --border-radius-input: #{$border-radius-input};
+  --border-radius-modal: #{$border-radius-modal};
+  --border-radius-tooltip: #{$border-radius-tooltip};
+  --border-radius-badge: #{$border-radius-badge};
+
+  // Border Width
+  --border-width-none: #{$border-width-none};
+  --border-width-thin: #{$border-width-thin};
+  --border-width-medium: #{$border-width-medium};
+  --border-width-thick: #{$border-width-thick};
+}
+
+// Border Utility Functions
+@function border-radius($key) {
+  @if map-has-key($border-radius-scale, $key) {
+    @return map-get($border-radius-scale, $key);
+  } @else {
+    @warn "Border radius key '#{$key}' not found in border radius scale";
+    @return $border-radius-none;
+  }
+}
+
+@function border-width($key) {
+  @if map-has-key($border-width-scale, $key) {
+    @return map-get($border-width-scale, $key);
+  } @else {
+    @warn "Border width key '#{$key}' not found in border width scale";
+    @return $border-width-thin;
+  }
+}
+
+// Border Mixins
+@mixin border-radius($size) {
+  border-radius: border-radius($size);
+}
+
+@mixin border($width: thin, $style: solid, $color: var(--color-border-medium)) {
+  border: border-width($width) $style $color;
+}
+
+@mixin border-top($width: thin, $style: solid, $color: var(--color-border-medium)) {
+  border-top: border-width($width) $style $color;
+}
+
+@mixin border-right($width: thin, $style: solid, $color: var(--color-border-medium)) {
+  border-right: border-width($width) $style $color;
+}
+
+@mixin border-bottom($width: thin, $style: solid, $color: var(--color-border-medium)) {
+  border-bottom: border-width($width) $style $color;
+}
+
+@mixin border-left($width: thin, $style: solid, $color: var(--color-border-medium)) {
+  border-left: border-width($width) $style $color;
+}
+
+// Border Utility Classes
+.rounded-none {
+  border-radius: var(--border-radius-none);
+}
+
+.rounded-sm {
+  border-radius: var(--border-radius-sm);
+}
+
+.rounded-md {
+  border-radius: var(--border-radius-md);
+}
+
+.rounded-lg {
+  border-radius: var(--border-radius-lg);
+}
+
+.rounded-xl {
+  border-radius: var(--border-radius-xl);
+}
+
+.rounded-2xl {
+  border-radius: var(--border-radius-2xl);
+}
+
+.rounded-3xl {
+  border-radius: var(--border-radius-3xl);
+}
+
+.rounded-full {
+  border-radius: var(--border-radius-full);
+}
+
+.rounded-button {
+  border-radius: var(--border-radius-button);
+}
+
+.rounded-card {
+  border-radius: var(--border-radius-card);
+}
+
+.rounded-input {
+  border-radius: var(--border-radius-input);
+}
+
+.rounded-modal {
+  border-radius: var(--border-radius-modal);
+}
+
+.rounded-tooltip {
+  border-radius: var(--border-radius-tooltip);
+}
+
+.rounded-badge {
+  border-radius: var(--border-radius-badge);
+}
+
+.border-none {
+  border: var(--border-width-none);
+}
+
+.border-thin {
+  border: var(--border-width-thin) solid var(--color-border-medium);
+}
+
+.border-medium {
+  border: var(--border-width-medium) solid var(--color-border-medium);
+}
+
+.border-thick {
+  border: var(--border-width-thick) solid var(--color-border-medium);
+}
+
+.border-light {
+  border-color: var(--color-border-light);
+}
+
+.border-medium {
+  border-color: var(--color-border-medium);
+}
+
+.border-dark {
+  border-color: var(--color-border-dark);
+}

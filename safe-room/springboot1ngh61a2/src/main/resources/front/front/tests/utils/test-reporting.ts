@@ -102,6 +102,19 @@ export interface ReportMetadata {
   branch?: string
 }
 
+export interface TestResult {
+  title: string
+  status: 'passed' | 'failed' | 'skipped'
+  duration?: number
+}
+
+export interface CoverageData {
+  statements?: { pct: number }
+  branches?: { pct: number }
+  functions?: { pct: number }
+  lines?: { pct: number }
+}
+
 export class TestReporter {
   private reportDir: string
   private coverageDir: string
@@ -115,7 +128,7 @@ export class TestReporter {
   /**
    * 生成完整的测试报告
    */
-  async generateComprehensiveReport(testResults: any[]): Promise<TestReport> {
+  async generateComprehensiveReport(testResults: TestResult[]): Promise<TestReport> {
     console.log('Generating comprehensive test report...')
 
     const summary = this.generateTestSummary(testResults)
@@ -140,7 +153,7 @@ export class TestReporter {
   /**
    * 生成测试摘要
    */
-  private generateTestSummary(testResults: any[]): TestSummary {
+  private generateTestSummary(testResults: TestResult[]): TestSummary {
     const total = testResults.length
     const passed = testResults.filter(t => t.status === 'passed').length
     const failed = testResults.filter(t => t.status === 'failed').length
@@ -190,7 +203,7 @@ export class TestReporter {
       const files: FileCoverage[] = []
 
       // 处理文件级覆盖率
-      Object.entries(coverageData).forEach(([filename, data]: [string, any]) => {
+      Object.entries(coverageData).forEach(([filename, data]: [string, CoverageData]) => {
         if (filename !== 'total') {
           files.push({
             filename,
@@ -254,7 +267,7 @@ export class TestReporter {
   /**
    * 判断覆盖率状态
    */
-  private determineCoverageStatus(overall: any, thresholds: CoverageThresholds): 'passed' | 'failed' | 'warning' {
+  private determineCoverageStatus(overall: CoverageData, thresholds: CoverageThresholds): 'passed' | 'failed' | 'warning' {
     const statements = overall.statements?.pct || 0
     const branches = overall.branches?.pct || 0
     const functions = overall.functions?.pct || 0
@@ -274,7 +287,7 @@ export class TestReporter {
   /**
    * 生成性能报告
    */
-  private generatePerformanceReport(testResults: any[]): PerformanceReport {
+  private generatePerformanceReport(testResults: TestResult[]): PerformanceReport {
     const durations = testResults.map(t => t.duration || 0).filter(d => d > 0)
     const sortedDurations = [...durations].sort((a, b) => a - b)
 
@@ -675,7 +688,7 @@ export function createTestReporter(reportDir?: string): TestReporter {
   return new TestReporter(reportDir)
 }
 
-export async function generateTestReport(testResults: any[], reportDir?: string): Promise<TestReport> {
+export async function generateTestReport(testResults: TestResult[], reportDir?: string): Promise<TestReport> {
   const reporter = createTestReporter(reportDir)
   return await reporter.generateComprehensiveReport(testResults)
 }

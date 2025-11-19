@@ -224,14 +224,24 @@ export class TestDataManager {
   }
 
   /**
+   * 数据过滤器接口
+   */
+  interface DataFilters {
+    [key: string]: string | number | boolean | Date
+  }
+
+  /**
    * 获取可重用的测试数据
    */
-  getReusableData(type: 'user' | 'course' | 'booking', filters: any = {}): any[] {
+  getReusableData(
+    type: 'user' | 'course' | 'booking',
+    filters: DataFilters = {}
+  ): Array<TestUser | TestCourse | TestBooking> {
     const allContexts = Array.from(this.dataContexts.values())
-    const reusableData: any[] = []
+    const reusableData: Array<TestUser | TestCourse | TestBooking> = []
 
     for (const context of allContexts) {
-      let dataArray: any[]
+      let dataArray: Array<TestUser | TestCourse | TestBooking>
 
       switch (type) {
         case 'user':
@@ -432,8 +442,11 @@ export class TestDataManager {
 /**
  * 测试数据隔离装饰器
  */
-export function withDataIsolation(testFunction: Function, dependencies: string[] = []) {
-  return async function(...args: any[]) {
+export function withDataIsolation(
+  testFunction: (...args: unknown[]) => Promise<unknown>,
+  dependencies: string[] = []
+) {
+  return async function(...args: unknown[]) {
     const testInfo = args[0] // Playwright的testInfo参数
     const testId = testInfo.testId || `test_${Date.now()}_${Math.random()}`
 
