@@ -1,0 +1,360 @@
+// =================================
+// Design Token System - Colors
+// =================================
+
+// Microsoft Copilot Color System
+$color-caramel-100: 255 251 248;
+$color-caramel-150: 254 243 234;
+$color-caramel-200: 254 230 212;
+$color-caramel-250: 253 213 182;
+$color-caramel-300: 248 188 140;
+$color-caramel-350: 226 156 97;
+$color-caramel-400: 202 125 54;
+$color-caramel-450: 162 90 2;
+$color-caramel-550: 138 75 1;
+$color-caramel-600: 127 68 0;
+$color-caramel-650: 107 57 0;
+$color-caramel-700: 88 47 3;
+$color-caramel-750: 66 38 13;
+$color-caramel-800: 50 31 15;
+$color-caramel-850: 36 24 13;
+$color-caramel-900: 24 16 10;
+
+$color-cocoa-100: 255 251 248;
+$color-cocoa-150: 255 243 234;
+$color-cocoa-200: 246 232 221;
+$color-cocoa-250: 235 219 206;
+$color-cocoa-300: 218 198 183;
+$color-cocoa-350: 193 169 150;
+$color-cocoa-400: 168 140 118;
+$color-cocoa-450: 135 103 78;
+$color-cocoa-550: 116 87 64;
+$color-cocoa-600: 106 79 57;
+$color-cocoa-650: 89 66 47;
+$color-cocoa-700: 73 54 38;
+$color-cocoa-750: 58 42 30;
+$color-cocoa-800: 45 33 23;
+$color-cocoa-850: 34 24 17;
+$color-cocoa-900: 23 16 10;
+
+$color-midnight-100: 251 252 254;
+$color-midnight-150: 241 245 255;
+$color-midnight-200: 228 235 255;
+$color-midnight-250: 209 221 255;
+$color-midnight-300: 183 201 254;
+$color-midnight-350: 151 171 234;
+$color-midnight-400: 121 143 212;
+$color-midnight-450: 83 105 182;
+$color-midnight-550: 68 88 160;
+$color-midnight-600: 62 80 145;
+$color-midnight-650: 53 68 121;
+$color-midnight-700: 44 56 96;
+$color-midnight-750: 35 44 73;
+$color-midnight-800: 28 35 56;
+$color-midnight-850: 21 26 40;
+$color-midnight-900: 14 17 27;
+
+$color-slate-100: 251 252 254;
+$color-slate-150: 241 245 255;
+$color-slate-200: 229 235 250;
+$color-slate-250: 215 222 239;
+$color-slate-300: 194 202 223;
+$color-slate-350: 164 173 200;
+$color-slate-400: 135 145 176;
+$color-slate-450: 98 109 143;
+$color-slate-550: 82 92 123;
+$color-slate-600: 74 84 113;
+$color-slate-650: 62 71 96;
+$color-slate-700: 51 58 78;
+$color-slate-750: 40 45 62;
+$color-slate-800: 31 36 49;
+$color-slate-850: 23 26 37;
+$color-slate-900: 15 17 25;
+
+$color-stone-100: 255 251 248;
+$color-stone-150: 248 244 241;
+$color-stone-200: 239 234 231;
+$color-stone-250: 226 221 217;
+$color-stone-300: 207 201 197;
+$color-stone-350: 179 173 168;
+$color-stone-400: 152 145 139;
+$color-stone-450: 116 109 104;
+$color-stone-550: 99 92 87;
+$color-stone-600: 90 84 79;
+$color-stone-650: 76 70 66;
+$color-stone-700: 63 57 53;
+$color-stone-750: 50 45 41;
+$color-stone-800: 39 35 32;
+$color-stone-850: 29 26 23;
+$color-stone-900: 20 17 14;
+
+$color-system-green-250: 216 236 163;
+$color-system-green-350: 111 195 102;
+$color-system-green-400: 75 168 73;
+$color-system-green-550: 18 115 35;
+$color-system-green-650: 4 88 25;
+$color-system-green-750: 0 61 15;
+$color-system-green-800: 0 48 12;
+
+$color-system-red-200: 255 235 236;
+$color-system-red-250: 255 214 215;
+$color-system-red-300: 255 172 176;
+$color-system-red-350: 250 129 139;
+$color-system-red-400: 216 104 114;
+$color-system-red-450: 184 80 91;
+$color-system-red-550: 153 58 69;
+$color-system-red-600: 137 47 59;
+$color-system-red-650: 118 39 50;
+$color-system-red-850: 51 12 17;
+
+$color-system-blue-350: 120 176 255;
+$color-system-blue-550: 1 89 186;
+$color-system-teal-250: 157 238 244;
+$color-system-teal-550: 2 107 112;
+
+// Primary Brand Colors
+$color-primary-50: #eff6ff;
+$color-primary-100: #dbeafe;
+$color-primary-200: #bfdbfe;
+$color-primary-300: #93c5fd;
+$color-primary-400: #60a5fa;
+$color-primary-500: #3b82f6; // Primary color
+$color-primary-600: #2563eb;
+$color-primary-700: #1d4ed8;
+$color-primary-800: #1e40af;
+$color-primary-900: #1e3a8a;
+
+// Success Colors
+$color-success-50: #f0fdf4;
+$color-success-500: #22c55e; // Primary success color
+$color-success-600: #16a34a;
+
+// Warning Colors
+$color-warning-50: #fffbeb;
+$color-warning-500: #f59e0b; // Primary warning color
+$color-warning-600: #d97706;
+
+// Danger Colors
+$color-danger-50: #fef2f2;
+$color-danger-500: #ef4444; // Primary danger color
+$color-danger-600: #dc2626;
+
+// Semantic Colors
+$color-text-primary: #111827;   // Primary text
+$color-text-secondary: #6b7280; // Secondary text
+$color-text-tertiary: #9ca3af;  // Tertiary text
+$color-text-inverse: #ffffff;   // Text on dark backgrounds
+
+$color-bg-primary: #ffffff;     // Primary background
+$color-bg-secondary: #f9fafb;   // Secondary background
+$color-bg-tertiary: #f3f4f6;    // Tertiary background
+$color-bg-overlay: rgba(0, 0, 0, 0.5); // Overlay
+
+$color-border-light: #f3f4f6;   // Light borders
+$color-border-medium: #d1d5db; // Medium borders
+$color-border-dark: #9ca3af;    // Dark borders
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$gradient-danger: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+$gradient-bg-auth: linear-gradient(135deg, #fafbfc 0%, #f5f7fa 50%, #fafbfc 100%);
+$gradient-bg-dashboard: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+$gradient-bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+// Clip Path (for squircle shapes)
+$clip-path-squircle-16: polygon(0px 32px,.078px 20.2712px,.3127px 16.0785px,.7058px 13.0122px,1.2605px 10.5458px,1.9817px 8.4842px,2.8766px 6.7314px,3.9554px 5.233px,5.233px 3.9554px,6.7314px 2.8766px,8.4842px 1.9817px,10.5458px 1.2605px,13.0122px .7058px,16.0785px .3127px,20.2712px .078px,32px 0px, calc(100% - 32px) 0px, calc(100% - 19.9074px) .0896px, calc(100% - 15.5906px) .3591px, calc(100% - 12.4422px) .8109px, calc(100% - 9.9208px) 1.4493px, calc(100% - 7.8262px) 2.2809px, calc(100% - 6.0604px) 3.3157px, calc(100% - 4.5682px) 4.5682px, calc(100% - 3.3157px) 6.0604px, calc(100% - 2.2809px) 7.8262px, calc(100% - 1.4493px) 9.9208px, calc(100% - .8109px) 12.4422px, calc(100% - .3591px) 15.5906px, calc(100% - .0896px) 19.9074px,100% 32px,100% calc(100% - 32px) , calc(100% - .0896px) calc(100% - 19.9074px) , calc(100% - .3591px) calc(100% - 15.5906px) , calc(100% - .8109px) calc(100% - 12.4422px) , calc(100% - 1.4493px) calc(100% - 9.9208px) , calc(100% - 2.2809px) calc(100% - 7.8262px) , calc(100% - 3.3157px) calc(100% - 6.0604px) , calc(100% - 4.5682px) calc(100% - 4.5682px) , calc(100% - 6.0604px) calc(100% - 3.3157px) , calc(100% - 7.8262px) calc(100% - 2.2809px) , calc(100% - 9.9208px) calc(100% - 1.4493px) , calc(100% - 12.4422px) calc(100% - .8109px) , calc(100% - 15.5906px) calc(100% - .3591px) , calc(100% - 19.9074px) calc(100% - .0896px) , calc(100% - 32px) 100%,32px 100%,19.9074px calc(100% - .0896px) ,15.5906px calc(100% - .3591px) ,12.4422px calc(100% - .8109px) ,9.9208px calc(100% - 1.4493px) ,7.8262px calc(100% - 2.2809px) ,6.0604px calc(100% - 3.3157px) ,4.5682px calc(100% - 4.5682px) ,3.3157px calc(100% - 6.0604px) ,2.2809px calc(100% - 7.8262px) ,1.4493px calc(100% - 9.9208px) ,.8109px calc(100% - 12.4422px) ,.3591px calc(100% - 15.5906px) ,.0896px calc(100% - 19.9074px) ,0px calc(100% - 32px) ,0px calc(100% - 32px) ,0px calc(92.3077% - 27.0769px) ,0px calc(84.6154% - 22.1538px) ,0px calc(76.9231% - 17.2308px) ,0px calc(69.2308% - 12.3077px) ,0px calc(61.5385% - 7.3846px) ,0px calc(53.8462% - 2.4615px) ,0px calc(46.1538% + 2.4615px) ,0px calc(38.4615% + 7.3846px) ,0px calc(30.7692% + 12.3077px) ,0px calc(23.0769% + 17.2308px) ,0px calc(15.3846% + 22.1538px) ,0px calc(7.6923% + 27.0769px) ,0px 32px);
+
+// CSS Custom Properties (for runtime theme switching)
+:root {
+  // Microsoft Copilot Colors
+  --color-caramel-100: #{$color-caramel-100};
+  --color-caramel-150: #{$color-caramel-150};
+  --color-caramel-200: #{$color-caramel-200};
+  --color-caramel-250: #{$color-caramel-250};
+  --color-caramel-300: #{$color-caramel-300};
+  --color-caramel-350: #{$color-caramel-350};
+  --color-caramel-400: #{$color-caramel-400};
+  --color-caramel-450: #{$color-caramel-450};
+  --color-caramel-550: #{$color-caramel-550};
+  --color-caramel-600: #{$color-caramel-600};
+  --color-caramel-650: #{$color-caramel-650};
+  --color-caramel-700: #{$color-caramel-700};
+  --color-caramel-750: #{$color-caramel-750};
+  --color-caramel-800: #{$color-caramel-800};
+  --color-caramel-850: #{$color-caramel-850};
+  --color-caramel-900: #{$color-caramel-900};
+
+  --color-cocoa-100: #{$color-cocoa-100};
+  --color-cocoa-150: #{$color-cocoa-150};
+  --color-cocoa-200: #{$color-cocoa-200};
+  --color-cocoa-250: #{$color-cocoa-250};
+  --color-cocoa-300: #{$color-cocoa-300};
+  --color-cocoa-350: #{$color-cocoa-350};
+  --color-cocoa-400: #{$color-cocoa-400};
+  --color-cocoa-450: #{$color-cocoa-450};
+  --color-cocoa-550: #{$color-cocoa-550};
+  --color-cocoa-600: #{$color-cocoa-600};
+  --color-cocoa-650: #{$color-cocoa-650};
+  --color-cocoa-700: #{$color-cocoa-700};
+  --color-cocoa-750: #{$color-cocoa-750};
+  --color-cocoa-800: #{$color-cocoa-800};
+  --color-cocoa-850: #{$color-cocoa-850};
+  --color-cocoa-900: #{$color-cocoa-900};
+
+  --color-midnight-100: #{$color-midnight-100};
+  --color-midnight-150: #{$color-midnight-150};
+  --color-midnight-200: #{$color-midnight-200};
+  --color-midnight-250: #{$color-midnight-250};
+  --color-midnight-300: #{$color-midnight-300};
+  --color-midnight-350: #{$color-midnight-350};
+  --color-midnight-400: #{$color-midnight-400};
+  --color-midnight-450: #{$color-midnight-450};
+  --color-midnight-550: #{$color-midnight-550};
+  --color-midnight-600: #{$color-midnight-600};
+  --color-midnight-650: #{$color-midnight-650};
+  --color-midnight-700: #{$color-midnight-700};
+  --color-midnight-750: #{$color-midnight-750};
+  --color-midnight-800: #{$color-midnight-800};
+  --color-midnight-850: #{$color-midnight-850};
+  --color-midnight-900: #{$color-midnight-900};
+
+  --color-slate-100: #{$color-slate-100};
+  --color-slate-150: #{$color-slate-150};
+  --color-slate-200: #{$color-slate-200};
+  --color-slate-250: #{$color-slate-250};
+  --color-slate-300: #{$color-slate-300};
+  --color-slate-350: #{$color-slate-350};
+  --color-slate-400: #{$color-slate-400};
+  --color-slate-450: #{$color-slate-450};
+  --color-slate-550: #{$color-slate-550};
+  --color-slate-600: #{$color-slate-600};
+  --color-slate-650: #{$color-slate-650};
+  --color-slate-700: #{$color-slate-700};
+  --color-slate-750: #{$color-slate-750};
+  --color-slate-800: #{$color-slate-800};
+  --color-slate-850: #{$color-slate-850};
+  --color-slate-900: #{$color-slate-900};
+
+  --color-stone-100: #{$color-stone-100};
+  --color-stone-150: #{$color-stone-150};
+  --color-stone-200: #{$color-stone-200};
+  --color-stone-250: #{$color-stone-250};
+  --color-stone-300: #{$color-stone-300};
+  --color-stone-350: #{$color-stone-350};
+  --color-stone-400: #{$color-stone-400};
+  --color-stone-450: #{$color-stone-450};
+  --color-stone-550: #{$color-stone-550};
+  --color-stone-600: #{$color-stone-600};
+  --color-stone-650: #{$color-stone-650};
+  --color-stone-700: #{$color-stone-700};
+  --color-stone-750: #{$color-stone-750};
+  --color-stone-800: #{$color-stone-800};
+  --color-stone-850: #{$color-stone-850};
+  --color-stone-900: #{$color-stone-900};
+
+  --color-system-green-250: #{$color-system-green-250};
+  --color-system-green-350: #{$color-system-green-350};
+  --color-system-green-400: #{$color-system-green-400};
+  --color-system-green-550: #{$color-system-green-550};
+  --color-system-green-650: #{$color-system-green-650};
+  --color-system-green-750: #{$color-system-green-750};
+  --color-system-green-800: #{$color-system-green-800};
+
+  --color-system-red-200: #{$color-system-red-200};
+  --color-system-red-250: #{$color-system-red-250};
+  --color-system-red-300: #{$color-system-red-300};
+  --color-system-red-350: #{$color-system-red-350};
+  --color-system-red-400: #{$color-system-red-400};
+  --color-system-red-450: #{$color-system-red-450};
+  --color-system-red-550: #{$color-system-red-550};
+  --color-system-red-600: #{$color-system-red-600};
+  --color-system-red-650: #{$color-system-red-650};
+  --color-system-red-850: #{$color-system-red-850};
+
+  --color-system-blue-350: #{$color-system-blue-350};
+  --color-system-blue-550: #{$color-system-blue-550};
+  --color-system-teal-250: #{$color-system-teal-250};
+  --color-system-teal-550: #{$color-system-teal-550};
+
+  // Primary Brand Colors
+  --color-primary-50: #{$color-primary-50};
+  --color-primary-100: #{$color-primary-100};
+  --color-primary-200: #{$color-primary-200};
+  --color-primary-300: #{$color-primary-300};
+  --color-primary-400: #{$color-primary-400};
+  --color-primary-500: #{$color-primary-500};
+  --color-primary-600: #{$color-primary-600};
+  --color-primary-700: #{$color-primary-700};
+  --color-primary-800: #{$color-primary-800};
+  --color-primary-900: #{$color-primary-900};
+
+  // Success Colors
+  --color-success-50: #{$color-success-50};
+  --color-success-500: #{$color-success-500};
+  --color-success-600: #{$color-success-600};
+
+  // Warning Colors
+  --color-warning-50: #{$color-warning-50};
+  --color-warning-500: #{$color-warning-500};
+  --color-warning-600: #{$color-warning-600};
+
+  // Danger Colors
+  --color-danger-50: #{$color-danger-50};
+  --color-danger-500: #{$color-danger-500};
+  --color-danger-600: #{$color-danger-600};
+
+  // Semantic Colors
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --color-text-tertiary: #{$color-text-tertiary};
+  --color-text-inverse: #{$color-text-inverse};
+
+  --color-bg-primary: #{$color-bg-primary};
+  --color-bg-secondary: #{$color-bg-secondary};
+  --color-bg-tertiary: #{$color-bg-tertiary};
+  --color-bg-overlay: #{$color-bg-overlay};
+
+  --color-border-light: #{$color-border-light};
+  --color-border-medium: #{$color-border-medium};
+  --color-border-dark: #{$color-border-dark};
+
+  // Gradients
+  --gradient-primary: #{$gradient-primary};
+  --gradient-success: #{$gradient-success};
+  --gradient-warning: #{$gradient-warning};
+  --gradient-danger: #{$gradient-danger};
+  --gradient-bg-auth: #{$gradient-bg-auth};
+  --gradient-bg-dashboard: #{$gradient-bg-dashboard};
+  --gradient-bg-card: #{$gradient-bg-card};
+
+  // Clip Path
+  --clip-path-squircle-16: #{$clip-path-squircle-16};
+}
+
+// Light Theme (Default)
+[data-theme="light"] {
+  --color-bg-primary: #{$color-bg-primary};
+  --color-bg-secondary: #{$color-bg-secondary};
+  --color-text-primary: #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --gradient-bg-auth: #{$gradient-bg-auth};
+}
+
+// Dark Theme
+[data-theme="dark"] {
+  --color-bg-primary: #{$color-midnight-900};
+  --color-bg-secondary: #{$color-midnight-800};
+  --color-text-primary: #{$color-stone-100};
+  --color-text-secondary: #{$color-stone-200};
+  --gradient-bg-auth: linear-gradient(135deg, #{$color-midnight-900} 0%, #{$color-midnight-800} 100%);
+}
+
+// High Contrast Mode Support
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-light: #{$color-text-primary};
+    --color-border-medium: #{$color-text-primary};
+  }
+}

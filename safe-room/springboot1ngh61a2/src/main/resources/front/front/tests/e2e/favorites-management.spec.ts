@@ -2,10 +2,13 @@ import { test, expect } from '@playwright/test'
 import { setupTestEnvironment, logTestStep, takeScreenshotWithTimestamp } from '../utils/shared-helpers'
 import { UserCenterPage } from '../utils/page-objects/user-center-page'
 
-test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
+test.describe('收藏夹管理模块测试', () => {
+  test.beforeEach(async ({ page }) => {
+    await setupTestEnvironment(page)
+    // 设置收藏夹管理测试环境
   })
 
-  test.describe('收藏夹页面访�?, () => {
+  test.describe('收藏夹页面访问', () => {
     test('应正确显示收藏夹页面', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
@@ -14,22 +17,22 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       // 验证收藏夹页面加�?
       await expect(page.locator('.favorites-page, .favorites-container')).toBeVisible()
 
-      logTestStep('收藏夹页面加载成�?)
+      logTestStep('收藏夹页面加载成功')
     })
 
-    test('应显示收藏内容列�?, async ({ page }) => {
+    test('应显示收藏内容列表', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
 
       // 验证收藏内容显示
       const favoriteCount = await userCenter.getFavoriteCount()
-      logTestStep(`收藏夹显�?${favoriteCount} 个收藏项`)
+      logTestStep(`收藏夹显示${favoriteCount} 个收藏项`)
     })
   })
 
   test.describe('收藏内容查看', () => {
-    test('应支持收藏项目详情查�?, async ({ page }) => {
+    test('应支持收藏项目详情查看', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -39,7 +42,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       if (await favoriteItems.count() > 0) {
         await favoriteItems.first().click()
 
-        // 验证跳转到详情页�?
+        // 验证跳转到详情页面
         await page.waitForURL(/.*/, { timeout: 3000 })
         logTestStep('收藏项目详情查看成功')
       } else {
@@ -47,7 +50,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       }
     })
 
-    test('应验证收藏内容信息完整�?, async ({ page }) => {
+    test('应验证收藏内容信息完整性', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -56,7 +59,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       if (await favoriteItems.count() > 0) {
         const firstItem = favoriteItems.first()
 
-        // 验证收藏项包含标�?
+        // 验证收藏项包含标题
         await expect(firstItem.locator('.title, .favorite-title')).toBeVisible()
 
         // 验证包含类型信息
@@ -68,7 +71,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
   })
 
   test.describe('收藏管理操作', () => {
-    test('应支持取消收藏操�?, async ({ page }) => {
+    test('应支持取消收藏操作', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -77,7 +80,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       const countBefore = await userCenter.getFavoriteCount()
 
       if (countBefore > 0) {
-        // 点击第一个收藏项的取消收藏按�?
+        // 点击第一个收藏项的取消收藏按钮
         const favoriteItems = page.locator('.favorite-item, .fav-item')
         const firstItem = favoriteItems.first()
 
@@ -90,7 +93,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
           await page.locator('button:has-text("确认"), .confirm-btn').click()
 
           // 验证取消成功提示
-          await page.waitForSelector('text=已取消收�? .success-message', { timeout: 3000 }).catch(() => {})
+          await page.waitForSelector('text=已取消收藏 .success-message', { timeout: 3000 }).catch(() => {})
 
           // 验证收藏数量减少
           const countAfter = await userCenter.getFavoriteCount()
@@ -110,7 +113,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       }
     })
 
-    test('应支持批量收藏管�?, async ({ page }) => {
+    test('应支持批量收藏管理', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -120,12 +123,12 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       if (await batchBtn.isVisible()) {
         await batchBtn.click()
 
-        // 选择多个收藏�?
+        // 选择多个收藏项
         const checkboxes = page.locator('input[type="checkbox"], .checkbox')
         const checkboxCount = await checkboxes.count()
 
         if (checkboxCount > 1) {
-          // 选择前两�?
+          // 选择前两项
           await checkboxes.nth(0).check()
           await checkboxes.nth(1).check()
 
@@ -138,13 +141,13 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
           logTestStep('无足够收藏项进行批量操作')
         }
       } else {
-        logTestStep('不支持批量收藏管�?)
+        logTestStep('不支持批量收藏管理')
       }
     })
   })
 
   test.describe('收藏分类管理', () => {
-    test('应支持收藏分类查�?, async ({ page }) => {
+    test('应支持收藏分类查看', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -154,18 +157,18 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       const categoryCount = await categoryTabs.count()
 
       if (categoryCount > 0) {
-        // 点击第一个分�?
+        // 点击第一个分类
         await categoryTabs.first().click()
 
         // 验证分类内容更新
         const newCount = await userCenter.getFavoriteCount()
         logTestStep(`切换到分类，显示 ${newCount} 个收藏项`)
       } else {
-        logTestStep('无收藏分�?)
+        logTestStep('无收藏分类')
       }
     })
 
-    test('应支持按类型筛选收�?, async ({ page }) => {
+    test('应支持按类型筛选收藏', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -175,7 +178,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       const filterCount = await typeFilters.count()
 
       if (filterCount > 0) {
-        // 点击课程类型筛�?
+        // 点击课程类型筛选
         const courseFilter = page.locator('text=课程, .filter-course')
         if (await courseFilter.isVisible()) {
           await courseFilter.click()
@@ -184,16 +187,16 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
           logTestStep(`筛选课程类型，显示 ${filteredCount} 个收藏项`)
         } else {
           await typeFilters.first().click()
-          logTestStep('类型筛选功能正�?)
+          logTestStep('类型筛选功能正常')
         }
       } else {
-        logTestStep('无类型筛选功�?)
+        logTestStep('无类型筛选功能')
       }
     })
   })
 
   test.describe('收藏数据同步', () => {
-    test('应验证收藏状态同�?, async ({ page }) => {
+    test('应验证收藏状态同步', async ({ page }) => {
       // 先在其他页面添加收藏
       await page.goto('/#/index/jianshenkecheng')
       await page.waitForLoadState('networkidle')
@@ -219,9 +222,9 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
           const favoriteCount = await userCenter.getFavoriteCount()
           expect(favoriteCount).toBeGreaterThan(0)
 
-          logTestStep('收藏状态同步正�?)
+          logTestStep('收藏状态同步正常')
         } else {
-          logTestStep('未找到收藏按�?)
+          logTestStep('未找到收藏按钮')
         }
       } else {
         logTestStep('无课程可收藏')
@@ -240,16 +243,16 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       await userCenter.expectLoaded()
       await userCenter.navigateToTab('favorites')
 
-      // 验证收藏数据保持一�?
+      // 验证收藏数据保持一致
       const afterReloadCount = await userCenter.getFavoriteCount()
       expect(afterReloadCount).toBe(initialCount)
 
-      logTestStep('收藏数据持久化正�?)
+      logTestStep('收藏数据持久化正常')
     })
   })
 
   test.describe('收藏分享功能', () => {
-    test('应支持收藏内容分�?, async ({ page }) => {
+    test('应支持收藏内容分享', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -263,19 +266,19 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
         if (await shareBtn.isVisible()) {
           await shareBtn.click()
 
-          // 验证分享弹窗或链接生�?
+          // 验证分享弹窗或链接生成
           await page.waitForSelector('.share-modal, .share-options, text=分享链接', { timeout: 3000 }).catch(() => {})
 
           logTestStep('收藏内容分享功能正常')
         } else {
-          logTestStep('不支持收藏内容分�?)
+          logTestStep('不支持收藏内容分享')
         }
       } else {
         logTestStep('无收藏内容可分享')
       }
     })
 
-    test('应支持导出收藏列�?, async ({ page }) => {
+    test('应支持导出收藏列表', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
@@ -290,14 +293,14 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
 
         logTestStep('收藏列表导出功能正常')
       } else {
-        logTestStep('不支持收藏列表导�?)
+        logTestStep('不支持收藏列表导出')
       }
     })
   })
 
-  test.describe('响应式设计测�?, () => {
+  test.describe('响应式设计测试', () => {
     test('应在移动端正确显示收藏夹', async ({ page }) => {
-      // 设置移动端视�?
+      // 设置移动端视图
       await page.setViewportSize({ width: 375, height: 667 })
 
       const userCenter = new UserCenterPage(page)
@@ -306,28 +309,28 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
 
       // 验证移动端收藏夹显示
       const favoriteCount = await userCenter.getFavoriteCount()
-      logTestStep(`移动端显�?${favoriteCount} 个收藏项`)
+      logTestStep(`移动端显示${favoriteCount} 个收藏项`)
     })
 
-    test('应在平板端优化收藏管�?, async ({ page }) => {
-      // 设置平板端视�?
+    test('应在平板端优化收藏管理', async ({ page }) => {
+      // 设置平板端视图
       await page.setViewportSize({ width: 768, height: 1024 })
 
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
       await userCenter.navigateToTab('favorites')
 
-      // 测试平板端交�?
+      // 测试平板端交互
       const favoriteItems = page.locator('.favorite-item, .fav-item')
       if (await favoriteItems.count() > 0) {
         // 测试悬停效果
         await favoriteItems.first().hover()
-        logTestStep('平板端收藏管理交互正�?)
+        logTestStep('平板端收藏管理交互正常')
       }
     })
   })
 
-  test.describe('收藏数据完整�?, () => {
+  test.describe('收藏数据完整性', () => {
     test('应验证收藏项数据结构', async ({ page }) => {
       const userCenter = new UserCenterPage(page)
       await userCenter.goto()
@@ -337,16 +340,16 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
       if (await favoriteItems.count() > 0) {
         const firstItem = favoriteItems.first()
 
-        // 验证收藏项包含必要信�?
+        // 验证收藏项包含必要信息
         await expect(firstItem.locator('.title, .name')).toBeVisible()
         await expect(firstItem.locator('.date, .add-time')).toBeVisible()
 
-        logTestStep('收藏项数据结构完�?)
+        logTestStep('收藏项数据结构完整')
       }
     })
 
-    test('应验证收藏操作反�?, async ({ page }) => {
-      // 测试添加收藏的反�?
+    test('应验证收藏操作反馈', async ({ page }) => {
+      // 测试添加收藏的反馈
       await page.goto('/#/index/jianshenkecheng')
       await page.waitForLoadState('networkidle')
 
@@ -357,7 +360,7 @@ test.describe('收藏夹管理模块测试'设置收藏夹管理测试环�?)
           await favoriteBtn.click()
 
           // 验证操作反馈
-          await page.waitForSelector('text=收藏成功, text=已收�? .toast-message, .el-message', { timeout: 3000 }).catch(() => {})
+          await page.waitForSelector('text=收藏成功, text=已收藏 .toast-message, .el-message', { timeout: 3000 }).catch(() => {})
 
           logTestStep('收藏操作反馈正常')
         }

@@ -1,0 +1,334 @@
+// =================================
+// Design Token System - Animations
+// =================================
+
+// Easing Functions
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-emphasized-in: cubic-bezier(0.05, 0.7, 0.1, 1);
+$ease-emphasized-out: cubic-bezier(0.3, 0, 0.8, 0.15);
+$ease-emphasized-in-out: cubic-bezier(0.05, 0.7, 0.1, 1.15);
+$ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// Duration Scale
+$duration-0: 0ms;
+$duration-25: 25ms;
+$duration-50: 50ms;
+$duration-75: 75ms;
+$duration-100: 100ms;
+$duration-150: 150ms;
+$duration-200: 200ms;
+$duration-300: 300ms;
+$duration-500: 500ms;
+$duration-700: 700ms;
+$duration-1000: 1000ms;
+
+// Animation Scale Map for programmatic access
+$ease-scale: (
+  in: $ease-in,
+  out: $ease-out,
+  in-out: $ease-in-out,
+  emphasized-in: $ease-emphasized-in,
+  emphasized-out: $ease-emphasized-out,
+  emphasized-in-out: $ease-emphasized-in-out,
+  spring: $ease-spring,
+  bounce: $ease-bounce,
+);
+
+$duration-scale: (
+  0: $duration-0,
+  25: $duration-25,
+  50: $duration-50,
+  75: $duration-75,
+  100: $duration-100,
+  150: $duration-150,
+  200: $duration-200,
+  300: $duration-300,
+  500: $duration-500,
+  700: $duration-700,
+  1000: $duration-1000,
+);
+
+// Semantic Transitions
+$transition-fast: $duration-150 $ease-out;
+$transition-normal: $duration-200 $ease-out;
+$transition-slow: $duration-300 $ease-out;
+$transition-bounce: $duration-500 $ease-bounce;
+$transition-spring: $duration-300 $ease-spring;
+
+// CSS Custom Properties for Animations
+:root {
+  // Easing Functions
+  --ease-in: #{$ease-in};
+  --ease-out: #{$ease-out};
+  --ease-in-out: #{$ease-in-out};
+  --ease-emphasized-in: #{$ease-emphasized-in};
+  --ease-emphasized-out: #{$ease-emphasized-out};
+  --ease-emphasized-in-out: #{$ease-emphasized-in-out};
+  --ease-spring: #{$ease-spring};
+  --ease-bounce: #{$ease-bounce};
+
+  // Duration Scale
+  --duration-0: #{$duration-0};
+  --duration-25: #{$duration-25};
+  --duration-50: #{$duration-50};
+  --duration-75: #{$duration-75};
+  --duration-100: #{$duration-100};
+  --duration-150: #{$duration-150};
+  --duration-200: #{$duration-200};
+  --duration-300: #{$duration-300};
+  --duration-500: #{$duration-500};
+  --duration-700: #{$duration-700};
+  --duration-1000: #{$duration-1000};
+
+  // Semantic Transitions
+  --transition-fast: #{$transition-fast};
+  --transition-normal: #{$transition-normal};
+  --transition-slow: #{$transition-slow};
+  --transition-bounce: #{$transition-bounce};
+  --transition-spring: #{$transition-spring};
+}
+
+// Animation Utility Functions
+@function ease($key) {
+  @if map-has-key($ease-scale, $key) {
+    @return map-get($ease-scale, $key);
+  } @else {
+    @warn "Ease key '#{$key}' not found in ease scale";
+    @return $ease-in-out;
+  }
+}
+
+@function duration($key) {
+  @if map-has-key($duration-scale, $key) {
+    @return map-get($duration-scale, $key);
+  } @else {
+    @warn "Duration key '#{$key}' not found in duration scale";
+    @return $duration-200;
+  }
+}
+
+// Animation Mixins
+@mixin transition($properties: all, $duration: 200, $ease: in-out) {
+  transition: #{$properties} duration($duration) ease($ease);
+}
+
+@mixin transition-fast($properties: all) {
+  transition: #{$properties} var(--transition-fast);
+}
+
+@mixin transition-normal($properties: all) {
+  transition: #{$properties} var(--transition-normal);
+}
+
+@mixin transition-slow($properties: all) {
+  transition: #{$properties} var(--transition-slow);
+}
+
+@mixin transition-spring($properties: all) {
+  transition: #{$properties} var(--transition-spring);
+}
+
+@mixin transition-bounce($properties: all) {
+  transition: #{$properties} var(--transition-bounce);
+}
+
+// Animation Keyframes
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Animation Utility Classes
+.animate-fade-in {
+  animation: fade-in var(--duration-200) var(--ease-out);
+}
+
+.animate-fade-out {
+  animation: fade-out var(--duration-200) var(--ease-out);
+}
+
+.animate-slide-in-top {
+  animation: slide-in-from-top var(--duration-300) var(--ease-out);
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-from-bottom var(--duration-300) var(--ease-out);
+}
+
+.animate-slide-in-left {
+  animation: slide-in-from-left var(--duration-300) var(--ease-out);
+}
+
+.animate-slide-in-right {
+  animation: slide-in-from-right var(--duration-300) var(--ease-out);
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-200) var(--ease-out);
+}
+
+.animate-scale-out {
+  animation: scale-out var(--duration-200) var(--ease-out);
+}
+
+.animate-bounce-in {
+  animation: bounce-in var(--duration-500) var(--ease-bounce);
+}
+
+// Transition Utility Classes
+.transition-fast {
+  transition: all var(--transition-fast);
+}
+
+.transition-normal {
+  transition: all var(--transition-normal);
+}
+
+.transition-slow {
+  transition: all var(--transition-slow);
+}
+
+.transition-spring {
+  transition: all var(--transition-spring);
+}
+
+.transition-bounce {
+  transition: all var(--transition-bounce);
+}
+
+.transition-colors {
+  transition: color var(--duration-200) var(--ease-in-out),
+              background-color var(--duration-200) var(--ease-in-out),
+              border-color var(--duration-200) var(--ease-in-out);
+}
+
+.transition-transform {
+  transition: transform var(--duration-200) var(--ease-in-out);
+}
+
+.transition-shadow {
+  transition: box-shadow var(--duration-200) var(--ease-in-out);
+}
+
+// Reduced Motion Support
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-25: 0ms;
+    --duration-50: 0ms;
+    --duration-75: 0ms;
+    --duration-100: 0ms;
+    --duration-150: 0ms;
+    --duration-200: 0ms;
+    --duration-300: 0ms;
+    --duration-500: 0ms;
+    --duration-700: 0ms;
+    --duration-1000: 0ms;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

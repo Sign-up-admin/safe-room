@@ -1,0 +1,316 @@
+// =================================
+// Design Token System - Typography
+// =================================
+
+// Font Families
+$font-family-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-family-mono: "JetBrains Mono", "Fira Code", "SF Mono", Monaco, "Cascadia Code", monospace;
+$font-family-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+// Font Sizes
+$font-size-display-2xl: clamp(2.5rem, 5vw, 4rem);
+$font-size-display-xl: clamp(2rem, 4vw, 3rem);
+$font-size-display-lg: clamp(1.5rem, 3vw, 2.25rem);
+$font-size-display-md: clamp(1.25rem, 2.5vw, 1.875rem);
+$font-size-display-sm: clamp(1.125rem, 2vw, 1.5rem);
+$font-size-body-lg: 1.125rem;
+$font-size-body-md: 1rem;
+$font-size-body-sm: 0.875rem;
+$font-size-body-xs: 0.75rem;
+
+// Font Weights
+$font-weight-thin: 100;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+$font-weight-black: 900;
+
+// Line Heights
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+$line-height-loose: 2;
+
+// Letter Spacing
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
+
+// Typography Scale Map
+$typography-scale: (
+  'h1': (
+    size: $font-size-display-xl,
+    weight: $font-weight-bold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-tight,
+    margin-bottom: 1rem,
+  ),
+  'h2': (
+    size: $font-size-display-lg,
+    weight: $font-weight-bold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-tight,
+    margin-bottom: 0.875rem,
+  ),
+  'h3': (
+    size: $font-size-display-md,
+    weight: $font-weight-semibold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.75rem,
+  ),
+  'h4': (
+    size: $font-size-display-sm,
+    weight: $font-weight-semibold,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.625rem,
+  ),
+  'h5': (
+    size: $font-size-body-lg,
+    weight: $font-weight-medium,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.5rem,
+  ),
+  'h6': (
+    size: $font-size-body-md,
+    weight: $font-weight-medium,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-wide,
+    margin-bottom: 0.5rem,
+  ),
+  'body-large': (
+    size: $font-size-body-lg,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 1rem,
+  ),
+  'body': (
+    size: $font-size-body-md,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 1rem,
+  ),
+  'body-small': (
+    size: $font-size-body-sm,
+    weight: $font-weight-normal,
+    line-height: $line-height-relaxed,
+    letter-spacing: $letter-spacing-normal,
+    margin-bottom: 0.75rem,
+  ),
+  'caption': (
+    size: $font-size-body-xs,
+    weight: $font-weight-normal,
+    line-height: $line-height-normal,
+    letter-spacing: $letter-spacing-wide,
+    margin-bottom: 0.5rem,
+  ),
+  'button': (
+    size: $font-size-body-sm,
+    weight: $font-weight-medium,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-wider,
+    margin-bottom: 0,
+  ),
+  'label': (
+    size: $font-size-body-sm,
+    weight: $font-weight-medium,
+    line-height: $line-height-tight,
+    letter-spacing: $letter-spacing-wider,
+    margin-bottom: 0.25rem,
+  ),
+);
+
+// CSS Custom Properties for Typography
+:root {
+  --font-family-primary: #{$font-family-primary};
+  --font-family-mono: #{$font-family-mono};
+  --font-family-display: #{$font-family-display};
+
+  --font-size-display-2xl: #{$font-size-display-2xl};
+  --font-size-display-xl: #{$font-size-display-xl};
+  --font-size-display-lg: #{$font-size-display-lg};
+  --font-size-display-md: #{$font-size-display-md};
+  --font-size-display-sm: #{$font-size-display-sm};
+  --font-size-body-lg: #{$font-size-body-lg};
+  --font-size-body-md: #{$font-size-body-md};
+  --font-size-body-sm: #{$font-size-body-sm};
+  --font-size-body-xs: #{$font-size-body-xs};
+
+  --font-weight-thin: #{$font-weight-thin};
+  --font-weight-light: #{$font-weight-light};
+  --font-weight-normal: #{$font-weight-normal};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+  --font-weight-extrabold: #{$font-weight-extrabold};
+  --font-weight-black: #{$font-weight-black};
+
+  --line-height-tight: #{$line-height-tight};
+  --line-height-normal: #{$line-height-normal};
+  --line-height-relaxed: #{$line-height-relaxed};
+  --line-height-loose: #{$line-height-loose};
+
+  --letter-spacing-tight: #{$letter-spacing-tight};
+  --letter-spacing-normal: #{$letter-spacing-normal};
+  --letter-spacing-wide: #{$letter-spacing-wide};
+  --letter-spacing-wider: #{$letter-spacing-wider};
+  --letter-spacing-widest: #{$letter-spacing-widest};
+}
+
+// Typography Mixins
+@mixin typography($variant) {
+  $config: map-get($typography-scale, $variant);
+
+  @if $config {
+    font-size: map-get($config, size);
+    font-weight: map-get($config, weight);
+    line-height: map-get($config, line-height);
+    letter-spacing: map-get($config, letter-spacing);
+
+    @if map-has-key($config, margin-bottom) {
+      margin-bottom: map-get($config, margin-bottom);
+    }
+  } @else {
+    @warn "Typography variant '#{$variant}' not found";
+  }
+}
+
+// Heading Mixins
+@mixin heading($level) {
+  @include typography('h#{$level}');
+
+  margin-top: 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-display);
+}
+
+@mixin body-text($size: base) {
+  @include typography('body#{$size}');
+
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+}
+
+@mixin caption-text {
+  @include typography('caption');
+
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-primary);
+}
+
+// Typography Utility Classes
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-tertiary {
+  color: var(--color-text-tertiary);
+}
+
+.text-muted {
+  color: var(--color-text-secondary);
+}
+
+.text-inverse {
+  color: var(--color-text-inverse);
+}
+
+.text-brand {
+  color: var(--color-primary-500);
+}
+
+.text-success {
+  color: var(--color-success-500);
+}
+
+.text-warning {
+  color: var(--color-warning-500);
+}
+
+.text-error {
+  color: var(--color-danger-500);
+}
+
+.text-info {
+  color: var(--color-primary-500);
+}
+
+// Font Weight Utility Classes
+.font-thin {
+  font-weight: $font-weight-thin;
+}
+
+.font-light {
+  font-weight: $font-weight-light;
+}
+
+.font-normal {
+  font-weight: $font-weight-normal;
+}
+
+.font-medium {
+  font-weight: $font-weight-medium;
+}
+
+.font-semibold {
+  font-weight: $font-weight-semibold;
+}
+
+.font-bold {
+  font-weight: $font-weight-bold;
+}
+
+.font-extrabold {
+  font-weight: $font-weight-extrabold;
+}
+
+.font-black {
+  font-weight: $font-weight-black;
+}
+
+// Text Transform Utility Classes
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-none {
+  text-transform: none;
+}
+
+// Responsive Typography
+@media (max-width: 768px) {
+  :root {
+    --font-size-display-2xl: clamp(2rem, 4vw, 3rem);
+    --font-size-display-xl: clamp(1.5rem, 3vw, 2.25rem);
+    --font-size-display-lg: clamp(1.25rem, 2.5vw, 1.875rem);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-display-2xl: clamp(1.75rem, 3vw, 2.5rem);
+    --font-size-display-xl: clamp(1.25rem, 2.5vw, 2rem);
+    --font-size-display-lg: clamp(1.125rem, 2vw, 1.5rem);
+  }
+}

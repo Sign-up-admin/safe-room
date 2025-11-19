@@ -788,7 +788,7 @@ export class ScreenshotErrorHandler {
     options: {
       fullPage?: boolean
       includeTimestamp?: boolean
-      onError?: (error: any, screenshotPath: string) => void
+      onError?: (error: unknown, screenshotPath: string) => void
     } = {}
   ): Promise<T> {
     const { fullPage = true, includeTimestamp = true, onError } = options
@@ -898,10 +898,63 @@ export function takeScreenshotWithTimestamp(
  * 增强的测试监控器
  */
 export class EnhancedTestMonitor {
+  /**
+   * 测试数据接口
+   */
+  interface TestData {
+    name: string
+    startTime: number
+    endTime?: number
+    duration?: number
+    status?: 'passed' | 'failed' | 'skipped'
+    metadata: Record<string, unknown>
+    steps: Array<{
+      name: string
+      timestamp: number
+      status: 'start' | 'success' | 'failure'
+      data?: unknown
+    }>
+    errors: Array<{
+      timestamp: number
+      error: {
+        message: string
+        stack?: string
+        type: string
+      }
+      context?: string
+      categorizedError: CategorizedError
+    }>
+    screenshots: Array<{
+      path: string
+      timestamp: number
+      context?: string
+    }>
+  }
+
+  /**
+   * 错误信息接口
+   */
+  interface ErrorInfo {
+    test: string
+    error: TestData['errors'][0]
+    timestamp: number
+  }
+
+  /**
+   * 性能数据接口
+   */
+  interface PerformanceEntry {
+    testName: string
+    metricName: string
+    value: number
+    unit: string
+    timestamp: number
+  }
+
   private startTime: number
-  private testMetrics: Map<string, any>
-  private errorTracker: Map<string, any[]>
-  private performanceData: any[]
+  private testMetrics: Map<string, TestData>
+  private errorTracker: Map<string, ErrorInfo[]>
+  private performanceData: PerformanceEntry[]
   private screenshotsTaken: string[]
 
   constructor() {
@@ -915,7 +968,7 @@ export class EnhancedTestMonitor {
   /**
    * 开始测试监控
    */
-  startTest(testName: string, metadata: any = {}) {
+  startTest(testName: string, metadata: Record<string, unknown> = {}) {
     const testStart = {
       name: testName,
       startTime: Date.now(),
@@ -932,7 +985,7 @@ export class EnhancedTestMonitor {
   /**
    * 记录测试步骤
    */
-  recordStep(testName: string, stepName: string, status: 'start' | 'success' | 'failure', data?: any) {
+  recordStep(testName: string, stepName: string, status: 'start' | 'success' | 'failure', data?: unknown) {
     const testData = this.testMetrics.get(testName)
     if (!testData) return
 
@@ -952,7 +1005,7 @@ export class EnhancedTestMonitor {
   /**
    * 记录错误
    */
-  recordError(testName: string, error: any, context?: string) {
+  recordError(testName: string, error: unknown, context?: string) {
     const testData = this.testMetrics.get(testName)
     if (!testData) return
 
@@ -1081,7 +1134,7 @@ export class EnhancedTestMonitor {
       metricsByName.get(entry.metricName)!.push(entry.value)
     })
 
-    const averages: any = {}
+    const averages: Record<string, { average: number; min: number; max: number; count: number }> = {}
     metricsByName.forEach((values, name) => {
       averages[name] = {
         average: values.reduce((sum, val) => sum + val, 0) / values.length,
