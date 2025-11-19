@@ -24,7 +24,6 @@ safe-room/
 ├── README.md                          # 项目主文档
 ├── CONTRIBUTING.md                    # 贡献指南
 ├── CHANGELOG.md                       # 变更日志
-├── LICENSE                            # MIT许可证
 ├── docs/                              # 文档体系（80+ 份文档）
 │   ├── README.md                      # 文档导航中心
 │   ├── requirements/                  # 需求文档（计划中）
@@ -148,17 +147,7 @@ npm run check:all:fix  # 前端项目（front/admin）各自执行
 
 ## 许可
 
-本项目采用 [MIT License](LICENSE) 开源协议。
-
-### 许可证说明
-
-MIT License 是一个宽松的开源协议，允许您：
-- ✅ 商业使用
-- ✅ 修改代码
-- ✅ 分发代码
-- ✅ 私人使用
-
-完整的许可证内容请查看 [LICENSE](LICENSE) 文件。
+本项目为专有软件，版权归项目所有者所有。未经授权，不得复制、修改、分发或使用本项目的任何部分。
 
 ### 法律文档
 
